@@ -1,0 +1,32 @@
+{
+    "title":"Haoyang's history",
+    "icon": "./assets/icons/user.svg",
+    "name":"Haoyang Li",
+    "email": "lihaoyangjingzhou@outlook.com",
+    "portrait": {
+        "imgSrc":"./assets/portrait-haoyang.jpg",
+        "url": "https://www.linkedin.com/in/haoyanghowyoung/"
+    },
+    "sections": [
+        {
+            "title":"research",
+            "icon": "./assets/icons/research.svg",
+            "url":"https://greenere.github.io/subpages/research.html"
+        },
+        {
+            "title":"project",
+            "icon": "./assets/icons/project.svg",
+            "url":"https://greenere.github.io/subpages/project.html"
+        },
+        {
+            "title":"timeline",
+            "icon": "./assets/icons/timeline.svg",
+            "url":"https://greenere.github.io/timeline.html"
+        },
+        {
+            "title":"blogs",
+            "icon": "./assets/icons/blogs.svg",
+            "url":"https://greenere.github.io/blogs.html"
+        }
+    ]
+}
