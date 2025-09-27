@@ -41,9 +41,6 @@
   gap: 10px;     
 }
 
-.sectionCard:hover {
-  transform: scale(1.05);
-}
 
 .read-the-docs {
   color: #888;

@@ -14,6 +14,8 @@ interface SectionCardProps {
 const SectionCard: React.FC<SectionCardProps> = ({
     sectionContent
 }) => {
+    const [focused, setFocused] = useState<boolean>(false);
+
     return (
         <div style={{
             margin: "1em 1em",
@@ -25,8 +27,14 @@ const SectionCard: React.FC<SectionCardProps> = ({
             userSelect: "none"
         }}
             className="sectionCard"
-            onClick={(e)=>{
+            onClick={()=>{
                 window.open(sectionContent.url, "_blank")
+            }}
+            onMouseOver={() => {
+                setFocused(true);
+            }}
+            onMouseLeave={() => {
+                setFocused(false);
             }}
         >
             <img style={{
@@ -34,6 +42,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
                 filter: `drop-shadow(1px 1px 1px ${colors.secondary}`,
             }} src={sectionContent.icon}></img>
             <div>{sectionContent.title}</div>
+            {focused && <span>⬆</span>}
         </div >
     )
 }

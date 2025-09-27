@@ -18,10 +18,10 @@ export const Portrait: React.FC<PortraitProps> = ({
         <a
             href={portrait.url}
             target="_blank"
-            onMouseOver={(e) => {
+            onMouseOver={() => {
                 setFocused(true);
             }}
-            onMouseLeave={(e) => {
+            onMouseLeave={() => {
                 setFocused(false);
             }}
         >
