@@ -8,11 +8,13 @@ type SectionContent = {
 }
 
 interface SectionCardProps {
-    sectionContent: SectionContent
+    sectionContent: SectionContent,
+    onClick: ()=>void,
 }
 
 const SectionCard: React.FC<SectionCardProps> = ({
-    sectionContent
+    sectionContent,
+    onClick
 }) => {
     const [focused, setFocused] = useState<boolean>(false);
 
@@ -27,9 +29,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
             userSelect: "none"
         }}
             className="sectionCard"
-            onClick={()=>{
-                window.open(sectionContent.url, "_blank")
-            }}
+            onClick={onClick}
             onMouseOver={() => {
                 setFocused(true);
             }}
