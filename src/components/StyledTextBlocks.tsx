@@ -26,32 +26,38 @@ export const Subtitle: React.FC<{ children: React.ReactNode }> = ({ children }) 
   </div>
 );
 
-export const Paragraph: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const Paragraph: React.FC<{ style?: Record<string, unknown>, children: React.ReactNode }> = ({
+  children,
+  style
+}) => (
   <div
     style={{
       color: `var(--color-text)`,
       fontSize: "0.5rem",
       lineHeight: 1.1,
-      textAlign:"justify",
-      paddingLeft:"1rem",
-      paddingRight:"1rem"
+      paddingLeft: "0.5rem",
+      paddingRight: "0.5rem",
+      ...style
     }}
   >
     {children}
   </div>
 );
 
-export const Footnote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <div
-      style={{
-        color: `var(--color-text)`,
-        fontSize: "0.3rem",
-        lineHeight: 1,
-      }}
-    >
-      {children}
-    </div>
-  );
+export const Footnote: React.FC<{ style?: Record<string, unknown>, children: React.ReactNode }> = ({
+  style,
+  children }) => (
+  <div
+    style={{
+      color: `var(--color-text)`,
+      fontSize: "0.3rem",
+      lineHeight: 1,
+      ...style
+    }}
+  >
+    {children}
+  </div>
+);
 
 export const Quote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <blockquote

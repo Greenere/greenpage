@@ -1,5 +1,4 @@
-import React from "react";
-import { Portrait } from "../components/Portrait";
+import React, { useState } from "react";
 import { Footnote, Paragraph, Subtitle } from "../components/StyledTextBlocks";
 import { Position } from "@xyflow/react";
 import { NodeContainer } from "../components/NodeContainer";
@@ -18,21 +17,29 @@ interface BioNodeProps {
 const BioNode: React.FC<BioNodeProps> = ({
     data, isConnectable
 }) => {
-    console.log(data, isConnectable)
+    const [focused, setFocused] = useState<Boolean>(false);
     return (<>
         <NodeContainer>
             <div style={{
                 paddingTop: "10px"
             }}>
                 <div style={{ position: "relative", display: "inline-block", background: "transparent" }}>
-                    <Portrait
-                        width={50}
-                        portrait={
-                            {
-                                "imgSrc": BIOTHEME[data.theme].imgSrc,
-                                "url": BIOTHEME[data.theme].url
-                            }
-                        } />
+                    <a
+                        href={BIOTHEME[data.theme].url}
+                        target="_blank"
+                        onMouseOver={() => {
+                            setFocused(true);
+                        }}
+                        onMouseLeave={() => {
+                            setFocused(false);
+                        }}
+                    >
+                        <img src={BIOTHEME[data.theme].imgSrc} style={{
+                            width: `50px`,
+                            borderRadius: "50%",
+                            border: `2px solid var(--color-secondary)`
+                        }} />
+                    </a>
 
                     <GreenHandle
                         type="target"

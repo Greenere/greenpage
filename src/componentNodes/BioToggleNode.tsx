@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Position } from "@xyflow/react";
 import { GreenHandle } from "./Handles";
 import { BIOTHEME, type Theme } from "../contents/BioTheme";
+import { themes2color } from "../styles/colors";
 
 interface BioThemeData {
     theme: Theme
@@ -25,6 +26,7 @@ const BioToggleNode: React.FC<BioToggleNodeProps> = ({
             paddingRight: "0.2rem",
             border: `2px solid var(--color-secondary)`,
             borderRadius: "13px",
+            textAlign:"center"
         }}>
             <div style={{
                 fontSize:"0.5rem"
@@ -37,13 +39,13 @@ const BioToggleNode: React.FC<BioToggleNodeProps> = ({
                         <div
                             key={key}
                             style={{
-                                background: BIOTHEME[key as Theme].keyColor,
+                                background: themes2color[key as Theme].primary,
                                 display: 'inline-block',
                                 borderRadius: "50%",
                                 width: "1rem",
                                 height: "1rem",
                                 margin:"0.1rem",
-                                border:`2px ${data.theme == key? 'solid':'dotted'} black`
+                                border:`1px ${data.theme == key? 'solid':'dotted'} var(--color-secondary)`
                             }}
                             onClick={() => {
                                 data.setTheme(key as unknown as Theme)

@@ -16,10 +16,10 @@ type Palette = {
   accent?: string;
 };
 
-const themes2color: Record<Theme, Palette> = {
+export const themes2color: Record<Theme, Palette> = {
   nyc:   { primary: "#373C42", secondary: "#696B6A", background: "#D3B090", text: "#373C42", accent: "#B4B9BD" },
   joshua:  { primary: "#7D8696ff", secondary: "#535360ff", background: "#A19CA0ff", text: "#45444Bff", accent: "#28272Bff" },
-  mty: { primary: "#30648Dff", secondary: "#E3E0E6ff", background: "#6796BEff", text: "#43444Dff", accent: "#43444Dff" },
+  mty: { primary: "#30648Dff", secondary: "#E3E0E6ff", background: "#6796BEff", text: "#E3E0E6ff", accent: "#43444Dff" },
 };
 
 export function applyThemeVars(key: Theme) {

@@ -14,7 +14,7 @@ import '@xyflow/react/dist/style.css';
 import BioNode from '../componentNodes/BioNode';
 import { edgeTypes } from '../componentNodes/EdgeTypes';
 import StoryNode from '../componentNodes/StoryNode';
-import { BlogIntro, EduIntro, ResearchIntro, TravelIntro } from '../contents/Intros';
+import { BlogIntro, EduIntro, ExperienceIntro, ResearchIntro, TravelIntro } from '../contents/Intros';
 import BioToggleNode from '../componentNodes/BioToggleNode';
 import { applyThemeVars } from '../styles/colors';
 import type { Theme } from '../contents/BioTheme';
@@ -108,7 +108,7 @@ const NodeCanvas: React.FC = () => {
             type: "storyNode",
             position: { x: centerX, y: centerY + 200 },
             data: {
-                title: "Experiences", content: <BlogIntro />, handles: [
+                title: "Experiences", content: <ExperienceIntro />, handles: [
                     {
                         id: 'bio-port',
                         type: 'source',
