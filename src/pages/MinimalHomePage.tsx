@@ -48,7 +48,7 @@ function MinimalHomePage() {
     <>
       <div>
         <div>
-          <Portrait highContent={highContent} portrait={homeContent.portrait} />
+          <Portrait  portrait={homeContent.portrait} />
         </div>
         {!highContent && <h2>{homeContent.name}</h2>}
         {/* <ContentPanel open={highContent != undefined}>{highContent}</ContentPanel>*/}

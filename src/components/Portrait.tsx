@@ -7,12 +7,12 @@ type PortraitContent = {
 
 interface PortraitProps {
     portrait: PortraitContent,
-    highContent?: string
+    width?: number
 }
 
 export const Portrait: React.FC<PortraitProps> = ({
     portrait,
-    highContent
+    width
 }) => {
     const [focused, setFocused] = useState<boolean>(false);
 
@@ -28,7 +28,7 @@ export const Portrait: React.FC<PortraitProps> = ({
             }}
         >
             <img src={portrait.imgSrc} style={{
-                width: `${highContent? 100:200}px`,
+                width: `${width? width:100}px`,
                 borderRadius: "50%",
                 filter: `drop-shadow(2px 2px ${focused ? 10 : 5}px rgba(0, 0, 0, 0.5))`,
                 transition: "width 2000ms ease, filter 200ms ease",

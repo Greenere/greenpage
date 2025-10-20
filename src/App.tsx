@@ -1,10 +1,11 @@
 import './App.css'
-import MinimalHomePage from './pages/MinimalHomePage'
+//import MinimalHomePage from './pages/MinimalHomePage'
+import NodeHomePage from './pages/NodeHomePage'
 
 function App() {
   return (
     <>
-     <MinimalHomePage/>
+     <NodeHomePage/>
     </>
   )
 }
