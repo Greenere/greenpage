@@ -1,0 +1,10 @@
+{
+  "title": "Vision Prototype",
+  "subtitle": "Placeholder experiment node",
+  "summary": "A lightweight node for the computer vision work that sat between theory, implementation, and demo-making.",
+  "tags": ["vision", "prototype"],
+  "detail": [
+    { "type": "text", "text": "Placeholder: this could hold demos, experiment snapshots, and implementation notes." },
+    { "type": "list", "items": ["Detection", "Evaluation", "Prototype results"] }
+  ]
+}

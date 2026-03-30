@@ -1,0 +1,25 @@
+{
+  "title": "History Writing",
+  "subtitle": "Essays from outside the technical track",
+  "summary": "A parallel writing thread focused on history rather than engineering, with essays on war, territory, and long arcs of political change.",
+  "tags": ["history", "essay"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "This node keeps the graph from collapsing into only study and work. The old site also made room for essays driven by curiosity about history, geography, and the movement of states and ideas over time."
+    },
+    {
+      "type": "list",
+      "items": [
+        "The Ripples of War",
+        "A history essay on the territorial changes of China",
+        "A quieter humanities thread alongside technical writing"
+      ]
+    },
+    {
+      "type": "link",
+      "label": "Old blog index",
+      "href": "https://greenere.github.io/blogs.html"
+    }
+  ]
+}

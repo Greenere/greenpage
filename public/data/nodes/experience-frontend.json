@@ -1,0 +1,10 @@
+{
+  "title": "Frontend Shipping",
+  "subtitle": "Placeholder product node",
+  "summary": "A node for product-facing engineering work where interfaces, iteration speed, and clarity matter most.",
+  "tags": ["frontend", "product"],
+  "detail": [
+    { "type": "text", "text": "Placeholder: this could later grow into project stories, shipped features, and design-engineering links." },
+    { "type": "list", "items": ["User-facing polish", "Interface tradeoffs", "Fast iteration"] }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Noise Modulation",
+  "subtitle": "Interpretability and robustness study",
+  "summary": "An unpublished paper proposing a lightweight way to recover cleaner, more interpretable input gradients without full adversarial training.",
+  "tags": ["interpretability", "robustness"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "The idea was to multiply images with learned noise during training. That pushed the model to rely on the truly critical components, cleaning up the gradient signal at the cost of some accuracy."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Worked on with Xinggang Wang",
+        "Cheap alternative to one aspect of adversarial training",
+        "Interesting result, but not publishable in its current form"
+      ]
+    }
+  ]
+}

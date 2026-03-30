@@ -1,0 +1,20 @@
+{
+  "title": "Oxford Summer School",
+  "subtitle": "Knowledge Representation, Aug. 2018",
+  "summary": "A short academic branch at Oriel College that widened the undergraduate horizon before the later research-heavy years.",
+  "tags": ["Oxford", "summer school"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "The old resume lists this as a summer school in knowledge representation at Oriel College, Oxford."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Oriel College",
+        "Knowledge representation",
+        "A brief international academic detour"
+      ]
+    }
+  ]
+}

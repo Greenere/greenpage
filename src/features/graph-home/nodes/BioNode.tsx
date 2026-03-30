@@ -1,27 +1,47 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { Footnote, Paragraph, Subtitle } from "../../../shared/ui/StyledTextBlocks";
-import { Position } from "@xyflow/react";
+import { Position, useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
-import { GreenHandle } from "./Handles";
+import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
 import { type Theme, BIOTHEME } from "../content/BioTheme";
 
 interface BioData {
     theme: Theme
+    handles?: DynamicHandle[]
+    portraitConnected?: boolean
 }
 
 interface BioNodeProps {
+    id: string,
     data: BioData,
     isConnectable: boolean
 }
 
 const BioNode: React.FC<BioNodeProps> = ({
+    id,
     data, isConnectable: _isConnectable
 }) => {
     const [focused, setFocused] = useState<boolean>(false);
+    const updateNodeInternals = useUpdateNodeInternals();
+
+    useLayoutEffect(() => {
+        updateNodeInternals(id);
+    }, [data.handles, data.portraitConnected, id, updateNodeInternals]);
+
     return (<>
-        <NodeContainer>
+        <NodeContainer
+            style={{
+                minWidth: "12rem",
+                maxWidth: "12rem",
+                minHeight: "14rem",
+                paddingLeft: "1rem",
+                paddingRight: "1rem",
+                paddingBottom: "1.25rem",
+                background: "color-mix(in srgb, var(--color-background) 90%, white 10%)",
+            }}
+        >
             <div style={{
-                paddingTop: "10px"
+                paddingTop: "1.1rem"
             }}>
                 <div style={{ position: "relative", display: "inline-block", background: "transparent" }}>
                     <a
@@ -35,10 +55,12 @@ const BioNode: React.FC<BioNodeProps> = ({
                         }}
                     >
                         <img src={BIOTHEME[data.theme].imgSrc} style={{
-                            width: `50px`,
+                            width: `96px`,
+                            height: `96px`,
+                            objectFit: "cover",
                             borderRadius: "50%",
                             border: `2px solid var(--color-secondary)`,
-                            filter: `saturate(${focused ? 1.1 : 1}) brightness(${focused ? 1.03 : 1})`
+                            filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`
                         }} />
                     </a>
 
@@ -46,64 +68,43 @@ const BioNode: React.FC<BioNodeProps> = ({
                         type="target"
                         id="portrait-port"
                         position={Position.Right}
+                        hidden={!data.portraitConnected}
                         style={{
                             top: "50%"
                         }}
                     />
                 </div>
-                <Subtitle>
-                    Haoyang Li
-                </Subtitle>
-                <Paragraph>
+                <div style={{ marginTop: "0.7rem" }}>
+                    <Subtitle>
+                        Haoyang Li
+                    </Subtitle>
+                </div>
+                <Paragraph style={{
+                    marginTop: "0.5rem",
+                    fontSize: "0.54rem",
+                    lineHeight: 1.16,
+                    textAlign: "center",
+                    textJustify: "auto",
+                }}>
                     I am a Software Engineer based in San Francisco Bay Area
                 </Paragraph>
-                <div style={{ paddingTop: "0.2rem" }}>
-                    <Footnote>lihaoyangjingzhou@outlook.com</Footnote>
+                <div style={{ paddingTop: "0.35rem" }}>
+                    <Footnote style={{ opacity: 0.84 }}>lihaoyangjingzhou@outlook.com</Footnote>
                 </div>
             </div>
 
-            <GreenHandle
-                type="target"
-                id="research-port"
-                position={Position.Left}
-                style={{
-                    top: "30%"
-                }}
-            />
-            <GreenHandle
-                type="target"
-                id="education-port"
-                position={Position.Left}
-                style={{
-                    top: "60%"
-                }}
-            />
-            <GreenHandle
-                type="target"
-                id="blog-port"
-                position={Position.Right}
-                style={{
-                    top: "75%"
-                }}
-            />
-            <GreenHandle
-                type="target"
-                id="travel-port"
-                position={Position.Right}
-                style={{
-                    top: "50%"
-                }}
-            />
-            <GreenHandle
-                type="target"
-                id="experience-port"
-                position={Position.Bottom}
-                style={{
-                    left: "50%"
-                }}
-            />
+            {(data.handles ?? []).map((handle) => (
+                <GreenHandle
+                    key={handle.id}
+                    id={handle.id}
+                    type={handle.type}
+                    position={sideToPosition(handle.side)}
+                    hidden={handle.hidden}
+                    style={sideToStyle(handle.side, handle.offset)}
+                />
+            ))}
         </NodeContainer>
     </>)
 }
 
-export default BioNode;
+export default React.memo(BioNode);

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Position } from "@xyflow/react";
 import { GreenHandle } from "./Handles";
 import { BIOTHEME, type Theme } from "../content/BioTheme";
@@ -17,7 +17,6 @@ interface BioToggleNodeProps {
 const BioToggleNode: React.FC<BioToggleNodeProps> = ({
     data, isConnectable: _isConnectable
 }) => {
-    const randomPos = useMemo(() => { return 30 + Math.random() * 50 }, [])
     return (<>
         <div style={{
             width:"10rem",
@@ -58,11 +57,11 @@ const BioToggleNode: React.FC<BioToggleNodeProps> = ({
                 id="bio-toggle-port"
                 position={Position.Bottom}
                 style={{
-                    left: `${randomPos}%`
+                    left: "50%"
                 }}
             />
         </div>
     </>)
 }
 
-export default BioToggleNode;
+export default React.memo(BioToggleNode);

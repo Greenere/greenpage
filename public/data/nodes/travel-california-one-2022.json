@@ -1,0 +1,22 @@
+{
+  "title": "California State Route 1",
+  "subtitle": "A coastal drive during the Verily summer",
+  "summary": "A Pacific coast travel node tied to the California internship period, with a scenic route through places like Half Moon Bay, Santa Cruz, Monterey, and 17-Mile Drive.",
+  "tags": ["travel", "coast"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "Among the old travel artifacts, this one is especially visual. It reads more like a route sketch than a diary entry: coastlines, viewpoints, and a day-long line from the Bay toward Monterey during the Verily summer."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Half Moon Bay",
+        "Santa Cruz",
+        "Monterey",
+        "17-Mile Drive",
+        "May 29, 2022"
+      ]
+    }
+  ]
+}

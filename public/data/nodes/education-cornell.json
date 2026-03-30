@@ -1,0 +1,20 @@
+{
+  "title": "Cornell M.Eng. in ECE",
+  "subtitle": "Graduate study in Ithaca",
+  "summary": "The Cornell period connected data visualization, machine learning, systems, and the path from internship to full-time work at Verily.",
+  "tags": ["Cornell", "graduate"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "Coursework and projects stretched across visualization, vision, and systems. Life in Ithaca also opened into travel and, later, work in California."
+    },
+    {
+      "type": "list",
+      "items": [
+        "INFO 5100 data visualization projects",
+        "CS 6670 and ECE project work",
+        "Bridge into the Verily internship"
+      ]
+    }
+  ]
+}

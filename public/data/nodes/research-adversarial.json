@@ -1,0 +1,10 @@
+{
+  "title": "Adversarial ML Notes",
+  "subtitle": "Placeholder project node",
+  "summary": "A research thread around robustness, attacks, and why models fail in ways humans still find surprising.",
+  "tags": ["robustness", "models"],
+  "detail": [
+    { "type": "text", "text": "Placeholder: this could expand into a paper list, experiments, or a small reading graph." },
+    { "type": "list", "items": ["Attack setup", "Failure modes", "What felt elegant"] }
+  ]
+}

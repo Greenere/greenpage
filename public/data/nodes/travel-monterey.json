@@ -1,0 +1,10 @@
+{
+  "title": "Monterey Coast",
+  "subtitle": "Ocean-facing placeholder",
+  "summary": "A travel node for slower coastal movement, photography, and reflection that can cross into writing.",
+  "tags": ["coast", "reflection"],
+  "detail": [
+    { "type": "text", "text": "Placeholder: this could later become a trip journal, gallery, or map-based story." },
+    { "type": "list", "items": ["Coastal scenes", "Quiet pacing", "Sketches for future posts"] }
+  ]
+}

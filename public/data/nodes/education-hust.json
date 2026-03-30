@@ -1,0 +1,20 @@
+{
+  "title": "HUST Electronic and Information Engineering",
+  "subtitle": "Bachelor's degree, 2016-2020",
+  "summary": "The undergraduate base where software, computer vision, modeling, and student-organization work first started to braid together.",
+  "tags": ["HUST", "undergraduate"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "I graduated in the top 10 with a 3.91/4.0 GPA. Research, contests, design work, and course projects gradually pulled the path toward machine learning and software."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Electronic and Information Engineering",
+        "Research and capstone project work",
+        "Student associations and design work"
+      ]
+    }
+  ]
+}

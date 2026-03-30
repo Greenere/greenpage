@@ -1,0 +1,20 @@
+{
+  "title": "Signature Verification Attack",
+  "subtitle": "Black-box adversarial ML research",
+  "summary": "A research thread on region-restricted black-box attacks against handwritten signature verification that later became a Pattern Recognition paper.",
+  "tags": ["adversarial ML", "signature"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "The work started from a course interest in adversarial examples. It focused on keeping perturbations inside the stroke region, so they stayed hard to notice and survived background cleaning."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Started in 2019 in Wei Yuan's lab",
+        "Published in Pattern Recognition, 2021",
+        "Region-restricted perturbations for cleaner attacks"
+      ]
+    }
+  ]
+}

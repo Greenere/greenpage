@@ -7,10 +7,11 @@ function DottedEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, ta
       id={id}
       path={path}
       style={{
-        ...style,
         strokeDasharray: "4 2",
         stroke: `var(--color-secondary)`,
         strokeWidth: 2,
+        strokeLinecap: "butt",
+        ...style,
       }}
     />
   );

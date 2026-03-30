@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
     ReactFlow,
     type Node,
@@ -8,16 +8,26 @@ import {
     useReactFlow,
     type NodeMouseHandler,
     ReactFlowProvider,
-    type ReactFlowInstance,
 } from '@xyflow/react';
+import { forceCollide, forceLink, forceManyBody, forceSimulation, forceX, forceY } from 'd3-force';
 import '@xyflow/react/dist/style.css';
 import BioNode from './nodes/BioNode';
 import { edgeTypes } from './nodes/EdgeTypes';
 import StoryNode from './nodes/StoryNode';
-import { BlogIntro, EduIntro, ExperienceIntro, ResearchIntro, TravelIntro } from './content/Intros';
 import BioToggleNode from './nodes/BioToggleNode';
+import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
 import type { Theme } from './content/BioTheme';
+import {
+    type DomainId,
+    type GraphContentNode,
+    type GraphModel,
+    getContentNodes,
+    getDisplayDomain,
+    getDomainLayout,
+    getGraphRelations,
+    loadGraphModel,
+} from './content/Nodes';
 
 const nodeTypes = {
     bioNode: BioNode,
@@ -25,289 +35,1203 @@ const nodeTypes = {
     storyNode: StoryNode
 };
 
-const half = (n: number) => n / 2;
-const sign = (n: number) => (n < 0 ? -1 : n > 0 ? 1 : 1);
+type Point = { x: number; y: number };
+
+type StoryNodeData = {
+    nodeRole: 'content';
+    nodeId: string;
+    domain: DomainId;
+    domainTag: string;
+    handles?: DynamicHandle[];
+    title: string;
+    subtitle?: string;
+    summary: string;
+    detail?: GraphContentNode['detail'];
+    badges?: string[];
+};
+
+type SimulationNode = {
+    id: string;
+    x: number;
+    y: number;
+    targetX: number;
+    targetY: number;
+    fx?: number;
+    fy?: number;
+};
+
+const CONTENT_NODE_WIDTH = 176;
+const CONTENT_NODE_HEIGHT = 146;
+const BIO_NODE_WIDTH = 264;
+const BIO_NODE_HEIGHT = 220;
+const BIO_COLLISION_RADIUS = 182;
+const CONTENT_COLLISION_PADDING = 18;
+const BIO_COLLISION_PADDING = 24;
+const TOGGLE_COLLISION_PADDING = 10;
+const CONTENT_FORCE_COLLISION_RADIUS = 118;
+const TOGGLE_NODE_WIDTH = 160;
+const TOGGLE_NODE_HEIGHT = 54;
+const HANDLE_MARGIN = 0.14;
+const PREFERRED_HANDLE_GAP = 0.11;
+const HANDLE_SMOOTHING = 0.35;
+
+type ProjectedHandle = DynamicHandle & {
+    nodeId: string;
+    desiredOffset: number;
+};
+
+const EMPTY_HANDLES: DynamicHandle[] = [];
+const COLLISION_CELL_SIZE = 220;
+
+type BoxState = {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    pad: number;
+};
 
 function sizeOf(n: Node) {
-    const w = (n.measured?.width ?? n.width ?? 220);
-    const h = (n.measured?.height ?? n.height ?? 120);
+    const w = (n.measured?.width ?? n.width ?? CONTENT_NODE_WIDTH);
+    const h = (n.measured?.height ?? n.height ?? CONTENT_NODE_HEIGHT);
     return { w, h };
+}
+
+function half(n: number) {
+    return n / 2;
+}
+
+function sign(n: number) {
+    return n < 0 ? -1 : n > 0 ? 1 : 1;
 }
 
 function mtvSeparateAABB(
     ax: number, ay: number, aw: number, ah: number,
     bx: number, by: number, bw: number, bh: number
 ): [number, number] {
-    const acx = ax + half(aw), acy = ay + half(ah);
-    const bcx = bx + half(bw), bcy = by + half(bh);
+    const acx = ax + half(aw);
+    const acy = ay + half(ah);
+    const bcx = bx + half(bw);
+    const bcy = by + half(bh);
 
     const overlapX = half(aw) + half(bw) - Math.abs(acx - bcx);
     const overlapY = half(ah) + half(bh) - Math.abs(acy - bcy);
 
-    if (overlapX <= 0 || overlapY <= 0) return [0, 0]; // no overlap
+    if (overlapX <= 0 || overlapY <= 0) return [0, 0];
 
     if (overlapX < overlapY) {
-        const dir = sign(bcx - acx);
-        return [dir * overlapX, 0];
-    } else {
-        const dir = sign(bcy - acy);
-        return [0, dir * overlapY];
+        return [sign(bcx - acx) * overlapX, 0];
+    }
+
+    return [0, sign(bcy - acy) * overlapY];
+}
+
+function getCollisionCellKey(x: number, y: number) {
+    return `${x}:${y}`;
+}
+
+function getExpandedBox(box: BoxState) {
+    return {
+        x: box.x - box.pad,
+        y: box.y - box.pad,
+        w: box.w + box.pad * 2,
+        h: box.h + box.pad * 2,
+    };
+}
+
+function getCollisionCellBounds(box: BoxState, cellSize: number) {
+    const expanded = getExpandedBox(box);
+    return {
+        minX: Math.floor(expanded.x / cellSize),
+        maxX: Math.floor((expanded.x + expanded.w) / cellSize),
+        minY: Math.floor(expanded.y / cellSize),
+        maxY: Math.floor((expanded.y + expanded.h) / cellSize),
+    };
+}
+
+function buildCollisionIndex(pos: Map<string, BoxState>, cellSize: number) {
+    const buckets = new Map<string, string[]>();
+
+    for (const [id, box] of pos) {
+        const bounds = getCollisionCellBounds(box, cellSize);
+
+        for (let x = bounds.minX; x <= bounds.maxX; x++) {
+            for (let y = bounds.minY; y <= bounds.maxY; y++) {
+                const key = getCollisionCellKey(x, y);
+                const existing = buckets.get(key) ?? [];
+                existing.push(id);
+                buckets.set(key, existing);
+            }
+        }
+    }
+
+    return buckets;
+}
+
+function getPotentialCollisionIds(id: string, box: BoxState, index: Map<string, string[]>, cellSize: number) {
+    const bounds = getCollisionCellBounds(box, cellSize);
+    const candidates = new Set<string>();
+
+    for (let x = bounds.minX; x <= bounds.maxX; x++) {
+        for (let y = bounds.minY; y <= bounds.maxY; y++) {
+            for (const candidateId of index.get(getCollisionCellKey(x, y)) ?? []) {
+                if (candidateId !== id) {
+                    candidates.add(candidateId);
+                }
+            }
+        }
+    }
+
+    return candidates;
+}
+
+function relaxBoxPositions(
+    pos: Map<string, BoxState>,
+    {
+        immovableIds,
+        maxIters,
+        damping,
+        maxStep,
+        cellSize = COLLISION_CELL_SIZE,
+    }: {
+        immovableIds?: Set<string>;
+        maxIters: number;
+        damping: number;
+        maxStep: number;
+        cellSize?: number;
+    }
+) {
+    for (let iter = 0; iter < maxIters; iter++) {
+        let movedAny = false;
+        const collisionIndex = buildCollisionIndex(pos, cellSize);
+
+        for (const [bid, bp] of pos) {
+            if (immovableIds?.has(bid)) continue;
+
+            const candidateIds = getPotentialCollisionIds(bid, bp, collisionIndex, cellSize);
+
+            for (const aid of candidateIds) {
+                const ap = pos.get(aid);
+                if (!ap) continue;
+                const expandedA = getExpandedBox(ap);
+                const expandedB = getExpandedBox(bp);
+
+                const [dx, dy] = mtvSeparateAABB(
+                    expandedA.x,
+                    expandedA.y,
+                    expandedA.w,
+                    expandedA.h,
+                    expandedB.x,
+                    expandedB.y,
+                    expandedB.w,
+                    expandedB.h
+                );
+                if (dx === 0 && dy === 0) continue;
+
+                const nextX = bp.x + Math.max(-maxStep, Math.min(maxStep, dx * damping));
+                const nextY = bp.y + Math.max(-maxStep, Math.min(maxStep, dy * damping));
+
+                if (nextX !== bp.x || nextY !== bp.y) {
+                    bp.x = nextX;
+                    bp.y = nextY;
+                    movedAny = true;
+                }
+            }
+        }
+
+        if (!movedAny) break;
     }
 }
 
+function getNodeDimensions(node: Node) {
+    if (node.id === 'bio') {
+        return { w: BIO_NODE_WIDTH, h: BIO_NODE_HEIGHT };
+    }
 
-const NodeCanvas: React.FC = () => {
-    const [theme, setTheme] = useState<string>('nyc');
+    if (node.id === 'biotoggle') {
+        return { w: TOGGLE_NODE_WIDTH, h: TOGGLE_NODE_HEIGHT };
+    }
 
-    const centerX = window.innerWidth / 2 - 90;
-    const centerY = window.innerHeight / 2 - 50;
-    const initialNodes: Node[] = [
+    return sizeOf(node);
+}
+
+function getCollisionPadding(nodeId: string) {
+    if (nodeId === 'bio') return BIO_COLLISION_PADDING;
+    if (nodeId === 'biotoggle') return TOGGLE_COLLISION_PADDING;
+    return CONTENT_COLLISION_PADDING;
+}
+
+function getCenter(node: Node) {
+    const { w, h } = getNodeDimensions(node);
+    return {
+        x: node.position.x + half(w),
+        y: node.position.y + half(h),
+    };
+}
+
+function clampOffset(offset: number) {
+    return Math.max(HANDLE_MARGIN, Math.min(1 - HANDLE_MARGIN, offset));
+}
+
+function projectHandleToBoundary(node: Node, toward: Point) {
+    const { w, h } = getNodeDimensions(node);
+    const center = getCenter(node);
+    const halfWidth = w / 2;
+    const halfHeight = h / 2;
+    const dx = toward.x - center.x;
+    const dy = toward.y - center.y;
+
+    if (dx === 0 && dy === 0) {
+        return {
+            side: 'right' as const,
+            offset: 0.5,
+        };
+    }
+
+    const scale = 1 / Math.max(Math.abs(dx) / halfWidth, Math.abs(dy) / halfHeight);
+    const edgeX = center.x + dx * scale;
+    const edgeY = center.y + dy * scale;
+    const left = node.position.x;
+    const top = node.position.y;
+    const right = left + w;
+    const epsilon = 0.5;
+
+    if (Math.abs(edgeX - left) < epsilon) {
+        return {
+            side: 'left' as const,
+            offset: clampOffset((edgeY - top) / h),
+        };
+    }
+    if (Math.abs(edgeX - right) < epsilon) {
+        return {
+            side: 'right' as const,
+            offset: clampOffset((edgeY - top) / h),
+        };
+    }
+    if (Math.abs(edgeY - top) < epsilon) {
+        return {
+            side: 'top' as const,
+            offset: clampOffset((edgeX - left) / w),
+        };
+    }
+
+    return {
+        side: 'bottom' as const,
+        offset: clampOffset((edgeX - left) / w),
+    };
+}
+
+function spreadProjectedHandles(handles: ProjectedHandle[]) {
+    if (handles.length === 0) return [];
+    if (handles.length === 1) {
+        return [{ ...handles[0], offset: clampOffset(handles[0].desiredOffset) }];
+    }
+
+    const sorted = [...handles].sort((left, right) => left.desiredOffset - right.desiredOffset);
+    const maxGap = (1 - HANDLE_MARGIN * 2) / (sorted.length - 1);
+    const gap = Math.min(PREFERRED_HANDLE_GAP, maxGap);
+    const offsets = sorted.map((handle) => clampOffset(handle.desiredOffset));
+
+    for (let index = 1; index < offsets.length; index++) {
+        offsets[index] = Math.max(offsets[index], offsets[index - 1] + gap);
+    }
+
+    const overflow = offsets[offsets.length - 1] - (1 - HANDLE_MARGIN);
+    if (overflow > 0) {
+        for (let index = 0; index < offsets.length; index++) {
+            offsets[index] -= overflow;
+        }
+    }
+
+    for (let index = offsets.length - 2; index >= 0; index--) {
+        offsets[index] = Math.min(offsets[index], offsets[index + 1] - gap);
+    }
+
+    const underflow = HANDLE_MARGIN - offsets[0];
+    if (underflow > 0) {
+        for (let index = 0; index < offsets.length; index++) {
+            offsets[index] += underflow;
+        }
+    }
+
+    return sorted.map((handle, index) => ({
+        ...handle,
+        offset: clampOffset(offsets[index]),
+    }));
+}
+
+function getExistingHandleLookup(nodes: Node[]) {
+    const lookup = new Map<string, DynamicHandle>();
+
+    for (const node of nodes) {
+        if (!node.data || typeof node.data !== 'object') continue;
+        const data = node.data as { handles?: unknown };
+        if (!Array.isArray(data.handles)) continue;
+
+        for (const handle of data.handles) {
+            if (!handle || typeof handle !== 'object') continue;
+            const candidate = handle as Partial<DynamicHandle>;
+            if (
+                typeof candidate.id === 'string' &&
+                typeof candidate.offset === 'number' &&
+                (candidate.type === 'source' || candidate.type === 'target') &&
+                (candidate.side === 'left' || candidate.side === 'right' || candidate.side === 'top' || candidate.side === 'bottom')
+            ) {
+                lookup.set(`${node.id}:${candidate.id}`, candidate as DynamicHandle);
+            }
+        }
+    }
+
+    return lookup;
+}
+
+function smoothProjectedHandle(handle: ProjectedHandle, previousHandles: Map<string, DynamicHandle>) {
+    const previous = previousHandles.get(`${handle.nodeId}:${handle.id}`);
+    if (!previous || previous.side !== handle.side) {
+        return handle;
+    }
+
+    return {
+        ...handle,
+        desiredOffset: clampOffset(previous.offset + (handle.desiredOffset - previous.offset) * HANDLE_SMOOTHING),
+    };
+}
+
+function areHandlesEqual(left: DynamicHandle[] | undefined, right: DynamicHandle[] | undefined) {
+    const safeLeft = left ?? EMPTY_HANDLES;
+    const safeRight = right ?? EMPTY_HANDLES;
+
+    if (safeLeft.length !== safeRight.length) {
+        return false;
+    }
+
+    for (let index = 0; index < safeLeft.length; index++) {
+        const leftHandle = safeLeft[index];
+        const rightHandle = safeRight[index];
+
+        if (
+            leftHandle.id !== rightHandle.id ||
+            leftHandle.type !== rightHandle.type ||
+            leftHandle.side !== rightHandle.side ||
+            leftHandle.hidden !== rightHandle.hidden ||
+            Math.abs(leftHandle.offset - rightHandle.offset) > 0.0001
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function applyHandlesToNodes(nodes: Node[], handles: ProjectedHandle[]) {
+    const handlesByNode = new Map<string, DynamicHandle[]>();
+    const handlesByNodeSide = new Map<string, ProjectedHandle[]>();
+
+    for (const handle of handles) {
+        const key = `${handle.nodeId}:${handle.side}`;
+        const group = handlesByNodeSide.get(key) ?? [];
+        group.push(handle);
+        handlesByNodeSide.set(key, group);
+    }
+
+    for (const groupedHandles of handlesByNodeSide.values()) {
+        const resolved = spreadProjectedHandles(groupedHandles);
+        for (const handle of resolved) {
+            const existing = handlesByNode.get(handle.nodeId) ?? [];
+            existing.push({
+                id: handle.id,
+                type: handle.type,
+                side: handle.side,
+                offset: handle.offset,
+            });
+            handlesByNode.set(handle.nodeId, existing);
+        }
+    }
+
+    return nodes.map((node) => {
+        const nextHandles = handlesByNode.get(node.id) ?? EMPTY_HANDLES;
+        const currentData = (node.data ?? {}) as { handles?: DynamicHandle[]; portraitConnected?: boolean };
+        const portraitConnected = node.id === 'bio' ? true : currentData.portraitConnected;
+
+        if (areHandlesEqual(currentData.handles, nextHandles) && currentData.portraitConnected === portraitConnected) {
+            return node;
+        }
+
+        return {
+            ...node,
+            data: {
+                ...node.data,
+                ...(node.id === 'bio' ? { portraitConnected: true } : null),
+                handles: nextHandles,
+            },
+        };
+    });
+}
+
+function buildEdgeStyle(edge: Pick<Edge, 'source' | 'target'>, highlightedNodeId: string | null) {
+    const highlighted = Boolean(highlightedNodeId && (edge.source === highlightedNodeId || edge.target === highlightedNodeId));
+
+    return {
+        opacity: 1,
+        strokeDasharray: highlighted ? 'none' : '4 2',
+        strokeWidth: highlighted ? 2.35 : 2,
+    };
+}
+
+function areEdgeStylesEqual(left: Edge['style'], right: Edge['style']) {
+    const safeLeft = left ?? {};
+    const safeRight = right ?? {};
+    const leftKeys = Object.keys(safeLeft);
+    const rightKeys = Object.keys(safeRight);
+    const leftRecord = safeLeft as Record<string, unknown>;
+    const rightRecord = safeRight as Record<string, unknown>;
+
+    if (leftKeys.length !== rightKeys.length) {
+        return false;
+    }
+
+    return leftKeys.every((key) => leftRecord[key] === rightRecord[key]);
+}
+
+function reuseEdgeIfPossible(previous: Edge | undefined, next: Edge, highlightedNodeId: string | null) {
+    const nextStyle = buildEdgeStyle(next, highlightedNodeId);
+
+    if (
+        previous &&
+        previous.source === next.source &&
+        previous.target === next.target &&
+        previous.sourceHandle === next.sourceHandle &&
+        previous.targetHandle === next.targetHandle &&
+        previous.type === next.type &&
+        areEdgeStylesEqual(previous.style, nextStyle)
+    ) {
+        return previous;
+    }
+
+    return {
+        ...next,
+        style: nextStyle,
+    };
+}
+
+function applyEdgeOpacity(edges: Edge[], highlightedNodeId: string | null) {
+    return edges.map((edge) => {
+        const nextStyle = buildEdgeStyle(edge, highlightedNodeId);
+
+        if (areEdgeStylesEqual(edge.style, nextStyle)) {
+            return edge;
+        }
+
+        return {
+            ...edge,
+            style: nextStyle,
+        };
+    });
+}
+
+function getDomainPairKey(left: DomainId, right: DomainId) {
+    return left < right ? `${left}|${right}` : `${right}|${left}`;
+}
+
+function permuteDomainOrder(domains: DomainId[]) {
+    const results: DomainId[][] = [];
+    const current: DomainId[] = [];
+    const used = new Array(domains.length).fill(false);
+
+    function walk() {
+        if (current.length === domains.length) {
+            results.push([...current]);
+            return;
+        }
+
+        for (let index = 0; index < domains.length; index++) {
+            if (used[index]) continue;
+            used[index] = true;
+            current.push(domains[index]);
+            walk();
+            current.pop();
+            used[index] = false;
+        }
+    }
+
+    walk();
+    return results;
+}
+
+function buildDomainLaneOrder(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
+    const domains = [...new Set(contentNodes.map((node) => node.domain))] as DomainId[];
+    const fallbackOrder = [...domains].sort((left, right) => getDomainLayout(left).seedAngle - getDomainLayout(right).seedAngle);
+    const fallbackIndex = new Map(fallbackOrder.map((domain, index) => [domain, index]));
+    const nodeById = new Map(contentNodes.map((node) => [node.id, node]));
+    const affinity = new Map<string, number>();
+
+    for (const relation of graphRelations) {
+        const fromNode = nodeById.get(relation.from);
+        const toNode = nodeById.get(relation.to);
+        if (!fromNode || !toNode || fromNode.domain === toNode.domain) continue;
+
+        const key = getDomainPairKey(fromNode.domain, toNode.domain);
+        const relationWeight =
+            relation.kind === 'reason' || relation.kind === 'outcome'
+                ? 1.35
+                : relation.kind === 'topic' || relation.kind === 'tool'
+                    ? 1.2
+                    : relation.kind === 'time'
+                        ? 1.05
+                        : 1;
+        affinity.set(key, (affinity.get(key) ?? 0) + relation.strength * relationWeight);
+    }
+
+    let bestOrder = fallbackOrder;
+    let bestScore = Number.NEGATIVE_INFINITY;
+
+    for (const order of permuteDomainOrder(fallbackOrder)) {
+        let score = 0;
+
+        for (let index = 0; index < order.length - 1; index++) {
+            score += (affinity.get(getDomainPairKey(order[index], order[index + 1])) ?? 0) * 6;
+        }
+
+        for (let index = 0; index < order.length; index++) {
+            score -= Math.abs((fallbackIndex.get(order[index]) ?? index) - index) * 0.85;
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestOrder = order;
+        }
+    }
+
+    return bestOrder;
+}
+
+function normalizeAngle(angle: number) {
+    let normalized = angle;
+
+    while (normalized <= -Math.PI) normalized += Math.PI * 2;
+    while (normalized > Math.PI) normalized -= Math.PI * 2;
+
+    return normalized;
+}
+
+function getAngularDistance(left: number, right: number) {
+    return Math.abs(normalizeAngle(left - right));
+}
+
+function rotateDomains(domains: DomainId[], offset: number) {
+    return domains.map((_, index) => domains[(index + offset) % domains.length]);
+}
+
+function buildDomainWeights(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
+    const weights = new Map<DomainId, number>();
+    const nodeById = new Map(contentNodes.map((node) => [node.id, node]));
+
+    for (const node of contentNodes) {
+        weights.set(node.domain, (weights.get(node.domain) ?? 0) + 1.3);
+    }
+
+    for (const relation of graphRelations) {
+        const fromNode = nodeById.get(relation.from);
+        const toNode = nodeById.get(relation.to);
+        if (!fromNode || !toNode || fromNode.domain === toNode.domain) continue;
+
+        const relationWeight =
+            relation.kind === 'reason' || relation.kind === 'outcome'
+                ? 0.55
+                : relation.kind === 'topic' || relation.kind === 'tool'
+                    ? 0.45
+                    : 0.3;
+
+        weights.set(fromNode.domain, (weights.get(fromNode.domain) ?? 1) + relation.strength * relationWeight);
+        weights.set(toNode.domain, (weights.get(toNode.domain) ?? 1) + relation.strength * relationWeight);
+    }
+
+    return weights;
+}
+
+function buildLaneAnglePlan(
+    orderedDomains: DomainId[],
+    domainWeights: Map<DomainId, number>,
+    baseArcStart: number,
+    totalArcSpan: number
+) {
+    const laneGap = Math.min(0.18, totalArcSpan / Math.max(18, orderedDomains.length * 4.5));
+    const usableArcSpan = totalArcSpan - laneGap * Math.max(0, orderedDomains.length - 1);
+    const totalWeight = orderedDomains.reduce((sum, domain) => sum + (domainWeights.get(domain) ?? 1), 0);
+    let cursor = baseArcStart;
+    const plan = new Map<DomainId, { centerAngle: number; span: number }>();
+
+    for (const domain of orderedDomains) {
+        const weight = domainWeights.get(domain) ?? 1;
+        const span = usableArcSpan * (weight / totalWeight);
+        plan.set(domain, {
+            centerAngle: cursor + span / 2,
+            span,
+        });
+        cursor += span + laneGap;
+    }
+
+    return plan;
+}
+
+function chooseBalancedDomainPlan(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
+    const baseOrder = buildDomainLaneOrder(contentNodes, graphRelations);
+    const domainWeights = buildDomainWeights(contentNodes, graphRelations);
+    const preferredAngles = new Map(
+        baseOrder.map((domain) => [domain, getDomainLayout(domain).seedAngle * (Math.PI / 180)])
+    );
+    const arcStart = -25 * (Math.PI / 180);
+    const arcSpan = 320 * (Math.PI / 180);
+    let bestPlan = buildLaneAnglePlan(baseOrder, domainWeights, arcStart, arcSpan);
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (let rotation = 0; rotation < baseOrder.length; rotation++) {
+        const rotatedOrder = rotateDomains(baseOrder, rotation);
+        const plan = buildLaneAnglePlan(rotatedOrder, domainWeights, arcStart, arcSpan);
+        let anchorPenalty = 0;
+        let balanceX = 0;
+        let balanceY = 0;
+
+        for (const domain of rotatedOrder) {
+            const weight = domainWeights.get(domain) ?? 1;
+            const centerAngle = plan.get(domain)?.centerAngle ?? 0;
+            const preferredAngle = preferredAngles.get(domain) ?? centerAngle;
+            anchorPenalty += getAngularDistance(centerAngle, preferredAngle) * weight * 0.95;
+            balanceX += Math.cos(centerAngle) * weight;
+            balanceY += Math.sin(centerAngle) * weight;
+        }
+
+        const balancePenalty = Math.hypot(balanceX, balanceY) * 0.55;
+        const score = anchorPenalty + balancePenalty;
+
+        if (score < bestScore) {
+            bestScore = score;
+            bestPlan = plan;
+        }
+    }
+
+    return bestPlan;
+}
+
+function buildLaneTargetPositions(
+    contentNodes: GraphContentNode[],
+    graphRelations: GraphModel['relations'],
+    centerX: number,
+    centerY: number,
+    viewportWidth: number,
+    viewportHeight: number
+) {
+    const lanePlan = chooseBalancedDomainPlan(contentNodes, graphRelations);
+    const domainOrder = [...lanePlan.keys()];
+    const minViewport = Math.min(viewportWidth, viewportHeight);
+    const innerRadius = Math.max(245, Math.min(330, minViewport * 0.28));
+    const radialGap = Math.max(136, Math.min(182, minViewport * 0.165));
+    const maxAngleStep = 0.36;
+    const targets = new Map<string, Point>();
+
+    for (const domain of domainOrder) {
+        const laneNodes = contentNodes
+            .filter((node) => node.domain === domain)
+            .sort((left, right) => right.chronology - left.chronology);
+        const lane = lanePlan.get(domain);
+        if (!lane) continue;
+        const centerIndex = (laneNodes.length - 1) / 2;
+        const usableLaneSpan = lane.span * 0.58;
+        const angleStep = laneNodes.length > 1
+            ? Math.min(maxAngleStep, usableLaneSpan / Math.max(1, laneNodes.length - 1))
+            : 0;
+
+        laneNodes.forEach((node, index) => {
+            const angle = lane.centerAngle + (index - centerIndex) * angleStep;
+            const radius = innerRadius + index * radialGap;
+            targets.set(node.id, {
+                x: centerX + Math.cos(angle) * radius,
+                y: centerY + Math.sin(angle) * radius,
+            });
+        });
+    }
+
+    return targets;
+}
+
+function buildCrossDomainSimulationLinks(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
+    const nodeById = new Map(contentNodes.map((node) => [node.id, node]));
+
+    return graphRelations.flatMap((relation) => {
+        const fromNode = nodeById.get(relation.from);
+        const toNode = nodeById.get(relation.to);
+        if (!fromNode || !toNode || fromNode.domain === toNode.domain) {
+            return [];
+        }
+
+        return [{
+            source: relation.from,
+            target: relation.to,
+            distance: 188 + (3 - relation.strength) * 20,
+            strength: 0.025 + relation.strength * 0.012,
+        }];
+    });
+}
+
+function buildEdgesForNodes(
+    nodes: Node[],
+    graphRelations: GraphModel['relations'],
+    highlightedNodeId: string | null = null,
+    previousEdges: Edge[] = []
+) {
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const previousHandles = getExistingHandleLookup(nodes);
+    const previousEdgeById = new Map(previousEdges.map((edge) => [edge.id, edge]));
+    const projectedHandles: ProjectedHandle[] = [];
+    const edges: Edge[] = [
+        reuseEdgeIfPossible(
+            previousEdgeById.get('edge-theme-bio'),
+            {
+                id: 'edge-theme-bio',
+                source: 'biotoggle',
+                target: 'bio',
+                sourceHandle: 'bio-toggle-port',
+                targetHandle: 'portrait-port',
+                type: 'dotted',
+            },
+            highlightedNodeId
+        ),
+    ];
+
+    for (const relation of graphRelations) {
+        const sourceNode = nodeById.get(relation.from);
+        const targetNode = nodeById.get(relation.to);
+        if (!sourceNode || !targetNode) continue;
+
+        const sourceHandleId = `edge-${relation.id}-source`;
+        const targetHandleId = `edge-${relation.id}-target`;
+        const sourceProjection = projectHandleToBoundary(sourceNode, getCenter(targetNode));
+        const targetProjection = projectHandleToBoundary(targetNode, getCenter(sourceNode));
+
+        projectedHandles.push(smoothProjectedHandle({
+            nodeId: sourceNode.id,
+            id: sourceHandleId,
+            type: 'source',
+            side: sourceProjection.side,
+            offset: sourceProjection.offset,
+            desiredOffset: sourceProjection.offset,
+        }, previousHandles));
+        projectedHandles.push(smoothProjectedHandle({
+            nodeId: targetNode.id,
+            id: targetHandleId,
+            type: 'target',
+            side: targetProjection.side,
+            offset: targetProjection.offset,
+            desiredOffset: targetProjection.offset,
+        }, previousHandles));
+
+        edges.push(
+            reuseEdgeIfPossible(
+                previousEdgeById.get(`edge-${relation.id}`),
+                {
+                    id: `edge-${relation.id}`,
+                    source: relation.from,
+                    target: relation.to,
+                    sourceHandle: sourceHandleId,
+                    targetHandle: targetHandleId,
+                    type: 'dotted',
+                },
+                highlightedNodeId
+            )
+        );
+    }
+
+    return {
+        nodes: applyHandlesToNodes(nodes, projectedHandles),
+        edges,
+    };
+}
+
+function relaxInitialNodes(nodes: Node[]) {
+    const lockedIds = new Set(['bio', 'biotoggle']);
+    const pos = new Map<string, BoxState>();
+
+    for (const node of nodes) {
+        const size = getNodeDimensions(node);
+
+        pos.set(node.id, {
+            x: node.position.x,
+            y: node.position.y,
+            w: size.w,
+            h: size.h,
+            pad: getCollisionPadding(node.id),
+        });
+    }
+
+    relaxBoxPositions(pos, {
+        immovableIds: lockedIds,
+        maxIters: 34,
+        damping: 0.82,
+        maxStep: 44,
+    });
+
+    return nodes.map((node) => {
+        const current = pos.get(node.id)!;
+        return { ...node, position: { x: current.x, y: current.y } };
+    });
+}
+
+function buildInitialGraph(
+    model: GraphModel,
+    graphRelations: GraphModel['relations'],
+    theme: Theme,
+    setTheme: (theme: Theme) => void,
+    viewportWidth: number,
+    viewportHeight: number
+) {
+    const bioPosition = {
+        x: viewportWidth / 2 - BIO_NODE_WIDTH / 2,
+        y: viewportHeight / 2 - BIO_NODE_HEIGHT / 2,
+    };
+    const bioCenter = {
+        x: bioPosition.x + BIO_NODE_WIDTH / 2,
+        y: bioPosition.y + BIO_NODE_HEIGHT / 2,
+    };
+    const togglePosition = {
+        x: bioPosition.x + BIO_NODE_WIDTH - TOGGLE_NODE_WIDTH * 0.68,
+        y: bioPosition.y - TOGGLE_NODE_HEIGHT - 26,
+    };
+    const contentNodes = getContentNodes(model);
+    const targetCenters = buildLaneTargetPositions(
+        contentNodes,
+        graphRelations,
+        bioCenter.x,
+        bioCenter.y,
+        viewportWidth,
+        viewportHeight
+    );
+    const crossDomainLinks = buildCrossDomainSimulationLinks(contentNodes, graphRelations);
+    const simulationNodes: SimulationNode[] = [
         {
             id: 'bio',
-            type: "bioNode",
-            position: { x: centerX, y: centerY },
-            data: { theme: theme }
+            x: bioCenter.x,
+            y: bioCenter.y,
+            targetX: bioCenter.x,
+            targetY: bioCenter.y,
+            fx: bioCenter.x,
+            fy: bioCenter.y,
+        },
+        ...contentNodes.map((node) => {
+            const target = targetCenters.get(node.id) ?? bioCenter;
+            return {
+                id: node.id,
+                x: target.x,
+                y: target.y,
+                targetX: target.x,
+                targetY: target.y,
+            };
+        }),
+    ];
+
+    const simulation = forceSimulation(simulationNodes)
+        .force('charge', forceManyBody().strength((node: SimulationNode) => node.id === 'bio' ? -30 : -90))
+        .force(
+            'collision',
+            forceCollide().radius((simNode: SimulationNode) =>
+                simNode.id === 'bio' ? BIO_COLLISION_RADIUS : CONTENT_FORCE_COLLISION_RADIUS
+            ).strength(1)
+        )
+        .force('x', forceX((node: SimulationNode) => node.targetX).strength((node: SimulationNode) => node.id === 'bio' ? 1 : 0.22))
+        .force('y', forceY((node: SimulationNode) => node.targetY).strength((node: SimulationNode) => node.id === 'bio' ? 1 : 0.22))
+        .force(
+            'link',
+            forceLink(crossDomainLinks)
+                .id((node: SimulationNode) => node.id)
+                .distance((link: { distance: number }) => link.distance)
+                .strength((link: { strength: number }) => link.strength)
+        )
+        .stop();
+
+    for (let i = 0; i < 180; i++) {
+        simulation.tick();
+    }
+
+    const positionById = new Map(simulationNodes.map((node) => [node.id, { x: node.x, y: node.y }]));
+
+    const relaxedNodes = relaxInitialNodes([
+        {
+            id: 'bio',
+            type: 'bioNode',
+            position: bioPosition,
+            data: { theme, nodeRole: 'bio' },
         },
         {
             id: 'biotoggle',
-            position: { x: centerX + 100, y: centerY - 50 },
-            data: {
-                theme: theme,
-                setTheme: setTheme
-            },
-            type: "bioToggleNode"
+            type: 'bioToggleNode',
+            position: togglePosition,
+            data: { theme, setTheme, nodeRole: 'toggle' },
         },
-        {
-            id: 'research',
-            type: "storyNode",
-            position: { x: centerX - 300, y: centerY - 100 },
-            data: {
-                title: "Research", content: <ResearchIntro />, handles: [
-                    {
-                        id: 'bio-port',
-                        type: 'source',
-                        pos: 'right'
-                    }
-                ]
-            }
-        },
-        {
-            id: 'education',
-            type: "storyNode",
-            position: { x: centerX - 300, y: centerY + 50 },
-            data: {
-                title: "Education", content: <EduIntro />, handles: [
-                    {
-                        id: 'bio-port',
-                        type: 'source',
-                        pos: 'right'
-                    }
-                ]
-            }
-        },
-        {
-            id: 'travel',
-            type: "storyNode",
-            position: { x: centerX + 300, y: centerY - 100 },
-            data: {
-                title: "Travel", content: <TravelIntro />, handles: [
-                    {
-                        id: 'bio-port',
-                        type: 'source',
-                        pos: 'left'
-                    }
-                ]
-            }
-        },
-        {
-            id: 'blog',
-            type: "storyNode",
-            position: { x: centerX + 300, y: centerY + 50 },
-            data: {
-                title: "Blogs", content: <BlogIntro />, handles: [
-                    {
-                        id: 'bio-port',
-                        type: 'source',
-                        pos: 'left'
-                    }
-                ]
-            }
-        },
-        {
-            id: 'experience',
-            type: "storyNode",
-            position: { x: centerX, y: centerY + 200 },
-            data: {
-                title: "Experiences", content: <ExperienceIntro />, handles: [
-                    {
-                        id: 'bio-port',
-                        type: 'source',
-                        pos: 'top'
-                    }
-                ]
-            }
-        },
-    ];
-    const initialEdges: Edge[] = [
-        {
-            id: "e1",
-            source: "biotoggle",
-            target: "bio",
-            sourceHandle: "bio-toggle-port",
-            targetHandle: "portrait-port",
-            type: "dotted"
-        },
-        {
-            id: "e2",
-            source: "research",
-            target: "bio",
-            sourceHandle: "bio-port",
-            targetHandle: "research-port",
-            type: "dotted"
-        },
-        {
-            id: "e3",
-            source: "education",
-            target: "bio",
-            sourceHandle: "bio-port",
-            targetHandle: "education-port",
-            type: "dotted"
-        },
-        {
-            id: "e4",
-            source: "travel",
-            target: "bio",
-            sourceHandle: "bio-port",
-            targetHandle: "travel-port",
-            type: "dotted"
-        },
-        {
-            id: "e5",
-            source: "blog",
-            target: "bio",
-            sourceHandle: "bio-port",
-            targetHandle: "blog-port",
-            type: "dotted"
-        },
-        {
-            id: "e6",
-            source: "experience",
-            target: "bio",
-            sourceHandle: "bio-port",
-            targetHandle: "experience-port",
-            type: "dotted"
-        },
-    ];
+        ...contentNodes.map((node) => {
+            const position = positionById.get(node.id) ?? bioCenter;
+            return {
+                id: node.id,
+                type: 'storyNode',
+                position: {
+                    x: position.x - CONTENT_NODE_WIDTH / 2,
+                    y: position.y - CONTENT_NODE_HEIGHT / 2,
+                },
+                data: {
+                    nodeRole: 'content',
+                    nodeId: node.id,
+                    domain: node.domain,
+                    domainTag: getDisplayDomain(node.domain),
+                    title: node.title,
+                    subtitle: node.subtitle,
+                    summary: node.summary,
+                    detail: node.detail,
+                    badges: node.tags,
+                } satisfies StoryNodeData,
+            };
+        }),
+    ]);
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+    return buildEdgesForNodes(relaxedNodes, graphRelations);
+}
+
+const NodeCanvas: React.FC = () => {
+    const [theme, setTheme] = useState<Theme>('nyc');
+    const [graphModel, setGraphModel] = useState<GraphModel | null>(null);
+    const [graphError, setGraphError] = useState<string | null>(null);
+    const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+    const viewport = useMemo(
+        () => ({ width: window.innerWidth, height: window.innerHeight }),
+        []
+    );
+    const highlightedNodeId = draggingNodeId;
+    const graphRelations = useMemo(
+        () => graphModel ? getGraphRelations(graphModel) : [],
+        [graphModel]
+    );
+    const orderedGraphRelations = useMemo(
+        () => [...graphRelations].sort((left, right) => right.strength - left.strength || left.id.localeCompare(right.id)),
+        [graphRelations]
+    );
+    const initialGraph = useMemo(
+        () => graphModel ? buildInitialGraph(graphModel, graphRelations, 'nyc', setTheme, viewport.width, viewport.height) : { nodes: [], edges: [] },
+        [graphModel, graphRelations, viewport.height, viewport.width]
+    );
+
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
     const { fitView } = useReactFlow();
+    const dragRafId = useRef<number | null>(null);
+    const edgesRef = useRef<Edge[]>(initialGraph.edges);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        loadGraphModel()
+            .then((model) => {
+                if (cancelled) return;
+                setGraphModel(model);
+                setGraphError(null);
+            })
+            .catch((error: unknown) => {
+                if (cancelled) return;
+                setGraphError(error instanceof Error ? error.message : 'Failed to load graph model.');
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        setNodes(initialGraph.nodes);
+        setEdges(initialGraph.edges);
+    }, [initialGraph, setEdges, setNodes]);
+
+    useEffect(() => {
+        edgesRef.current = edges;
+    }, [edges]);
+
+    useEffect(() => {
+        setEdges((prev) => applyEdgeOpacity(prev, highlightedNodeId));
+    }, [highlightedNodeId, setEdges]);
 
     const onNodeClick: NodeMouseHandler = useCallback((_, node) => {
-        if (node.id == 'biotoggle') {
-            return
-        }
-        fitView({
-            nodes: [{ id: node.id }],
-            padding: node.id == 'bio' ? 3 : 2,
-            duration: 500,
-            includeHiddenNodes: false,
-        });
-    }, [fitView]);
+        if (node.id === 'biotoggle') return;
 
-    const onInit = (instance: ReactFlowInstance) => {
+        if (node.id === 'bio') {
+            fitView({
+                nodes: nodes.map((graphNode) => ({ id: graphNode.id })),
+                padding: 0.8,
+                duration: 450,
+                includeHiddenNodes: false,
+            });
+        } else {
+            fitView({
+                nodes: [{ id: node.id }],
+                padding: 1.7,
+                duration: 400,
+                includeHiddenNodes: false,
+            });
+        }
+    }, [fitView, nodes]);
+
+    const onInit = (instance: any) => {
+        if (initialGraph.nodes.length === 0) return;
         instance.fitView({
-            nodes: [{ id: 'bio' }],
-            padding: 2,
+            nodes: initialGraph.nodes.map((node) => ({ id: node.id })),
+            padding: 0.8,
             duration: 500,
             includeHiddenNodes: false,
         });
     };
 
-    const rafId = useRef<number | null>(null);
-
     const onNodeDrag = useCallback((_: unknown, dragged: Node) => {
-        if (rafId.current) cancelAnimationFrame(rafId.current);
+        if (!graphModel) {
+            return;
+        }
 
-        rafId.current = requestAnimationFrame(() => {
+        if (dragged.id === 'biotoggle') {
+            return;
+        }
+
+        if (draggingNodeId !== dragged.id) {
+            setDraggingNodeId(dragged.id);
+        }
+
+        if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
+
+        dragRafId.current = requestAnimationFrame(() => {
             setNodes((prev) => {
-                // Build a mutable position map we can relax on
-                const pos = new Map<string, { x: number; y: number; w: number; h: number }>();
-                for (const n of prev) {
-                    const { w, h } = sizeOf(n);
-                    // start from current RF positions
-                    pos.set(n.id, { x: n.position.x, y: n.position.y, w, h });
+                const pos = new Map<string, BoxState>();
+
+                for (const node of prev) {
+                    const { w, h } = getNodeDimensions(node);
+                    pos.set(node.id, {
+                        x: node.position.x,
+                        y: node.position.y,
+                        w,
+                        h,
+                        pad: getCollisionPadding(node.id),
+                    });
                 }
-                // Keep the dragged node exactly where the user is dragging
+
                 if (pos.has(dragged.id)) {
-                    const p = pos.get(dragged.id)!;
-                    p.x = dragged.position.x;
-                    p.y = dragged.position.y;
+                    const current = pos.get(dragged.id)!;
+                    current.x = dragged.position.x;
+                    current.y = dragged.position.y;
                 }
 
-                // Relaxation parameters
-                const MAX_ITERS = 5;        // a few sweeps are enough for small graphs
-                const DAMPING = 0.6;        // soften pushes to reduce jitter
-                const MAX_STEP = 30;        // clamp per-iteration move to avoid teleports
+                relaxBoxPositions(pos, {
+                    immovableIds: new Set([dragged.id, 'biotoggle']),
+                    maxIters: 8,
+                    damping: 0.64,
+                    maxStep: 38,
+                });
 
-                for (let iter = 0; iter < MAX_ITERS; iter++) {
-                    let movedAny = false;
+                const nextNodes = prev.map((node) => {
+                    const point = pos.get(node.id)!;
+                    const nextPosition = node.id === dragged.id
+                        ? { x: dragged.position.x, y: dragged.position.y }
+                        : { x: point.x, y: point.y };
 
-                    // Iterate over all pairs (B against every A), but never move the dragged node
-                    for (const [bid, bp] of pos) {
-                        if (bid === dragged.id) continue;
-
-                        for (const [aid, ap] of pos) {
-                            if (aid === bid) continue;
-
-                            const [dx, dy] = mtvSeparateAABB(ap.x, ap.y, ap.w, ap.h, bp.x, bp.y, bp.w, bp.h);
-                            if (dx !== 0 || dy !== 0) {
-                                // push B away from A, damped and clamped
-                                const nx = bp.x + Math.max(-MAX_STEP, Math.min(MAX_STEP, dx * DAMPING));
-                                const ny = bp.y + Math.max(-MAX_STEP, Math.min(MAX_STEP, dy * DAMPING));
-                                if (nx !== bp.x || ny !== bp.y) {
-                                    bp.x = nx; bp.y = ny;
-                                    movedAny = true;
-                                }
-                            }
-                        }
+                    if (node.position.x === nextPosition.x && node.position.y === nextPosition.y) {
+                        return node;
                     }
 
-                    if (!movedAny) break; // early exit if settled
-                }
-
-                // Commit relaxed positions back to React Flow
-                return prev.map((n) => {
-                    const p = pos.get(n.id)!;
-                    return n.id === dragged.id
-                        ? { ...n, position: { x: dragged.position.x, y: dragged.position.y } }
-                        : { ...n, position: { x: p.x, y: p.y } };
+                    return { ...node, position: nextPosition };
                 });
+
+                const nextGraph = buildEdgesForNodes(nextNodes, orderedGraphRelations, dragged.id, edgesRef.current);
+                edgesRef.current = nextGraph.edges;
+                setEdges(nextGraph.edges);
+                return nextGraph.nodes;
             });
         });
-    }, [setNodes]);
+    }, [draggingNodeId, graphModel, orderedGraphRelations, setEdges, setNodes]);
 
-    const onNodeDragStop = useCallback(() => {
-        if (rafId.current) cancelAnimationFrame(rafId.current);
-    }, []);
+    const onNodeDragStop = useCallback((_: unknown, dragged: Node) => {
+        if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
+        setNodes((prev) => {
+            const pos = new Map<string, BoxState>();
+
+            for (const node of prev) {
+                const { w, h } = getNodeDimensions(node);
+                pos.set(node.id, {
+                    x: node.position.x,
+                    y: node.position.y,
+                    w,
+                    h,
+                    pad: getCollisionPadding(node.id),
+                });
+            }
+
+            if (pos.has(dragged.id)) {
+                const current = pos.get(dragged.id)!;
+                current.x = dragged.position.x;
+                current.y = dragged.position.y;
+            }
+
+            relaxBoxPositions(pos, {
+                immovableIds: new Set([dragged.id, 'biotoggle']),
+                maxIters: 16,
+                damping: 0.72,
+                maxStep: 42,
+            });
+
+            const nextNodes = prev.map((node) => {
+                const point = pos.get(node.id)!;
+                if (node.position.x === point.x && node.position.y === point.y) {
+                    return node;
+                }
+
+                return {
+                    ...node,
+                    position: { x: point.x, y: point.y },
+                };
+            });
+
+            const nextGraph = buildEdgesForNodes(nextNodes, orderedGraphRelations, null, edgesRef.current);
+            edgesRef.current = nextGraph.edges;
+            setEdges(nextGraph.edges);
+            return nextGraph.nodes;
+        });
+        setDraggingNodeId(null);
+    }, [orderedGraphRelations, setEdges, setNodes]);
 
     useEffect(() => {
-        setNodes((nds) =>
-            nds.map((n) => {
-                if (n.id === "bio") {
-                    return { ...n, data: { ...n.data, theme } };
+        setNodes((prev) =>
+            prev.map((node) => {
+                if (node.id === 'bio') {
+                    return { ...node, data: { ...node.data, theme } };
                 }
-                if (n.id === "biotoggle") {
-                    return { ...n, data: { ...n.data, theme, setTheme } };
+                if (node.id === 'biotoggle') {
+                    return { ...node, data: { ...node.data, theme, setTheme } };
                 }
-                return n;
+                return node;
             })
         );
     }, [theme, setNodes, setTheme]);
 
     useEffect(() => {
-        applyThemeVars(theme as Theme);
+        applyThemeVars(theme);
     }, [theme]);
+
+    useEffect(() => {
+        return () => {
+            if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
+        };
+    }, []);
+
+    if (graphError) {
+        return (
+            <div style={{ color: 'crimson', padding: '1rem' }}>
+                Error loading graph model: {graphError}
+            </div>
+        );
+    }
+
+    if (!graphModel) {
+        return <div style={{ padding: '1rem', color: 'var(--color-text)' }}>Loading graph...</div>;
+    }
 
     return (
         <ReactFlow

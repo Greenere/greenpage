@@ -37,6 +37,8 @@ export const Paragraph: React.FC<{ style?: Record<string, unknown>, children: Re
       lineHeight: 1.1,
       paddingLeft: "0.5rem",
       paddingRight: "0.5rem",
+      textAlign: "justify",
+      textJustify: "inter-word",
       ...style
     }}
   >

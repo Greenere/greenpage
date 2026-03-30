@@ -1,4 +1,4 @@
-export const NodeContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const NodeContainer: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
     <div style={{
         minWidth:"5rem",
         maxWidth:"10rem",
@@ -8,7 +8,10 @@ export const NodeContainer: React.FC<{ children: React.ReactNode }> = ({ childre
         border: `2px solid var(--color-secondary)`,
         borderRadius: "10px",
         background: `transparent`,
-        textAlign: "center"
+        textAlign: "center",
+        position: "relative",
+        overflow: "visible",
+        ...style
     }}>
         {children}
     </div>

@@ -1,0 +1,20 @@
+{
+  "title": "Software Engineer Intern at Verily",
+  "subtitle": "Summer 2022, from Cornell to California",
+  "summary": "The internship that turned graduate school into a clearer engineering path, connecting Cornell coursework with California life and later full-time work.",
+  "tags": ["internship", "engineering"],
+  "detail": [
+    {
+      "type": "text",
+      "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Software engineering internship at Verily",
+        "Overlapped with summer travel and the California Route 1 trip",
+        "Converted into the full-time role that follows in the graph"
+      ]
+    }
+  ]
+}
