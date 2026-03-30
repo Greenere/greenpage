@@ -1,4 +1,4 @@
-type Theme = 'nyc' | 'joshua' | 'mty'
+type Theme = 'nyc' | 'joshua' | 'mty' | 'atlp'
 
 type ThemeInfo = {
     imgSrc: string,
@@ -21,6 +21,11 @@ const BIOTHEME: Record<Theme,ThemeInfo> = {
         'imgSrc': './assets/portrait-haoyang-mty.jpg',
         'url': 'https://www.linkedin.com/in/haoyanghowyoung/',
         'description': 'Monterey, 2023',
+    },
+    'atlp': {
+        'imgSrc': './assets/portrait-haoyang-atlp.jpg',
+        'url': 'https://www.linkedin.com/in/haoyanghowyoung/',
+        'description': 'Antelope Valley, 2023',
     }
 }
 

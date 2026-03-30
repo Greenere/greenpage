@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Portrait, type PortraitContent } from '../components/Portrait'
-import { type SectionContent } from '../components/SectionCard'
-import { colors } from '../styles/colors'
-import { HomeSection } from '../components/HomeSection'
+import { Portrait, type PortraitContent } from './components/Portrait'
+import { type SectionContent } from './components/SectionCard'
+import { colors } from '../../shared/styles/colors'
+import { HomeSection } from './components/HomeSection'
 
 type HomeContent = {
   title: string,

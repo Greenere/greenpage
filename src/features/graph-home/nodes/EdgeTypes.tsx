@@ -1,6 +1,6 @@
-import { BaseEdge, getSimpleBezierPath } from "@xyflow/react";
+import { BaseEdge, getSimpleBezierPath, type EdgeProps } from "@xyflow/react";
 
-function DottedEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {} }) {
+function DottedEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {} }: EdgeProps) {
   const [path] = getSimpleBezierPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition });
   return (
     <BaseEdge

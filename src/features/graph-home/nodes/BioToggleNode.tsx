@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { Position } from "@xyflow/react";
 import { GreenHandle } from "./Handles";
-import { BIOTHEME, type Theme } from "../contents/BioTheme";
-import { themes2color } from "../styles/colors";
+import { BIOTHEME, type Theme } from "../content/BioTheme";
+import { themes2color } from "../../../shared/styles/colors";
 
 interface BioThemeData {
     theme: Theme
@@ -15,12 +15,12 @@ interface BioToggleNodeProps {
 }
 
 const BioToggleNode: React.FC<BioToggleNodeProps> = ({
-    data, isConnectable
+    data, isConnectable: _isConnectable
 }) => {
     const randomPos = useMemo(() => { return 30 + Math.random() * 50 }, [])
     return (<>
         <div style={{
-            width:"5rem",
+            width:"10rem",
             paddingTop:"0.2rem",
             paddingLeft: "0.2rem",
             paddingRight: "0.2rem",

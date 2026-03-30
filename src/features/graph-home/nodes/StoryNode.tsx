@@ -1,7 +1,7 @@
 import React, { useMemo, type ReactNode } from "react";
-import { Footnote, Paragraph, Subtitle } from "../components/StyledTextBlocks";
-import { Handle, Position } from "@xyflow/react";
-import { NodeContainer } from "../components/NodeContainer";
+import { Subtitle } from "../../../shared/ui/StyledTextBlocks";
+import { Position } from "@xyflow/react";
+import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle } from "./Handles";
 
 type HandleData = {
@@ -22,7 +22,7 @@ interface StoryNodeProps {
 }
 
 const StoryNode: React.FC<StoryNodeProps> = ({
-    data, isConnectable
+    data, isConnectable: _isConnectable
 }) => {
     const randomPos = useMemo(() => { return 30 + Math.random() * 50 }, [])
     return (<>

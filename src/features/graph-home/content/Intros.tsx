@@ -1,4 +1,4 @@
-import { Paragraph } from "../components/StyledTextBlocks"
+import { Paragraph } from "../../../shared/ui/StyledTextBlocks"
 
 const ResearchIntro: React.FC = () => {
     return (

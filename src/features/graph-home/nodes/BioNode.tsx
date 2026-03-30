@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Footnote, Paragraph, Subtitle } from "../components/StyledTextBlocks";
+import { Footnote, Paragraph, Subtitle } from "../../../shared/ui/StyledTextBlocks";
 import { Position } from "@xyflow/react";
-import { NodeContainer } from "../components/NodeContainer";
+import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle } from "./Handles";
-import { type Theme, BIOTHEME } from "../contents/BioTheme";
+import { type Theme, BIOTHEME } from "../content/BioTheme";
 
 interface BioData {
     theme: Theme
@@ -15,9 +15,9 @@ interface BioNodeProps {
 }
 
 const BioNode: React.FC<BioNodeProps> = ({
-    data, isConnectable
+    data, isConnectable: _isConnectable
 }) => {
-    const [focused, setFocused] = useState<Boolean>(false);
+    const [focused, setFocused] = useState<boolean>(false);
     return (<>
         <NodeContainer>
             <div style={{
@@ -37,7 +37,8 @@ const BioNode: React.FC<BioNodeProps> = ({
                         <img src={BIOTHEME[data.theme].imgSrc} style={{
                             width: `50px`,
                             borderRadius: "50%",
-                            border: `2px solid var(--color-secondary)`
+                            border: `2px solid var(--color-secondary)`,
+                            filter: `saturate(${focused ? 1.1 : 1}) brightness(${focused ? 1.03 : 1})`
                         }} />
                     </a>
 
