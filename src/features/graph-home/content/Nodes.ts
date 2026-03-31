@@ -18,10 +18,17 @@ export type RelationKind =
   | 'tool'
   | 'sequence';
 
+export type NodeGalleryImage = {
+  src: string;
+  alt: string;
+  caption?: string;
+};
+
 export type ContentBlock =
   | { type: 'text'; text: string }
   | { type: 'list'; items: string[] }
   | { type: 'quote'; text: string }
+  | { type: 'image'; src: string; alt: string; caption?: string }
   | { type: 'link'; label: string; href: string };
 
 export type GraphContentNode = {
@@ -33,6 +40,7 @@ export type GraphContentNode = {
   summary: string;
   chronology: number;
   tags?: string[];
+  gallery?: NodeGalleryImage[];
   detail?: ContentBlock[];
 };
 
@@ -49,6 +57,7 @@ export type GraphNodeContent = {
   subtitle?: string;
   summary: string;
   tags?: string[];
+  gallery?: NodeGalleryImage[];
   detail?: ContentBlock[];
 };
 
@@ -100,7 +109,19 @@ export const DOMAIN_LAYOUTS: Record<DomainId, DomainLayout> = {
 function withBaseUrl(path: string) {
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
   const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
-  return `${base}${path.replace(/^\//, '')}`;
+  return `${base}${path.replace(/^\.\//, '').replace(/^\//, '')}`;
+}
+
+export function resolveAssetUrl(path: string) {
+  return withBaseUrl(path);
+}
+
+export function getNodeDetailPath(nodeId: string) {
+  return `/nodes/${encodeURIComponent(nodeId)}`;
+}
+
+export function getNodeTransitionName(nodeId: string) {
+  return `content-node-${nodeId}`;
 }
 
 function isDomainId(value: unknown): value is DomainId {
@@ -127,6 +148,13 @@ function normalizeContentBlocks(value: unknown): ContentBlock[] | undefined {
     if (candidate.type === 'list') {
       return Array.isArray(candidate.items) && candidate.items.every((item) => typeof item === 'string');
     }
+    if (candidate.type === 'image') {
+      return (
+        typeof candidate.src === 'string' &&
+        typeof candidate.alt === 'string' &&
+        (candidate.caption === undefined || typeof candidate.caption === 'string')
+      );
+    }
     if (candidate.type === 'link') {
       return typeof candidate.label === 'string' && typeof candidate.href === 'string';
     }
@@ -134,6 +162,23 @@ function normalizeContentBlocks(value: unknown): ContentBlock[] | undefined {
   });
 
   return blocks;
+}
+
+function normalizeGalleryImages(value: unknown): NodeGalleryImage[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const images = value.filter((image): image is NodeGalleryImage => {
+    if (!image || typeof image !== 'object') return false;
+    const candidate = image as Record<string, unknown>;
+
+    return (
+      typeof candidate.src === 'string' &&
+      typeof candidate.alt === 'string' &&
+      (candidate.caption === undefined || typeof candidate.caption === 'string')
+    );
+  });
+
+  return images.length > 0 ? images : undefined;
 }
 
 export function normalizeGraphStructure(raw: unknown): GraphStructure {
@@ -227,6 +272,7 @@ export function normalizeNodeContent(raw: unknown, nodeId = 'unknown'): GraphNod
     subtitle: typeof candidate.subtitle === 'string' ? candidate.subtitle : undefined,
     summary: candidate.summary,
     tags: Array.isArray(candidate.tags) ? candidate.tags.filter((tag): tag is string => typeof tag === 'string') : undefined,
+    gallery: normalizeGalleryImages(candidate.gallery),
     detail: normalizeContentBlocks(candidate.detail),
   } satisfies GraphNodeContent;
 }
@@ -282,14 +328,25 @@ async function loadGraphModelUncached(url = GRAPH_MODEL_URL): Promise<GraphModel
     })
   );
 
-  return {
+  const model = {
     nodes: resolvedNodes,
     relations: structure.relations,
     settings: structure.settings,
   };
+
+  if (url === GRAPH_MODEL_URL) {
+    graphModelCache = model;
+  }
+
+  return model;
 }
 
 let graphModelPromise: Promise<GraphModel> | null = null;
+let graphModelCache: GraphModel | null = null;
+
+export function readCachedGraphModel() {
+  return graphModelCache;
+}
 
 export async function loadGraphModel(url = GRAPH_MODEL_URL): Promise<GraphModel> {
   if (url !== GRAPH_MODEL_URL) {

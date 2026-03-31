@@ -339,6 +339,13 @@
       "internship",
       "engineering"
     ],
+    "gallery": [
+      {
+        "src": "assets/portrait-haoyang-sfbay.jpg",
+        "alt": "Haoyang in the Bay Area during the Verily internship summer",
+        "caption": "Work, relocation, and weekend travel started to blur into one California chapter."
+      }
+    ],
     "detail": [
       {
         "type": "text",
@@ -441,6 +448,13 @@
       "travel",
       "east coast"
     ],
+    "gallery": [
+      {
+        "src": "assets/portrait-haoyang-nyc.jpg",
+        "alt": "Haoyang in New York City during the Cornell period",
+        "caption": "New York became one of the recurring anchors in that travel season."
+      }
+    ],
     "detail": [
       {
         "type": "text",
@@ -489,10 +503,28 @@
       "travel",
       "coast"
     ],
+    "gallery": [
+      {
+        "src": "assets/portrait-haoyang-sfbay.jpg",
+        "alt": "Haoyang in the Bay Area during summer 2022",
+        "caption": "The Bay was the starting point before the drive turned into a longer coastal day."
+      },
+      {
+        "src": "assets/portrait-haoyang-mty.jpg",
+        "alt": "Haoyang in Monterey during the Route 1 trip",
+        "caption": "Monterey became the clearest visual memory in the route."
+      }
+    ],
     "detail": [
       {
         "type": "text",
         "text": "Among the old travel artifacts, this one is especially visual. It reads more like a route sketch than a diary entry: coastlines, viewpoints, and a day-long line from the Bay toward Monterey during the Verily summer."
+      },
+      {
+        "type": "image",
+        "src": "assets/portrait-haoyang-mty.jpg",
+        "alt": "Haoyang in Monterey during the coastal route",
+        "caption": "A travel node like this benefits from a visual layer even when the written story stays short."
       },
       {
         "type": "list",

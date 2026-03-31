@@ -3,6 +3,13 @@
   "subtitle": "Cornell-year loops through NYC, Philly, Boston, and upstate",
   "summary": "A cluster of 2022 trips radiating out from Ithaca during the Cornell period, mixing museums, city walks, nearby escapes, and the feeling of learning the U.S. Northeast through movement.",
   "tags": ["travel", "east coast"],
+  "gallery": [
+    {
+      "src": "assets/portrait-haoyang-nyc.jpg",
+      "alt": "Haoyang in New York City during the Cornell period",
+      "caption": "New York became one of the recurring anchors in that travel season."
+    }
+  ],
   "detail": [
     {
       "type": "text",

@@ -3,9 +3,11 @@ import {
     ReactFlow,
     type Node,
     type Edge,
+    type Viewport,
     useNodesState,
     useEdgesState,
     useReactFlow,
+    type ReactFlowInstance,
     type NodeMouseHandler,
     ReactFlowProvider,
 } from '@xyflow/react';
@@ -17,7 +19,7 @@ import StoryNode from './nodes/StoryNode';
 import BioToggleNode from './nodes/BioToggleNode';
 import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
-import type { Theme } from './content/BioTheme';
+import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
     type GraphContentNode,
@@ -27,6 +29,7 @@ import {
     getDomainLayout,
     getGraphRelations,
     loadGraphModel,
+    readCachedGraphModel,
 } from './content/Nodes';
 
 const nodeTypes = {
@@ -46,6 +49,7 @@ type StoryNodeData = {
     title: string;
     subtitle?: string;
     summary: string;
+    gallery?: GraphContentNode['gallery'];
     detail?: GraphContentNode['detail'];
     badges?: string[];
 };
@@ -60,20 +64,28 @@ type SimulationNode = {
     fy?: number;
 };
 
-const CONTENT_NODE_WIDTH = 176;
-const CONTENT_NODE_HEIGHT = 146;
+const CONTENT_NODE_WIDTH = 196;
+const CONTENT_NODE_HEIGHT = 190;
 const BIO_NODE_WIDTH = 264;
 const BIO_NODE_HEIGHT = 220;
 const BIO_COLLISION_RADIUS = 182;
 const CONTENT_COLLISION_PADDING = 18;
 const BIO_COLLISION_PADDING = 24;
 const TOGGLE_COLLISION_PADDING = 10;
-const CONTENT_FORCE_COLLISION_RADIUS = 118;
+const CONTENT_FORCE_COLLISION_RADIUS = 132;
 const TOGGLE_NODE_WIDTH = 160;
 const TOGGLE_NODE_HEIGHT = 54;
 const HANDLE_MARGIN = 0.14;
 const PREFERRED_HANDLE_GAP = 0.11;
 const HANDLE_SMOOTHING = 0.35;
+const FLOATING_NODE_Z_INDEX = 10000;
+const FLOATING_EDGE_Z_INDEX = 10001;
+const GRAPH_VIEW_STORAGE_KEY = 'greenpage-graph-view';
+const GRAPH_RETURN_FOCUS_NODE_KEY = 'greenpage-graph-return-focus-node';
+const GRAPH_NODE_CLASS_NAME = 'greenpage-graph-node';
+const GRAPH_NODE_HIGHLIGHT_SELF_CLASS_NAME = 'greenpage-graph-node-highlight-self';
+const GRAPH_NODE_HIGHLIGHT_CONNECTED_CLASS_NAME = 'greenpage-graph-node-highlight-connected';
+const STYLE_NODE_CLASS_NAME = 'greenpage-style-node';
 
 type ProjectedHandle = DynamicHandle & {
     nodeId: string;
@@ -81,7 +93,7 @@ type ProjectedHandle = DynamicHandle & {
 };
 
 const EMPTY_HANDLES: DynamicHandle[] = [];
-const COLLISION_CELL_SIZE = 220;
+const COLLISION_CELL_SIZE = 240;
 
 type BoxState = {
     x: number;
@@ -89,6 +101,17 @@ type BoxState = {
     w: number;
     h: number;
     pad: number;
+};
+
+type StoredGraphView = {
+    nodes: Array<{ id: string; x: number; y: number }>;
+    viewport?: Viewport;
+};
+
+type PendingGraphRestore = {
+    nodes: Node[];
+    viewport?: Viewport;
+    returnFocusNodeId: string | null;
 };
 
 function sizeOf(n: Node) {
@@ -259,6 +282,67 @@ function getCollisionPadding(nodeId: string) {
     if (nodeId === 'bio') return BIO_COLLISION_PADDING;
     if (nodeId === 'biotoggle') return TOGGLE_COLLISION_PADDING;
     return CONTENT_COLLISION_PADDING;
+}
+
+function participatesInCollision(nodeId: string) {
+    return nodeId !== 'biotoggle';
+}
+
+function readStoredGraphView(): StoredGraphView | null {
+    if (typeof window === 'undefined') return null;
+
+    const raw = window.sessionStorage.getItem(GRAPH_VIEW_STORAGE_KEY);
+    if (!raw) return null;
+
+    try {
+        const parsed = JSON.parse(raw) as Partial<StoredGraphView>;
+        if (!Array.isArray(parsed.nodes)) return null;
+
+        const nodes = parsed.nodes.filter(
+            (node): node is { id: string; x: number; y: number } =>
+                Boolean(node) &&
+                typeof node.id === 'string' &&
+                typeof node.x === 'number' &&
+                typeof node.y === 'number'
+        );
+
+        const viewport =
+            parsed.viewport &&
+            typeof parsed.viewport.x === 'number' &&
+            typeof parsed.viewport.y === 'number' &&
+            typeof parsed.viewport.zoom === 'number'
+                ? parsed.viewport
+                : undefined;
+
+        return { nodes, viewport };
+    } catch {
+        return null;
+    }
+}
+
+function persistGraphView(nodes: Node[], viewport?: Viewport) {
+    if (typeof window === 'undefined') return;
+
+    const payload: StoredGraphView = {
+        nodes: nodes.map((node) => ({
+            id: node.id,
+            x: node.position.x,
+            y: node.position.y,
+        })),
+        viewport,
+    };
+
+    window.sessionStorage.setItem(GRAPH_VIEW_STORAGE_KEY, JSON.stringify(payload));
+}
+
+function readReturnFocusNodeId() {
+    if (typeof window === 'undefined') return null;
+    return window.sessionStorage.getItem(GRAPH_RETURN_FOCUS_NODE_KEY);
+}
+
+function clearReturnFocusNodeId() {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.removeItem(GRAPH_RETURN_FOCUS_NODE_KEY);
 }
 
 function getCenter(node: Node) {
@@ -478,6 +562,51 @@ function buildEdgeStyle(edge: Pick<Edge, 'source' | 'target'>, highlightedNodeId
     };
 }
 
+function getConnectedNodeIds(graphRelations: GraphModel['relations'], nodeId: string | null) {
+    if (!nodeId) return new Set<string>();
+
+    const connectedNodeIds = new Set<string>([nodeId]);
+
+    for (const relation of graphRelations) {
+        if (relation.from === nodeId) {
+            connectedNodeIds.add(relation.to);
+        }
+        if (relation.to === nodeId) {
+            connectedNodeIds.add(relation.from);
+        }
+    }
+
+    return connectedNodeIds;
+}
+
+function getNodeClassName(nodeId: string, highlightedNodeId: string | null, connectedNodeIds: Set<string>) {
+    if (nodeId === 'biotoggle') {
+        return STYLE_NODE_CLASS_NAME;
+    }
+
+    if (!highlightedNodeId) {
+        return GRAPH_NODE_CLASS_NAME;
+    }
+
+    if (nodeId === highlightedNodeId) {
+        return `${GRAPH_NODE_CLASS_NAME} ${GRAPH_NODE_HIGHLIGHT_SELF_CLASS_NAME}`;
+    }
+
+    if (connectedNodeIds.has(nodeId)) {
+        return `${GRAPH_NODE_CLASS_NAME} ${GRAPH_NODE_HIGHLIGHT_CONNECTED_CLASS_NAME}`;
+    }
+
+    return GRAPH_NODE_CLASS_NAME;
+}
+
+function getEdgeZIndex(edge: Pick<Edge, 'source' | 'target'>) {
+    if (edge.source === 'biotoggle' || edge.target === 'biotoggle') {
+        return FLOATING_EDGE_Z_INDEX;
+    }
+
+    return 0;
+}
+
 function areEdgeStylesEqual(left: Edge['style'], right: Edge['style']) {
     const safeLeft = left ?? {};
     const safeRight = right ?? {};
@@ -495,6 +624,7 @@ function areEdgeStylesEqual(left: Edge['style'], right: Edge['style']) {
 
 function reuseEdgeIfPossible(previous: Edge | undefined, next: Edge, highlightedNodeId: string | null) {
     const nextStyle = buildEdgeStyle(next, highlightedNodeId);
+    const nextZIndex = getEdgeZIndex(next);
 
     if (
         previous &&
@@ -503,7 +633,8 @@ function reuseEdgeIfPossible(previous: Edge | undefined, next: Edge, highlighted
         previous.sourceHandle === next.sourceHandle &&
         previous.targetHandle === next.targetHandle &&
         previous.type === next.type &&
-        areEdgeStylesEqual(previous.style, nextStyle)
+        areEdgeStylesEqual(previous.style, nextStyle) &&
+        previous.zIndex === nextZIndex
     ) {
         return previous;
     }
@@ -511,22 +642,44 @@ function reuseEdgeIfPossible(previous: Edge | undefined, next: Edge, highlighted
     return {
         ...next,
         style: nextStyle,
+        zIndex: nextZIndex,
     };
 }
 
-function applyEdgeOpacity(edges: Edge[], highlightedNodeId: string | null) {
-    return edges.map((edge) => {
-        const nextStyle = buildEdgeStyle(edge, highlightedNodeId);
+function applyEdgeOpacity(edges: Edge[], previousHighlightedNodeId: string | null, nextHighlightedNodeId: string | null) {
+    const affectedNodeIds = new Set<string>();
+
+    if (previousHighlightedNodeId) {
+        affectedNodeIds.add(previousHighlightedNodeId);
+    }
+    if (nextHighlightedNodeId) {
+        affectedNodeIds.add(nextHighlightedNodeId);
+    }
+
+    if (affectedNodeIds.size === 0) {
+        return edges;
+    }
+
+    let updated = false;
+    const nextEdges = edges.map((edge) => {
+        if (!affectedNodeIds.has(edge.source) && !affectedNodeIds.has(edge.target)) {
+            return edge;
+        }
+
+        const nextStyle = buildEdgeStyle(edge, nextHighlightedNodeId);
 
         if (areEdgeStylesEqual(edge.style, nextStyle)) {
             return edge;
         }
 
+        updated = true;
         return {
             ...edge,
             style: nextStyle,
         };
     });
+
+    return updated ? nextEdges : edges;
 }
 
 function getDomainPairKey(left: DomainId, right: DomainId) {
@@ -783,6 +936,22 @@ function buildEdgesForNodes(
     const previousHandles = getExistingHandleLookup(nodes);
     const previousEdgeById = new Map(previousEdges.map((edge) => [edge.id, edge]));
     const projectedHandles: ProjectedHandle[] = [];
+    const bioToggleNode = nodeById.get('biotoggle');
+    const bioNode = nodeById.get('bio');
+
+    if (bioToggleNode && bioNode) {
+        const toggleProjection = projectHandleToBoundary(bioToggleNode, getCenter(bioNode));
+
+        projectedHandles.push(smoothProjectedHandle({
+            nodeId: bioToggleNode.id,
+            id: 'bio-toggle-port',
+            type: 'source',
+            side: toggleProjection.side,
+            offset: toggleProjection.offset,
+            desiredOffset: toggleProjection.offset,
+        }, previousHandles));
+    }
+
     const edges: Edge[] = [
         reuseEdgeIfPossible(
             previousEdgeById.get('edge-theme-bio'),
@@ -848,10 +1017,11 @@ function buildEdgesForNodes(
 }
 
 function relaxInitialNodes(nodes: Node[]) {
-    const lockedIds = new Set(['bio', 'biotoggle']);
+    const lockedIds = new Set(['bio']);
     const pos = new Map<string, BoxState>();
 
     for (const node of nodes) {
+        if (!participatesInCollision(node.id)) continue;
         const size = getNodeDimensions(node);
 
         pos.set(node.id, {
@@ -871,6 +1041,9 @@ function relaxInitialNodes(nodes: Node[]) {
     });
 
     return nodes.map((node) => {
+        if (!participatesInCollision(node.id)) {
+            return node;
+        }
         const current = pos.get(node.id)!;
         return { ...node, position: { x: current.x, y: current.y } };
     });
@@ -959,18 +1132,22 @@ function buildInitialGraph(
             type: 'bioNode',
             position: bioPosition,
             data: { theme, nodeRole: 'bio' },
+            className: GRAPH_NODE_CLASS_NAME,
         },
         {
             id: 'biotoggle',
             type: 'bioToggleNode',
             position: togglePosition,
             data: { theme, setTheme, nodeRole: 'toggle' },
+            zIndex: FLOATING_NODE_Z_INDEX,
+            className: STYLE_NODE_CLASS_NAME,
         },
         ...contentNodes.map((node) => {
             const position = positionById.get(node.id) ?? bioCenter;
             return {
                 id: node.id,
                 type: 'storyNode',
+                className: GRAPH_NODE_CLASS_NAME,
                 position: {
                     x: position.x - CONTENT_NODE_WIDTH / 2,
                     y: position.y - CONTENT_NODE_HEIGHT / 2,
@@ -983,6 +1160,7 @@ function buildInitialGraph(
                     title: node.title,
                     subtitle: node.subtitle,
                     summary: node.summary,
+                    gallery: node.gallery,
                     detail: node.detail,
                     badges: node.tags,
                 } satisfies StoryNodeData,
@@ -994,15 +1172,20 @@ function buildInitialGraph(
 }
 
 const NodeCanvas: React.FC = () => {
-    const [theme, setTheme] = useState<Theme>('nyc');
-    const [graphModel, setGraphModel] = useState<GraphModel | null>(null);
+    const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
+    const initialThemeRef = useRef(theme);
+    const [graphModel, setGraphModel] = useState<GraphModel | null>(() => readCachedGraphModel());
     const [graphError, setGraphError] = useState<string | null>(null);
+    const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
     const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+    const hasHydratedStoredViewRef = useRef(false);
+    const flowReadyRef = useRef(false);
+    const pendingGraphRestoreRef = useRef<PendingGraphRestore | null>(null);
     const viewport = useMemo(
         () => ({ width: window.innerWidth, height: window.innerHeight }),
         []
     );
-    const highlightedNodeId = draggingNodeId;
+    const highlightedNodeId = draggingNodeId ?? hoveredNodeId;
     const graphRelations = useMemo(
         () => graphModel ? getGraphRelations(graphModel) : [],
         [graphModel]
@@ -1012,18 +1195,119 @@ const NodeCanvas: React.FC = () => {
         [graphRelations]
     );
     const initialGraph = useMemo(
-        () => graphModel ? buildInitialGraph(graphModel, graphRelations, 'nyc', setTheme, viewport.width, viewport.height) : { nodes: [], edges: [] },
+        () => graphModel ? buildInitialGraph(graphModel, graphRelations, initialThemeRef.current, setTheme, viewport.width, viewport.height) : { nodes: [], edges: [] },
         [graphModel, graphRelations, viewport.height, viewport.width]
     );
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
-    const { fitView } = useReactFlow();
+    const { fitView, getViewport, setCenter, setViewport } = useReactFlow();
     const dragRafId = useRef<number | null>(null);
     const edgesRef = useRef<Edge[]>(initialGraph.edges);
+    const highlightedNodeIdRef = useRef<string | null>(null);
+
+    const handleResetGraph = useCallback(() => {
+        if (dragRafId.current) {
+            cancelAnimationFrame(dragRafId.current);
+            dragRafId.current = null;
+        }
+
+        setHoveredNodeId(null);
+        setDraggingNodeId(null);
+        highlightedNodeIdRef.current = null;
+
+        const resetNodes = initialGraph.nodes.map((node) => {
+            if (node.id === 'bio') {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        theme,
+                        onResetGraph: handleResetGraph,
+                    },
+                    className: GRAPH_NODE_CLASS_NAME,
+                };
+            }
+
+            if (node.id === 'biotoggle') {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        theme,
+                        setTheme,
+                    },
+                    className: STYLE_NODE_CLASS_NAME,
+                };
+            }
+
+            return {
+                ...node,
+                className: GRAPH_NODE_CLASS_NAME,
+            };
+        });
+
+        const resetGraph = buildEdgesForNodes(resetNodes, orderedGraphRelations, null);
+        setNodes(resetGraph.nodes);
+        setEdges(resetGraph.edges);
+        edgesRef.current = resetGraph.edges;
+
+        requestAnimationFrame(() => {
+            fitView({
+                nodes: [{ id: 'bio' }],
+                padding: 2.1,
+                duration: 420,
+                includeHiddenNodes: false,
+            });
+        });
+    }, [fitView, initialGraph.nodes, orderedGraphRelations, setEdges, setNodes, setTheme, theme]);
+
+    const applyPendingGraphRestore = useCallback(() => {
+        if (!flowReadyRef.current || !pendingGraphRestoreRef.current) {
+            return false;
+        }
+
+        const pendingRestore = pendingGraphRestoreRef.current;
+        pendingGraphRestoreRef.current = null;
+
+        requestAnimationFrame(() => {
+            if (pendingRestore.viewport) {
+                setViewport(pendingRestore.viewport, { duration: 0 });
+            }
+
+            if (!pendingRestore.returnFocusNodeId) {
+                return;
+            }
+
+            const targetNode = pendingRestore.nodes.find((node) => node.id === pendingRestore.returnFocusNodeId);
+            if (!targetNode) {
+                clearReturnFocusNodeId();
+                return;
+            }
+
+            const center = getCenter(targetNode);
+            const targetZoom = pendingRestore.viewport?.zoom ?? getViewport().zoom;
+
+            requestAnimationFrame(() => {
+                setCenter(center.x, center.y, {
+                    zoom: targetZoom,
+                    duration: 420,
+                });
+                clearReturnFocusNodeId();
+            });
+        });
+
+        return true;
+    }, [getViewport, setCenter, setViewport]);
 
     useEffect(() => {
         let cancelled = false;
+
+        if (graphModel) {
+            return () => {
+                cancelled = true;
+            };
+        }
 
         loadGraphModel()
             .then((model) => {
@@ -1039,29 +1323,103 @@ const NodeCanvas: React.FC = () => {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [graphModel]);
 
     useEffect(() => {
-        setNodes(initialGraph.nodes);
-        setEdges(initialGraph.edges);
-    }, [initialGraph, setEdges, setNodes]);
+        if (!graphModel) return;
+
+        const storedView = hasHydratedStoredViewRef.current ? null : readStoredGraphView();
+        const returnFocusNodeId = readReturnFocusNodeId();
+        const storedPositions = new Map(storedView?.nodes.map((node) => [node.id, node]) ?? []);
+        const restoredNodes = initialGraph.nodes.map((node) => {
+            const storedNode = storedPositions.get(node.id);
+            if (!storedNode) return node;
+
+            return {
+                ...node,
+                position: {
+                    x: storedNode.x,
+                    y: storedNode.y,
+                },
+            };
+        });
+        const restoredGraph = buildEdgesForNodes(restoredNodes, orderedGraphRelations);
+
+        setNodes(restoredGraph.nodes);
+        setEdges(restoredGraph.edges);
+        edgesRef.current = restoredGraph.edges;
+
+        if (!hasHydratedStoredViewRef.current) {
+            hasHydratedStoredViewRef.current = true;
+        }
+
+        pendingGraphRestoreRef.current = {
+            nodes: restoredGraph.nodes,
+            viewport: storedView?.viewport,
+            returnFocusNodeId,
+        };
+        applyPendingGraphRestore();
+    }, [applyPendingGraphRestore, graphModel, initialGraph, orderedGraphRelations, setEdges, setNodes]);
 
     useEffect(() => {
         edgesRef.current = edges;
     }, [edges]);
 
     useEffect(() => {
-        setEdges((prev) => applyEdgeOpacity(prev, highlightedNodeId));
-    }, [highlightedNodeId, setEdges]);
+        if (!graphModel || nodes.length === 0) return;
+        persistGraphView(nodes, getViewport());
+    }, [getViewport, graphModel, nodes]);
+
+    useEffect(() => {
+        const previousHighlightedNodeId = highlightedNodeIdRef.current;
+        if (previousHighlightedNodeId === highlightedNodeId) {
+            return;
+        }
+
+        const previousConnectedNodeIds = getConnectedNodeIds(orderedGraphRelations, previousHighlightedNodeId);
+        const nextConnectedNodeIds = getConnectedNodeIds(orderedGraphRelations, highlightedNodeId);
+        const changedNodeIds = new Set<string>([
+            ...previousConnectedNodeIds,
+            ...nextConnectedNodeIds,
+        ]);
+
+        setEdges((prev) => applyEdgeOpacity(prev, previousHighlightedNodeId, highlightedNodeId));
+
+        if (changedNodeIds.size > 0) {
+            setNodes((prev) => {
+                let updated = false;
+                const nextNodes = prev.map((node) => {
+                    if (!changedNodeIds.has(node.id) && node.id !== 'biotoggle') {
+                        return node;
+                    }
+
+                    const nextClassName = getNodeClassName(node.id, highlightedNodeId, nextConnectedNodeIds);
+                    if ((node.className ?? '') === nextClassName) {
+                        return node;
+                    }
+
+                    updated = true;
+                    return {
+                        ...node,
+                        className: nextClassName,
+                    };
+                });
+
+                return updated ? nextNodes : prev;
+            });
+        }
+
+        highlightedNodeIdRef.current = highlightedNodeId;
+    }, [highlightedNodeId, orderedGraphRelations, setEdges, setNodes]);
 
     const onNodeClick: NodeMouseHandler = useCallback((_, node) => {
         if (node.id === 'biotoggle') return;
 
         if (node.id === 'bio') {
             fitView({
-                nodes: nodes.map((graphNode) => ({ id: graphNode.id })),
-                padding: 0.8,
-                duration: 450,
+                nodes: [{ id: node.id }],
+                padding: 2.1,
+                duration: 400,
                 includeHiddenNodes: false,
             });
         } else {
@@ -1072,10 +1430,41 @@ const NodeCanvas: React.FC = () => {
                 includeHiddenNodes: false,
             });
         }
+    }, [fitView]);
+
+    const onNodeDoubleClick: NodeMouseHandler = useCallback((_, node) => {
+        if (node.id !== 'bio') return;
+
+        fitView({
+            nodes: nodes.map((graphNode) => ({ id: graphNode.id })),
+            padding: 0.8,
+            duration: 450,
+            includeHiddenNodes: false,
+        });
     }, [fitView, nodes]);
 
-    const onInit = (instance: any) => {
+    const onNodeMouseEnter: NodeMouseHandler = useCallback((_, node) => {
+        if (node.id === 'biotoggle') return;
+        setHoveredNodeId(node.id);
+    }, []);
+
+    const onNodeMouseLeave: NodeMouseHandler = useCallback((_, node) => {
+        if (node.id === 'biotoggle') return;
+        setHoveredNodeId((current) => (current === node.id ? null : current));
+    }, []);
+
+    const onInit = (instance: ReactFlowInstance) => {
+        flowReadyRef.current = true;
+        if (applyPendingGraphRestore()) {
+            return;
+        }
+
         if (initialGraph.nodes.length === 0) return;
+        const storedView = readStoredGraphView();
+        if (storedView?.viewport) {
+            instance.setViewport(storedView.viewport, { duration: 0 });
+            return;
+        }
         instance.fitView({
             nodes: initialGraph.nodes.map((node) => ({ id: node.id })),
             padding: 0.8,
@@ -1084,12 +1473,13 @@ const NodeCanvas: React.FC = () => {
         });
     };
 
+    const onMoveEnd = useCallback(() => {
+        if (!graphModel || nodes.length === 0) return;
+        persistGraphView(nodes, getViewport());
+    }, [getViewport, graphModel, nodes]);
+
     const onNodeDrag = useCallback((_: unknown, dragged: Node) => {
         if (!graphModel) {
-            return;
-        }
-
-        if (dragged.id === 'biotoggle') {
             return;
         }
 
@@ -1101,9 +1491,23 @@ const NodeCanvas: React.FC = () => {
 
         dragRafId.current = requestAnimationFrame(() => {
             setNodes((prev) => {
+                if (dragged.id === 'biotoggle') {
+                    const nextNodes = prev.map((node) =>
+                        node.id === dragged.id
+                            ? { ...node, position: { x: dragged.position.x, y: dragged.position.y } }
+                            : node
+                    );
+
+                    const nextGraph = buildEdgesForNodes(nextNodes, orderedGraphRelations, dragged.id, edgesRef.current);
+                    edgesRef.current = nextGraph.edges;
+                    setEdges(nextGraph.edges);
+                    return nextGraph.nodes;
+                }
+
                 const pos = new Map<string, BoxState>();
 
                 for (const node of prev) {
+                    if (!participatesInCollision(node.id)) continue;
                     const { w, h } = getNodeDimensions(node);
                     pos.set(node.id, {
                         x: node.position.x,
@@ -1121,13 +1525,16 @@ const NodeCanvas: React.FC = () => {
                 }
 
                 relaxBoxPositions(pos, {
-                    immovableIds: new Set([dragged.id, 'biotoggle']),
+                    immovableIds: new Set([dragged.id]),
                     maxIters: 8,
                     damping: 0.64,
                     maxStep: 38,
                 });
 
                 const nextNodes = prev.map((node) => {
+                    if (!participatesInCollision(node.id)) {
+                        return node;
+                    }
                     const point = pos.get(node.id)!;
                     const nextPosition = node.id === dragged.id
                         ? { x: dragged.position.x, y: dragged.position.y }
@@ -1151,9 +1558,23 @@ const NodeCanvas: React.FC = () => {
     const onNodeDragStop = useCallback((_: unknown, dragged: Node) => {
         if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
         setNodes((prev) => {
+            if (dragged.id === 'biotoggle') {
+                const nextNodes = prev.map((node) =>
+                    node.id === dragged.id
+                        ? { ...node, position: { x: dragged.position.x, y: dragged.position.y } }
+                        : node
+                );
+
+                const nextGraph = buildEdgesForNodes(nextNodes, orderedGraphRelations, null, edgesRef.current);
+                edgesRef.current = nextGraph.edges;
+                setEdges(nextGraph.edges);
+                return nextGraph.nodes;
+            }
+
             const pos = new Map<string, BoxState>();
 
             for (const node of prev) {
+                if (!participatesInCollision(node.id)) continue;
                 const { w, h } = getNodeDimensions(node);
                 pos.set(node.id, {
                     x: node.position.x,
@@ -1171,13 +1592,16 @@ const NodeCanvas: React.FC = () => {
             }
 
             relaxBoxPositions(pos, {
-                immovableIds: new Set([dragged.id, 'biotoggle']),
+                immovableIds: new Set([dragged.id]),
                 maxIters: 16,
                 damping: 0.72,
                 maxStep: 42,
             });
 
             const nextNodes = prev.map((node) => {
+                if (!participatesInCollision(node.id)) {
+                    return node;
+                }
                 const point = pos.get(node.id)!;
                 if (node.position.x === point.x && node.position.y === point.y) {
                     return node;
@@ -1201,7 +1625,7 @@ const NodeCanvas: React.FC = () => {
         setNodes((prev) =>
             prev.map((node) => {
                 if (node.id === 'bio') {
-                    return { ...node, data: { ...node.data, theme } };
+                    return { ...node, data: { ...node.data, theme, onResetGraph: handleResetGraph } };
                 }
                 if (node.id === 'biotoggle') {
                     return { ...node, data: { ...node.data, theme, setTheme } };
@@ -1209,10 +1633,11 @@ const NodeCanvas: React.FC = () => {
                 return node;
             })
         );
-    }, [theme, setNodes, setTheme]);
+    }, [handleResetGraph, theme, setNodes, setTheme]);
 
     useEffect(() => {
         applyThemeVars(theme);
+        persistTheme(theme);
     }, [theme]);
 
     useEffect(() => {
@@ -1242,9 +1667,14 @@ const NodeCanvas: React.FC = () => {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onNodeClick={onNodeClick}
+            onNodeDoubleClick={onNodeDoubleClick}
+            onNodeMouseEnter={onNodeMouseEnter}
+            onNodeMouseLeave={onNodeMouseLeave}
             onInit={onInit}
             onNodeDrag={onNodeDrag}
             onNodeDragStop={onNodeDragStop}
+            onMoveEnd={onMoveEnd}
+            elevateNodesOnSelect={false}
             panOnDrag
             zoomOnScroll
             proOptions={{ hideAttribution: true }}

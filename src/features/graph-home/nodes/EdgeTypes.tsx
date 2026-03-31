@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { BaseEdge, getSimpleBezierPath, type EdgeProps } from "@xyflow/react";
 
 function DottedEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {} }: EdgeProps) {

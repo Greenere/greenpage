@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Footnote, Paragraph, Subtitle } from "../../../shared/ui/StyledTextBlocks";
 import { Position, useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
@@ -9,24 +9,77 @@ interface BioData {
     theme: Theme
     handles?: DynamicHandle[]
     portraitConnected?: boolean
+    onResetGraph?: () => void
 }
 
 interface BioNodeProps {
     id: string,
-    data: BioData,
-    isConnectable: boolean
+    data: BioData
 }
 
 const BioNode: React.FC<BioNodeProps> = ({
     id,
-    data, isConnectable: _isConnectable
+    data
 }) => {
     const [focused, setFocused] = useState<boolean>(false);
+    const [resetArmed, setResetArmed] = useState(false);
+    const resetArmTimeoutRef = useRef<number | null>(null);
     const updateNodeInternals = useUpdateNodeInternals();
 
     useLayoutEffect(() => {
         updateNodeInternals(id);
     }, [data.handles, data.portraitConnected, id, updateNodeInternals]);
+
+    useEffect(() => {
+        return () => {
+            if (resetArmTimeoutRef.current !== null) {
+                window.clearTimeout(resetArmTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const armReset = useCallback(() => {
+        if (resetArmTimeoutRef.current !== null) {
+            window.clearTimeout(resetArmTimeoutRef.current);
+        }
+
+        resetArmTimeoutRef.current = window.setTimeout(() => {
+            setResetArmed(true);
+            resetArmTimeoutRef.current = null;
+        }, 220);
+    }, []);
+
+    const disarmReset = useCallback(() => {
+        if (resetArmTimeoutRef.current !== null) {
+            window.clearTimeout(resetArmTimeoutRef.current);
+            resetArmTimeoutRef.current = null;
+        }
+
+        setResetArmed(false);
+    }, []);
+
+    const stopEventPropagation = (event: React.SyntheticEvent) => {
+        event.stopPropagation();
+    };
+
+    const handleResetPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+        if (!resetArmed) {
+            return;
+        }
+
+        stopEventPropagation(event);
+    };
+
+    const handleResetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (!resetArmed || !data.onResetGraph) {
+            event.preventDefault();
+            return;
+        }
+
+        stopEventPropagation(event);
+        data.onResetGraph();
+        event.currentTarget.blur();
+    };
 
     return (<>
         <NodeContainer
@@ -91,6 +144,27 @@ const BioNode: React.FC<BioNodeProps> = ({
                 <div style={{ paddingTop: "0.35rem" }}>
                     <Footnote style={{ opacity: 0.84 }}>lihaoyangjingzhou@outlook.com</Footnote>
                 </div>
+            </div>
+            <div
+                className="node-card-detail-shell"
+                onPointerEnter={armReset}
+                onPointerLeave={disarmReset}
+            >
+                <button
+                    type="button"
+                    className={`node-card-detail-link ${resetArmed ? 'nodrag nopan' : ''}`.trim()}
+                    onPointerDown={handleResetPointerDown}
+                    onClick={handleResetClick}
+                    onFocus={armReset}
+                    onBlur={disarmReset}
+                    aria-label="Reset graph layout"
+                    style={{
+                        background: "transparent",
+                        border: "none",
+                    }}
+                >
+                    <span>reset</span>
+                </button>
             </div>
 
             {(data.handles ?? []).map((handle) => (

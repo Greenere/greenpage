@@ -4,7 +4,7 @@ import './index.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter basename="/greenpage">
+  <BrowserRouter basename={import.meta.env.BASE_URL}>
     <App />
   </BrowserRouter>,
 )

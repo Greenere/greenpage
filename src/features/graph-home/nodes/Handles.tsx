@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Handle, Position } from "@xyflow/react"
 
 export type HandleSide = 'left' | 'right' | 'top' | 'bottom'
