@@ -83,5 +83,6 @@ export const THEME_CONFIG = {
 
 export type Theme = keyof typeof THEME_CONFIG;
 
-export const DEFAULT_THEME: Theme = 'nyc';
+// Controls the initial style when there is no saved preference in localStorage yet.
+export const DEFAULT_THEME: Theme = 'joshua';
 export const THEME_ORDER = Object.keys(THEME_CONFIG) as Theme[];

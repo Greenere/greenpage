@@ -15,6 +15,7 @@ import {
 } from '../../shared/ui/viewTransitions';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from './content/BioPage';
+import ThemePicker from './ThemePicker';
 import {
   getDisplayDomain,
   getGraphRelations,
@@ -673,6 +674,11 @@ const NodeDetailPage: React.FC = () => {
     playSharedElementEnterTransition(heroSectionRef.current, transitionName);
   }, [transitionName]);
 
+  const handleThemeChange = (nextTheme: Theme) => {
+    setTheme(nextTheme);
+    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  };
+
   const handleNavigateWithTransition = (href: string) => {
     navigateWithViewTransition(() => {
       navigate(href);
@@ -831,26 +837,23 @@ const NodeDetailPage: React.FC = () => {
           style={{
             maxWidth: DETAIL_SECTION_WIDTH,
             marginInline: 'auto',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '1rem',
           }}
         >
           <Link
             to="/"
+            className="node-card-detail-link node-page-back-link"
             onClick={(event) => {
               event.preventDefault();
               handleBackToGraph();
             }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              color: 'var(--color-text)',
-              fontWeight: 600,
-              textDecoration: 'underline',
-              textUnderlineOffset: '0.18em',
-            }}
           >
-            {UI_COPY.nodeDetailPage.backToGraph}
+            <span>{UI_COPY.nodeDetailPage.backToGraph}</span>
           </Link>
+          <ThemePicker theme={theme} setTheme={handleThemeChange} variant="inline" />
         </div>
 
         <section

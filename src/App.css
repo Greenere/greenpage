@@ -134,6 +134,11 @@ body,
   justify-content: center;
 }
 
+.node-page-back-shell {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .node-card-detail-link {
   position: relative;
   display: inline-flex;
@@ -155,6 +160,17 @@ body,
   -webkit-appearance: none;
   outline: none;
   box-shadow: none;
+}
+
+.node-page-back-link {
+  font-size: 0.68rem;
+  padding: 0.16rem 0.1rem 0.38rem;
+  letter-spacing: 0.05em;
+  opacity: 0.82;
+}
+
+.node-page-back-link::after {
+  bottom: 0.12rem;
 }
 
 .node-card-detail-link span {
