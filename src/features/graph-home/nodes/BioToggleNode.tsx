@@ -31,11 +31,13 @@ const BioToggleNode: React.FC<BioToggleNodeProps> = ({
             paddingTop:"0.2rem",
             paddingLeft: "0.2rem",
             paddingRight: "0.2rem",
-            border: `2px solid var(--color-secondary)`,
+            border: `1px solid transparent`,
             borderRadius: "13px",
             textAlign:"center",
             background: "color-mix(in srgb, var(--color-background) 88%, white 12%)",
-            backdropFilter: "blur(6px)"
+            backdropFilter: "blur(6px)",
+            boxShadow: `var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) var(--greenpage-node-ring-color, color-mix(in srgb, var(--color-secondary) 38%, transparent))`,
+            transition: "box-shadow 170ms ease, background-color 170ms ease",
         }}>
             <div style={{
                 fontSize:"0.5rem"

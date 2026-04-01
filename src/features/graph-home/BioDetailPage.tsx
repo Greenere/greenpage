@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  DETAIL_PAGE_ACTION_BORDER,
+  DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
+  getHighlightBorderShadowPrefix,
+} from '../../configs/graphHighlight';
 import { THEME_CONFIG } from '../../configs/themes';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
@@ -205,13 +210,18 @@ const BioDetailPage: React.FC = () => {
     );
   }
 
+  const detailPageStyle = {
+    minHeight: '100vh',
+    color: 'var(--color-text)',
+    ['--greenpage-detail-action-border-width-idle' as const]: DETAIL_PAGE_ACTION_BORDER.idleWidth,
+    ['--greenpage-detail-action-border-opacity-idle' as const]: DETAIL_PAGE_ACTION_BORDER.idleOpacity,
+    ['--greenpage-detail-action-border-width-active' as const]: DETAIL_PAGE_ACTION_BORDER.activeWidth,
+    ['--greenpage-detail-action-border-opacity-active' as const]: DETAIL_PAGE_ACTION_BORDER.activeOpacity,
+    ['--greenpage-detail-action-ring-shadow-prefix' as const]: getHighlightBorderShadowPrefix(DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION),
+  } as CSSProperties;
+
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        color: 'var(--color-text)',
-      }}
-    >
+    <div style={detailPageStyle}>
       <div
         style={{
           maxWidth: '72rem',
@@ -449,7 +459,7 @@ const BioDetailPage: React.FC = () => {
                   width: '100%',
                   padding: '0.8rem 0.85rem',
                   borderRadius: '16px',
-                  border: '1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)',
+                  border: '1px solid transparent',
                   color: 'var(--color-text)',
                   background: 'color-mix(in srgb, var(--color-background) 84%, white 16%)',
                   textDecoration: 'none',

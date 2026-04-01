@@ -47,17 +47,31 @@ body,
 }
 
 .react-flow__node.greenpage-graph-node {
-  transition: filter 170ms ease;
+  --greenpage-node-ring-width: calc(var(--greenpage-node-ring-width-idle, 1.35) * 1px);
+  --greenpage-node-ring-color: color-mix(
+    in srgb,
+    var(--color-secondary) calc(var(--greenpage-node-ring-opacity-idle, 0.34) * 100%),
+    transparent
+  );
 }
 
 .react-flow__node.greenpage-graph-node.greenpage-graph-node-highlight-self {
-  filter:
-    drop-shadow(0 10px 16px rgba(0, 0, 0, 0.2))
-    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+  --greenpage-node-ring-width: calc(var(--greenpage-node-ring-width-active, 3.5) * 1px);
+  --greenpage-node-ring-color: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--color-secondary) 90%, var(--color-text) 10%)
+      calc(var(--greenpage-node-ring-opacity-active, 0.92) * 100%),
+    transparent
+  );
 }
 
 .react-flow__node.greenpage-graph-node.greenpage-graph-node-highlight-connected {
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.14));
+  --greenpage-node-ring-width: calc(var(--greenpage-node-ring-width-connected, 2.5) * 1px);
+  --greenpage-node-ring-color: color-mix(
+    in srgb,
+    var(--color-secondary) calc(var(--greenpage-node-ring-opacity-connected, 0.64) * 100%),
+    transparent
+  );
 }
 
 .node-card-detail-shell {
@@ -133,18 +147,27 @@ body,
 }
 
 .node-detail-related-link {
+  box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, inset 0 0 0)
+    calc(var(--greenpage-detail-action-border-width-idle, 1.35) * 1px)
+    color-mix(
+      in srgb,
+      var(--color-secondary) calc(var(--greenpage-detail-action-border-opacity-idle, 0.45) * 100%),
+      transparent
+    );
   transition:
-    transform 180ms ease,
     box-shadow 180ms ease,
-    border-color 180ms ease,
     background-color 180ms ease;
 }
 
 .node-detail-related-link:hover,
 .node-detail-related-link:focus-visible {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 34px rgba(0, 0, 0, 0.09);
-  border-color: color-mix(in srgb, var(--color-secondary) 62%, transparent);
+  box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, inset 0 0 0)
+    calc(var(--greenpage-detail-action-border-width-active, 3) * 1px)
+    color-mix(
+      in srgb,
+      var(--color-secondary) calc(var(--greenpage-detail-action-border-opacity-active, 0.9) * 100%),
+      transparent
+    );
   background: color-mix(in srgb, var(--color-background) 80%, white 20%);
 }
 
@@ -153,7 +176,6 @@ body,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .react-flow__node.greenpage-graph-node,
   .node-card-detail-link,
   .node-card-detail-link::after,
   .node-detail-related-link {

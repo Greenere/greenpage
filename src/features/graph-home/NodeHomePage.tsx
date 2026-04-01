@@ -19,6 +19,13 @@ import BioToggleNode from './nodes/BioToggleNode';
 import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graphFocus';
+import {
+    GRAPH_EDGE_HIGHLIGHT_STROKE_WIDTH,
+    GRAPH_NODE_HIGHLIGHT_GROWTH_DIRECTION,
+    GRAPH_NODE_HIGHLIGHT_RING_OPACITY,
+    GRAPH_NODE_HIGHLIGHT_RING_WIDTH,
+    getHighlightBorderShadowPrefix,
+} from '../../configs/graphHighlight';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
@@ -615,7 +622,7 @@ function buildEdgeStyle(edge: Pick<Edge, 'source' | 'target'>, highlightedNodeId
     return {
         opacity: 1,
         strokeDasharray: highlighted ? 'none' : '4 2',
-        strokeWidth: highlighted ? 2.35 : 2,
+        strokeWidth: highlighted ? GRAPH_EDGE_HIGHLIGHT_STROKE_WIDTH.active : GRAPH_EDGE_HIGHLIGHT_STROKE_WIDTH.idle,
     };
 }
 
@@ -632,12 +639,38 @@ function buildConnectedNodeIdsByNode(graphRelations: GraphModel['relations']) {
         connectedByNode.set(relation.to, targetNodes);
     }
 
+    const bioNodes = connectedByNode.get('bio') ?? new Set<string>(['bio']);
+    bioNodes.add('biotoggle');
+    connectedByNode.set('bio', bioNodes);
+
+    const toggleNodes = connectedByNode.get('biotoggle') ?? new Set<string>(['biotoggle']);
+    toggleNodes.add('bio');
+    connectedByNode.set('biotoggle', toggleNodes);
+
     return connectedByNode;
+}
+
+function getStyleNodeClassName(highlightedNodeId: string | null, connectedNodeIds: Set<string>) {
+    const baseClassName = `${GRAPH_NODE_CLASS_NAME} ${STYLE_NODE_CLASS_NAME}`;
+
+    if (!highlightedNodeId) {
+        return baseClassName;
+    }
+
+    if (highlightedNodeId === 'biotoggle') {
+        return `${baseClassName} ${GRAPH_NODE_HIGHLIGHT_SELF_CLASS_NAME}`;
+    }
+
+    if (connectedNodeIds.has('biotoggle')) {
+        return `${baseClassName} ${GRAPH_NODE_HIGHLIGHT_CONNECTED_CLASS_NAME}`;
+    }
+
+    return baseClassName;
 }
 
 function getNodeClassName(nodeId: string, highlightedNodeId: string | null, connectedNodeIds: Set<string>) {
     if (nodeId === 'biotoggle') {
-        return STYLE_NODE_CLASS_NAME;
+        return getStyleNodeClassName(highlightedNodeId, connectedNodeIds);
     }
 
     if (!highlightedNodeId) {
@@ -1134,7 +1167,7 @@ function buildInitialGraph(
             position: togglePosition,
             data: { theme, setTheme, nodeRole: 'toggle' },
             zIndex: FLOATING_NODE_Z_INDEX,
-            className: STYLE_NODE_CLASS_NAME,
+            className: `${GRAPH_NODE_CLASS_NAME} ${STYLE_NODE_CLASS_NAME}`,
         },
         ...contentNodes.map((node) => {
             const position = positionById.get(node.id) ?? bioCenter;
@@ -1257,7 +1290,7 @@ const NodeCanvas: React.FC = () => {
                         theme,
                         setTheme,
                     },
-                    className: STYLE_NODE_CLASS_NAME,
+                    className: `${GRAPH_NODE_CLASS_NAME} ${STYLE_NODE_CLASS_NAME}`,
                 };
             }
 
@@ -1458,12 +1491,10 @@ const NodeCanvas: React.FC = () => {
     }, [nodes, setCenter, viewport.height, viewport.width]);
 
     const onNodeMouseEnter: NodeMouseHandler = useCallback((_, node) => {
-        if (node.id === 'biotoggle') return;
         setHoveredNodeId(node.id);
     }, []);
 
     const onNodeMouseLeave: NodeMouseHandler = useCallback((_, node) => {
-        if (node.id === 'biotoggle') return;
         setHoveredNodeId((current) => (current === node.id ? null : current));
     }, []);
 
@@ -1725,8 +1756,22 @@ const NodeCanvas: React.FC = () => {
 }
 
 export default function NodeHomePage() {
+    const graphStyleVars = {
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        inset: 0,
+        ['--greenpage-node-ring-width-idle' as const]: GRAPH_NODE_HIGHLIGHT_RING_WIDTH.idle,
+        ['--greenpage-node-ring-width-connected' as const]: GRAPH_NODE_HIGHLIGHT_RING_WIDTH.connected,
+        ['--greenpage-node-ring-width-active' as const]: GRAPH_NODE_HIGHLIGHT_RING_WIDTH.active,
+        ['--greenpage-node-ring-opacity-idle' as const]: GRAPH_NODE_HIGHLIGHT_RING_OPACITY.idle,
+        ['--greenpage-node-ring-opacity-connected' as const]: GRAPH_NODE_HIGHLIGHT_RING_OPACITY.connected,
+        ['--greenpage-node-ring-opacity-active' as const]: GRAPH_NODE_HIGHLIGHT_RING_OPACITY.active,
+        ['--greenpage-node-ring-shadow-prefix' as const]: getHighlightBorderShadowPrefix(GRAPH_NODE_HIGHLIGHT_GROWTH_DIRECTION),
+    } as React.CSSProperties;
+
     return (
-        <div style={{ width: "100vw", height: "100vh", margin: 0, inset: 0 }}>
+        <div style={graphStyleVars}>
             <ReactFlowProvider>
                 <NodeCanvas />
             </ReactFlowProvider>

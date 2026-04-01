@@ -1,9 +1,15 @@
-import { Fragment, useEffect, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import {
+  DETAIL_PAGE_ACTION_BORDER,
+  DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
+  getHighlightBorderShadowPrefix,
+} from '../../configs/graphHighlight';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
 import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
+import { loadBioPageContent, readCachedBioPageContent } from './content/BioPage';
 import {
   getDisplayDomain,
   getGraphRelations,
@@ -38,21 +44,58 @@ function isInternalHref(href: string) {
   return href.startsWith('/') && !isExternalHref(href);
 }
 
-function getRelatedEntries(model: GraphModel, node: GraphContentNode) {
+type RelatedEntry = {
+  relation: GraphRelation;
+  relatedNodeId: string;
+  relatedNodeTitle: string;
+  relatedNodeSubtitle: string;
+  displayKind: string;
+  displayLabel: string;
+  isBio: boolean;
+};
+
+function getRelatedEntries(model: GraphModel, node: GraphContentNode, bioSubtitle: string | null) {
   const nodeById = new Map(model.nodes.map((entry) => [entry.id, entry]));
 
   return getGraphRelations(model)
     .filter((relation) => relation.from === node.id || relation.to === node.id)
-    .filter((relation) => relation.from !== 'bio' && relation.to !== 'bio')
-    .map((relation) => {
+    .map<RelatedEntry | null>((relation) => {
       const relatedId = relation.from === node.id ? relation.to : relation.from;
+      if (relatedId === 'bio') {
+        return {
+          relation,
+          relatedNodeId: 'bio',
+          relatedNodeTitle: 'Haoyang Li',
+          relatedNodeSubtitle: bioSubtitle ?? 'Software engineer in the San Francisco Bay Area',
+          displayKind: 'BIO',
+          displayLabel: bioSubtitle ?? 'Software engineer in the San Francisco Bay Area',
+          isBio: true,
+        };
+      }
+
+      const relatedNode = nodeById.get(relatedId);
+      if (!relatedNode) {
+        return null;
+      }
+
       return {
         relation,
-        relatedNode: nodeById.get(relatedId) ?? null,
+        relatedNodeId: relatedNode.id,
+        relatedNodeTitle: relatedNode.title,
+        relatedNodeSubtitle: relatedNode.subtitle ?? relation.label,
+        displayKind: relation.kind,
+        displayLabel: relation.label,
+        isBio: false,
       };
     })
-    .filter((entry): entry is { relation: GraphRelation; relatedNode: GraphContentNode } => entry.relatedNode !== null)
-    .sort((left, right) => right.relation.strength - left.relation.strength || left.relatedNode.title.localeCompare(right.relatedNode.title))
+    .filter((entry): entry is RelatedEntry => entry !== null)
+    .sort((left, right) => {
+      if (left.isBio !== right.isBio) {
+        return left.isBio ? -1 : 1;
+      }
+
+      return right.relation.strength - left.relation.strength || left.relatedNodeTitle.localeCompare(right.relatedNodeTitle);
+    })
     .slice(0, 8);
 }
 
@@ -604,6 +647,7 @@ const NodeDetailPage: React.FC = () => {
   const decodedNodeId = nodeId ? decodeURIComponent(nodeId) : '';
   const [graphModel, setGraphModel] = useState<GraphModel | null>(() => readCachedGraphModel());
   const [graphError, setGraphError] = useState<string | null>(null);
+  const [bioSubtitle, setBioSubtitle] = useState<string | null>(() => readCachedBioPageContent()?.subtitle ?? null);
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const transitionName = decodedNodeId ? getNodeTransitionName(decodedNodeId) : undefined;
 
@@ -645,6 +689,29 @@ const NodeDetailPage: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
 
+    if (bioSubtitle) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    loadBioPageContent()
+      .then((content) => {
+        if (cancelled) return;
+        setBioSubtitle(content.subtitle);
+      })
+      .catch(() => {
+        if (cancelled) return;
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bioSubtitle]);
+
+  useEffect(() => {
+    let cancelled = false;
+
     if (graphModel) {
       return () => {
         cancelled = true;
@@ -668,7 +735,7 @@ const NodeDetailPage: React.FC = () => {
   }, [graphModel]);
 
   const node = graphModel?.nodes.find((entry) => entry.id === decodedNodeId) ?? null;
-  const relatedEntries = graphModel && node ? getRelatedEntries(graphModel, node) : [];
+  const relatedEntries = graphModel && node ? getRelatedEntries(graphModel, node, bioSubtitle) : [];
 
   if (graphError) {
     return (
@@ -719,14 +786,18 @@ const NodeDetailPage: React.FC = () => {
   }
 
   const articleSections = node.sections;
+  const detailPageStyle = {
+    minHeight: '100vh',
+    color: 'var(--color-text)',
+    ['--greenpage-detail-action-border-width-idle' as const]: DETAIL_PAGE_ACTION_BORDER.idleWidth,
+    ['--greenpage-detail-action-border-opacity-idle' as const]: DETAIL_PAGE_ACTION_BORDER.idleOpacity,
+    ['--greenpage-detail-action-border-width-active' as const]: DETAIL_PAGE_ACTION_BORDER.activeWidth,
+    ['--greenpage-detail-action-border-opacity-active' as const]: DETAIL_PAGE_ACTION_BORDER.activeOpacity,
+    ['--greenpage-detail-action-ring-shadow-prefix' as const]: getHighlightBorderShadowPrefix(DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION),
+  } as CSSProperties;
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        color: 'var(--color-text)',
-      }}
-    >
+    <div style={detailPageStyle}>
       <div
         style={{
           maxWidth: '72rem',
@@ -916,25 +987,25 @@ const NodeDetailPage: React.FC = () => {
                 gap: '0.85rem',
               }}
             >
-              {relatedEntries.map(({ relation, relatedNode }) => (
+              {relatedEntries.map(({ relation, relatedNodeId, relatedNodeTitle, displayKind, displayLabel }) => (
                 <Link
                   key={relation.id}
-                  to={getNodeDetailPath(relatedNode.id)}
+                  to={getNodeDetailPath(relatedNodeId)}
                   className="node-detail-related-link"
                   onClick={(event) => {
                     event.preventDefault();
-                    handleOpenRelatedNode(relatedNode.id);
+                    handleOpenRelatedNode(relatedNodeId);
                   }}
                   style={{
                     display: 'block',
                     width: '100%',
                     padding: '0.8rem 0.85rem',
                     borderRadius: '16px',
-                    border: '1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)',
+                    border: '1px solid transparent',
                     color: 'var(--color-text)',
                     background: 'color-mix(in srgb, var(--color-background) 84%, white 16%)',
                     textDecoration: 'none',
-                    viewTransitionName: getNodeTransitionName(relatedNode.id),
+                    viewTransitionName: getNodeTransitionName(relatedNodeId),
                   }}
                 >
                   <Footnote
@@ -945,13 +1016,13 @@ const NodeDetailPage: React.FC = () => {
                       fontSize: '0.58rem',
                     }}
                   >
-                    {relation.kind}
+                    {displayKind}
                   </Footnote>
                   <div style={{ marginTop: '0.3rem', fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.35 }}>
-                    {relatedNode.title}
+                    {relatedNodeTitle}
                   </div>
                   <div style={{ marginTop: '0.38rem', fontSize: '0.76rem', lineHeight: 1.45, opacity: 0.8 }}>
-                    {relation.label}
+                    {displayLabel}
                   </div>
                 </Link>
               ))}
