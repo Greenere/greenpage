@@ -5,6 +5,7 @@ import { useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
+import { UI_COPY } from "../../../configs/uiCopy";
 import {
     getNodeDetailPath,
     getNodeTransitionName,
@@ -37,12 +38,12 @@ interface StoryNodeProps {
 }
 
 const DOMAIN_ICONS: Record<DomainId, string> = {
-    research: "RESEARCH",
-    education: "EDUCATION",
-    travel: "TRAVEL",
-    blog: "BLOG",
-    experience: "EXPERIENCE",
-    project: "PROJECT",
+    research: UI_COPY.domains.research.cardTag,
+    education: UI_COPY.domains.education.cardTag,
+    travel: UI_COPY.domains.travel.cardTag,
+    blog: UI_COPY.domains.blog.cardTag,
+    experience: UI_COPY.domains.experience.cardTag,
+    project: UI_COPY.domains.project.cardTag,
 };
 
 const StoryNode: React.FC<StoryNodeProps> = ({
@@ -272,9 +273,9 @@ const StoryNode: React.FC<StoryNodeProps> = ({
                         onClick={handleOpenDetail}
                         onFocus={armDetailLink}
                         onBlur={disarmDetailLink}
-                        aria-label={`Open detail page for ${data.title}`}
+                        aria-label={UI_COPY.storyNode.openDetailPageAriaLabel(data.title)}
                     >
-                        <span>more details</span>
+                        <span>{UI_COPY.storyNode.moreDetails}</span>
                     </Link>
                 </div>
             )}
@@ -285,7 +286,7 @@ const StoryNode: React.FC<StoryNodeProps> = ({
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
                 }}>
-                    Drag child nodes inside this domain
+                    {UI_COPY.storyNode.dragChildNodesHint}
                 </Footnote>
             )}
             {(data.handles ?? []).map((handle) => (

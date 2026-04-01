@@ -1,3 +1,5 @@
+import { UI_COPY } from '../../../configs/uiCopy';
+
 export type DomainId = 'research' | 'education' | 'travel' | 'blog' | 'experience' | 'project';
 export type AnchorId = DomainId;
 
@@ -470,7 +472,7 @@ function getNodeContentUrl(node: GraphNodeRef) {
 async function loadNodeContent(node: GraphNodeRef) {
   const response = await fetch(getNodeContentUrl(node));
   if (!response.ok) {
-    throw new Error(`Failed to load content for "${node.id}": ${response.status}`);
+    throw new Error(UI_COPY.contentLoaders.failedToLoadContentFor(node.id, response.status));
   }
   const raw = await response.json();
   return normalizeNodeContent(raw, node.id);
@@ -503,7 +505,7 @@ async function loadNodeContentIndex() {
 async function loadGraphModelUncached(url = GRAPH_MODEL_URL): Promise<GraphModel> {
   const [response, contentIndex] = await Promise.all([fetch(url), loadNodeContentIndex()]);
   if (!response.ok) {
-    throw new Error(`Failed to load graph model: ${response.status}`);
+    throw new Error(UI_COPY.contentLoaders.failedToLoadGraphModel(response.status));
   }
 
   const raw = await response.json();
@@ -575,8 +577,7 @@ export function getDomainLayout(domain: DomainId) {
 }
 
 export function getDisplayDomain(domain: DomainId) {
-  if (domain === 'blog') return 'writing';
-  return domain;
+  return UI_COPY.domains[domain].display;
 }
 
 export function getTemporalDomainRelations(model: GraphModel) {
@@ -595,7 +596,7 @@ export function getTemporalDomainRelations(model: GraphModel) {
       from: sorted[index].id,
       to: node.id,
       kind: 'sequence' as const,
-      label: 'next in timeline',
+      label: UI_COPY.graphRelations.nextInTimeline,
       strength: 2 as const,
     }));
   });
@@ -607,7 +608,7 @@ export function getLatestBioRelations(model: GraphModel) {
     from: node.id,
     to: 'bio',
     kind: 'sequence' as const,
-    label: 'latest node in domain',
+    label: UI_COPY.graphRelations.latestNodeInDomain,
     strength: 2 as const,
   }));
 }

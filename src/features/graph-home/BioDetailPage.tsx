@@ -6,6 +6,7 @@ import {
   getHighlightBorderShadowPrefix,
 } from '../../configs/graphHighlight';
 import { THEME_CONFIG } from '../../configs/themes';
+import { UI_COPY } from '../../configs/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
 import {
@@ -168,7 +169,7 @@ const BioDetailPage: React.FC = () => {
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setBioError(error instanceof Error ? error.message : 'Failed to load bio content.');
+        setBioError(error instanceof Error ? error.message : UI_COPY.bioDetailPage.errorLoading);
       });
 
     return () => {
@@ -193,7 +194,7 @@ const BioDetailPage: React.FC = () => {
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setGraphError(error instanceof Error ? error.message : 'Failed to load graph content.');
+        setGraphError(error instanceof Error ? error.message : UI_COPY.graphHome.errorLoading);
       });
 
     return () => {
@@ -206,7 +207,7 @@ const BioDetailPage: React.FC = () => {
   if (bioError || graphError) {
     return (
       <div style={{ minHeight: '100vh', padding: '2rem', color: 'crimson' }}>
-        Error loading bio content: {bioError ?? graphError}
+        {UI_COPY.bioDetailPage.errorLoading}: {bioError ?? graphError}
       </div>
     );
   }
@@ -214,7 +215,7 @@ const BioDetailPage: React.FC = () => {
   if (!bioContent || !graphModel) {
     return (
       <div style={{ minHeight: '100vh', padding: '2rem', color: 'var(--color-text)' }}>
-        Loading bio content...
+        {UI_COPY.bioDetailPage.loading}
       </div>
     );
   }
@@ -260,7 +261,7 @@ const BioDetailPage: React.FC = () => {
               textUnderlineOffset: '0.18em',
             }}
           >
-            Back to graph
+            {UI_COPY.bioDetailPage.backToGraph}
           </Link>
         </div>
 
@@ -293,7 +294,7 @@ const BioDetailPage: React.FC = () => {
                   fontSize: '0.68rem',
                 }}
               >
-                {bioContent.eyebrow ?? 'Bio node'}
+                {bioContent.eyebrow ?? UI_COPY.bioDetailPage.fallbackEyebrow}
               </Footnote>
               <h1
                 style={{
@@ -353,7 +354,7 @@ const BioDetailPage: React.FC = () => {
                       opacity: 0.64,
                     }}
                   >
-                    {bioContent.themeFactLabel ?? 'Current frame'}
+                    {bioContent.themeFactLabel ?? UI_COPY.bioDetailPage.fallbackThemeFactLabel}
                   </Footnote>
                   <div style={{ marginTop: '0.22rem', fontSize: '0.93rem', lineHeight: 1.45 }}>{themeLabel}</div>
                 </div>
@@ -379,7 +380,7 @@ const BioDetailPage: React.FC = () => {
               >
                 <img
                   src={resolveAssetUrl(portrait.imgSrc)}
-                  alt={`Portrait of ${bioContent.name}`}
+                  alt={UI_COPY.bioDetailPage.portraitAlt(bioContent.name)}
                   style={{
                     display: 'block',
                     width: '100%',
@@ -447,7 +448,7 @@ const BioDetailPage: React.FC = () => {
             marginInline: 'auto',
           }}
         >
-          {renderSectionHeading(bioContent.pathsSectionLabel ?? 'Paths through the graph')}
+          {renderSectionHeading(bioContent.pathsSectionLabel ?? UI_COPY.bioDetailPage.fallbackPathsSectionLabel)}
           <div
             style={{
               display: 'grid',
@@ -517,7 +518,7 @@ const BioDetailPage: React.FC = () => {
               marginInline: 'auto',
             }}
           >
-            {renderSectionHeading(bioContent.linksSectionLabel ?? 'Elsewhere')}
+            {renderSectionHeading(bioContent.linksSectionLabel ?? UI_COPY.bioDetailPage.fallbackLinksSectionLabel)}
             <div
               style={{
                 maxWidth: DETAIL_READING_WIDTH,

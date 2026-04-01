@@ -5,7 +5,9 @@ import { Position, useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
 import { type Theme, BIOTHEME } from "../content/BioTheme";
+import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from "../content/BioPage";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
+import { UI_COPY } from "../../../configs/uiCopy";
 import { getNodeDetailPath, getNodeTransitionName, resolveAssetUrl } from "../content/Nodes";
 
 interface BioData {
@@ -26,6 +28,7 @@ const BioNode: React.FC<BioNodeProps> = ({
 }) => {
     const navigate = useNavigate();
     const [focused, setFocused] = useState<boolean>(false);
+    const [bioContent, setBioContent] = useState<BioPageContent | null>(() => readCachedBioPageContent());
     const [bioLinkArmed, setBioLinkArmed] = useState(false);
     const [resetArmed, setResetArmed] = useState(false);
     const bioLinkArmTimeoutRef = useRef<number | null>(null);
@@ -37,6 +40,30 @@ const BioNode: React.FC<BioNodeProps> = ({
     }, [data.handles, data.portraitConnected, id, updateNodeInternals]);
 
     useEffect(() => {
+        let cancelled = false;
+
+        if (bioContent) {
+            return () => {
+                cancelled = true;
+            };
+        }
+
+        loadBioPageContent()
+            .then((content) => {
+                if (!cancelled) {
+                    setBioContent(content);
+                }
+            })
+            .catch(() => {
+                // Keep the bio card usable even if the bio payload fails to load.
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [bioContent]);
+
+    useEffect(() => {
         return () => {
             if (bioLinkArmTimeoutRef.current !== null) {
                 window.clearTimeout(bioLinkArmTimeoutRef.current);
@@ -46,6 +73,12 @@ const BioNode: React.FC<BioNodeProps> = ({
             }
         };
     }, []);
+
+    const bioName = bioContent?.name ?? UI_COPY.bioNode.fallbackName;
+    const bioSubtitle = bioContent?.subtitle ?? UI_COPY.bioNode.fallbackSubtitle;
+    const bioContact =
+        bioContent?.facts?.find((fact) => fact.href?.startsWith("mailto:") || fact.value.includes("@"))?.value ??
+        UI_COPY.bioNode.fallbackContact;
 
     const armBioLink = useCallback(() => {
         if (bioLinkArmTimeoutRef.current !== null) {
@@ -180,7 +213,7 @@ const BioNode: React.FC<BioNodeProps> = ({
                 </div>
                 <div style={{ marginTop: "0.7rem" }}>
                     <Subtitle>
-                        Haoyang Li
+                        {bioName}
                     </Subtitle>
                 </div>
                 <Paragraph style={{
@@ -190,10 +223,10 @@ const BioNode: React.FC<BioNodeProps> = ({
                     textAlign: "center",
                     textJustify: "auto",
                 }}>
-                    I am a Software Engineer based in San Francisco Bay Area
+                    {bioSubtitle}
                 </Paragraph>
                 <div style={{ paddingTop: "0.35rem" }}>
-                    <Footnote style={{ opacity: 0.84 }}>lihaoyangjingzhou@outlook.com</Footnote>
+                    <Footnote style={{ opacity: 0.84 }}>{bioContact}</Footnote>
                 </div>
             </div>
             <div
@@ -211,9 +244,9 @@ const BioNode: React.FC<BioNodeProps> = ({
                         onClick={handleOpenBio}
                         onFocus={armBioLink}
                         onBlur={disarmBioLink}
-                        aria-label="Open the bio detail page"
+                        aria-label={UI_COPY.bioNode.openBioDetailPageAriaLabel}
                     >
-                        <span>about me</span>
+                        <span>{UI_COPY.bioNode.aboutMe}</span>
                     </Link>
                 </div>
                 <div
@@ -227,13 +260,13 @@ const BioNode: React.FC<BioNodeProps> = ({
                         onClick={handleResetClick}
                         onFocus={armReset}
                         onBlur={disarmReset}
-                        aria-label="Reset graph layout"
+                        aria-label={UI_COPY.bioNode.resetGraphLayoutAriaLabel}
                         style={{
                             background: "transparent",
                             border: "none",
                         }}
                     >
-                        <span>reset</span>
+                        <span>{UI_COPY.bioNode.reset}</span>
                     </button>
                 </div>
             </div>

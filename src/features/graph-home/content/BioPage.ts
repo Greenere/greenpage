@@ -1,3 +1,5 @@
+import { UI_COPY } from '../../../configs/uiCopy';
+
 export type BioPageLink = {
   label: string;
   href: string;
@@ -101,14 +103,14 @@ async function loadBioPageContentUncached(url: string) {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(`Failed to load bio content from ${url}`);
+    throw new Error(UI_COPY.contentLoaders.failedToLoadBioContentFrom(url));
   }
 
   const payload: unknown = await response.json();
   const content = normalizeBioPageContent(payload);
 
   if (!content) {
-    throw new Error(`Invalid bio content payload from ${url}`);
+    throw new Error(UI_COPY.contentLoaders.invalidBioContentPayloadFrom(url));
   }
 
   if (url === BIO_PAGE_URL) {

@@ -5,6 +5,7 @@ import {
   DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
   getHighlightBorderShadowPrefix,
 } from '../../configs/graphHighlight';
+import { UI_COPY } from '../../configs/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
 import {
@@ -69,10 +70,10 @@ function getRelatedEntries(model: GraphModel, node: GraphContentNode, bioSubtitl
         return {
           relation,
           relatedNodeId: 'bio',
-          relatedNodeTitle: 'Haoyang Li',
-          relatedNodeSubtitle: bioSubtitle ?? 'Software engineer in the San Francisco Bay Area',
-          displayKind: 'BIO',
-          displayLabel: bioSubtitle ?? 'Software engineer in the San Francisco Bay Area',
+          relatedNodeTitle: UI_COPY.nodeDetailPage.bioEntry.title,
+          relatedNodeSubtitle: bioSubtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
+          displayKind: UI_COPY.nodeDetailPage.bioEntry.kind,
+          displayLabel: bioSubtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
           isBio: true,
         };
       }
@@ -387,12 +388,23 @@ const ArticleGallery: React.FC<ArticleGalleryProps> = ({ items, columns, align, 
 function renderMeta(meta: NodeArticleMeta | undefined, onNavigate?: (href: string) => void) {
   if (!meta) return null;
 
-  const metaItems = [
-    meta.dateLabel ? { label: 'Date', value: meta.dateLabel } : null,
-    meta.location ? { label: 'Place', value: meta.location } : null,
-    meta.readingTime ? { label: 'Read', value: meta.readingTime } : null,
-    meta.status ? { label: 'Status', value: meta.status } : null,
-  ].filter((item): item is { label: string; value: string } => item !== null);
+  const metaItems: Array<{ label: string; value: string }> = [];
+
+  if (meta.dateLabel) {
+    metaItems.push({ label: UI_COPY.nodeDetailPage.metaLabels.date, value: meta.dateLabel });
+  }
+
+  if (meta.location) {
+    metaItems.push({ label: UI_COPY.nodeDetailPage.metaLabels.place, value: meta.location });
+  }
+
+  if (meta.readingTime) {
+    metaItems.push({ label: UI_COPY.nodeDetailPage.metaLabels.read, value: meta.readingTime });
+  }
+
+  if (meta.status) {
+    metaItems.push({ label: UI_COPY.nodeDetailPage.metaLabels.status, value: meta.status });
+  }
 
   if (metaItems.length === 0 && !meta.links?.length) {
     return null;
@@ -736,7 +748,7 @@ const NodeDetailPage: React.FC = () => {
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setGraphError(error instanceof Error ? error.message : 'Failed to load graph content.');
+        setGraphError(error instanceof Error ? error.message : UI_COPY.graphHome.errorLoading);
       });
 
     return () => {
@@ -749,8 +761,8 @@ const NodeDetailPage: React.FC = () => {
 
   if (graphError) {
     return (
-      <div style={{ minHeight: '100vh', padding: '2rem', color: 'crimson' }}>
-        Error loading node content: {graphError}
+        <div style={{ minHeight: '100vh', padding: '2rem', color: 'crimson' }}>
+        {UI_COPY.nodeDetailPage.errorLoading}: {graphError}
       </div>
     );
   }
@@ -758,7 +770,7 @@ const NodeDetailPage: React.FC = () => {
   if (!graphModel) {
     return (
       <div style={{ minHeight: '100vh', padding: '2rem', color: 'var(--color-text)' }}>
-        Loading node content...
+        {UI_COPY.nodeDetailPage.loading}
       </div>
     );
   }
@@ -775,9 +787,9 @@ const NodeDetailPage: React.FC = () => {
         }}
       >
         <div style={{ maxWidth: '32rem', textAlign: 'center' }}>
-          <h1 style={{ marginBottom: '0.75rem' }}>Node not found</h1>
+          <h1 style={{ marginBottom: '0.75rem' }}>{UI_COPY.nodeDetailPage.notFoundTitle}</h1>
           <p style={{ lineHeight: 1.6, marginBottom: '1.25rem' }}>
-            The node &quot;{decodedNodeId}&quot; does not exist in the current graph dataset.
+            {UI_COPY.nodeDetailPage.notFoundDescription(decodedNodeId)}
           </p>
           <Link
             to="/"
@@ -788,7 +800,7 @@ const NodeDetailPage: React.FC = () => {
               textUnderlineOffset: '0.2em',
             }}
           >
-            Return to the graph
+            {UI_COPY.nodeDetailPage.returnToGraph}
           </Link>
         </div>
       </div>
@@ -837,7 +849,7 @@ const NodeDetailPage: React.FC = () => {
               textUnderlineOffset: '0.18em',
             }}
           >
-            Back to graph
+            {UI_COPY.nodeDetailPage.backToGraph}
           </Link>
         </div>
 
@@ -956,7 +968,7 @@ const NodeDetailPage: React.FC = () => {
 
         {node.gallery && node.gallery.length > 0 && (
           <section style={{ marginTop: '2.2rem', maxWidth: DETAIL_SECTION_WIDTH, marginInline: 'auto' }}>
-            {renderSectionHeading('Gallery')}
+            {renderSectionHeading(UI_COPY.nodeDetailPage.sections.gallery)}
             <ArticleGallery
               items={node.gallery}
               columns={Math.min(3, Math.max(1, node.gallery.length))}
@@ -977,7 +989,7 @@ const NodeDetailPage: React.FC = () => {
               marginInline: 'auto',
             }}
           >
-            {renderSectionHeading('Story')}
+            {renderSectionHeading(UI_COPY.nodeDetailPage.sections.story)}
             <div>{node.detail.map((block, index) => renderContentBlock(block, index, handleNavigateWithTransition))}</div>
           </section>
         )}
@@ -990,7 +1002,7 @@ const NodeDetailPage: React.FC = () => {
               marginInline: 'auto',
             }}
           >
-            {renderSectionHeading('Connected nodes')}
+            {renderSectionHeading(UI_COPY.nodeDetailPage.sections.connectedNodes)}
             <div
               style={{
                 display: 'grid',

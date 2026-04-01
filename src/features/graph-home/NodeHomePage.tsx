@@ -28,6 +28,7 @@ import {
     GRAPH_NODE_HIGHLIGHT_RING_WIDTH,
     getHighlightBorderShadowPrefix,
 } from '../../configs/graphHighlight';
+import { UI_COPY } from '../../configs/uiCopy';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
@@ -1722,13 +1723,13 @@ const NodeCanvas: React.FC = () => {
     if (graphError) {
         return (
             <div style={{ color: 'crimson', padding: '1rem' }}>
-                Error loading graph model: {graphError}
+                {UI_COPY.graphHome.errorLoading}: {graphError}
             </div>
         );
     }
 
     if (!graphModel) {
-        return <div style={{ padding: '1rem', color: 'var(--color-text)' }}>Loading graph...</div>;
+        return <div style={{ padding: '1rem', color: 'var(--color-text)' }}>{UI_COPY.graphHome.loading}</div>;
     }
 
     return (
