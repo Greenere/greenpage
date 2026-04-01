@@ -1,6 +1,7 @@
+import { DOMAIN_CONFIG, isDomainId, type DomainId } from '../../../configs/domains';
 import { UI_COPY } from '../../../configs/uiCopy';
 
-export type DomainId = 'research' | 'education' | 'travel' | 'blog' | 'experience' | 'project';
+export type { DomainId } from '../../../configs/domains';
 export type AnchorId = DomainId;
 
 export type NodeKind =
@@ -135,14 +136,9 @@ export const GRAPH_MODEL_URL = `${import.meta.env.BASE_URL}data/graph.json`;
 export const GRAPH_NODE_CONTENT_DIR = 'data/nodes/';
 export const GRAPH_NODE_CONTENT_INDEX_URL = `${import.meta.env.BASE_URL}data/nodes/index.json`;
 
-export const DOMAIN_LAYOUTS: Record<DomainId, DomainLayout> = {
-  research: { seedAngle: -140 },
-  education: { seedAngle: -95 },
-  travel: { seedAngle: -20 },
-  blog: { seedAngle: 25 },
-  experience: { seedAngle: 95 },
-  project: { seedAngle: 150 },
-};
+export const DOMAIN_LAYOUTS: Record<DomainId, DomainLayout> = Object.fromEntries(
+  Object.entries(DOMAIN_CONFIG).map(([domain, config]) => [domain, { seedAngle: config.seedAngle }])
+) as Record<DomainId, DomainLayout>;
 
 function withBaseUrl(path: string) {
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -160,10 +156,6 @@ export function getNodeDetailPath(nodeId: string) {
 
 export function getNodeTransitionName(nodeId: string) {
   return `content-node-${nodeId}`;
-}
-
-function isDomainId(value: unknown): value is DomainId {
-  return value === 'research' || value === 'education' || value === 'travel' || value === 'blog' || value === 'experience' || value === 'project';
 }
 
 function isNodeKind(value: unknown): value is NodeKind {
@@ -577,7 +569,7 @@ export function getDomainLayout(domain: DomainId) {
 }
 
 export function getDisplayDomain(domain: DomainId) {
-  return UI_COPY.domains[domain].display;
+  return DOMAIN_CONFIG[domain].display;
 }
 
 export function getTemporalDomainRelations(model: GraphModel) {

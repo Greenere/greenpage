@@ -1,30 +1,4 @@
 export const UI_COPY = {
-  domains: {
-    research: {
-      display: 'research',
-      cardTag: 'RESEARCH',
-    },
-    education: {
-      display: 'education',
-      cardTag: 'EDUCATION',
-    },
-    travel: {
-      display: 'travel',
-      cardTag: 'TRAVEL',
-    },
-    blog: {
-      display: 'writing',
-      cardTag: 'BLOG',
-    },
-    experience: {
-      display: 'experience',
-      cardTag: 'EXPERIENCE',
-    },
-    project: {
-      display: 'project',
-      cardTag: 'PROJECT',
-    },
-  },
   graphRelations: {
     nextInTimeline: 'adjacent in timeline',
     latestNodeInDomain: 'latest node in domain',

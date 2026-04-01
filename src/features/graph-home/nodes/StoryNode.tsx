@@ -6,6 +6,7 @@ import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
 import { UI_COPY } from "../../../configs/uiCopy";
+import { DOMAIN_CONFIG } from "../../../configs/domains";
 import {
     getNodeDetailPath,
     getNodeTransitionName,
@@ -37,14 +38,9 @@ interface StoryNodeProps {
     data: StoryData
 }
 
-const DOMAIN_ICONS: Record<DomainId, string> = {
-    research: UI_COPY.domains.research.cardTag,
-    education: UI_COPY.domains.education.cardTag,
-    travel: UI_COPY.domains.travel.cardTag,
-    blog: UI_COPY.domains.blog.cardTag,
-    experience: UI_COPY.domains.experience.cardTag,
-    project: UI_COPY.domains.project.cardTag,
-};
+const DOMAIN_ICONS: Record<DomainId, string> = Object.fromEntries(
+    Object.entries(DOMAIN_CONFIG).map(([domain, config]) => [domain, config.cardTag])
+) as Record<DomainId, string>;
 
 const StoryNode: React.FC<StoryNodeProps> = ({
     id,

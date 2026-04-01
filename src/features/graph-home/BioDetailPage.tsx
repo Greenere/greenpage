@@ -5,6 +5,7 @@ import {
   DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
   getHighlightBorderShadowPrefix,
 } from '../../configs/graphHighlight';
+import { DOMAIN_ORDER } from '../../configs/domains';
 import { THEME_CONFIG } from '../../configs/themes';
 import { UI_COPY } from '../../configs/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
@@ -18,7 +19,6 @@ import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './cont
 import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
 import ThemePicker from './ThemePicker';
 import {
-  DOMAIN_LAYOUTS,
   getDisplayDomain,
   getLatestNodesByDomain,
   getNodeDetailPath,
@@ -26,7 +26,6 @@ import {
   loadGraphModel,
   readCachedGraphModel,
   resolveAssetUrl,
-  type DomainId,
   type GraphContentNode,
   type GraphModel,
 } from './content/Nodes';
@@ -34,8 +33,6 @@ import {
 const GRAPH_RETURN_FOCUS_NODE_KEY = 'greenpage-graph-return-focus-node';
 const DETAIL_READING_WIDTH = '46rem';
 const DETAIL_SECTION_WIDTH = '48rem';
-
-const DOMAIN_ORDER = Object.keys(DOMAIN_LAYOUTS) as DomainId[];
 
 type BioLinkProps = {
   href: string;
