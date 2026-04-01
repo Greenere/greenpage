@@ -1,0 +1,57 @@
+{
+  "title": "Software Engineer Intern at Verily",
+  "subtitle": "Summer 2022, from Cornell to California",
+  "summary": "The internship that turned graduate school into a clearer engineering path, connecting Cornell coursework with California life and later full-time work.",
+  "tags": [
+    "internship",
+    "engineering"
+  ],
+  "hero": {
+    "image": {
+      "src": "assets/portrait-haoyang-sfbay.jpg",
+      "alt": "Haoyang in the Bay Area during the Verily internship summer",
+      "caption": "Work, relocation, and weekend travel started to blur into one California chapter."
+    }
+  },
+  "meta": {
+    "dateLabel": "Summer 2022",
+    "location": "South San Francisco",
+    "readingTime": "3 min",
+    "status": "milestone"
+  },
+  "sections": [
+    {
+      "id": "shift",
+      "label": "Shift",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
+        },
+        {
+          "type": "text",
+          "text": "It also changed how the summer itself felt. Workdays at Verily and weekend drives like [California State Route 1](/nodes/california-one-2022) started to belong to the same chapter rather than separate categories."
+        }
+      ]
+    },
+    {
+      "id": "what-changed",
+      "label": "What changed",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "Software engineering became a concrete path rather than an abstract possibility",
+            "The distance between coursework and real product work became much smaller",
+            "The internship later connected forward into the full-time role that follows in the graph"
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "Practical effect",
+          "text": "The important part was not just learning new tools. It was seeing how engineering decisions accumulate in a team setting and how much clarity can come from shipping something that other people actually depend on."
+        }
+      ]
+    }
+  ]
+}

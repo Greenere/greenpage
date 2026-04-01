@@ -132,10 +132,31 @@ body,
   box-shadow: none;
 }
 
+.node-detail-related-link {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.node-detail-related-link:hover,
+.node-detail-related-link:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 34px rgba(0, 0, 0, 0.09);
+  border-color: color-mix(in srgb, var(--color-secondary) 62%, transparent);
+  background: color-mix(in srgb, var(--color-background) 80%, white 20%);
+}
+
+.node-detail-related-link:focus-visible {
+  outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .react-flow__node.greenpage-graph-node,
   .node-card-detail-link,
-  .node-card-detail-link::after {
+  .node-card-detail-link::after,
+  .node-detail-related-link {
     transition: none !important;
   }
 }

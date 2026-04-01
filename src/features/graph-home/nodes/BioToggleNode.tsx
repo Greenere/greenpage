@@ -1,8 +1,8 @@
 import React, { useLayoutEffect } from "react";
 import { useUpdateNodeInternals } from "@xyflow/react";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
-import { BIOTHEME, type Theme } from "../content/BioTheme";
-import { themes2color } from "../../../shared/styles/colors";
+import { type Theme } from "../content/BioTheme";
+import { THEME_CONFIG, THEME_ORDER } from "../../../configs/themes";
 
 interface BioThemeData {
     theme: Theme
@@ -40,24 +40,24 @@ const BioToggleNode: React.FC<BioToggleNodeProps> = ({
             <div style={{
                 fontSize:"0.5rem"
             }}>
-                {BIOTHEME[data.theme].description}
+                {THEME_CONFIG[data.theme].label}
             </div>
             {
-                Object.keys(BIOTHEME).map((key) => {
+                THEME_ORDER.map((key) => {
                     return (
                         <div
                             key={key}
                             style={{
-                                background: themes2color[key as Theme].primary,
+                                background: THEME_CONFIG[key].colors.primary,
                                 display: 'inline-block',
                                 borderRadius: "50%",
                                 width: "1rem",
                                 height: "1rem",
                                 margin:"0.1rem",
-                                border:`1px ${data.theme == key? 'solid':'dotted'} var(--color-secondary)`
+                                border:`1px ${data.theme === key ? 'solid' : 'dotted'} var(--color-secondary)`
                             }}
                             onClick={() => {
-                                data.setTheme(key as unknown as Theme)
+                                data.setTheme(key)
                             }}>
                         </div>)
                 })

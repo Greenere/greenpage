@@ -1,0 +1,29 @@
+{
+  "title": "Field Notes",
+  "subtitle": "Travel writing placeholder",
+  "summary": "A node for the essays or fragments that emerge after trips, especially when a place wants a written afterlife.",
+  "tags": [
+    "travel writing",
+    "reflection"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Placeholder: this could later connect travel nodes to writing drafts and published pieces."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Place memory",
+            "Photo captions",
+            "Long-form reflection"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,8 @@
-type Theme = 'nyc' | 'joshua' | 'mty' | 'atlp'
+import {
+    DEFAULT_THEME,
+    THEME_CONFIG,
+    type Theme,
+} from "../../../configs/themes";
 
 const THEME_STORAGE_KEY = 'greenpage-active-theme';
 
@@ -6,40 +10,24 @@ type ThemeInfo = {
     imgSrc: string,
     url: string,
     description: string
-}
+};
 
-const BIOTHEME: Record<Theme,ThemeInfo> = {
-    'nyc': {
-        'imgSrc': './assets/portrait-haoyang-nyc.jpg',
-        'url': 'https://www.linkedin.com/in/haoyanghowyoung/',
-        'description': 'New York, 2023',
-    },
-    'joshua': {
-        'imgSrc': './assets/portrait-haoyang-joshua.jpg',
-        'url': 'https://www.linkedin.com/in/haoyanghowyoung/',
-        'description': 'Joshua Tree, 2023',
-    },
-    'mty': {
-        'imgSrc': './assets/portrait-haoyang-mty.jpg',
-        'url': 'https://www.linkedin.com/in/haoyanghowyoung/',
-        'description': 'Monterey, 2023',
-    },
-    'atlp': {
-        'imgSrc': './assets/portrait-haoyang-atlp.jpg',
-        'url': 'https://www.linkedin.com/in/haoyanghowyoung/',
-        'description': 'Antelope Valley, 2023',
-    }
-}
+const BIOTHEME: Record<Theme, ThemeInfo> = {
+    nyc: THEME_CONFIG.nyc.portrait,
+    joshua: THEME_CONFIG.joshua.portrait,
+    mty: THEME_CONFIG.mty.portrait,
+    atlp: THEME_CONFIG.atlp.portrait,
+};
 
 function isTheme(value: unknown): value is Theme {
-    return value === 'nyc' || value === 'joshua' || value === 'mty' || value === 'atlp';
+    return typeof value === 'string' && value in THEME_CONFIG;
 }
 
 function readStoredTheme(): Theme {
-    if (typeof window === 'undefined') return 'nyc';
+    if (typeof window === 'undefined') return DEFAULT_THEME;
 
     const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-    return isTheme(storedTheme) ? storedTheme : 'nyc';
+    return isTheme(storedTheme) ? storedTheme : DEFAULT_THEME;
 }
 
 function persistTheme(theme: Theme) {
@@ -47,6 +35,6 @@ function persistTheme(theme: Theme) {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
 }
 
-export { BIOTHEME }
-export { THEME_STORAGE_KEY, isTheme, readStoredTheme, persistTheme }
-export type { Theme }
+export { BIOTHEME };
+export { THEME_STORAGE_KEY, isTheme, readStoredTheme, persistTheme };
+export type { Theme };

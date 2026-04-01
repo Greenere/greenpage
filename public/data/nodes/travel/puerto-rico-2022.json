@@ -1,0 +1,30 @@
+{
+  "title": "Puerto Rico",
+  "subtitle": "December 2022 island trip",
+  "summary": "A late-2022 trip that feels like a marker between the Cornell chapter and what came next, with beaches, coastal stops, and a very different atmosphere from Ithaca.",
+  "tags": [
+    "travel",
+    "island"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "The old tripline artwork turns this into a vivid node: Old San Juan, Punta Higuero Lighthouse, beaches, airport thresholds, and a compact trip at the end of 2022 that feels transitional in the larger story."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Old San Juan",
+            "Punta Higuero Lighthouse",
+            "Playa Escondida and other coastal stops",
+            "Dec. 21-25, 2022"
+          ]
+        }
+      ]
+    }
+  ]
+}

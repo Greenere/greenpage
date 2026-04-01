@@ -1,0 +1,29 @@
+{
+  "title": "Software Algorithm Engineer Intern at RealAI",
+  "subtitle": "AI security internship in Beijing",
+  "summary": "A short industry chapter in AI security that sat between academic robustness research and later product engineering work.",
+  "tags": [
+    "industry",
+    "ai security"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "RealAI felt like a bridge. The same adversarial-ML interests appeared in a more applied setting, shaped by industry pace and product constraints. It sharpened the sense that robustness ideas had to survive outside the paper world."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Worked as a software algorithm engineer intern",
+            "Stayed close to AI security and robustness themes",
+            "Helped mark the transition from research-heavy work toward engineering roles"
+          ]
+        }
+      ]
+    }
+  ]
+}

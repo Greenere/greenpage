@@ -12,7 +12,11 @@ function resolveContentPath(nodeRef) {
     return path.join(publicDir, nodeRef.contentPath.replace(/^\//, ''));
   }
 
-  return path.join(nodesDir, `${nodeRef.id}.json`);
+  if (typeof nodeRef.domain !== 'string' || nodeRef.domain.length === 0) {
+    throw new Error(`Graph node ref "${String(nodeRef.id)}" must include a "domain" to resolve its content path.`);
+  }
+
+  return path.join(nodesDir, nodeRef.domain, `${nodeRef.id}.json`);
 }
 
 async function main() {

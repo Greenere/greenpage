@@ -19,6 +19,7 @@ import StoryNode from './nodes/StoryNode';
 import BioToggleNode from './nodes/BioToggleNode';
 import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
+import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graphFocus';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
@@ -86,6 +87,9 @@ const GRAPH_NODE_CLASS_NAME = 'greenpage-graph-node';
 const GRAPH_NODE_HIGHLIGHT_SELF_CLASS_NAME = 'greenpage-graph-node-highlight-self';
 const GRAPH_NODE_HIGHLIGHT_CONNECTED_CLASS_NAME = 'greenpage-graph-node-highlight-connected';
 const STYLE_NODE_CLASS_NAME = 'greenpage-style-node';
+const GRAPH_OVERVIEW_PADDING_RATIO = 0.1;
+const GRAPH_MIN_ZOOM = 0.5;
+const GRAPH_MAX_ZOOM = 2;
 
 type ProjectedHandle = DynamicHandle & {
     nodeId: string;
@@ -351,6 +355,45 @@ function getCenter(node: Node) {
         x: node.position.x + half(w),
         y: node.position.y + half(h),
     };
+}
+
+function clampZoom(zoom: number) {
+    return Math.max(GRAPH_MIN_ZOOM, Math.min(GRAPH_MAX_ZOOM, zoom));
+}
+
+function getNodeFocusZoom(nodeId: string) {
+    return nodeId === 'bio'
+        ? GRAPH_NODE_FOCUS_ZOOM.bio
+        : GRAPH_NODE_FOCUS_ZOOM.content;
+}
+
+function getGraphOverviewZoom(nodes: Node[], viewportWidth: number, viewportHeight: number, focusNodeId = 'bio') {
+    const focusNode = nodes.find((node) => node.id === focusNodeId);
+    if (!focusNode) {
+        return GRAPH_MIN_ZOOM;
+    }
+
+    const focusCenter = getCenter(focusNode);
+    let maxDx = 1;
+    let maxDy = 1;
+
+    for (const node of nodes) {
+        const { w, h } = getNodeDimensions(node);
+        const left = node.position.x;
+        const right = left + w;
+        const top = node.position.y;
+        const bottom = top + h;
+
+        maxDx = Math.max(maxDx, Math.abs(left - focusCenter.x), Math.abs(right - focusCenter.x));
+        maxDy = Math.max(maxDy, Math.abs(top - focusCenter.y), Math.abs(bottom - focusCenter.y));
+    }
+
+    const availableWidth = Math.max(1, viewportWidth * (1 - GRAPH_OVERVIEW_PADDING_RATIO * 2));
+    const availableHeight = Math.max(1, viewportHeight * (1 - GRAPH_OVERVIEW_PADDING_RATIO * 2));
+    const zoomX = availableWidth / (maxDx * 2);
+    const zoomY = availableHeight / (maxDy * 2);
+
+    return clampZoom(Math.min(zoomX, zoomY));
 }
 
 function clampOffset(offset: number) {
@@ -1201,10 +1244,24 @@ const NodeCanvas: React.FC = () => {
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
-    const { fitView, getViewport, setCenter, setViewport } = useReactFlow();
+    const { getViewport, setCenter, setViewport } = useReactFlow();
     const dragRafId = useRef<number | null>(null);
     const edgesRef = useRef<Edge[]>(initialGraph.edges);
     const highlightedNodeIdRef = useRef<string | null>(null);
+
+    const focusNode = useCallback((
+        node: Node,
+        { preserveHigherZoom = false }: { preserveHigherZoom?: boolean } = {}
+    ) => {
+        const center = getCenter(node);
+        const baseZoom = getNodeFocusZoom(node.id);
+        const targetZoom = preserveHigherZoom ? Math.max(getViewport().zoom, baseZoom) : baseZoom;
+
+        setCenter(center.x, center.y, {
+            zoom: targetZoom,
+            duration: 400,
+        });
+    }, [getViewport, setCenter]);
 
     const handleResetGraph = useCallback(() => {
         if (dragRafId.current) {
@@ -1253,14 +1310,12 @@ const NodeCanvas: React.FC = () => {
         edgesRef.current = resetGraph.edges;
 
         requestAnimationFrame(() => {
-            fitView({
-                nodes: [{ id: 'bio' }],
-                padding: 2.1,
-                duration: 420,
-                includeHiddenNodes: false,
-            });
+            const bioNode = resetGraph.nodes.find((node) => node.id === 'bio');
+            if (!bioNode) return;
+
+            focusNode(bioNode);
         });
-    }, [fitView, initialGraph.nodes, orderedGraphRelations, setEdges, setNodes, setTheme, theme]);
+    }, [focusNode, initialGraph.nodes, orderedGraphRelations, setEdges, setNodes, setTheme, theme]);
 
     const applyPendingGraphRestore = useCallback(() => {
         if (!flowReadyRef.current || !pendingGraphRestoreRef.current) {
@@ -1415,33 +1470,25 @@ const NodeCanvas: React.FC = () => {
     const onNodeClick: NodeMouseHandler = useCallback((_, node) => {
         if (node.id === 'biotoggle') return;
 
-        if (node.id === 'bio') {
-            fitView({
-                nodes: [{ id: node.id }],
-                padding: 2.1,
-                duration: 400,
-                includeHiddenNodes: false,
-            });
-        } else {
-            fitView({
-                nodes: [{ id: node.id }],
-                padding: 1.7,
-                duration: 400,
-                includeHiddenNodes: false,
-            });
-        }
-    }, [fitView]);
+        focusNode(node, { preserveHigherZoom: true });
+    }, [focusNode]);
 
     const onNodeDoubleClick: NodeMouseHandler = useCallback((_, node) => {
-        if (node.id !== 'bio') return;
+        if (node.id === 'biotoggle') return;
 
-        fitView({
-            nodes: nodes.map((graphNode) => ({ id: graphNode.id })),
-            padding: 0.8,
+        const bioNode = nodes.find((graphNode) => graphNode.id === 'bio');
+        if (!bioNode) {
+            return;
+        }
+
+        const bioCenter = getCenter(bioNode);
+        const overviewZoom = getGraphOverviewZoom(nodes, viewport.width, viewport.height);
+
+        setCenter(bioCenter.x, bioCenter.y, {
+            zoom: overviewZoom,
             duration: 450,
-            includeHiddenNodes: false,
         });
-    }, [fitView, nodes]);
+    }, [nodes, setCenter, viewport.height, viewport.width]);
 
     const onNodeMouseEnter: NodeMouseHandler = useCallback((_, node) => {
         if (node.id === 'biotoggle') return;
@@ -1664,6 +1711,8 @@ const NodeCanvas: React.FC = () => {
             edges={edges}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
+            nodeClickDistance={6}
+            nodeDragThreshold={4}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onNodeClick={onNodeClick}

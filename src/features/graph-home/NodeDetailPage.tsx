@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { applyThemeVars } from '../../shared/styles/colors';
-import { Footnote, ImageBlock, Paragraph } from '../../shared/ui/StyledTextBlocks';
+import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
 import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import {
@@ -12,17 +12,30 @@ import {
   loadGraphModel,
   readCachedGraphModel,
   resolveAssetUrl,
+  type ArticleBlock,
   type ContentBlock,
   type GraphContentNode,
   type GraphModel,
   type GraphRelation,
+  type NodeArticleMeta,
+  type NodeGalleryAlignment,
+  type NodeArticleSection,
   type NodeGalleryImage,
 } from './content/Nodes';
 
 const GRAPH_RETURN_FOCUS_NODE_KEY = 'greenpage-graph-return-focus-node';
+const INLINE_PATTERN = /(\[([^\]]+)\]\(([^)]+)\)|`([^`]+)`|\*\*\*([^*]+)\*\*\*|\*\*([^*]+)\*\*|\*([^*]+)\*)/g;
+const DETAIL_READING_WIDTH = '46rem';
+const DETAIL_SECTION_WIDTH = '48rem';
+const DEFAULT_GALLERY_RATIO = 4 / 3;
+const GALLERY_TRACKS_PER_COLUMN = 6;
 
 function isExternalHref(href: string) {
   return href.startsWith('http://') || href.startsWith('https://');
+}
+
+function isInternalHref(href: string) {
+  return href.startsWith('/') && !isExternalHref(href);
 }
 
 function getRelatedEntries(model: GraphModel, node: GraphContentNode) {
@@ -43,60 +56,372 @@ function getRelatedEntries(model: GraphModel, node: GraphContentNode) {
     .slice(0, 8);
 }
 
-function renderGalleryImage(image: NodeGalleryImage, index: number) {
-  return (
-    <figure
-      key={`${image.src}-${index}`}
-      style={{
-        margin: 0,
-        borderRadius: '20px',
-        overflow: 'hidden',
-        border: '1.5px solid color-mix(in srgb, var(--color-secondary) 52%, transparent)',
-        background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-        boxShadow: '0 18px 34px rgba(0, 0, 0, 0.08)',
-      }}
-    >
-      <img
-        src={resolveAssetUrl(image.src)}
-        alt={image.alt}
-        style={{
-          display: 'block',
-          width: '100%',
-          aspectRatio: '4 / 3',
-          objectFit: 'cover',
+type ArticleLinkProps = {
+  href: string;
+  children: ReactNode;
+  onNavigate?: (href: string) => void;
+  style?: React.CSSProperties;
+};
+
+function ArticleLink({ href, children, onNavigate, style }: ArticleLinkProps) {
+  const linkStyle: React.CSSProperties = {
+    color: 'var(--color-text)',
+    textDecoration: 'underline',
+    textUnderlineOffset: '0.2em',
+    textDecorationThickness: '1px',
+    textDecorationColor: 'color-mix(in srgb, var(--color-secondary) 62%, transparent)',
+    ...style,
+  };
+
+  if (isInternalHref(href)) {
+    return (
+      <Link
+        to={href}
+        onClick={(event) => {
+          if (!onNavigate) return;
+          event.preventDefault();
+          onNavigate(href);
         }}
-      />
-      {image.caption && (
-        <figcaption
-          style={{
-            padding: '0.8rem 0.95rem 0.95rem',
-            color: 'var(--color-text)',
-            fontSize: '0.85rem',
-            lineHeight: 1.45,
-          }}
-        >
-          {image.caption}
-        </figcaption>
-      )}
-    </figure>
+        style={linkStyle}
+      >
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      target={isExternalHref(href) ? '_blank' : undefined}
+      rel={isExternalHref(href) ? 'noreferrer' : undefined}
+      style={linkStyle}
+    >
+      {children}
+    </a>
   );
 }
 
-function renderContentBlock(block: ContentBlock, index: number) {
+function renderInlineMarkdown(text: string, keyPrefix: string, onNavigate?: (href: string) => void): ReactNode[] {
+  const matches = [...text.matchAll(INLINE_PATTERN)];
+  if (matches.length === 0) {
+    return [text];
+  }
+
+  const nodes: ReactNode[] = [];
+  let cursor = 0;
+
+  for (const match of matches) {
+    const matchIndex = match.index ?? 0;
+
+    if (matchIndex > cursor) {
+      nodes.push(<Fragment key={`${keyPrefix}-text-${cursor}`}>{text.slice(cursor, matchIndex)}</Fragment>);
+    }
+
+    if (match[2] && match[3]) {
+      nodes.push(
+        <ArticleLink key={`${keyPrefix}-link-${matchIndex}`} href={match[3]} onNavigate={onNavigate}>
+          {match[2]}
+        </ArticleLink>
+      );
+    } else if (match[4]) {
+      nodes.push(
+        <code
+          key={`${keyPrefix}-code-${matchIndex}`}
+          style={{
+            fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace',
+            fontSize: '0.92em',
+            padding: '0.08rem 0.34rem',
+            borderRadius: '0.45rem',
+            background: 'color-mix(in srgb, var(--color-background) 86%, white 14%)',
+          }}
+        >
+          {match[4]}
+        </code>
+      );
+    } else if (match[5]) {
+      nodes.push(
+        <strong key={`${keyPrefix}-strong-em-${matchIndex}`} style={{ fontWeight: 700, fontStyle: 'italic' }}>
+          {renderInlineMarkdown(match[5], `${keyPrefix}-strong-em-${matchIndex}`, onNavigate)}
+        </strong>
+      );
+    } else if (match[6]) {
+      nodes.push(
+        <strong key={`${keyPrefix}-strong-${matchIndex}`} style={{ fontWeight: 700 }}>
+          {renderInlineMarkdown(match[6], `${keyPrefix}-strong-${matchIndex}`, onNavigate)}
+        </strong>
+      );
+    } else if (match[7]) {
+      nodes.push(
+        <em key={`${keyPrefix}-em-${matchIndex}`} style={{ fontStyle: 'italic' }}>
+          {renderInlineMarkdown(match[7], `${keyPrefix}-em-${matchIndex}`, onNavigate)}
+        </em>
+      );
+    }
+
+    cursor = matchIndex + match[0].length;
+  }
+
+  if (cursor < text.length) {
+    nodes.push(<Fragment key={`${keyPrefix}-text-${cursor}`}>{text.slice(cursor)}</Fragment>);
+  }
+
+  return nodes;
+}
+
+function renderSectionHeading(label: string, maxWidth = DETAIL_SECTION_WIDTH) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.9rem',
+        marginBottom: '1.1rem',
+        maxWidth,
+      }}
+    >
+      <Footnote
+        style={{
+          textTransform: 'uppercase',
+          letterSpacing: '0.14em',
+          fontSize: '0.68rem',
+          opacity: 0.74,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {label}
+      </Footnote>
+      <div
+        style={{
+          flex: 1,
+          height: '1px',
+          background: 'color-mix(in srgb, var(--color-secondary) 28%, transparent)',
+        }}
+      />
+    </div>
+  );
+}
+
+function chunkGalleryItems<T>(items: T[], size: number) {
+  const rows: T[][] = [];
+
+  for (let index = 0; index < items.length; index += size) {
+    rows.push(items.slice(index, index + size));
+  }
+
+  return rows;
+}
+
+function getNormalizedGallerySpans(aspectRatios: number[], totalTracks: number) {
+  if (aspectRatios.length === 0) {
+    return [];
+  }
+
+  const totalRatio = aspectRatios.reduce((sum, ratio) => sum + ratio, 0) || aspectRatios.length;
+  const rawSpans = aspectRatios.map((ratio) => (ratio / totalRatio) * totalTracks);
+  const spans = rawSpans.map((span) => Math.max(1, Math.floor(span)));
+  let remainingTracks = totalTracks - spans.reduce((sum, span) => sum + span, 0);
+
+  if (remainingTracks > 0) {
+    const remainders = rawSpans.map((span, index) => ({ index, remainder: span - Math.floor(span) }));
+    remainders.sort((left, right) => right.remainder - left.remainder);
+
+    let cursor = 0;
+    while (remainingTracks > 0) {
+      const target = remainders[cursor % remainders.length];
+      spans[target.index] += 1;
+      remainingTracks -= 1;
+      cursor += 1;
+    }
+  } else if (remainingTracks < 0) {
+    const candidates = rawSpans.map((span, index) => ({ index, remainder: span - Math.floor(span) }));
+    candidates.sort((left, right) => left.remainder - right.remainder);
+
+    let cursor = 0;
+    while (remainingTracks < 0 && candidates.length > 0) {
+      const target = candidates[cursor % candidates.length];
+      if (spans[target.index] > 1) {
+        spans[target.index] -= 1;
+        remainingTracks += 1;
+      }
+      cursor += 1;
+    }
+  }
+
+  return spans;
+}
+
+type ArticleGalleryProps = {
+  items: NodeGalleryImage[];
+  columns: number;
+  align: NodeGalleryAlignment;
+  keyPrefix: string;
+  onNavigate?: (href: string) => void;
+};
+
+const ArticleGallery: React.FC<ArticleGalleryProps> = ({ items, columns, align, keyPrefix, onNavigate }) => {
+  const [aspectRatios, setAspectRatios] = useState<Record<string, number>>({});
+  const galleryRows = chunkGalleryItems(items, columns);
+  const totalTracks = columns * GALLERY_TRACKS_PER_COLUMN;
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${totalTracks}, minmax(0, 1fr))`,
+        gap: '1.05rem',
+      }}
+    >
+      {galleryRows.flatMap((row, rowIndex) => {
+        const rowAspectRatios = row.map((image, imageIndex) => {
+          const absoluteIndex = rowIndex * columns + imageIndex;
+          const itemKey = `${keyPrefix}-${image.src}-${absoluteIndex}`;
+          const measuredRatio = aspectRatios[itemKey] ?? DEFAULT_GALLERY_RATIO;
+          return align === 'height' ? Math.sqrt(measuredRatio) : measuredRatio;
+        });
+        const rowSpans = getNormalizedGallerySpans(rowAspectRatios, totalTracks);
+
+        return row.map((image, imageIndex) => {
+          const absoluteIndex = rowIndex * columns + imageIndex;
+          const itemKey = `${keyPrefix}-${image.src}-${absoluteIndex}`;
+
+          return (
+            <figure
+              key={itemKey}
+              style={{
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                minWidth: 0,
+                gridColumn: `span ${rowSpans[imageIndex] ?? GALLERY_TRACKS_PER_COLUMN}`,
+              }}
+            >
+              <img
+                src={resolveAssetUrl(image.src)}
+                alt={image.alt}
+                onLoad={(event) => {
+                  const { naturalWidth, naturalHeight } = event.currentTarget;
+                  if (!naturalWidth || !naturalHeight) return;
+
+                  const nextAspectRatio = naturalWidth / naturalHeight;
+                  setAspectRatios((current) =>
+                    current[itemKey] === nextAspectRatio ? current : { ...current, [itemKey]: nextAspectRatio }
+                  );
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  height: align === 'height' ? '15rem' : 'auto',
+                  borderRadius: '15px',
+                  objectFit: align === 'height' ? 'contain' : undefined,
+                }}
+              />
+              {image.caption && (
+                <figcaption
+                  style={{
+                    padding: '0.8rem 0.15rem 0 0.15rem',
+                    color: 'var(--color-text)',
+                    fontSize: '0.76rem',
+                    lineHeight: 1.55,
+                    opacity: 0.84,
+                    textAlign: 'center',
+                  }}
+                >
+                  {renderInlineMarkdown(image.caption, `${itemKey}-caption`, onNavigate)}
+                </figcaption>
+              )}
+            </figure>
+          );
+        });
+      })}
+    </div>
+  );
+};
+
+function renderMeta(meta: NodeArticleMeta | undefined, onNavigate?: (href: string) => void) {
+  if (!meta) return null;
+
+  const metaItems = [
+    meta.dateLabel ? { label: 'Date', value: meta.dateLabel } : null,
+    meta.location ? { label: 'Place', value: meta.location } : null,
+    meta.readingTime ? { label: 'Read', value: meta.readingTime } : null,
+    meta.status ? { label: 'Status', value: meta.status } : null,
+  ].filter((item): item is { label: string; value: string } => item !== null);
+
+  if (metaItems.length === 0 && !meta.links?.length) {
+    return null;
+  }
+
+  return (
+    <div style={{ marginTop: '1.2rem' }}>
+      {metaItems.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.95rem 1.4rem',
+          }}
+        >
+          {metaItems.map((item) => (
+            <div key={item.label}>
+              <Footnote
+                style={{
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.11em',
+                  fontSize: '0.64rem',
+                  opacity: 0.64,
+                }}
+              >
+                {item.label}
+              </Footnote>
+              <div style={{ marginTop: '0.22rem', fontSize: '0.93rem', lineHeight: 1.45 }}>
+                {item.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {meta.links && meta.links.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.55rem 1rem',
+            marginTop: metaItems.length > 0 ? '1rem' : 0,
+          }}
+        >
+          {meta.links.map((link) => (
+            <ArticleLink
+              key={`${link.label}-${link.href}`}
+              href={link.href}
+              onNavigate={onNavigate}
+              style={{ fontSize: '0.92rem', fontWeight: 600 }}
+            >
+              {link.label}
+            </ArticleLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function renderContentBlock(block: ContentBlock | ArticleBlock, index: number, onNavigate?: (href: string) => void) {
   if (block.type === 'text') {
     return (
       <Paragraph
         key={`text-${index}`}
         style={{
-          fontSize: '0.9rem',
-          lineHeight: 1.72,
+          maxWidth: DETAIL_READING_WIDTH,
+          fontSize: '0.92rem',
+          lineHeight: 1.78,
           paddingLeft: 0,
           paddingRight: 0,
           marginTop: 0,
           marginBottom: '1rem',
         }}
       >
-        {block.text}
+        {renderInlineMarkdown(block.text, `text-${index}`, onNavigate)}
       </Paragraph>
     );
   }
@@ -106,17 +431,17 @@ function renderContentBlock(block: ContentBlock, index: number) {
       <blockquote
         key={`quote-${index}`}
         style={{
-          margin: '0 0 1.2rem',
-          padding: '1rem 1.1rem',
-          borderLeft: '4px solid var(--color-secondary)',
-          background: 'color-mix(in srgb, var(--color-background) 88%, white 12%)',
+          maxWidth: DETAIL_READING_WIDTH,
+          margin: '0 0 1.35rem',
+          padding: '0.15rem 0 0.15rem 1rem',
           color: 'var(--color-text)',
           fontStyle: 'italic',
-          lineHeight: 1.65,
-          borderRadius: '0 16px 16px 0',
+          lineHeight: 1.72,
+          borderLeft: '2px solid color-mix(in srgb, var(--color-secondary) 48%, transparent)',
+          opacity: 0.9,
         }}
       >
-        "{block.text}"
+        {renderInlineMarkdown(block.text, `quote-${index}`, onNavigate)}
       </blockquote>
     );
   }
@@ -126,15 +451,16 @@ function renderContentBlock(block: ContentBlock, index: number) {
       <ul
         key={`list-${index}`}
         style={{
+          maxWidth: DETAIL_READING_WIDTH,
           margin: '0 0 1.2rem',
           paddingLeft: '1.15rem',
           color: 'var(--color-text)',
-          lineHeight: 1.7,
+          lineHeight: 1.72,
         }}
       >
-        {block.items.map((item) => (
-          <li key={item} style={{ marginBottom: '0.35rem' }}>
-            {item}
+        {block.items.map((item, itemIndex) => (
+          <li key={`${item}-${itemIndex}`} style={{ marginBottom: '0.38rem' }}>
+            {renderInlineMarkdown(item, `list-${index}-${itemIndex}`, onNavigate)}
           </li>
         ))}
       </ul>
@@ -143,36 +469,133 @@ function renderContentBlock(block: ContentBlock, index: number) {
 
   if (block.type === 'image') {
     return (
-      <div key={`image-${index}`} style={{ marginBottom: '1.3rem' }}>
-        <ImageBlock src={resolveAssetUrl(block.src)} alt={block.alt} caption={block.caption} />
-      </div>
+      <figure
+        key={`image-${index}`}
+        style={{
+          maxWidth: DETAIL_READING_WIDTH,
+          margin: '0 0 1.35rem',
+        }}
+      >
+        <img
+          src={resolveAssetUrl(block.src)}
+          alt={block.alt}
+          style={{
+            display: 'block',
+            width: '100%',
+            borderRadius: '16px',
+            objectFit: 'contain',
+            background: 'color-mix(in srgb, var(--color-background) 94%, white 6%)',
+          }}
+        />
+        {block.caption && (
+          <figcaption
+            style={{
+              marginTop: '0.58rem',
+              color: 'var(--color-text)',
+              opacity: 0.78,
+              fontSize: '0.78rem',
+              lineHeight: 1.58,
+              textAlign: 'center',
+            }}
+          >
+            {renderInlineMarkdown(block.caption, `image-caption-${index}`, onNavigate)}
+          </figcaption>
+        )}
+      </figure>
     );
   }
 
   if (block.type === 'link') {
     return (
-      <div key={`link-${index}`} style={{ marginBottom: '1rem' }}>
-        <a
-          href={block.href}
-          target={isExternalHref(block.href) ? '_blank' : undefined}
-          rel={isExternalHref(block.href) ? 'noreferrer' : undefined}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            color: 'var(--color-text)',
-            fontWeight: 600,
-            textDecoration: 'underline',
-            textUnderlineOffset: '0.2em',
-          }}
-        >
+      <div key={`link-${index}`} style={{ maxWidth: DETAIL_READING_WIDTH, marginBottom: '1rem' }}>
+        <ArticleLink href={block.href} onNavigate={onNavigate} style={{ fontWeight: 600 }}>
           {block.label}
-        </a>
+        </ArticleLink>
+        {block.description && (
+          <div style={{ marginTop: '0.35rem', fontSize: '0.9rem', lineHeight: 1.65, opacity: 0.84 }}>
+            {renderInlineMarkdown(block.description, `link-description-${index}`, onNavigate)}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (block.type === 'gallery') {
+    const galleryColumns = block.columns ?? Math.min(3, Math.max(1, block.items.length));
+    const galleryAlign = block.align ?? 'height';
+
+    return (
+      <div
+        key={`gallery-${index}`}
+        style={{
+          maxWidth: DETAIL_SECTION_WIDTH,
+          marginBottom: '1.3rem',
+        }}
+      >
+        <ArticleGallery
+          items={block.items}
+          columns={galleryColumns}
+          align={galleryAlign}
+          keyPrefix={`gallery-${index}`}
+          onNavigate={onNavigate}
+        />
+      </div>
+    );
+  }
+
+  if (block.type === 'callout') {
+    return (
+      <div
+        key={`callout-${index}`}
+        style={{
+          maxWidth: DETAIL_READING_WIDTH,
+          marginBottom: '1.3rem',
+          padding: '1rem 1.05rem',
+          borderRadius: '18px',
+          background:
+            block.tone === 'highlight'
+              ? 'color-mix(in srgb, var(--color-secondary) 12%, var(--color-background))'
+              : 'color-mix(in srgb, var(--color-background) 88%, white 12%)',
+        }}
+      >
+        {block.title && (
+          <Footnote
+            style={{
+              display: 'block',
+              marginBottom: '0.45rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.11em',
+              fontSize: '0.64rem',
+              opacity: 0.7,
+            }}
+          >
+            {block.title}
+          </Footnote>
+        )}
+        <div style={{ fontSize: '0.92rem', lineHeight: 1.72 }}>
+          {renderInlineMarkdown(block.text, `callout-${index}`, onNavigate)}
+        </div>
       </div>
     );
   }
 
   return null;
+}
+
+function renderSection(section: NodeArticleSection, index: number, onNavigate?: (href: string) => void) {
+  return (
+    <section
+      key={section.id ?? `${section.label}-${index}`}
+      style={{
+        marginTop: index === 0 ? '2.2rem' : '2.5rem',
+        maxWidth: DETAIL_SECTION_WIDTH,
+        marginInline: 'auto',
+      }}
+    >
+      {renderSectionHeading(section.label)}
+      <div>{section.blocks.map((block, blockIndex) => renderContentBlock(block, blockIndex, onNavigate))}</div>
+    </section>
+  );
 }
 
 const NodeDetailPage: React.FC = () => {
@@ -184,20 +607,22 @@ const NodeDetailPage: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const transitionName = decodedNodeId ? getNodeTransitionName(decodedNodeId) : undefined;
 
+  const handleNavigateWithTransition = (href: string) => {
+    navigateWithViewTransition(() => {
+      navigate(href);
+    });
+  };
+
   const handleBackToGraph = () => {
     if (decodedNodeId) {
       window.sessionStorage.setItem(GRAPH_RETURN_FOCUS_NODE_KEY, decodedNodeId);
     }
 
-    navigateWithViewTransition(() => {
-      navigate('/');
-    });
+    handleNavigateWithTransition('/');
   };
 
   const handleOpenRelatedNode = (relatedNodeId: string) => {
-    navigateWithViewTransition(() => {
-      navigate(getNodeDetailPath(relatedNodeId));
-    });
+    handleNavigateWithTransition(getNodeDetailPath(relatedNodeId));
   };
 
   useEffect(() => {
@@ -293,42 +718,56 @@ const NodeDetailPage: React.FC = () => {
     );
   }
 
+  const articleSections = node.sections;
+
   return (
-    <div style={{ minHeight: '100vh', color: 'var(--color-text)' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        color: 'var(--color-text)',
+      }}
+    >
       <div
         style={{
-          maxWidth: '70rem',
+          maxWidth: '72rem',
           margin: '0 auto',
-          padding: '2rem 1.25rem 4rem',
+          padding: '2rem 1.4rem 4.5rem',
         }}
       >
-        <Link
-          to="/"
-          onClick={(event) => {
-            event.preventDefault();
-            handleBackToGraph();
-          }}
+        <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            color: 'var(--color-text)',
-            fontWeight: 600,
-            textDecoration: 'underline',
-            textUnderlineOffset: '0.18em',
+            maxWidth: DETAIL_SECTION_WIDTH,
+            marginInline: 'auto',
           }}
         >
-          Back to graph
-        </Link>
+          <Link
+            to="/"
+            onClick={(event) => {
+              event.preventDefault();
+              handleBackToGraph();
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              color: 'var(--color-text)',
+              fontWeight: 600,
+              textDecoration: 'underline',
+              textUnderlineOffset: '0.18em',
+            }}
+          >
+            Back to graph
+          </Link>
+        </div>
 
         <section
           style={{
-            marginTop: '1rem',
-            padding: '1.4rem 1.3rem 1.6rem',
-            borderRadius: '28px',
-            border: '1.5px solid color-mix(in srgb, var(--color-secondary) 52%, transparent)',
+            marginTop: '1.15rem',
+            maxWidth: DETAIL_SECTION_WIDTH,
+            marginInline: 'auto',
+            padding: '2.3rem 2rem 2.35rem',
+            borderRadius: '34px',
             background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-            boxShadow: '0 28px 54px rgba(0, 0, 0, 0.08)',
             viewTransitionName: transitionName,
           }}
         >
@@ -344,28 +783,32 @@ const NodeDetailPage: React.FC = () => {
           </Footnote>
           <h1
             style={{
-              margin: '0.4rem 0 0',
-              fontSize: 'clamp(2rem, 5vw, 3.4rem)',
-              lineHeight: 0.98,
+              margin: '0.45rem 0 0',
+              fontSize: 'clamp(2.35rem, 5vw, 4rem)',
+              lineHeight: 0.96,
+              letterSpacing: '-0.04em',
             }}
           >
             {node.title}
           </h1>
           {node.subtitle && (
-            <div style={{ marginTop: '0.75rem', fontSize: '1.05rem', opacity: 0.82 }}>
+            <div style={{ marginTop: '0.9rem', fontSize: '1.08rem', opacity: 0.8 }}>
               {node.subtitle}
             </div>
           )}
           <p
             style={{
-              margin: '1rem 0 0',
-              maxWidth: '54rem',
-              fontSize: '1rem',
-              lineHeight: 1.75,
+              margin: '1.2rem 0 0',
+              maxWidth: DETAIL_READING_WIDTH,
+              fontSize: '1.02rem',
+              lineHeight: 1.8,
             }}
           >
             {node.summary}
           </p>
+
+          {renderMeta(node.meta, handleNavigateWithTransition)}
+
           {node.tags && node.tags.length > 0 && (
             <div
               style={{
@@ -379,12 +822,12 @@ const NodeDetailPage: React.FC = () => {
                 <span
                   key={tag}
                   style={{
-                    padding: '0.32rem 0.72rem',
+                    padding: '0.34rem 0.74rem',
                     borderRadius: '999px',
-                    border: '1px solid color-mix(in srgb, var(--color-secondary) 48%, transparent)',
-                    background: 'color-mix(in srgb, var(--color-background) 82%, white 18%)',
-                    fontSize: '0.8rem',
+                    background: 'color-mix(in srgb, var(--color-background) 84%, white 16%)',
+                    fontSize: '0.78rem',
                     fontWeight: 600,
+                    border: '1px solid color-mix(in srgb, var(--color-secondary) 44%, transparent)',
                   }}
                 >
                   {tag}
@@ -392,52 +835,84 @@ const NodeDetailPage: React.FC = () => {
               ))}
             </div>
           )}
+
+          {node.hero?.image && (
+            <figure
+              style={{
+                margin: '1.5rem 0 0',
+                maxWidth: DETAIL_SECTION_WIDTH,
+              }}
+            >
+              <img
+                src={resolveAssetUrl(node.hero.image.src)}
+                alt={node.hero.image.alt}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  borderRadius: '22px',
+                  objectFit: 'cover',
+                  aspectRatio: '16 / 9',
+                  background: 'color-mix(in srgb, var(--color-background) 94%, white 6%)',
+                }}
+              />
+              {node.hero.image.caption && (
+                <figcaption
+                  style={{
+                    marginTop: '0.65rem',
+                    fontSize: '0.78rem',
+                    lineHeight: 1.58,
+                    opacity: 0.8,
+                    textAlign: 'center',
+                  }}
+                >
+                  {renderInlineMarkdown(node.hero.image.caption, 'hero-caption', handleNavigateWithTransition)}
+                </figcaption>
+              )}
+            </figure>
+          )}
         </section>
 
         {node.gallery && node.gallery.length > 0 && (
-          <section style={{ marginTop: '1.5rem' }}>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '1rem',
-              }}
-            >
-              {node.gallery.map(renderGalleryImage)}
-            </div>
+          <section style={{ marginTop: '2.2rem', maxWidth: DETAIL_SECTION_WIDTH, marginInline: 'auto' }}>
+            {renderSectionHeading('Gallery')}
+            <ArticleGallery
+              items={node.gallery}
+              columns={Math.min(3, Math.max(1, node.gallery.length))}
+              align="height"
+              keyPrefix="top-gallery"
+              onNavigate={handleNavigateWithTransition}
+            />
           </section>
         )}
 
-        {node.detail && node.detail.length > 0 && (
+        {articleSections && articleSections.length > 0 && articleSections.map((section, index) => renderSection(section, index, handleNavigateWithTransition))}
+
+        {(!articleSections || articleSections.length === 0) && node.detail && node.detail.length > 0 && (
           <section
             style={{
-              marginTop: '1.5rem',
-              padding: '1.4rem 1.3rem 1.2rem',
-              borderRadius: '24px',
-              border: '1.5px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
-              background: 'color-mix(in srgb, var(--color-background) 92%, white 8%)',
+              marginTop: '2.2rem',
+              maxWidth: DETAIL_SECTION_WIDTH,
+              marginInline: 'auto',
             }}
           >
-            <h2 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.15rem' }}>Story</h2>
-            {node.detail.map(renderContentBlock)}
+            {renderSectionHeading('Story')}
+            <div>{node.detail.map((block, index) => renderContentBlock(block, index, handleNavigateWithTransition))}</div>
           </section>
         )}
 
         {relatedEntries.length > 0 && (
           <section
             style={{
-              marginTop: '1.5rem',
-              padding: '1.4rem 1.3rem',
-              borderRadius: '24px',
-              border: '1.5px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
-              background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
+              marginTop: '2.4rem',
+              maxWidth: DETAIL_SECTION_WIDTH,
+              marginInline: 'auto',
             }}
           >
-            <h2 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.15rem' }}>Connected nodes</h2>
+            {renderSectionHeading('Connected nodes')}
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
                 gap: '0.85rem',
               }}
             >
@@ -445,19 +920,20 @@ const NodeDetailPage: React.FC = () => {
                 <Link
                   key={relation.id}
                   to={getNodeDetailPath(relatedNode.id)}
+                  className="node-detail-related-link"
                   onClick={(event) => {
                     event.preventDefault();
                     handleOpenRelatedNode(relatedNode.id);
                   }}
                   style={{
                     display: 'block',
-                    padding: '0.95rem 1rem',
-                    borderRadius: '18px',
+                    width: '100%',
+                    padding: '0.8rem 0.85rem',
+                    borderRadius: '16px',
                     border: '1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)',
                     color: 'var(--color-text)',
                     background: 'color-mix(in srgb, var(--color-background) 84%, white 16%)',
                     textDecoration: 'none',
-                    boxShadow: '0 14px 26px rgba(0, 0, 0, 0.06)',
                     viewTransitionName: getNodeTransitionName(relatedNode.id),
                   }}
                 >
@@ -466,15 +942,15 @@ const NodeDetailPage: React.FC = () => {
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       opacity: 0.7,
-                      fontSize: '0.62rem',
+                      fontSize: '0.58rem',
                     }}
                   >
                     {relation.kind}
                   </Footnote>
-                  <div style={{ marginTop: '0.35rem', fontWeight: 700, fontSize: '0.95rem' }}>
+                  <div style={{ marginTop: '0.3rem', fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.35 }}>
                     {relatedNode.title}
                   </div>
-                  <div style={{ marginTop: '0.45rem', fontSize: '0.82rem', lineHeight: 1.5, opacity: 0.82 }}>
+                  <div style={{ marginTop: '0.38rem', fontSize: '0.76rem', lineHeight: 1.45, opacity: 0.8 }}>
                     {relation.label}
                   </div>
                 </Link>
