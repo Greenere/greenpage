@@ -11,7 +11,6 @@ import {
     type NodeMouseHandler,
     ReactFlowProvider,
 } from '@xyflow/react';
-import { forceCollide, forceLink, forceManyBody, forceSimulation, forceX, forceY } from 'd3-force';
 import '@xyflow/react/dist/style.css';
 import BioNode from './nodes/BioNode';
 import { edgeTypes } from './nodes/EdgeTypes';
@@ -50,32 +49,19 @@ type StoryNodeData = {
     title: string;
     subtitle?: string;
     summary: string;
-    gallery?: GraphContentNode['gallery'];
     detail?: GraphContentNode['detail'];
     badges?: string[];
 };
 
-type SimulationNode = {
-    id: string;
-    x: number;
-    y: number;
-    targetX: number;
-    targetY: number;
-    fx?: number;
-    fy?: number;
-};
-
 const CONTENT_NODE_WIDTH = 196;
 const CONTENT_NODE_HEIGHT = 190;
-const BIO_NODE_WIDTH = 264;
-const BIO_NODE_HEIGHT = 220;
-const BIO_COLLISION_RADIUS = 182;
+const BIO_NODE_WIDTH = 228;
+const BIO_NODE_HEIGHT = 248;
 const CONTENT_COLLISION_PADDING = 18;
 const BIO_COLLISION_PADDING = 24;
 const TOGGLE_COLLISION_PADDING = 10;
-const CONTENT_FORCE_COLLISION_RADIUS = 132;
-const TOGGLE_NODE_WIDTH = 160;
-const TOGGLE_NODE_HEIGHT = 54;
+const TOGGLE_NODE_WIDTH = 170;
+const TOGGLE_NODE_HEIGHT = 48;
 const HANDLE_MARGIN = 0.14;
 const PREFERRED_HANDLE_GAP = 0.11;
 const HANDLE_SMOOTHING = 0.35;
@@ -90,6 +76,13 @@ const STYLE_NODE_CLASS_NAME = 'greenpage-style-node';
 const GRAPH_OVERVIEW_PADDING_RATIO = 0.1;
 const GRAPH_MIN_ZOOM = 0.5;
 const GRAPH_MAX_ZOOM = 2;
+const DRAG_EDGE_SYNC_INTERVAL_MS = 34;
+const DRAG_EDGE_SYNC_DISTANCE = 16;
+const DOMAIN_LAYOUT_INNER_RADIUS_MIN = 228;
+const DOMAIN_LAYOUT_INNER_RADIUS_MAX = 292;
+const DOMAIN_LAYOUT_RADIAL_GAP_MIN = 98;
+const DOMAIN_LAYOUT_RADIAL_GAP_MAX = 134;
+const DOMAIN_LAYOUT_MAX_ANGLE_OFFSET = 0.42;
 
 type ProjectedHandle = DynamicHandle & {
     nodeId: string;
@@ -117,12 +110,6 @@ type PendingGraphRestore = {
     viewport?: Viewport;
     returnFocusNodeId: string | null;
 };
-
-function sizeOf(n: Node) {
-    const w = (n.measured?.width ?? n.width ?? CONTENT_NODE_WIDTH);
-    const h = (n.measured?.height ?? n.height ?? CONTENT_NODE_HEIGHT);
-    return { w, h };
-}
 
 function half(n: number) {
     return n / 2;
@@ -271,6 +258,14 @@ function relaxBoxPositions(
 }
 
 function getNodeDimensions(node: Node) {
+    if (typeof node.measured?.width === 'number' && typeof node.measured?.height === 'number') {
+        return { w: node.measured.width, h: node.measured.height };
+    }
+
+    if (typeof node.width === 'number' && typeof node.height === 'number') {
+        return { w: node.width, h: node.height };
+    }
+
     if (node.id === 'bio') {
         return { w: BIO_NODE_WIDTH, h: BIO_NODE_HEIGHT };
     }
@@ -279,7 +274,26 @@ function getNodeDimensions(node: Node) {
         return { w: TOGGLE_NODE_WIDTH, h: TOGGLE_NODE_HEIGHT };
     }
 
-    return sizeOf(node);
+    return { w: CONTENT_NODE_WIDTH, h: CONTENT_NODE_HEIGHT };
+}
+
+function shouldSyncDragEdges(
+    previousPosition: Point | null,
+    nextPosition: Point,
+    now: number,
+    lastSyncAt: number
+) {
+    if (!previousPosition) {
+        return true;
+    }
+
+    const dx = nextPosition.x - previousPosition.x;
+    const dy = nextPosition.y - previousPosition.y;
+
+    return (
+        now - lastSyncAt >= DRAG_EDGE_SYNC_INTERVAL_MS ||
+        Math.hypot(dx, dy) >= DRAG_EDGE_SYNC_DISTANCE
+    );
 }
 
 function getCollisionPadding(nodeId: string) {
@@ -605,21 +619,20 @@ function buildEdgeStyle(edge: Pick<Edge, 'source' | 'target'>, highlightedNodeId
     };
 }
 
-function getConnectedNodeIds(graphRelations: GraphModel['relations'], nodeId: string | null) {
-    if (!nodeId) return new Set<string>();
-
-    const connectedNodeIds = new Set<string>([nodeId]);
+function buildConnectedNodeIdsByNode(graphRelations: GraphModel['relations']) {
+    const connectedByNode = new Map<string, Set<string>>();
 
     for (const relation of graphRelations) {
-        if (relation.from === nodeId) {
-            connectedNodeIds.add(relation.to);
-        }
-        if (relation.to === nodeId) {
-            connectedNodeIds.add(relation.from);
-        }
+        const sourceNodes = connectedByNode.get(relation.from) ?? new Set<string>([relation.from]);
+        sourceNodes.add(relation.to);
+        connectedByNode.set(relation.from, sourceNodes);
+
+        const targetNodes = connectedByNode.get(relation.to) ?? new Set<string>([relation.to]);
+        targetNodes.add(relation.from);
+        connectedByNode.set(relation.to, targetNodes);
     }
 
-    return connectedNodeIds;
+    return connectedByNode;
 }
 
 function getNodeClassName(nodeId: string, highlightedNodeId: string | null, connectedNodeIds: Set<string>) {
@@ -920,9 +933,8 @@ function buildLaneTargetPositions(
     const lanePlan = chooseBalancedDomainPlan(contentNodes, graphRelations);
     const domainOrder = [...lanePlan.keys()];
     const minViewport = Math.min(viewportWidth, viewportHeight);
-    const innerRadius = Math.max(245, Math.min(330, minViewport * 0.28));
-    const radialGap = Math.max(136, Math.min(182, minViewport * 0.165));
-    const maxAngleStep = 0.36;
+    const innerRadius = Math.max(DOMAIN_LAYOUT_INNER_RADIUS_MIN, Math.min(DOMAIN_LAYOUT_INNER_RADIUS_MAX, minViewport * 0.245));
+    const radialGap = Math.max(DOMAIN_LAYOUT_RADIAL_GAP_MIN, Math.min(DOMAIN_LAYOUT_RADIAL_GAP_MAX, minViewport * 0.128));
     const targets = new Map<string, Point>();
 
     for (const domain of domainOrder) {
@@ -931,42 +943,27 @@ function buildLaneTargetPositions(
             .sort((left, right) => right.chronology - left.chronology);
         const lane = lanePlan.get(domain);
         if (!lane) continue;
-        const centerIndex = (laneNodes.length - 1) / 2;
-        const usableLaneSpan = lane.span * 0.58;
-        const angleStep = laneNodes.length > 1
-            ? Math.min(maxAngleStep, usableLaneSpan / Math.max(1, laneNodes.length - 1))
-            : 0;
+
+        const outerLayerCount = Math.max(1, Math.ceil((laneNodes.length - 1) / 2));
+        const maxAngleOffset = Math.min(DOMAIN_LAYOUT_MAX_ANGLE_OFFSET, lane.span * 0.34);
+        const angleStep = outerLayerCount > 0 ? maxAngleOffset / outerLayerCount : 0;
 
         laneNodes.forEach((node, index) => {
-            const angle = lane.centerAngle + (index - centerIndex) * angleStep;
-            const radius = innerRadius + index * radialGap;
+            const layer = index === 0 ? 0 : Math.ceil(index / 2);
+            const side = index === 0 ? 0 : index % 2 === 1 ? -1 : 1;
+            const angleOffset = side * angleStep * layer;
+            const angle = lane.centerAngle + angleOffset;
+            const radius = innerRadius + layer * radialGap;
+            const tangentOffset = side === 0 ? 0 : side * radialGap * 0.14;
+
             targets.set(node.id, {
-                x: centerX + Math.cos(angle) * radius,
-                y: centerY + Math.sin(angle) * radius,
+                x: centerX + Math.cos(angle) * radius - Math.sin(angle) * tangentOffset,
+                y: centerY + Math.sin(angle) * radius + Math.cos(angle) * tangentOffset,
             });
         });
     }
 
     return targets;
-}
-
-function buildCrossDomainSimulationLinks(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
-    const nodeById = new Map(contentNodes.map((node) => [node.id, node]));
-
-    return graphRelations.flatMap((relation) => {
-        const fromNode = nodeById.get(relation.from);
-        const toNode = nodeById.get(relation.to);
-        if (!fromNode || !toNode || fromNode.domain === toNode.domain) {
-            return [];
-        }
-
-        return [{
-            source: relation.from,
-            target: relation.to,
-            distance: 188 + (3 - relation.strength) * 20,
-            strength: 0.025 + relation.strength * 0.012,
-        }];
-    });
 }
 
 function buildEdgesForNodes(
@@ -1121,53 +1118,7 @@ function buildInitialGraph(
         viewportWidth,
         viewportHeight
     );
-    const crossDomainLinks = buildCrossDomainSimulationLinks(contentNodes, graphRelations);
-    const simulationNodes: SimulationNode[] = [
-        {
-            id: 'bio',
-            x: bioCenter.x,
-            y: bioCenter.y,
-            targetX: bioCenter.x,
-            targetY: bioCenter.y,
-            fx: bioCenter.x,
-            fy: bioCenter.y,
-        },
-        ...contentNodes.map((node) => {
-            const target = targetCenters.get(node.id) ?? bioCenter;
-            return {
-                id: node.id,
-                x: target.x,
-                y: target.y,
-                targetX: target.x,
-                targetY: target.y,
-            };
-        }),
-    ];
-
-    const simulation = forceSimulation(simulationNodes)
-        .force('charge', forceManyBody().strength((node: SimulationNode) => node.id === 'bio' ? -30 : -90))
-        .force(
-            'collision',
-            forceCollide().radius((simNode: SimulationNode) =>
-                simNode.id === 'bio' ? BIO_COLLISION_RADIUS : CONTENT_FORCE_COLLISION_RADIUS
-            ).strength(1)
-        )
-        .force('x', forceX((node: SimulationNode) => node.targetX).strength((node: SimulationNode) => node.id === 'bio' ? 1 : 0.22))
-        .force('y', forceY((node: SimulationNode) => node.targetY).strength((node: SimulationNode) => node.id === 'bio' ? 1 : 0.22))
-        .force(
-            'link',
-            forceLink(crossDomainLinks)
-                .id((node: SimulationNode) => node.id)
-                .distance((link: { distance: number }) => link.distance)
-                .strength((link: { strength: number }) => link.strength)
-        )
-        .stop();
-
-    for (let i = 0; i < 180; i++) {
-        simulation.tick();
-    }
-
-    const positionById = new Map(simulationNodes.map((node) => [node.id, { x: node.x, y: node.y }]));
+    const positionById = new Map(contentNodes.map((node) => [node.id, targetCenters.get(node.id) ?? bioCenter]));
 
     const relaxedNodes = relaxInitialNodes([
         {
@@ -1203,7 +1154,6 @@ function buildInitialGraph(
                     title: node.title,
                     subtitle: node.subtitle,
                     summary: node.summary,
-                    gallery: node.gallery,
                     detail: node.detail,
                     badges: node.tags,
                 } satisfies StoryNodeData,
@@ -1233,6 +1183,10 @@ const NodeCanvas: React.FC = () => {
         () => graphModel ? getGraphRelations(graphModel) : [],
         [graphModel]
     );
+    const connectedNodeIdsByNode = useMemo(
+        () => buildConnectedNodeIdsByNode(graphRelations),
+        [graphRelations]
+    );
     const orderedGraphRelations = useMemo(
         () => [...graphRelations].sort((left, right) => right.strength - left.strength || left.id.localeCompare(right.id)),
         [graphRelations]
@@ -1246,8 +1200,15 @@ const NodeCanvas: React.FC = () => {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
     const { getViewport, setCenter, setViewport } = useReactFlow();
     const dragRafId = useRef<number | null>(null);
+    const nodesRef = useRef<Node[]>(initialGraph.nodes);
     const edgesRef = useRef<Edge[]>(initialGraph.edges);
     const highlightedNodeIdRef = useRef<string | null>(null);
+    const lastDragEdgeSyncAtRef = useRef(0);
+    const lastDragEdgeSyncPositionRef = useRef<Point | null>(null);
+    const persistCurrentGraphView = useCallback((nextNodes: Node[], viewport?: Viewport) => {
+        if (!graphModel || nextNodes.length === 0) return;
+        persistGraphView(nextNodes, viewport ?? getViewport());
+    }, [getViewport, graphModel]);
 
     const focusNode = useCallback((
         node: Node,
@@ -1272,6 +1233,8 @@ const NodeCanvas: React.FC = () => {
         setHoveredNodeId(null);
         setDraggingNodeId(null);
         highlightedNodeIdRef.current = null;
+        lastDragEdgeSyncAtRef.current = 0;
+        lastDragEdgeSyncPositionRef.current = null;
 
         const resetNodes = initialGraph.nodes.map((node) => {
             if (node.id === 'bio') {
@@ -1308,6 +1271,7 @@ const NodeCanvas: React.FC = () => {
         setNodes(resetGraph.nodes);
         setEdges(resetGraph.edges);
         edgesRef.current = resetGraph.edges;
+        persistCurrentGraphView(resetGraph.nodes);
 
         requestAnimationFrame(() => {
             const bioNode = resetGraph.nodes.find((node) => node.id === 'bio');
@@ -1315,7 +1279,7 @@ const NodeCanvas: React.FC = () => {
 
             focusNode(bioNode);
         });
-    }, [focusNode, initialGraph.nodes, orderedGraphRelations, setEdges, setNodes, setTheme, theme]);
+    }, [focusNode, initialGraph.nodes, orderedGraphRelations, persistCurrentGraphView, setEdges, setNodes, setTheme, theme]);
 
     const applyPendingGraphRestore = useCallback(() => {
         if (!flowReadyRef.current || !pendingGraphRestoreRef.current) {
@@ -1417,13 +1381,12 @@ const NodeCanvas: React.FC = () => {
     }, [applyPendingGraphRestore, graphModel, initialGraph, orderedGraphRelations, setEdges, setNodes]);
 
     useEffect(() => {
-        edgesRef.current = edges;
-    }, [edges]);
+        nodesRef.current = nodes;
+    }, [nodes]);
 
     useEffect(() => {
-        if (!graphModel || nodes.length === 0) return;
-        persistGraphView(nodes, getViewport());
-    }, [getViewport, graphModel, nodes]);
+        edgesRef.current = edges;
+    }, [edges]);
 
     useEffect(() => {
         const previousHighlightedNodeId = highlightedNodeIdRef.current;
@@ -1431,8 +1394,12 @@ const NodeCanvas: React.FC = () => {
             return;
         }
 
-        const previousConnectedNodeIds = getConnectedNodeIds(orderedGraphRelations, previousHighlightedNodeId);
-        const nextConnectedNodeIds = getConnectedNodeIds(orderedGraphRelations, highlightedNodeId);
+        const previousConnectedNodeIds = previousHighlightedNodeId
+            ? connectedNodeIdsByNode.get(previousHighlightedNodeId) ?? new Set<string>([previousHighlightedNodeId])
+            : new Set<string>();
+        const nextConnectedNodeIds = highlightedNodeId
+            ? connectedNodeIdsByNode.get(highlightedNodeId) ?? new Set<string>([highlightedNodeId])
+            : new Set<string>();
         const changedNodeIds = new Set<string>([
             ...previousConnectedNodeIds,
             ...nextConnectedNodeIds,
@@ -1465,7 +1432,7 @@ const NodeCanvas: React.FC = () => {
         }
 
         highlightedNodeIdRef.current = highlightedNodeId;
-    }, [highlightedNodeId, orderedGraphRelations, setEdges, setNodes]);
+    }, [connectedNodeIdsByNode, highlightedNodeId, setEdges, setNodes]);
 
     const onNodeClick: NodeMouseHandler = useCallback((_, node) => {
         if (node.id === 'biotoggle') return;
@@ -1521,9 +1488,8 @@ const NodeCanvas: React.FC = () => {
     };
 
     const onMoveEnd = useCallback(() => {
-        if (!graphModel || nodes.length === 0) return;
-        persistGraphView(nodes, getViewport());
-    }, [getViewport, graphModel, nodes]);
+        persistCurrentGraphView(nodes);
+    }, [nodes, persistCurrentGraphView]);
 
     const onNodeDrag = useCallback((_: unknown, dragged: Node) => {
         if (!graphModel) {
@@ -1537,6 +1503,20 @@ const NodeCanvas: React.FC = () => {
         if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
 
         dragRafId.current = requestAnimationFrame(() => {
+            const now = performance.now();
+            const dragPosition = { x: dragged.position.x, y: dragged.position.y };
+            const syncEdges = shouldSyncDragEdges(
+                lastDragEdgeSyncPositionRef.current,
+                dragPosition,
+                now,
+                lastDragEdgeSyncAtRef.current
+            );
+
+            if (syncEdges) {
+                lastDragEdgeSyncAtRef.current = now;
+                lastDragEdgeSyncPositionRef.current = dragPosition;
+            }
+
             setNodes((prev) => {
                 if (dragged.id === 'biotoggle') {
                     const nextNodes = prev.map((node) =>
@@ -1544,6 +1524,10 @@ const NodeCanvas: React.FC = () => {
                             ? { ...node, position: { x: dragged.position.x, y: dragged.position.y } }
                             : node
                     );
+
+                    if (!syncEdges) {
+                        return nextNodes;
+                    }
 
                     const nextGraph = buildEdgesForNodes(nextNodes, orderedGraphRelations, dragged.id, edgesRef.current);
                     edgesRef.current = nextGraph.edges;
@@ -1594,6 +1578,10 @@ const NodeCanvas: React.FC = () => {
                     return { ...node, position: nextPosition };
                 });
 
+                if (!syncEdges) {
+                    return nextNodes;
+                }
+
                 const nextGraph = buildEdgesForNodes(nextNodes, orderedGraphRelations, dragged.id, edgesRef.current);
                 edgesRef.current = nextGraph.edges;
                 setEdges(nextGraph.edges);
@@ -1604,6 +1592,8 @@ const NodeCanvas: React.FC = () => {
 
     const onNodeDragStop = useCallback((_: unknown, dragged: Node) => {
         if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
+        lastDragEdgeSyncAtRef.current = 0;
+        lastDragEdgeSyncPositionRef.current = null;
         setNodes((prev) => {
             if (dragged.id === 'biotoggle') {
                 const nextNodes = prev.map((node) =>
@@ -1666,7 +1656,10 @@ const NodeCanvas: React.FC = () => {
             return nextGraph.nodes;
         });
         setDraggingNodeId(null);
-    }, [orderedGraphRelations, setEdges, setNodes]);
+        requestAnimationFrame(() => {
+            persistCurrentGraphView(nodesRef.current);
+        });
+    }, [orderedGraphRelations, persistCurrentGraphView, setEdges, setNodes]);
 
     useEffect(() => {
         setNodes((prev) =>
