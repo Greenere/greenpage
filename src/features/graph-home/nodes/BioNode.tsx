@@ -1,9 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Footnote, Paragraph, Subtitle } from "../../../shared/ui/StyledTextBlocks";
 import { Position, useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
 import { type Theme, BIOTHEME } from "../content/BioTheme";
+import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
+import { getNodeDetailPath, getNodeTransitionName, resolveAssetUrl } from "../content/Nodes";
 
 interface BioData {
     theme: Theme
@@ -21,8 +24,11 @@ const BioNode: React.FC<BioNodeProps> = ({
     id,
     data
 }) => {
+    const navigate = useNavigate();
     const [focused, setFocused] = useState<boolean>(false);
+    const [bioLinkArmed, setBioLinkArmed] = useState(false);
     const [resetArmed, setResetArmed] = useState(false);
+    const bioLinkArmTimeoutRef = useRef<number | null>(null);
     const resetArmTimeoutRef = useRef<number | null>(null);
     const updateNodeInternals = useUpdateNodeInternals();
 
@@ -32,10 +38,33 @@ const BioNode: React.FC<BioNodeProps> = ({
 
     useEffect(() => {
         return () => {
+            if (bioLinkArmTimeoutRef.current !== null) {
+                window.clearTimeout(bioLinkArmTimeoutRef.current);
+            }
             if (resetArmTimeoutRef.current !== null) {
                 window.clearTimeout(resetArmTimeoutRef.current);
             }
         };
+    }, []);
+
+    const armBioLink = useCallback(() => {
+        if (bioLinkArmTimeoutRef.current !== null) {
+            window.clearTimeout(bioLinkArmTimeoutRef.current);
+        }
+
+        bioLinkArmTimeoutRef.current = window.setTimeout(() => {
+            setBioLinkArmed(true);
+            bioLinkArmTimeoutRef.current = null;
+        }, 220);
+    }, []);
+
+    const disarmBioLink = useCallback(() => {
+        if (bioLinkArmTimeoutRef.current !== null) {
+            window.clearTimeout(bioLinkArmTimeoutRef.current);
+            bioLinkArmTimeoutRef.current = null;
+        }
+
+        setBioLinkArmed(false);
     }, []);
 
     const armReset = useCallback(() => {
@@ -81,6 +110,27 @@ const BioNode: React.FC<BioNodeProps> = ({
         event.currentTarget.blur();
     };
 
+    const handleBioPointerDown = (event: React.PointerEvent<HTMLAnchorElement>) => {
+        if (!bioLinkArmed) {
+            return;
+        }
+
+        stopEventPropagation(event);
+    };
+
+    const handleOpenBio = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!bioLinkArmed) {
+            event.preventDefault();
+            return;
+        }
+
+        stopEventPropagation(event);
+        event.preventDefault();
+        navigateWithViewTransition(() => {
+            navigate(getNodeDetailPath('bio'));
+        });
+    };
+
     return (<>
         <NodeContainer
             style={{
@@ -91,6 +141,7 @@ const BioNode: React.FC<BioNodeProps> = ({
                 paddingRight: "1rem",
                 paddingBottom: "1.25rem",
                 background: "color-mix(in srgb, var(--color-background) 90%, white 10%)",
+                viewTransitionName: getNodeTransitionName('bio'),
             }}
         >
             <div style={{
@@ -107,7 +158,7 @@ const BioNode: React.FC<BioNodeProps> = ({
                             setFocused(false);
                         }}
                     >
-                        <img src={BIOTHEME[data.theme].imgSrc} style={{
+                        <img src={resolveAssetUrl(BIOTHEME[data.theme].imgSrc)} style={{
                             width: `96px`,
                             height: `96px`,
                             objectFit: "cover",
@@ -147,24 +198,44 @@ const BioNode: React.FC<BioNodeProps> = ({
             </div>
             <div
                 className="node-card-detail-shell"
-                onPointerEnter={armReset}
-                onPointerLeave={disarmReset}
+                style={{ gap: "0.9rem" }}
             >
-                <button
-                    type="button"
-                    className={`node-card-detail-link ${resetArmed ? 'nodrag nopan' : ''}`.trim()}
-                    onPointerDown={handleResetPointerDown}
-                    onClick={handleResetClick}
-                    onFocus={armReset}
-                    onBlur={disarmReset}
-                    aria-label="Reset graph layout"
-                    style={{
-                        background: "transparent",
-                        border: "none",
-                    }}
+                <div
+                    onPointerEnter={armBioLink}
+                    onPointerLeave={disarmBioLink}
                 >
-                    <span>reset</span>
-                </button>
+                    <Link
+                        to={getNodeDetailPath('bio')}
+                        className={`node-card-detail-link ${bioLinkArmed ? 'nodrag nopan' : ''}`.trim()}
+                        onPointerDown={handleBioPointerDown}
+                        onClick={handleOpenBio}
+                        onFocus={armBioLink}
+                        onBlur={disarmBioLink}
+                        aria-label="Open the bio detail page"
+                    >
+                        <span>about me</span>
+                    </Link>
+                </div>
+                <div
+                    onPointerEnter={armReset}
+                    onPointerLeave={disarmReset}
+                >
+                    <button
+                        type="button"
+                        className={`node-card-detail-link ${resetArmed ? 'nodrag nopan' : ''}`.trim()}
+                        onPointerDown={handleResetPointerDown}
+                        onClick={handleResetClick}
+                        onFocus={armReset}
+                        onBlur={disarmReset}
+                        aria-label="Reset graph layout"
+                        style={{
+                            background: "transparent",
+                            border: "none",
+                        }}
+                    >
+                        <span>reset</span>
+                    </button>
+                </div>
             </div>
 
             {(data.handles ?? []).map((handle) => (
