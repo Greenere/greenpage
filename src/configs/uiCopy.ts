@@ -26,7 +26,7 @@ export const UI_COPY = {
     },
   },
   graphRelations: {
-    nextInTimeline: 'next in timeline',
+    nextInTimeline: 'adjacent in timeline',
     latestNodeInDomain: 'latest node in domain',
   },
   graphHome: {
@@ -63,7 +63,7 @@ export const UI_COPY = {
     sections: {
       gallery: 'Gallery',
       story: 'Story',
-      connectedNodes: 'Connected nodes',
+      connectedNodes: 'Click to Explore Connected nodes',
     },
     bioEntry: {
       title: 'Haoyang Li',
@@ -77,7 +77,7 @@ export const UI_COPY = {
     errorLoading: 'Error loading bio content',
     fallbackEyebrow: 'Bio node',
     fallbackThemeFactLabel: 'Current frame',
-    fallbackPathsSectionLabel: 'Paths through the graph',
+    fallbackPathsSectionLabel: 'Click to Explore Paths into the Graph',
     fallbackLinksSectionLabel: 'Elsewhere',
     portraitAlt: (name: string) => `Portrait of ${name}`,
   },

@@ -48,6 +48,7 @@ const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'f
             key={key}
             type="button"
             aria-label={THEME_CONFIG[key].label}
+            title={isInline ? THEME_CONFIG[key].label : undefined}
             onClick={(event) => {
               setTheme(key);
               event.currentTarget.blur();
