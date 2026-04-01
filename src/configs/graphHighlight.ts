@@ -1,7 +1,7 @@
 export type HighlightBorderGrowthDirection = 'inward' | 'outward';
 
 export const GRAPH_NODE_HIGHLIGHT_RING_WIDTH = {
-    idle: 1.35,
+    idle: 1,
     connected: 3,
     active: 4,
 } as const;
@@ -17,15 +17,22 @@ export const GRAPH_EDGE_HIGHLIGHT_STROKE_WIDTH = {
     active: 2.35,
 } as const;
 
-export const GRAPH_BIO_PORTRAIT_BORDER = {
-    width: 1.35,
-    opacity: 1,
+export const GRAPH_BIO_PORTRAIT_BORDER_WIDTH = {
+    idle: 2.35,
+    connected: 2.35,
+    active: 2.35,
+} as const;
+
+export const GRAPH_BIO_PORTRAIT_BORDER_OPACITY = {
+    idle: 1,
+    connected: 1,
+    active: 1,
 } as const;
 
 export const GRAPH_NODE_HIGHLIGHT_GROWTH_DIRECTION: HighlightBorderGrowthDirection = 'outward';
 
 export const DETAIL_PAGE_ACTION_BORDER = {
-    idleWidth: 1.35,
+    idleWidth: 0,
     idleOpacity: 0.8,
     activeWidth: 3,
     activeOpacity: 0.9,

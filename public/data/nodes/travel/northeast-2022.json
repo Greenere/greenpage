@@ -32,7 +32,8 @@
       "blocks": [
         {
           "type": "gallery",
-          "columns": 2,
+          "align": "natural",
+          "columns": 1,
           "items": [
             {
               "src": "assets/portrait-haoyang-nyc.jpg",

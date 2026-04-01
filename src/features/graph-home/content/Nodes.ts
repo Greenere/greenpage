@@ -40,7 +40,7 @@ export type ContentBlock =
 
 export type ArticleBlock =
   | ContentBlock
-  | { type: 'gallery'; items: NodeGalleryImage[]; columns?: 2 | 3; align?: NodeGalleryAlignment }
+  | { type: 'gallery'; items: NodeGalleryImage[]; columns?: 1 | 2 | 3; align?: NodeGalleryAlignment }
   | { type: 'callout'; text: string; title?: string; tone?: 'note' | 'highlight' };
 
 export type NodeArticleHero = {
@@ -285,7 +285,7 @@ function normalizeArticleBlocks(value: unknown): ArticleBlock[] | undefined {
       const items = normalizeGalleryImages(block.items);
       return (
         Boolean(items?.length) &&
-        (block.columns === undefined || block.columns === 2 || block.columns === 3) &&
+        (block.columns === undefined || block.columns === 1 || block.columns === 2 || block.columns === 3) &&
         (block.align === undefined || block.align === 'height' || block.align === 'natural')
       );
     }

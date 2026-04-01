@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   DETAIL_PAGE_ACTION_BORDER,
@@ -8,7 +8,11 @@ import {
 import { THEME_CONFIG } from '../../configs/themes';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
-import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
+import {
+  captureSharedElementTransition,
+  navigateWithViewTransition,
+  playSharedElementEnterTransition,
+} from '../../shared/ui/viewTransitions';
 import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
 import {
@@ -113,11 +117,16 @@ const BioDetailPage: React.FC = () => {
   const portrait = BIOTHEME[theme];
   const themeLabel = THEME_CONFIG[theme].label;
   const transitionName = getNodeTransitionName('bio');
+  const heroSectionRef = useRef<HTMLElement | null>(null);
+
+  useLayoutEffect(() => {
+    playSharedElementEnterTransition(heroSectionRef.current, transitionName);
+  }, [transitionName]);
 
   const handleNavigateWithTransition = (href: string) => {
     navigateWithViewTransition(() => {
       navigate(href);
-    });
+    }, { resetScrollTop: href.startsWith('/nodes/') });
   };
 
   const handleBackToGraph = () => {
@@ -256,6 +265,7 @@ const BioDetailPage: React.FC = () => {
         </div>
 
         <section
+          ref={heroSectionRef}
           style={{
             marginTop: '1.15rem',
             maxWidth: DETAIL_SECTION_WIDTH,
@@ -452,6 +462,7 @@ const BioDetailPage: React.FC = () => {
                 className="node-detail-related-link"
                 onClick={(event) => {
                   event.preventDefault();
+                  captureSharedElementTransition(event.currentTarget, getNodeTransitionName(entry.id));
                   handleNavigateWithTransition(getNodeDetailPath(entry.id));
                 }}
                 style={{

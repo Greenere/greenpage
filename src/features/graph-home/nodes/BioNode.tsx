@@ -7,7 +7,6 @@ import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./
 import { type Theme, BIOTHEME } from "../content/BioTheme";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
 import { getNodeDetailPath, getNodeTransitionName, resolveAssetUrl } from "../content/Nodes";
-import { GRAPH_BIO_PORTRAIT_BORDER } from "../../../configs/graphHighlight";
 
 interface BioData {
     theme: Theme
@@ -129,7 +128,7 @@ const BioNode: React.FC<BioNodeProps> = ({
         event.preventDefault();
         navigateWithViewTransition(() => {
             navigate(getNodeDetailPath('bio'));
-        });
+        }, { resetScrollTop: true });
     };
 
     return (<>
@@ -164,7 +163,7 @@ const BioNode: React.FC<BioNodeProps> = ({
                             height: `96px`,
                             objectFit: "cover",
                             borderRadius: "50%",
-                            border: `${GRAPH_BIO_PORTRAIT_BORDER.width}px solid color-mix(in srgb, var(--color-secondary) ${GRAPH_BIO_PORTRAIT_BORDER.opacity * 100}%, transparent)`,
+                            border: `calc(var(--greenpage-bio-portrait-border-width, 1.35) * 1px) solid color-mix(in srgb, var(--color-secondary) calc(var(--greenpage-bio-portrait-border-opacity, 1) * 100%), transparent)`,
                             filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`
                         }} />
                     </a>

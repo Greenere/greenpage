@@ -165,7 +165,7 @@ const StoryNode: React.FC<StoryNodeProps> = ({
         event.preventDefault();
         navigateWithViewTransition(() => {
             navigate(getNodeDetailPath(data.nodeId ?? id));
-        });
+        }, { resetScrollTop: true });
     };
 
     const renderBlock = (block: ContentBlock, idx: number) => {

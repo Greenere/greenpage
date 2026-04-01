@@ -30,12 +30,59 @@ body,
   .react-flow__background {
     transition: none !important;
   }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
   margin: 0;
+}
+
+::view-transition-group(root) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root) {
+  animation: greenpage-view-fade-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: greenpage-view-fade-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes greenpage-view-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+}
+
+@keyframes greenpage-view-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
 .card {
@@ -53,6 +100,8 @@ body,
     var(--color-secondary) calc(var(--greenpage-node-ring-opacity-idle, 0.34) * 100%),
     transparent
   );
+  --greenpage-bio-portrait-border-width: var(--greenpage-bio-portrait-border-width-idle, 1.35);
+  --greenpage-bio-portrait-border-opacity: var(--greenpage-bio-portrait-border-opacity-idle, 1);
 }
 
 .react-flow__node.greenpage-graph-node.greenpage-graph-node-highlight-self {
@@ -63,6 +112,8 @@ body,
       calc(var(--greenpage-node-ring-opacity-active, 0.92) * 100%),
     transparent
   );
+  --greenpage-bio-portrait-border-width: var(--greenpage-bio-portrait-border-width-active, 2.8);
+  --greenpage-bio-portrait-border-opacity: var(--greenpage-bio-portrait-border-opacity-active, 1);
 }
 
 .react-flow__node.greenpage-graph-node.greenpage-graph-node-highlight-connected {
@@ -72,6 +123,8 @@ body,
     var(--color-secondary) calc(var(--greenpage-node-ring-opacity-connected, 0.64) * 100%),
     transparent
   );
+  --greenpage-bio-portrait-border-width: var(--greenpage-bio-portrait-border-width-connected, 2.2);
+  --greenpage-bio-portrait-border-opacity: var(--greenpage-bio-portrait-border-opacity-connected, 1);
 }
 
 .node-card-detail-shell {

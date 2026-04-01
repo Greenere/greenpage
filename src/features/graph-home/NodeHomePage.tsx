@@ -20,6 +20,8 @@ import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graphFocus';
 import {
+    GRAPH_BIO_PORTRAIT_BORDER_OPACITY,
+    GRAPH_BIO_PORTRAIT_BORDER_WIDTH,
     GRAPH_EDGE_HIGHLIGHT_STROKE_WIDTH,
     GRAPH_NODE_HIGHLIGHT_GROWTH_DIRECTION,
     GRAPH_NODE_HIGHLIGHT_RING_OPACITY,
@@ -1768,6 +1770,12 @@ export default function NodeHomePage() {
         ['--greenpage-node-ring-opacity-connected' as const]: GRAPH_NODE_HIGHLIGHT_RING_OPACITY.connected,
         ['--greenpage-node-ring-opacity-active' as const]: GRAPH_NODE_HIGHLIGHT_RING_OPACITY.active,
         ['--greenpage-node-ring-shadow-prefix' as const]: getHighlightBorderShadowPrefix(GRAPH_NODE_HIGHLIGHT_GROWTH_DIRECTION),
+        ['--greenpage-bio-portrait-border-width-idle' as const]: GRAPH_BIO_PORTRAIT_BORDER_WIDTH.idle,
+        ['--greenpage-bio-portrait-border-width-connected' as const]: GRAPH_BIO_PORTRAIT_BORDER_WIDTH.connected,
+        ['--greenpage-bio-portrait-border-width-active' as const]: GRAPH_BIO_PORTRAIT_BORDER_WIDTH.active,
+        ['--greenpage-bio-portrait-border-opacity-idle' as const]: GRAPH_BIO_PORTRAIT_BORDER_OPACITY.idle,
+        ['--greenpage-bio-portrait-border-opacity-connected' as const]: GRAPH_BIO_PORTRAIT_BORDER_OPACITY.connected,
+        ['--greenpage-bio-portrait-border-opacity-active' as const]: GRAPH_BIO_PORTRAIT_BORDER_OPACITY.active,
     } as React.CSSProperties;
 
     return (
