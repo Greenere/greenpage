@@ -139,11 +139,11 @@ function validateContent(content: GraphNodeContent, nodeId: string): ValidationS
 
 function createEmptySection(): NodeArticleSection {
   return {
-    label: 'New section',
+    label: UI_COPY.nodeEditor.sectionEditor.newSectionLabel,
     blocks: [
       {
         type: 'text',
-        text: 'Start writing here.',
+        text: UI_COPY.nodeEditor.sectionEditor.newSectionText,
       },
     ],
   };
@@ -345,11 +345,11 @@ function SectionSyntaxHint() {
         background: 'color-mix(in srgb, var(--color-background) 82%, white 18%)',
       }}
     >
-      <strong>Inline:</strong> plain text paragraphs &nbsp;·&nbsp; <code>{'> quote'}</code> &nbsp;·&nbsp; <code>- item</code> for lists
+      <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintInlineLabel}</strong> {UI_COPY.nodeEditor.sectionEditor.syntaxHintInlineBody} &nbsp;·&nbsp; <code>{'> quote'}</code> &nbsp;·&nbsp; <code>- item</code> for lists
       <br />
-      <strong>Media:</strong> <code>![alt](src "caption")</code> &nbsp;·&nbsp; <code>[label](href)</code> for links
+      <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintMediaLabel}</strong> <code>![alt](src "caption")</code> &nbsp;·&nbsp; <code>[label](href)</code> {UI_COPY.nodeEditor.sectionEditor.syntaxHintMediaBody}
       <br />
-      <strong>Blocks:</strong> <code>:::gallery columns=2 align=height</code>…<code>:::</code>
+      <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintBlocksLabel}</strong> <code>:::gallery columns=2 align=height</code>…<code>:::</code>
       &nbsp;·&nbsp; <code>:::note</code> or <code>:::highlight</code>…<code>:::</code>
     </div>
   );
@@ -413,7 +413,7 @@ function SectionEditor({
             fontFamily: 'inherit',
           }}
         >
-          {showHint ? '↑ Hide syntax guide' : '? Syntax guide'}
+          {showHint ? UI_COPY.nodeEditor.sectionEditor.syntaxGuideHide : UI_COPY.nodeEditor.sectionEditor.syntaxGuideShow}
         </button>
         {markdownError && <div style={{ fontSize: '0.8rem', color: 'crimson' }}>{markdownError}</div>}
       </div>
@@ -493,13 +493,13 @@ function InlineSectionCard({
                 opacity: 0.8,
               }}
             >
-              Edit
+              {UI_COPY.nodeEditor.common.edit}
             </button>
           )}
           <button
             type="button"
             onClick={onDelete}
-            title="Delete section"
+            title={UI_COPY.nodeEditor.sectionEditor.deleteSectionTitle}
             style={{
               padding: '0.25rem 0.5rem',
               borderRadius: '7px',
@@ -543,7 +543,7 @@ function InlineSectionCard({
                 fontFamily: 'inherit',
               }}
             >
-              Done
+              {UI_COPY.nodeEditor.common.done}
             </button>
           </div>
         </div>
@@ -644,7 +644,7 @@ function DomainTreemap({
           opacity: 0.82,
         }}
       >
-        Current graph size: <strong>{totalNodes}</strong> nodes across <strong>{entries.length}</strong> domains.
+        {UI_COPY.nodeEditor.domainStats.summary(totalNodes, entries.length)}
       </div>
       <div
         style={{
@@ -701,7 +701,7 @@ function DomainTreemap({
                       opacity: 0.88,
                     }}
                   >
-                    Delete
+                    {UI_COPY.nodeEditor.domainStats.delete}
                   </button>
                 ) : null}
               </div>
@@ -710,7 +710,7 @@ function DomainTreemap({
                   {entry.display}
                 </div>
                 <div style={{ marginTop: '0.3rem', fontSize: '0.8rem', opacity: 0.78 }}>
-                  {entry.count} node{entry.count === 1 ? '' : 's'}
+                  {UI_COPY.nodeEditor.domainStats.nodeCount(entry.count)}
                 </div>
               </div>
             </div>
@@ -755,7 +755,7 @@ function sortNodeRefs(left: GraphNodeRef, right: GraphNodeRef) {
 }
 
 function getEditorNodeTitle(node: EditorNodeOption | undefined, fallbackId: string) {
-  return node?.title?.trim() || fallbackId || node?.id || 'Choose node';
+  return node?.title?.trim() || fallbackId || node?.id || UI_COPY.nodeEditor.common.chooseNodeFallback;
 }
 
 function formatEditorNodeOptionLabel(node: GraphNodeRef & { title?: string; subtitle?: string }) {
@@ -906,11 +906,13 @@ function buildExplicitConnectionEntry(
   return {
     key: `explicit-${relationIndex}-${relation.from}-${relation.to}-${relation.kind}`,
     relatedNodeId,
-    relatedNodeTitle: hasChosenPeer ? getEditorNodeTitle(relatedNode, relatedNodeId) : 'Choose node',
+    relatedNodeTitle: hasChosenPeer ? getEditorNodeTitle(relatedNode, relatedNodeId) : UI_COPY.nodeEditor.common.chooseNodeFallback,
     displayKind: relation.kind,
     displayLabel:
       relation.label.trim() ||
-      (hasChosenPeer ? 'Add a short label for this connection.' : 'Select the other node to complete this connection.'),
+      (hasChosenPeer
+        ? UI_COPY.nodeEditor.connectedNodes.relationLabelFallback
+        : UI_COPY.nodeEditor.connectedNodes.relationIncompleteFallback),
     removable: true,
     explicitRelationIndex: relationIndex,
   };
@@ -1410,7 +1412,7 @@ const NodeEditorPage: React.FC = () => {
         setJsonDraft(prettyJson(nextContent));
         setJsonError(null);
         setValidation(validateContent(nextContent, decodedNodeId));
-        setStatusMessage(storedDraft ? 'Recovered browser draft.' : null);
+        setStatusMessage(storedDraft ? UI_COPY.nodeEditor.status.recoveredDraft : null);
         setTab('content');
         setEditingSectionIndex(null);
       })
@@ -1602,7 +1604,7 @@ const NodeEditorPage: React.FC = () => {
   const handleSaveDraft = () => {
     if (!decodedNodeId || !draftContent) return;
     window.localStorage.setItem(getDraftStorageKey(decodedNodeId), prettyJson(draftContent));
-    setStatusMessage('Saved browser draft.');
+    setStatusMessage(UI_COPY.nodeEditor.status.savedDraft);
   };
 
   const handleDiscardDraft = () => {
@@ -1613,7 +1615,7 @@ const NodeEditorPage: React.FC = () => {
     setJsonDraft(prettyJson(originalContent));
     setValidation(validateContent(originalContent, decodedNodeId));
     setJsonError(null);
-    setStatusMessage('Discarded browser draft.');
+    setStatusMessage(UI_COPY.nodeEditor.status.discardedDraft);
   };
 
   const handleWriteToFile = async () => {
@@ -1637,8 +1639,8 @@ const NodeEditorPage: React.FC = () => {
       setOriginalContent(draftContent);
       const successMessage =
         incompleteExplicitRelationCount > 0
-          ? `Wrote node JSON to file. Skipped ${incompleteExplicitRelationCount} incomplete connection${incompleteExplicitRelationCount === 1 ? '' : 's'}.`
-          : 'Wrote node JSON to file.';
+          ? UI_COPY.nodeEditor.status.wroteNodeFileSkipped(incompleteExplicitRelationCount)
+          : UI_COPY.nodeEditor.status.wroteNodeFile;
       setStatusMessage(successMessage);
       setBootstrapError(null);
       setBootstrapNodes((current) =>
@@ -1656,7 +1658,7 @@ const NodeEditorPage: React.FC = () => {
       window.localStorage.removeItem(getDraftStorageKey(decodedNodeId));
       return successMessage;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to write node file.';
+      const message = error instanceof Error ? error.message : UI_COPY.nodeEditor.status.failedWriteNodeFile;
       setStatusMessage(message);
       throw new Error(message);
     } finally {
@@ -1693,10 +1695,10 @@ const NodeEditorPage: React.FC = () => {
         ];
       });
       setBootstrapError(null);
-      setStatusMessage(`Created node "${nodeId}".`);
+      setStatusMessage(UI_COPY.nodeEditor.status.createdNode(nodeId));
       navigate(`/editor/nodes/${encodeURIComponent(nodeId)}`);
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Failed to create node.');
+      setStatusMessage(error instanceof Error ? error.message : UI_COPY.nodeEditor.status.failedCreateNode);
     } finally {
       setActionPending(false);
     }
@@ -1729,14 +1731,14 @@ const NodeEditorPage: React.FC = () => {
       const domainId = newDomainDraft.domainId.trim();
       await createEditorDomain(newDomainDraft);
       window.sessionStorage.setItem(EDITOR_PENDING_NEW_DOMAIN_KEY, domainId);
-      setStatusMessage(`Created domain "${domainId}". Opening new node editor...`);
+      setStatusMessage(UI_COPY.nodeEditor.status.createdDomainOpening(domainId));
       setBootstrapError(null);
       window.setTimeout(() => {
         const editorUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/editor`;
         window.location.assign(editorUrl);
       }, 200);
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Failed to create domain.');
+      setStatusMessage(error instanceof Error ? error.message : UI_COPY.nodeEditor.status.failedCreateDomain);
     } finally {
       setActionPending(false);
     }
@@ -1748,15 +1750,15 @@ const NodeEditorPage: React.FC = () => {
     setActionPending(true);
     try {
       await deleteEditorDomain({ domainId: entry.domain });
-      setStatusMessage(`Deleted domain "${entry.domain}". Reloading editor...`);
+      setStatusMessage(UI_COPY.nodeEditor.status.deletedDomainReloading(entry.domain));
       setBootstrapError(null);
       window.setTimeout(() => {
         const editorUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/editor`;
         window.location.assign(editorUrl);
       }, 200);
-      return `Deleted domain "${entry.domain}". Reloading editor...`;
+      return UI_COPY.nodeEditor.status.deletedDomainReloading(entry.domain);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to delete domain.';
+      const message = error instanceof Error ? error.message : UI_COPY.nodeEditor.status.failedDeleteDomain;
       setStatusMessage(message);
       throw new Error(message);
     } finally {
@@ -1789,7 +1791,7 @@ const NodeEditorPage: React.FC = () => {
             ? {
                 ...current,
                 status: 'error',
-                resultMessage: error instanceof Error ? error.message : 'Action failed.',
+                resultMessage: error instanceof Error ? error.message : UI_COPY.nodeEditor.confirmations.actionFailed,
               }
             : current
         );
@@ -1802,7 +1804,7 @@ const NodeEditorPage: React.FC = () => {
         ? {
             ...current,
             status: 'pending',
-            resultMessage: current.pendingMessage ?? 'Working…',
+            resultMessage: current.pendingMessage ?? UI_COPY.nodeEditor.common.working,
           }
         : current
     );
@@ -1814,7 +1816,7 @@ const NodeEditorPage: React.FC = () => {
           ? {
               ...current,
               status: 'success',
-              resultMessage: resultMessage ?? 'Action completed successfully.',
+              resultMessage: resultMessage ?? UI_COPY.nodeEditor.confirmations.actionCompleted,
             }
           : current
       );
@@ -1824,7 +1826,7 @@ const NodeEditorPage: React.FC = () => {
           ? {
               ...current,
               status: 'error',
-              resultMessage: error instanceof Error ? error.message : 'Action failed.',
+              resultMessage: error instanceof Error ? error.message : UI_COPY.nodeEditor.confirmations.actionFailed,
             }
           : current
       );
@@ -1886,9 +1888,9 @@ const NodeEditorPage: React.FC = () => {
           }}
         >
           <div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 700, letterSpacing: '-0.02em' }}>Node editor</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 700, letterSpacing: '-0.02em' }}>{UI_COPY.nodeEditor.title}</div>
             <div style={{ marginTop: '0.3rem', opacity: 0.62, fontSize: '0.88rem' }}>
-              Dev workspace · edit content, preview the article, and write to JSON files.
+              {UI_COPY.nodeEditor.subtitle}
             </div>
           </div>
           <ThemePicker theme={theme} setTheme={setTheme} variant="inline" />
@@ -1942,14 +1944,14 @@ const NodeEditorPage: React.FC = () => {
             {/* Node selector */}
             {tab !== 'new-domain' && (
               <FieldShell>
-                <ControlLabel>Open node</ControlLabel>
+                <ControlLabel>{UI_COPY.nodeEditor.common.openNode}</ControlLabel>
                 <select
                   value={tab === 'new-node' ? '' : decodedNodeId}
                   onChange={(event) => handleOpenNode(event.target.value)}
                   disabled={tab === 'new-node'}
                   style={tab === 'new-node' ? { ...inputStyle(), ...btnDisabled } : inputStyle()}
                 >
-                  <option value="">Choose a node…</option>
+                  <option value="">{UI_COPY.nodeEditor.common.chooseNode}</option>
                   {bootstrapNodes
                     .slice()
                     .sort(sortNodeRefs)
@@ -2007,7 +2009,7 @@ const NodeEditorPage: React.FC = () => {
               <div>
                 {!draftContent || !currentNodeRef ? (
                   <div style={{ marginTop: '1rem', opacity: 0.65, fontSize: '0.88rem' }}>
-                    {loadingNode ? 'Loading…' : 'Choose a node above to edit its content.'}
+                    {loadingNode ? UI_COPY.nodeEditor.common.loading : UI_COPY.nodeEditor.contentTab.emptyState}
                   </div>
                 ) : (
                   <>
@@ -2028,7 +2030,7 @@ const NodeEditorPage: React.FC = () => {
                     </div>
 
                     <FieldShell>
-                      <ControlLabel>Chronology</ControlLabel>
+                      <ControlLabel>{UI_COPY.nodeEditor.contentTab.chronology}</ControlLabel>
                       <input
                         type="text"
                         inputMode="numeric"
@@ -2038,7 +2040,7 @@ const NodeEditorPage: React.FC = () => {
                             current ? { ...current, chronology: event.target.value } : current
                           )
                         }
-                        placeholder="YYYY, YYYYMM, or YYYYMMDD"
+                        placeholder={CHRONOLOGY_FORMAT_HINT}
                         style={inputStyle()}
                       />
                       <div
@@ -2054,7 +2056,7 @@ const NodeEditorPage: React.FC = () => {
                     </FieldShell>
 
                     <FieldShell>
-                      <ControlLabel>Tags</ControlLabel>
+                      <ControlLabel>{UI_COPY.nodeEditor.contentTab.tags}</ControlLabel>
                       <input
                         value={tagInput}
                         onChange={(event) => {
@@ -2066,7 +2068,7 @@ const NodeEditorPage: React.FC = () => {
                           const normalized = serializeTags(parseCommaSeparatedTags(tagInput));
                           setTagInput(normalized);
                         }}
-                        placeholder="tag1, tag2, …"
+                        placeholder={UI_COPY.nodeEditor.contentTab.tagsPlaceholder}
                         style={inputStyle()}
                       />
                     </FieldShell>
@@ -2095,13 +2097,13 @@ const NodeEditorPage: React.FC = () => {
                         }}
                       >
                         <span style={{ opacity: 0.55, fontSize: '0.7rem' }}>{showHeaderFields ? '▾' : '▸'}</span>
-                        Header
+                        {UI_COPY.nodeEditor.contentTab.header}
                       </button>
 
                       {showHeaderFields && (
                         <div style={{ marginTop: '0.5rem' }}>
                           <FieldShell>
-                            <ControlLabel>Title</ControlLabel>
+                            <ControlLabel>{UI_COPY.nodeEditor.contentTab.title}</ControlLabel>
                             <input
                               value={draftContent.title}
                               onChange={(event) => updateDraftContent({ ...draftContent, title: event.target.value })}
@@ -2109,7 +2111,7 @@ const NodeEditorPage: React.FC = () => {
                             />
                           </FieldShell>
                           <FieldShell>
-                            <ControlLabel>Subtitle</ControlLabel>
+                            <ControlLabel>{UI_COPY.nodeEditor.contentTab.subtitle}</ControlLabel>
                             <input
                               value={draftContent.subtitle ?? ''}
                               onChange={(event) =>
@@ -2119,7 +2121,7 @@ const NodeEditorPage: React.FC = () => {
                             />
                           </FieldShell>
                           <FieldShell>
-                            <ControlLabel>Summary</ControlLabel>
+                            <ControlLabel>{UI_COPY.nodeEditor.contentTab.summary}</ControlLabel>
                             <textarea
                               value={draftContent.summary}
                               onChange={(event) => updateDraftContent({ ...draftContent, summary: event.target.value })}
@@ -2156,13 +2158,13 @@ const NodeEditorPage: React.FC = () => {
                         }}
                       >
                         <span style={{ opacity: 0.55, fontSize: '0.7rem' }}>{showMeta ? '▾' : '▸'}</span>
-                        Metadata &amp; hero
+                        {UI_COPY.nodeEditor.contentTab.metadataHero}
                       </button>
 
                       {showMeta && (
                         <div style={{ marginTop: '0.5rem' }}>
                           <FieldShell>
-                            <ControlLabel>Hero image src</ControlLabel>
+                            <ControlLabel>{UI_COPY.nodeEditor.contentTab.heroImageSrc}</ControlLabel>
                             <input
                               value={draftContent.hero?.image?.src ?? ''}
                               onChange={(event) =>
@@ -2172,14 +2174,14 @@ const NodeEditorPage: React.FC = () => {
                                     ? {
                                         image: {
                                           src: event.target.value,
-                                          alt: draftContent.hero?.image?.alt ?? 'Describe the image',
+                                          alt: draftContent.hero?.image?.alt ?? UI_COPY.nodeEditor.contentTab.fallbackHeroAlt,
                                           caption: draftContent.hero?.image?.caption,
                                         },
                                       }
                                     : undefined,
                                 })
                               }
-                              placeholder="assets/hero.jpg"
+                              placeholder={UI_COPY.nodeEditor.contentTab.heroPlaceholder}
                               style={inputStyle()}
                             />
                           </FieldShell>
@@ -2187,7 +2189,7 @@ const NodeEditorPage: React.FC = () => {
                           {draftContent.hero?.image && (
                             <>
                               <FieldShell>
-                                <ControlLabel>Hero alt</ControlLabel>
+                                <ControlLabel>{UI_COPY.nodeEditor.contentTab.heroAlt}</ControlLabel>
                                 <input
                                   value={draftContent.hero.image.alt}
                                   onChange={(event) =>
@@ -2200,7 +2202,7 @@ const NodeEditorPage: React.FC = () => {
                                 />
                               </FieldShell>
                               <FieldShell>
-                                <ControlLabel>Hero caption</ControlLabel>
+                                <ControlLabel>{UI_COPY.nodeEditor.contentTab.heroCaption}</ControlLabel>
                                 <input
                                   value={draftContent.hero.image.caption ?? ''}
                                   onChange={(event) =>
@@ -2231,10 +2233,10 @@ const NodeEditorPage: React.FC = () => {
                           >
                             {(
                               [
-                                { key: 'dateLabel', label: 'Date' },
-                                { key: 'location', label: 'Place' },
-                                { key: 'readingTime', label: 'Read time' },
-                                { key: 'status', label: 'Status' },
+                                { key: 'dateLabel', label: UI_COPY.nodeEditor.contentTab.metadataFields.date },
+                                { key: 'location', label: UI_COPY.nodeEditor.contentTab.metadataFields.place },
+                                { key: 'readingTime', label: UI_COPY.nodeEditor.contentTab.metadataFields.readTime },
+                                { key: 'status', label: UI_COPY.nodeEditor.contentTab.metadataFields.status },
                               ] as const
                             ).map(({ key, label }) => (
                               <div key={key}>
@@ -2267,10 +2269,10 @@ const NodeEditorPage: React.FC = () => {
                           letterSpacing: '0.06em',
                         }}
                       >
-                        Connection details
+                        {UI_COPY.nodeEditor.contentTab.connectionDetails}
                       </div>
                       <div style={{ fontSize: '0.8rem', opacity: 0.62, lineHeight: 1.55 }}>
-                        Timeline links within the same domain are inferred automatically from chronology. Use the connected-node cards on the right to add, remove, and select explicit relations.
+                        {UI_COPY.nodeEditor.contentTab.connectionDetailsHint}
                       </div>
                       {incompleteExplicitRelationCount > 0 && (
                         <div
@@ -2281,7 +2283,7 @@ const NodeEditorPage: React.FC = () => {
                             lineHeight: 1.5,
                           }}
                         >
-                          Incomplete connection drafts stay in the editor, but they will not be saved until both ends are chosen.
+                          {UI_COPY.nodeEditor.contentTab.incompleteConnectionsHint}
                         </div>
                       )}
                       {selectedExplicitRelationIndex !== null && selectedExplicitRelation ? (
@@ -2311,10 +2313,10 @@ const NodeEditorPage: React.FC = () => {
                                   letterSpacing: '0.06em',
                                 }}
                               >
-                                Editing
+                                {UI_COPY.nodeEditor.contentTab.connectionEditing}
                               </div>
                               <div style={{ marginTop: '0.22rem', fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.35 }}>
-                                {selectedExplicitConnection?.relatedNodeTitle ?? 'Untitled connection'}
+                                {selectedExplicitConnection?.relatedNodeTitle ?? UI_COPY.nodeEditor.contentTab.untitledConnection}
                               </div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginLeft: 'auto' }}>
@@ -2334,15 +2336,15 @@ const NodeEditorPage: React.FC = () => {
                                   opacity: 0.82,
                                 }}
                               >
-                                Done
+                                {UI_COPY.nodeEditor.common.done}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => {
                                   if (selectedExplicitRelationIndex === null) return;
                                   openDangerDialog({
-                                    actionDescription: 'delete this explicit connection',
-                                    proceedLabel: 'Delete',
+                                    actionDescription: UI_COPY.nodeEditor.confirmations.deleteExplicitConnection,
+                                    proceedLabel: UI_COPY.nodeEditor.common.delete,
                                     tone: 'danger',
                                     onProceed: () => {
                                       handleRemoveExplicitRelation(selectedExplicitRelationIndex);
@@ -2362,14 +2364,14 @@ const NodeEditorPage: React.FC = () => {
                                   opacity: 0.82,
                                 }}
                               >
-                                Delete
+                                {UI_COPY.nodeEditor.common.delete}
                               </button>
                             </div>
                           </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.65rem' }}>
                             <div>
-                              <ControlLabel>Current node</ControlLabel>
+                              <ControlLabel>{UI_COPY.nodeEditor.contentTab.currentNode}</ControlLabel>
                               <div
                                 style={{
                                   ...inputStyle(),
@@ -2382,11 +2384,11 @@ const NodeEditorPage: React.FC = () => {
                                 {currentNodeRef ? formatEditorNodeOptionLabel(editorNodeById.get(currentNodeRef.id) ?? currentNodeRef) : ''}
                               </div>
                               <div style={{ marginTop: '0.3rem', fontSize: '0.74rem', opacity: 0.62, lineHeight: 1.45 }}>
-                                Anchored on the <strong>{selectedRelationAnchoredSide}</strong> side for this connection.
+                                {selectedRelationAnchoredSide ? UI_COPY.nodeEditor.contentTab.currentNodeAnchorHint(selectedRelationAnchoredSide) : null}
                               </div>
                             </div>
                             <div>
-                              <ControlLabel>Other node</ControlLabel>
+                              <ControlLabel>{UI_COPY.nodeEditor.contentTab.otherNode}</ControlLabel>
                               <SearchableNodePicker
                                 options={otherNodeOptions}
                                 value={selectedOtherNodeId}
@@ -2398,16 +2400,16 @@ const NodeEditorPage: React.FC = () => {
                                       : { ...entry, from: nodeId }
                                   )
                                 }
-                                placeholder="Search by title, id, subtitle, or domain…"
+                                placeholder={UI_COPY.nodeEditor.contentTab.otherNodePlaceholder}
                               />
                               <div style={{ marginTop: '0.3rem', fontSize: '0.74rem', opacity: 0.62, lineHeight: 1.45 }}>
                                 {selectedRelationAnchoredSide === 'from'
-                                  ? 'This connection points from the current node to the selected node.'
-                                  : 'This connection points from the selected node to the current node.'}
+                                  ? UI_COPY.nodeEditor.contentTab.otherNodeDirectionFrom
+                                  : UI_COPY.nodeEditor.contentTab.otherNodeDirectionTo}
                               </div>
                             </div>
                             <div>
-                              <ControlLabel>Kind</ControlLabel>
+                              <ControlLabel>{UI_COPY.nodeEditor.contentTab.kind}</ControlLabel>
                               <select
                                 value={selectedExplicitRelation.kind}
                                 onChange={(event) =>
@@ -2426,7 +2428,7 @@ const NodeEditorPage: React.FC = () => {
                               </select>
                             </div>
                             <div>
-                              <ControlLabel>Strength</ControlLabel>
+                              <ControlLabel>{UI_COPY.nodeEditor.contentTab.strength}</ControlLabel>
                               <select
                                 value={selectedExplicitRelation.strength}
                                 onChange={(event) =>
@@ -2445,7 +2447,7 @@ const NodeEditorPage: React.FC = () => {
                           </div>
 
                           <FieldShell>
-                            <ControlLabel>Label</ControlLabel>
+                            <ControlLabel>{UI_COPY.nodeEditor.contentTab.label}</ControlLabel>
                             <input
                               value={selectedExplicitRelation.label}
                               onChange={(event) => updateSelectedExplicitRelation((entry) => ({ ...entry, label: event.target.value }))}
@@ -2465,14 +2467,14 @@ const NodeEditorPage: React.FC = () => {
                             lineHeight: 1.55,
                           }}
                         >
-                          Select an explicit connection card on the right to edit its direction, kind, strength, and label.
+                          {UI_COPY.nodeEditor.contentTab.explicitConnectionEmpty}
                         </div>
                       )}
                     </div>
 
                     {/* Hint */}
                     <div style={{ marginTop: '0.9rem', fontSize: '0.8rem', opacity: 0.6, lineHeight: 1.55 }}>
-                      Edit header, metadata, and hero from this panel. Click any section on the right to edit it.
+                      {UI_COPY.nodeEditor.contentTab.sidebarHint}
                     </div>
 
                     {/* Action buttons */}
@@ -2481,11 +2483,11 @@ const NodeEditorPage: React.FC = () => {
                         type="button"
                         onClick={() =>
                           openDangerDialog({
-                            actionDescription: 'write these editor changes to file',
-                            proceedLabel: 'Proceed',
+                            actionDescription: UI_COPY.nodeEditor.confirmations.writeChanges,
+                            proceedLabel: UI_COPY.nodeEditor.common.proceed,
                             tone: 'primary',
                             showResult: true,
-                            pendingMessage: 'Writing to file…',
+                            pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
                             onProceed: handleWriteToFile,
                           })
                         }
@@ -2496,7 +2498,7 @@ const NodeEditorPage: React.FC = () => {
                             : btnPrimary
                         }
                       >
-                        Write to file
+                        {UI_COPY.nodeEditor.contentTab.writeToFile}
                       </button>
                       <button
                         type="button"
@@ -2504,14 +2506,14 @@ const NodeEditorPage: React.FC = () => {
                         disabled={!draftContent}
                         style={!draftContent ? { ...btnSecondary, ...btnDisabled } : btnSecondary}
                       >
-                        Save draft
+                        {UI_COPY.nodeEditor.contentTab.saveDraft}
                       </button>
                       <button
                         type="button"
                         onClick={() =>
                           openDangerDialog({
-                            actionDescription: 'reset this draft back to the last saved file version',
-                            proceedLabel: 'Reset',
+                            actionDescription: UI_COPY.nodeEditor.confirmations.resetDraft,
+                            proceedLabel: UI_COPY.nodeEditor.contentTab.reset,
                             tone: 'danger',
                             onProceed: () => {
                               handleDiscardDraft();
@@ -2521,7 +2523,7 @@ const NodeEditorPage: React.FC = () => {
                         disabled={!originalContent}
                         style={!originalContent ? { ...btnDanger, ...btnDisabled } : btnDanger}
                       >
-                        Reset
+                        {UI_COPY.nodeEditor.contentTab.reset}
                       </button>
                     </div>
                     {validation.error && (
@@ -2538,7 +2540,7 @@ const NodeEditorPage: React.FC = () => {
             {tab === 'json' && (
               <div style={{ marginTop: '0.85rem' }}>
                 {!decodedNodeId ? (
-                  <div style={{ opacity: 0.65, fontSize: '0.88rem' }}>Choose a node above to edit raw JSON.</div>
+                  <div style={{ opacity: 0.65, fontSize: '0.88rem' }}>{UI_COPY.nodeEditor.jsonTab.emptyState}</div>
                 ) : (
                   <>
                     <textarea
@@ -2565,11 +2567,11 @@ const NodeEditorPage: React.FC = () => {
                         type="button"
                         onClick={() =>
                           openDangerDialog({
-                            actionDescription: 'write these JSON edits to file',
-                            proceedLabel: 'Proceed',
+                            actionDescription: UI_COPY.nodeEditor.confirmations.writeJsonChanges,
+                            proceedLabel: UI_COPY.nodeEditor.common.proceed,
                             tone: 'primary',
                             showResult: true,
-                            pendingMessage: 'Writing to file…',
+                            pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
                             onProceed: handleWriteToFile,
                           })
                         }
@@ -2580,7 +2582,7 @@ const NodeEditorPage: React.FC = () => {
                             : btnPrimary
                         }
                       >
-                        Write to file
+                        {UI_COPY.nodeEditor.jsonTab.writeToFile}
                       </button>
                       <button
                         type="button"
@@ -2588,7 +2590,7 @@ const NodeEditorPage: React.FC = () => {
                         disabled={!draftContent}
                         style={!draftContent ? { ...btnSecondary, ...btnDisabled } : btnSecondary}
                       >
-                        Save draft
+                        {UI_COPY.nodeEditor.jsonTab.saveDraft}
                       </button>
                     </div>
                   </>
@@ -2600,7 +2602,7 @@ const NodeEditorPage: React.FC = () => {
             {tab === 'new-node' && (
               <div style={{ marginTop: '0.85rem' }}>
                 <FieldShell>
-                  <ControlLabel>Domain</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.domain}</ControlLabel>
                   <select
                     value={newNodeDraft.domain}
                     onChange={(event) => {
@@ -2622,7 +2624,7 @@ const NodeEditorPage: React.FC = () => {
                 </FieldShell>
                 <FieldShell>
                   <div style={{ position: 'relative' }}>
-                    <ControlLabel>Node id / filename</ControlLabel>
+                    <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.nodeId}</ControlLabel>
                     {newNodeIdAlreadyExists ? (
                       <div
                         style={{
@@ -2636,24 +2638,24 @@ const NodeEditorPage: React.FC = () => {
                           letterSpacing: 'normal',
                         }}
                       >
-                        This node id already exists.
+                        {UI_COPY.nodeEditor.newNodeTab.nodeIdExists}
                       </div>
                     ) : null}
                   </div>
                   <input
                     value={newNodeDraft.nodeId}
                     onChange={(event) => setNewNodeDraft((current) => ({ ...current, nodeId: event.target.value }))}
-                    placeholder="my-node-id"
+                    placeholder={UI_COPY.nodeEditor.newNodeTab.nodeIdPlaceholder}
                     style={inputStyle()}
                   />
                   {!newNodeIdAlreadyExists && newNodeIdInvalid ? (
                     <div style={{ marginTop: '0.45rem', color: 'crimson', fontSize: '0.8rem' }}>
-                      Use lowercase letters, numbers, and single hyphens only.
+                      {UI_COPY.nodeEditor.newNodeTab.nodeIdInvalid}
                     </div>
                   ) : null}
                 </FieldShell>
                 <FieldShell>
-                  <ControlLabel>Template</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.template}</ControlLabel>
                   <select
                     value={newNodeDraft.template}
                     onChange={(event) => setNewNodeDraft((current) => ({ ...current, template: event.target.value }))}
@@ -2666,12 +2668,12 @@ const NodeEditorPage: React.FC = () => {
                     ))}
                   </select>
                   <div style={{ marginTop: '0.45rem', color: 'var(--color-text-subtle)', fontSize: '0.8rem' }}>
-                    The right panel updates live so you can preview the template before creating the node.
+                    {UI_COPY.nodeEditor.newNodeTab.templatePreviewHint}
                   </div>
                 </FieldShell>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.85rem' }}>
                   <div>
-                    <ControlLabel>Kind</ControlLabel>
+                    <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.kind}</ControlLabel>
                     <input
                       value={newNodeDraft.kind}
                       onChange={(event) =>
@@ -2684,7 +2686,7 @@ const NodeEditorPage: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <ControlLabel>Chronology</ControlLabel>
+                    <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.chronology}</ControlLabel>
                     <input
                       type="text"
                       inputMode="numeric"
@@ -2692,7 +2694,7 @@ const NodeEditorPage: React.FC = () => {
                       onChange={(event) =>
                         setNewNodeDraft((current) => ({ ...current, chronology: event.target.value }))
                       }
-                      placeholder="YYYY, YYYYMM, or YYYYMMDD"
+                      placeholder={CHRONOLOGY_FORMAT_HINT}
                       style={{ ...inputStyle(), padding: '0.48rem 0.58rem', fontSize: '0.82rem' }}
                     />
                     <div
@@ -2708,7 +2710,7 @@ const NodeEditorPage: React.FC = () => {
                   </div>
                 </div>
                 <FieldShell>
-                  <ControlLabel>Title</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.title}</ControlLabel>
                   <input
                     value={newNodeDraft.title}
                     onChange={(event) => setNewNodeDraft((current) => ({ ...current, title: event.target.value }))}
@@ -2716,7 +2718,7 @@ const NodeEditorPage: React.FC = () => {
                   />
                 </FieldShell>
                 <FieldShell>
-                  <ControlLabel>Subtitle</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.subtitle}</ControlLabel>
                   <input
                     value={newNodeDraft.subtitle}
                     onChange={(event) => setNewNodeDraft((current) => ({ ...current, subtitle: event.target.value }))}
@@ -2724,7 +2726,7 @@ const NodeEditorPage: React.FC = () => {
                   />
                 </FieldShell>
                 <FieldShell>
-                  <ControlLabel>Summary</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newNodeTab.summary}</ControlLabel>
                   <textarea
                     value={newNodeDraft.summary}
                     onChange={(event) => setNewNodeDraft((current) => ({ ...current, summary: event.target.value }))}
@@ -2739,7 +2741,7 @@ const NodeEditorPage: React.FC = () => {
                     disabled={newNodeCreateDisabled}
                     style={newNodeCreateDisabled ? { ...btnPrimary, ...btnDisabled } : btnPrimary}
                   >
-                    Create node
+                    {UI_COPY.nodeEditor.newNodeTab.createNode}
                   </button>
                 </div>
               </div>
@@ -2758,14 +2760,14 @@ const NodeEditorPage: React.FC = () => {
                     opacity: 0.82,
                   }}
                 >
-                  <div><strong>Domain id:</strong> internal key, folder name, and URL-safe identifier.</div>
-                  <div><strong>Display label:</strong> human-readable name shown in the UI.</div>
-                  <div><strong>Card tag:</strong> short badge text shown on graph cards, usually uppercase.</div>
-                  <div><strong>Seed angle:</strong> default angle that places this domain around the graph.</div>
+                  <div><strong>{UI_COPY.nodeEditor.newDomainTab.infoDomainId}</strong> {UI_COPY.nodeEditor.newDomainTab.infoDomainIdDescription}</div>
+                  <div><strong>{UI_COPY.nodeEditor.newDomainTab.infoDisplay}</strong> {UI_COPY.nodeEditor.newDomainTab.infoDisplayDescription}</div>
+                  <div><strong>{UI_COPY.nodeEditor.newDomainTab.infoCardTag}</strong> {UI_COPY.nodeEditor.newDomainTab.infoCardTagDescription}</div>
+                  <div><strong>{UI_COPY.nodeEditor.newDomainTab.infoSeedAngle}</strong> {UI_COPY.nodeEditor.newDomainTab.infoSeedAngleDescription}</div>
                 </div>
                 <FieldShell>
                   <div style={{ position: 'relative' }}>
-                    <ControlLabel>Domain id</ControlLabel>
+                    <ControlLabel>{UI_COPY.nodeEditor.newDomainTab.domainId}</ControlLabel>
                     {newDomainIdAlreadyExists ? (
                       <div
                         style={{
@@ -2779,7 +2781,7 @@ const NodeEditorPage: React.FC = () => {
                           letterSpacing: 'normal',
                         }}
                       >
-                        This domain id already exists.
+                        {UI_COPY.nodeEditor.newDomainTab.domainIdExists}
                       </div>
                     ) : null}
                   </div>
@@ -2790,12 +2792,12 @@ const NodeEditorPage: React.FC = () => {
                   />
                   {!newDomainIdAlreadyExists && newDomainIdInvalid ? (
                     <div style={{ marginTop: '0.45rem', color: 'crimson', fontSize: '0.8rem' }}>
-                      Use lowercase letters, numbers, and single hyphens only.
+                      {UI_COPY.nodeEditor.newDomainTab.domainIdInvalid}
                     </div>
                   ) : null}
                 </FieldShell>
                 <FieldShell>
-                  <ControlLabel>Display label</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newDomainTab.displayLabel}</ControlLabel>
                   <input
                     value={newDomainDraft.display}
                     onChange={(event) => setNewDomainDraft((current) => ({ ...current, display: event.target.value }))}
@@ -2803,7 +2805,7 @@ const NodeEditorPage: React.FC = () => {
                   />
                 </FieldShell>
                 <FieldShell>
-                  <ControlLabel>Card tag</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newDomainTab.cardTag}</ControlLabel>
                   <input
                     value={newDomainDraft.cardTag}
                     onChange={(event) => setNewDomainDraft((current) => ({ ...current, cardTag: event.target.value }))}
@@ -2811,16 +2813,16 @@ const NodeEditorPage: React.FC = () => {
                   />
                   {newDomainCardTagAlreadyExists ? (
                     <div style={{ marginTop: '0.45rem', color: 'crimson', fontSize: '0.8rem' }}>
-                      This card tag already exists.
+                      {UI_COPY.nodeEditor.newDomainTab.cardTagExists}
                     </div>
                   ) : (
                     <div style={{ marginTop: '0.45rem', color: 'var(--color-text-subtle)', fontSize: '0.8rem' }}>
-                      Keep this short and distinct so graph cards stay easy to scan.
+                      {UI_COPY.nodeEditor.newDomainTab.cardTagHint}
                     </div>
                   )}
                 </FieldShell>
                 <FieldShell>
-                  <ControlLabel>Seed angle</ControlLabel>
+                  <ControlLabel>{UI_COPY.nodeEditor.newDomainTab.seedAngle}</ControlLabel>
                   <input
                     type="number"
                     value={newDomainDraft.seedAngle}
@@ -2837,7 +2839,7 @@ const NodeEditorPage: React.FC = () => {
                     disabled={newDomainCreateDisabled}
                     style={newDomainCreateDisabled ? { ...btnPrimary, ...btnDisabled } : btnPrimary}
                   >
-                    Create domain
+                    {UI_COPY.nodeEditor.newDomainTab.createDomain}
                   </button>
                 </div>
               </div>
@@ -2868,14 +2870,14 @@ const NodeEditorPage: React.FC = () => {
             >
               <div>
                 <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>
-                  {tab === 'content' ? 'Article editor' : tab === 'new-domain' ? 'Domain statistics' : 'Live preview'}
+                  {tab === 'content' ? UI_COPY.nodeEditor.rightPanel.articleEditor : tab === 'new-domain' ? UI_COPY.nodeEditor.domainStats.title : UI_COPY.nodeEditor.rightPanel.livePreview}
                 </div>
                 <div style={{ marginTop: '0.2rem', opacity: 0.6, fontSize: '0.82rem' }}>
                   {tab === 'new-domain'
-                    ? `${bootstrapNodes.length} nodes across ${domainTreemapEntries.length} configured domains`
+                    ? UI_COPY.nodeEditor.domainStats.subtitle(bootstrapNodes.length, domainTreemapEntries.length)
                     : previewNode
                       ? `${previewNode.domain} / ${previewNode.id}`
-                      : 'Select a node or template draft to preview.'}
+                      : UI_COPY.nodeEditor.rightPanel.previewSelectionHint}
                 </div>
               </div>
             </div>
@@ -2886,11 +2888,11 @@ const NodeEditorPage: React.FC = () => {
                 entries={domainTreemapEntries}
                 onDeleteDomain={(entry) =>
                   openDangerDialog({
-                    actionDescription: `delete the "${entry.domain}" domain`,
-                    proceedLabel: 'Delete',
+                    actionDescription: UI_COPY.nodeEditor.confirmations.deleteDomain(entry.domain),
+                    proceedLabel: UI_COPY.nodeEditor.common.delete,
                     tone: 'danger',
                     showResult: true,
-                    pendingMessage: 'Deleting domain…',
+                    pendingMessage: UI_COPY.nodeEditor.confirmations.deletingDomain,
                     onProceed: () => handleDeleteDomain(entry),
                   })
                 }
@@ -3018,8 +3020,8 @@ const NodeEditorPage: React.FC = () => {
                     }
                     onDelete={() =>
                       openDangerDialog({
-                        actionDescription: `delete the "${section.label}" section`,
-                        proceedLabel: 'Delete',
+                        actionDescription: UI_COPY.nodeEditor.confirmations.deleteSection(section.label),
+                        proceedLabel: UI_COPY.nodeEditor.common.delete,
                         tone: 'danger',
                         onProceed: () => {
                           updateDraftContent({
@@ -3061,10 +3063,10 @@ const NodeEditorPage: React.FC = () => {
                       fontFamily: 'inherit',
                       opacity: 0.7,
                     }}
-                    title="Add section at end"
-                  >
-                    + Add section
-                  </button>
+                      title={UI_COPY.nodeEditor.sectionEditor.addSectionTitle}
+                    >
+                      {UI_COPY.nodeEditor.sectionEditor.addSection}
+                    </button>
                 </div>
 
                 <section
@@ -3115,7 +3117,7 @@ const NodeEditorPage: React.FC = () => {
               <NodeArticlePreview node={previewNode} />
             ) : (
               <div style={{ padding: '2.5rem 1.5rem', opacity: 0.55, fontSize: '0.9rem' }}>
-                Choose an existing node or start a new template to see the rendered article here.
+                {UI_COPY.nodeEditor.rightPanel.previewEmptyState}
               </div>
             )}
           </div>
@@ -3150,37 +3152,37 @@ const NodeEditorPage: React.FC = () => {
           >
             <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>
               {dangerDialog.status === 'success'
-                ? 'Action completed'
+                ? UI_COPY.nodeEditor.confirmations.titleSuccess
                 : dangerDialog.status === 'error'
-                  ? 'Action failed'
-                  : 'Please confirm'}
+                  ? UI_COPY.nodeEditor.confirmations.titleError
+                  : UI_COPY.nodeEditor.confirmations.titleConfirm}
             </div>
             <div style={{ marginTop: '0.55rem', fontSize: '0.88rem', lineHeight: 1.6, opacity: 0.82 }}>
               {dangerDialog.status === 'confirm'
-                ? `Are you sure you want to ${dangerDialog.actionDescription}?`
+                ? UI_COPY.nodeEditor.confirmations.prompt(dangerDialog.actionDescription)
                 : dangerDialog.resultMessage}
             </div>
             <div style={{ marginTop: '0.95rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
               {dangerDialog.status === 'confirm' ? (
                 <>
                   <button type="button" onClick={closeDangerDialog} style={btnSecondary}>
-                    Cancel
+                    {UI_COPY.nodeEditor.common.cancel}
                   </button>
                   <button
                     type="button"
                     onClick={handleDangerDialogProceed}
                     style={dangerDialog.tone === 'danger' ? btnDanger : btnPrimary}
                   >
-                    {dangerDialog.proceedLabel ?? 'Proceed'}
+                    {dangerDialog.proceedLabel ?? UI_COPY.nodeEditor.common.proceed}
                   </button>
                 </>
               ) : dangerDialog.status === 'pending' ? (
                 <button type="button" disabled style={{ ...btnPrimary, ...btnDisabled }}>
-                  Working…
+                  {UI_COPY.nodeEditor.common.working}
                 </button>
               ) : (
                 <button type="button" onClick={() => setDangerDialog(null)} style={btnPrimary}>
-                  Close
+                  {UI_COPY.nodeEditor.common.close}
                 </button>
               )}
             </div>
