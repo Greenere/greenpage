@@ -64,9 +64,79 @@ npm run generate:node-index
 - [`src/configs/uiCopy.ts`](./src/configs/uiCopy.ts)
   Shared UI copy that is not stored in node JSON.
 
+## Node editor
+
+The project now includes a dev-only node editor for creating and editing nodes, relations, and domains.
+
+### Open it
+
+Start the dev server:
+
+```bash
+npm run dev
+```
+
+Then open:
+
+- `/editor`
+
+Important:
+
+- the editor uses Vite dev-only endpoints, so it is available during `npm run dev`
+- create/delete domain operations still reload the editor because domains are stored in [`src/configs/domains.ts`](./src/configs/domains.ts), not in data yet
+
+### What it can do
+
+- edit node content with a live article preview
+- edit raw JSON
+- create new nodes from templates
+- edit explicit graph relations from the connected-nodes UI
+- create new domains
+- delete zero-node domains from the domain statistics view
+
+### Notes
+
+- node ids and domain ids must use lowercase letters, numbers, and hyphens
+- chronology accepts `yyyy`, `yyyymm`, or `yyyymmdd`
+- incomplete connection drafts stay in the editor, but they are skipped on save
+- chronology timeline links and the latest bio link are inferred automatically
+- dangerous actions like write, reset, and delete ask for confirmation first
+
+## How to use the editor
+
+### Edit an existing node
+
+1. Open `/editor`
+2. Choose a node from `Open node`
+3. Edit content in the `Edit` tab or raw JSON in the `JSON` tab
+4. Use `Write to file` to persist changes
+
+### Create a new node
+
+1. Open `/editor`
+2. Go to `New Node`
+3. Pick a domain and template
+4. Fill in `node id`, chronology, and the basic article fields
+5. Review the live preview on the right
+6. Click `Create node`
+
+### Create a new domain
+
+1. Open `/editor`
+2. Go to `New Domain`
+3. Fill in:
+   - `Domain id`: internal id, folder name, and URL-safe key
+   - `Display label`: human-readable UI name
+   - `Card tag`: short badge text shown on graph cards
+   - `Seed angle`: default orbital position in the graph layout
+4. Review the domain statistics panel on the right
+5. Click `Create domain`
+
+After creating a domain, the editor reopens in `New Node` with that domain preselected.
+
 ## How to add a new node
 
-Adding a normal node is mostly data work.
+The recommended path is the node editor described above. If you want to work manually, follow the steps below.
 
 ### 1. Create the node content file
 
@@ -172,7 +242,7 @@ npm run build
 
 ## How to add a new domain
 
-Adding a domain is no longer scattered across multiple unrelated files, but it is not data-only yet. The main registration point is [`src/configs/domains.ts`](./src/configs/domains.ts).
+The recommended path is the `New Domain` flow in the node editor. If you want to work manually, the main registration point is still [`src/configs/domains.ts`](./src/configs/domains.ts).
 
 ### 1. Add the domain to `domains.ts`
 
