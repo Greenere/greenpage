@@ -244,10 +244,60 @@ body,
   outline: none;
 }
 
+.greenpage-node-editor button {
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+}
+
+.greenpage-node-editor button:focus,
+.greenpage-node-editor button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.greenpage-node-editor button:not([aria-label]):not(.node-card-detail-link):not(.greenpage-editor-text-toggle) {
+  box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, 0 0 0)
+    calc(var(--greenpage-detail-action-border-width-idle, 1.35) * 1px)
+    color-mix(
+      in srgb,
+      var(--color-secondary) calc(var(--greenpage-detail-action-border-opacity-idle, 0.45) * 100%),
+      transparent
+    );
+  transition:
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.greenpage-node-editor button:not([aria-label]):not(.node-card-detail-link):not(.greenpage-editor-text-toggle):hover,
+.greenpage-node-editor button:not([aria-label]):not(.node-card-detail-link):not(.greenpage-editor-text-toggle):focus-visible {
+  box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, 0 0 0)
+    calc(var(--greenpage-detail-action-border-width-active, 3) * 1px)
+    color-mix(
+      in srgb,
+      var(--color-secondary) calc(var(--greenpage-detail-action-border-opacity-active, 0.9) * 100%),
+      transparent
+    );
+}
+
+.greenpage-node-editor button:not([aria-label]):not(.node-card-detail-link):not(.greenpage-editor-text-toggle):active {
+  box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, 0 0 0)
+    calc(var(--greenpage-detail-action-border-width-active, 3.2) * 1px)
+    color-mix(
+      in srgb,
+      var(--color-secondary) calc(var(--greenpage-detail-action-border-opacity-active, 0.9) * 100%),
+      transparent
+    );
+}
+
 @media (prefers-reduced-motion: reduce) {
   .node-card-detail-link,
   .node-card-detail-link::after,
-  .node-detail-related-link {
+  .node-detail-related-link,
+  .greenpage-node-editor button:not([aria-label]):not(.node-card-detail-link):not(.greenpage-editor-text-toggle) {
     transition: none !important;
   }
 }

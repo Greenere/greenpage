@@ -1,0 +1,35 @@
+{
+  "title": "Software Engineer at Waymo",
+  "subtitle": "Full-time job since Dec 15th, 2025, still enjoying it",
+  "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
+  "sections": [
+    {
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "I am in a team spanning across data, model and ops, a lot of new stuff to learn with a lot of new opportunities. The progress that Waymo is making is very exciting and I wish to be able to stay here until its potential IPO."
+        }
+      ],
+      "id": "overview"
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Responsibility",
+        "Project",
+        "Outcome"
+      ]
+    },
+    {
+      "type": "quote",
+      "text": "What did this period change about how you work or think?"
+    }
+  ]
+}

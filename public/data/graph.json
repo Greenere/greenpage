@@ -5,130 +5,148 @@
   },
   "nodes": [
     {
-      "id": "oxford",
-      "kind": "education",
-      "domain": "education",
-      "chronology": 201808
-    },
-    {
-      "id": "hust",
-      "kind": "education",
-      "domain": "education",
-      "chronology": 202006
-    },
-    {
-      "id": "cornell",
-      "kind": "education",
-      "domain": "education",
-      "chronology": 202212
-    },
-    {
-      "id": "signature-attack",
-      "kind": "research",
-      "domain": "research",
-      "chronology": 201909
-    },
-    {
-      "id": "noise-modulation",
-      "kind": "research",
-      "domain": "research",
-      "chronology": 202102
-    },
-    {
-      "id": "wellmail",
-      "kind": "project",
-      "domain": "project",
-      "chronology": 201812
-    },
-    {
-      "id": "louvre-evacuation",
-      "kind": "project",
-      "domain": "project",
-      "chronology": 201901
-    },
-    {
-      "id": "weibe",
-      "kind": "project",
-      "domain": "project",
-      "chronology": 201912
-    },
-    {
-      "id": "faceswap",
-      "kind": "project",
-      "domain": "project",
-      "chronology": 202005
-    },
-    {
-      "id": "online-kitchen",
-      "kind": "project",
-      "domain": "project",
-      "chronology": 202111
-    },
-    {
-      "id": "programming-languages",
-      "kind": "project",
-      "domain": "project",
-      "chronology": 202112
-    },
-    {
-      "id": "naec",
-      "kind": "experience",
-      "domain": "experience",
-      "chronology": 202005
-    },
-    {
-      "id": "hust-mclab",
-      "kind": "experience",
-      "domain": "experience",
-      "chronology": 202104
-    },
-    {
-      "id": "realai",
-      "kind": "experience",
-      "domain": "experience",
-      "chronology": 202107
-    },
-    {
-      "id": "verily-intern",
-      "kind": "experience",
-      "domain": "experience",
-      "chronology": 202208
-    },
-    {
-      "id": "verily",
-      "kind": "experience",
-      "domain": "experience",
-      "chronology": 202301
+      "id": "history-writing",
+      "kind": "writing",
+      "domain": "blog",
+      "chronology": "202103"
     },
     {
       "id": "adversarial-writing",
       "kind": "writing",
       "domain": "blog",
-      "chronology": 202104
+      "chronology": "202104"
     },
     {
-      "id": "history-writing",
-      "kind": "writing",
+      "id": "layoff-journey",
       "domain": "blog",
-      "chronology": 202103
+      "kind": "writing",
+      "chronology": "20260315"
+    },
+    {
+      "id": "oxford",
+      "kind": "education",
+      "domain": "education",
+      "chronology": "201808"
+    },
+    {
+      "id": "hust",
+      "kind": "education",
+      "domain": "education",
+      "chronology": "202006"
+    },
+    {
+      "id": "cornell",
+      "kind": "education",
+      "domain": "education",
+      "chronology": "202212"
+    },
+    {
+      "id": "naec",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202005"
+    },
+    {
+      "id": "hust-mclab",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202104"
+    },
+    {
+      "id": "realai",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202107"
+    },
+    {
+      "id": "verily-intern",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202208"
+    },
+    {
+      "id": "verily",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202301"
+    },
+    {
+      "id": "waymo",
+      "domain": "experience",
+      "kind": "experience",
+      "chronology": "202512"
+    },
+    {
+      "id": "wellmail",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "201812"
+    },
+    {
+      "id": "louvre-evacuation",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "201901"
+    },
+    {
+      "id": "weibe",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "201912"
+    },
+    {
+      "id": "faceswap",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "202005"
+    },
+    {
+      "id": "online-kitchen",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "202111"
+    },
+    {
+      "id": "programming-languages",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "202112"
+    },
+    {
+      "id": "signature-attack",
+      "kind": "research",
+      "domain": "research",
+      "chronology": "201909"
+    },
+    {
+      "id": "noise-modulation",
+      "kind": "research",
+      "domain": "research",
+      "chronology": "202102"
     },
     {
       "id": "northeast-2022",
       "kind": "travel",
       "domain": "travel",
-      "chronology": 202203
-    },
-    {
-      "id": "puerto-rico-2022",
-      "kind": "travel",
-      "domain": "travel",
-      "chronology": 202212
+      "chronology": "202203"
     },
     {
       "id": "california-one-2022",
       "kind": "travel",
       "domain": "travel",
-      "chronology": 202205
+      "chronology": "202205"
+    },
+    {
+      "id": "california-santa-barbara-2022",
+      "domain": "travel",
+      "kind": "travel",
+      "chronology": "202210"
+    },
+    {
+      "id": "puerto-rico-2022",
+      "kind": "travel",
+      "domain": "travel",
+      "chronology": "202212"
     }
   ],
   "relations": [
@@ -291,6 +309,14 @@
       "kind": "time",
       "label": "summer trip in the graduate-school stretch",
       "strength": 1
+    },
+    {
+      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "label": "laid-off by Verily",
+      "strength": 3
     }
   ]
 }

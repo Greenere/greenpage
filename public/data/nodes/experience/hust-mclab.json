@@ -4,11 +4,11 @@
   "summary": "A research-assistant period focused on adversarial robustness, interpretability, and what adversarial training changes inside a model.",
   "tags": [
     "robustness",
-    "interpretability"
+    "interpretability",
+    "Adversarial ML"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
@@ -28,7 +28,27 @@
           "label": "Noise Modulation preprint",
           "href": "https://arxiv.org/abs/2103.10603"
         }
+      ],
+      "id": "overview"
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "This lab period deepened the adversarial-ML thread that began with the signature project. Much of the reading, experimentation, and writing around noise modulation came together here."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Studied adversarial training and robustness literature in depth",
+        "Developed the noise modulation idea around interpretable input gradients",
+        "Balanced paper-writing ambitions with unresolved accuracy tradeoffs"
       ]
+    },
+    {
+      "type": "link",
+      "label": "Noise Modulation preprint",
+      "href": "https://arxiv.org/abs/2103.10603"
     }
   ]
 }

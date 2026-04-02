@@ -1,16 +1,15 @@
 import { DOMAIN_CONFIG, isDomainId, type DomainId } from '../../../configs/domains';
 import { UI_COPY } from '../../../configs/uiCopy';
+import {
+  getChronologySortKey,
+  normalizeChronologyValue,
+  type ChronologyValue,
+} from '../../../shared/chronology';
 
 export type { DomainId } from '../../../configs/domains';
 export type AnchorId = DomainId;
 
-export type NodeKind =
-  | 'research'
-  | 'education'
-  | 'travel'
-  | 'writing'
-  | 'experience'
-  | 'project';
+export type NodeKind = DomainId | 'writing';
 
 export type RelationKind =
   | 'time'
@@ -71,7 +70,7 @@ export type GraphContentNode = {
   title: string;
   subtitle?: string;
   summary: string;
-  chronology: number;
+  chronology: ChronologyValue;
   tags?: string[];
   hero?: NodeArticleHero;
   meta?: NodeArticleMeta;
@@ -84,7 +83,7 @@ export type GraphNodeRef = {
   id: string;
   kind: NodeKind;
   domain: DomainId;
-  chronology: number;
+  chronology: ChronologyValue;
   contentPath?: string;
 };
 
@@ -159,7 +158,7 @@ export function getNodeTransitionName(nodeId: string) {
 }
 
 function isNodeKind(value: unknown): value is NodeKind {
-  return value === 'research' || value === 'education' || value === 'travel' || value === 'writing' || value === 'experience' || value === 'project';
+  return value === 'writing' || isDomainId(value);
 }
 
 function isRelationKind(value: unknown): value is RelationKind {
@@ -331,7 +330,18 @@ function normalizeArticleSections(value: unknown): NodeArticleSection[] | undefi
 function derivePreviewBlocks(sections: NodeArticleSection[] | undefined): ContentBlock[] | undefined {
   if (!sections?.length) return undefined;
 
-  const previewBlocks = sections
+  const orderedSections = [
+    ...sections.filter(
+      (section) =>
+        section.id?.toLowerCase() === 'overview' || section.label.trim().toLowerCase() === 'overview'
+    ),
+    ...sections.filter(
+      (section) =>
+        section.id?.toLowerCase() !== 'overview' && section.label.trim().toLowerCase() !== 'overview'
+    ),
+  ];
+
+  const previewBlocks = orderedSections
     .flatMap((section) => section.blocks)
     .flatMap((block): ContentBlock[] => {
       if (
@@ -373,8 +383,7 @@ export function normalizeGraphStructure(raw: unknown): GraphStructure {
     if (
       typeof item.id !== 'string' ||
       !isNodeKind(item.kind) ||
-      !isDomainId(item.domain) ||
-      typeof item.chronology !== 'number'
+      !isDomainId(item.domain)
     ) {
       throw new Error(`Node "${String(item.id ?? index)}" is missing required fields.`);
     }
@@ -383,7 +392,7 @@ export function normalizeGraphStructure(raw: unknown): GraphStructure {
       id: item.id,
       kind: item.kind,
       domain: item.domain,
-      chronology: item.chronology,
+      chronology: normalizeChronologyValue(item.chronology),
       contentPath: typeof item.contentPath === 'string' ? item.contentPath : undefined,
     } satisfies GraphNodeRef;
   });
@@ -442,7 +451,7 @@ export function normalizeNodeContent(raw: unknown, nodeId = 'unknown'): GraphNod
   }
 
   const sections = normalizeArticleSections(candidate.sections);
-  const detail = normalizeContentBlocks(candidate.detail) ?? derivePreviewBlocks(sections);
+  const detail = sections?.length ? derivePreviewBlocks(sections) : normalizeContentBlocks(candidate.detail);
 
   return {
     title: candidate.title,
@@ -556,7 +565,7 @@ export function getLatestNodesByDomain(model: GraphModel) {
 
   for (const node of model.nodes) {
     const current = latestByDomain.get(node.domain);
-    if (!current || node.chronology > current.chronology) {
+    if (!current || getChronologySortKey(node.chronology) > getChronologySortKey(current.chronology)) {
       latestByDomain.set(node.domain, node);
     }
   }
@@ -582,7 +591,7 @@ export function getTemporalDomainRelations(model: GraphModel) {
   }
 
   return [...byDomain.entries()].flatMap(([domain, nodes]) => {
-    const sorted = [...nodes].sort((a, b) => a.chronology - b.chronology);
+    const sorted = [...nodes].sort((a, b) => getChronologySortKey(a.chronology) - getChronologySortKey(b.chronology));
     return sorted.slice(1).map((node, index) => ({
       id: `seq-${domain}-${sorted[index].id}-${node.id}`,
       from: sorted[index].id,

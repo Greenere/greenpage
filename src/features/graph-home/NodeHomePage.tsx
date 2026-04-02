@@ -18,6 +18,7 @@ import StoryNode from './nodes/StoryNode';
 import BioToggleNode from './nodes/BioToggleNode';
 import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
+import { getChronologySortKey } from '../../shared/chronology';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graphFocus';
 import {
     GRAPH_BIO_PORTRAIT_BORDER_OPACITY,
@@ -976,7 +977,7 @@ function buildLaneTargetPositions(
     for (const domain of domainOrder) {
         const laneNodes = contentNodes
             .filter((node) => node.domain === domain)
-            .sort((left, right) => right.chronology - left.chronology);
+            .sort((left, right) => getChronologySortKey(right.chronology) - getChronologySortKey(left.chronology));
         const lane = lanePlan.get(domain);
         if (!lane) continue;
 
