@@ -1,14 +1,22 @@
 # greenpage
 
-`greenpage` is a personal website prototype built with React, TypeScript, Vite, and React Flow.
+`greenpage` is a personal site built with React, TypeScript, Vite, and React Flow.
 
-The active experience is a graph-based homepage:
+The main experience is a graph-based homepage with:
 
 - a central bio node
-- content nodes grouped into domains like research, education, travel, writing, experience, and project
-- draggable connections between those nodes
-- routed detail pages for each node
-- a theme/style system that swaps palette and portrait framing across both graph and detail pages
+- domain-grouped content nodes such as education, experience, project, research, travel, and writing
+- draggable graph interactions and routed detail pages
+- a dev-only node editor for content, relations, and domains
+- localized UI and localized content files
+
+## Stack
+
+- React 19
+- TypeScript
+- Vite
+- React Flow
+- GitHub Pages deployment
 
 ## Development
 
@@ -30,7 +38,13 @@ npm run dev
 npm run build
 ```
 
-### Regenerate the node index manually
+### Lint
+
+```bash
+npm run lint
+```
+
+### Regenerate generated node indexes manually
 
 ```bash
 npm run generate:node-index
@@ -40,33 +54,115 @@ npm run generate:node-index
 
 ## Project structure
 
-- [`src/features/graph_home`](./src/features/graph_home)
-  The active graph homepage, node detail pages, and graph-specific components.
-- [`src/configs`](./src/configs)
-  Small centralized config files for themes, domains, copy, highlight behavior, focus behavior, and transitions.
-- [`public/data`](./public/data)
-  Data files for the graph structure, bio page, and node content.
-- [`src/features/legacy_home`](./src/features/legacy_home)
+- [`src/pages/graph`](./src/pages/graph)
+  The active graph homepage, node detail pages, graph nodes, and graph data loaders.
+- [`src/pages/editor`](./src/pages/editor)
+  The dev-only node editor, live preview, templates, and section editor.
+- [`src/pages/legacy`](./src/pages/legacy)
   Older homepage implementation kept as reference/archive material.
+- [`src/configs`](./src/configs)
+  Centralized config for domains, themes, icons, transitions, highlight behavior, and shared UI copy.
+- [`src/i18n`](./src/i18n)
+  Locale registry, language provider, and locale message files.
+- [`src/shared`](./src/shared)
+  Reusable UI, styling helpers, transitions, chronology helpers, and shared article/gallery UI.
+- [`public/data`](./public/data)
+  Graph structure, localized bio data, and localized node JSON content.
 
-## Important data/config files
+## Routes
+
+- `/` for the graph homepage
+- `/nodes/:nodeId` for content detail pages
+- `/nodes/bio` for the bio detail page
+- `/editor` for the dev-only node editor during `npm run dev`
+
+## Data model
+
+### Graph structure
 
 - [`public/data/graph.json`](./public/data/graph.json)
-  Graph structure: node registry, relations, and graph-level settings.
-- [`public/data/bio.json`](./public/data/bio.json)
-  Data for the bio detail page and bio card content.
-- [`public/data/nodes`](./public/data/nodes)
-  Node content JSON files, grouped into domain folders.
-- [`src/configs/domains.ts`](./src/configs/domains.ts)
-  Single source of truth for domain ids, display labels, card tags, and layout seed angles.
-- [`src/configs/themes.ts`](./src/configs/themes.ts)
-  Theme/style definitions and the default theme.
-- [`src/configs/uiCopy.ts`](./src/configs/uiCopy.ts)
-  Shared UI copy that is not stored in node JSON.
+  The graph registry: nodes, explicit relations, and graph-level settings.
+
+Each graph node entry contains structural fields such as:
+
+- `id`
+- `kind`
+- `domain`
+- `chronology`
+- optional `contentPath`
+
+### Bio content
+
+- [`public/data/bio.en.json`](./public/data/bio.en.json)
+- [`public/data/bio.zh_cn.json`](./public/data/bio.zh_cn.json)
+
+The bio page is localized with separate files per locale.
+
+### Node content
+
+Localized node articles live under [`public/data/nodes`](./public/data/nodes), grouped by domain.
+
+Examples:
+
+- `public/data/nodes/education/cornell.en.json`
+- `public/data/nodes/education/cornell.zh_cn.json`
+- `public/data/nodes/project/programming_languages.en.json`
+
+### Generated indexes
+
+The generator produces two locale-specific indexes per language:
+
+- `index.{locale}.json`
+  Full article payloads for fallback and tooling.
+- `node_cards.{locale}.json`
+  Lightweight graph-card payloads used by the graph homepage and bio path views.
+
+Current generated files include:
+
+- [`public/data/nodes/index.en.json`](./public/data/nodes/index.en.json)
+- [`public/data/nodes/index.zh_cn.json`](./public/data/nodes/index.zh_cn.json)
+- [`public/data/nodes/node_cards.en.json`](./public/data/nodes/node_cards.en.json)
+- [`public/data/nodes/node_cards.zh_cn.json`](./public/data/nodes/node_cards.zh_cn.json)
+
+The graph page now loads card-scale content only, while detail pages lazy-load the full article for the selected node.
+
+## Localization
+
+The app supports both UI localization and content localization.
+
+### UI localization
+
+UI copy is driven by:
+
+- [`src/i18n/locales/en.ts`](./src/i18n/locales/en.ts)
+- [`src/i18n/locales/zh_cn.ts`](./src/i18n/locales/zh_cn.ts)
+- [`src/i18n/LanguageProvider.tsx`](./src/i18n/LanguageProvider.tsx)
+
+### Content localization
+
+Content uses per-locale JSON files rather than inline translation objects.
+
+Examples:
+
+- `bio.en.json` and `bio.zh_cn.json`
+- `cornell.en.json` and `cornell.zh_cn.json`
+
+Fallback order is locale-aware and currently prefers:
+
+- requested locale
+- English
+- other supported locale
+- legacy unlocalized file if present
 
 ## Node editor
 
-The project now includes a dev-only node editor for creating and editing nodes, relations, and domains.
+The project includes a dev-only node editor for creating and editing:
+
+- node content
+- explicit graph relations
+- node metadata
+- new nodes from templates
+- new domains
 
 ### Open it
 
@@ -80,83 +176,42 @@ Then open:
 
 - `/editor`
 
-Important:
+Important notes:
 
-- the editor uses Vite dev-only endpoints, so it is available during `npm run dev`
-- create/delete domain operations still reload the editor because domains are stored in [`src/configs/domains.ts`](./src/configs/domains.ts), not in data yet
+- the editor uses Vite dev-only endpoints, so it is only available during `npm run dev`
+- create/delete domain operations still reload the editor because domains are stored in [`src/configs/domains.ts`](./src/configs/domains.ts)
 
 ### What it can do
 
-- edit node content with a live article preview
+- edit localized node content with a live article preview
 - edit raw JSON
 - create new nodes from templates
 - edit explicit graph relations from the connected-nodes UI
-- create new domains
-- delete zero-node domains from the domain statistics view
+- create and delete domains
+- switch editor language without changing the current editing context
 
-### Notes
+### Editor rules
 
 - node ids and domain ids must use lowercase letters, numbers, and hyphens
 - chronology accepts `yyyy`, `yyyymm`, or `yyyymmdd`
-- incomplete connection drafts stay in the editor, but they are skipped on save
-- chronology timeline links and the latest bio link are inferred automatically
-- dangerous actions like write, reset, and delete ask for confirmation first
+- incomplete connection drafts stay in the editor but are skipped on save
+- timeline links and latest-bio links are inferred automatically
+- dangerous actions like write, reset, and delete use confirmations
 
-## How to use the editor
+## Content format
 
-### Edit an existing node
-
-1. Open `/editor`
-2. Choose a node from `Open node`
-3. Edit content in the `Edit` tab or raw JSON in the `JSON` tab
-4. Use `Write to file` to persist changes
-
-### Create a new node
-
-1. Open `/editor`
-2. Go to `New Node`
-3. Pick a domain and template
-4. Fill in `node id`, chronology, and the basic article fields
-5. Review the live preview on the right
-6. Click `Create node`
-
-### Create a new domain
-
-1. Open `/editor`
-2. Go to `New Domain`
-3. Fill in:
-   - `Domain id`: internal id, folder name, and URL-safe key
-   - `Display label`: human-readable UI name
-   - `Card tag`: short badge text shown on graph cards
-   - `Seed angle`: default orbital position in the graph layout
-4. Review the domain statistics panel on the right
-5. Click `Create domain`
-
-After creating a domain, the editor reopens in `New Node` with that domain preselected.
-
-## How to add a new node
-
-The recommended path is the node editor described above. If you want to work manually, follow the steps below.
-
-### 1. Create the node content file
-
-Add a JSON file under the correct domain folder in [`public/data/nodes`](./public/data/nodes).
-
-Example:
-
-- `public/data/nodes/travel/new-trip.json`
-- `public/data/nodes/research/new-paper.json`
-
-The filename should usually match the node id you plan to use in `graph.json`.
-
-Example shape:
+Node article JSON typically includes:
 
 ```json
 {
-  "title": "New Node Title",
+  "title": "Node Title",
   "subtitle": "Optional subtitle",
   "summary": "Short summary used in cards and previews.",
   "tags": ["optional", "tags"],
+  "meta": {
+    "dateLabel": "2024",
+    "location": "Somewhere"
+  },
   "sections": [
     {
       "id": "overview",
@@ -164,7 +219,7 @@ Example shape:
       "blocks": [
         {
           "type": "text",
-          "text": "This node supports lightweight inline markdown like [links](/nodes/bio), *italic*, **bold**, ***bold italic***, and `code`."
+          "text": "Supports inline markdown like [links](/nodes/bio), *italic*, **bold**, ***bold italic***, and `code`."
         }
       ]
     }
@@ -172,7 +227,7 @@ Example shape:
 }
 ```
 
-Supported article block types include:
+Supported block types include:
 
 - `text`
 - `list`
@@ -182,11 +237,19 @@ Supported article block types include:
 - `gallery`
 - `callout`
 
-### 2. Register the node in the graph
+## Manual content workflow
 
-Add an entry to [`public/data/graph.json`](./public/data/graph.json) inside `nodes`.
+The recommended path is the node editor, but manual editing is still straightforward.
 
-Example:
+### Add a new node manually
+
+1. Create localized content files under the correct domain folder in [`public/data/nodes`](./public/data/nodes).
+2. Add the node entry to [`public/data/graph.json`](./public/data/graph.json).
+3. Add explicit relations in `graph.json` if needed.
+4. Regenerate indexes with `npm run generate:node-index`.
+5. Verify with `npm run build`.
+
+Example graph node entry:
 
 ```json
 {
@@ -197,18 +260,7 @@ Example:
 }
 ```
 
-Notes:
-
-- `id` should match the JSON filename by default
-- `domain` must match one of the registered domains in [`src/configs/domains.ts`](./src/configs/domains.ts)
-- `kind` is still separate from `domain`, so follow the existing values in `graph.json`
-- `chronology` is used for ordering and auto-derived temporal relations
-
-### 3. Add relations
-
-Add edges to [`public/data/graph.json`](./public/data/graph.json) inside `relations` if you want the node connected to others beyond the auto-derived domain timeline/bio relations.
-
-Example:
+Example explicit relation entry:
 
 ```json
 {
@@ -216,109 +268,44 @@ Example:
   "from": "new-trip",
   "to": "verily-intern",
   "kind": "location",
-  "label": "California period",
+  "labels": {
+    "en": "California period",
+    "zh-CN": "加州阶段"
+  },
   "strength": 2
 }
 ```
 
-### 4. Regenerate the node index
+## Domains
 
-Run:
+Domains are defined in [`src/configs/domains.ts`](./src/configs/domains.ts).
 
-```bash
-npm run generate:node-index
-```
+Each domain entry controls:
 
-This updates [`public/data/nodes/index.json`](./public/data/nodes/index.json).
+- domain id
+- display label
+- card tag
+- initial orbital layout seed angle
 
-### 5. Verify
+If you add a domain manually, also create its folder under [`public/data/nodes`](./public/data/nodes).
 
-Recommended quick check:
+## Themes and UI config
 
-```bash
-npm run lint
-npm run build
-```
+Important config files:
 
-## How to add a new domain
-
-The recommended path is the `New Domain` flow in the node editor. If you want to work manually, the main registration point is still [`src/configs/domains.ts`](./src/configs/domains.ts).
-
-### 1. Add the domain to `domains.ts`
-
-Create a new entry in [`src/configs/domains.ts`](./src/configs/domains.ts).
-
-Example:
-
-```ts
-archive: {
-  display: 'archive',
-  cardTag: 'ARCHIVE',
-  seedAngle: 180,
-}
-```
-
-This single entry controls:
-
-- the domain id
-- the display label shown in the UI
-- the top tag shown on node cards
-- the initial orbital layout angle in the graph
-
-### 2. Add node content files for that domain
-
-Create a new folder under [`public/data/nodes`](./public/data/nodes), for example:
-
-- `public/data/nodes/archive/`
-
-Then add the node JSON files for that domain there.
-
-### 3. Add graph nodes using the new domain
-
-Add node entries in [`public/data/graph.json`](./public/data/graph.json) with:
-
-- `"domain": "archive"`
-
-### 4. Regenerate and verify
-
-Run:
-
-```bash
-npm run generate:node-index
-npm run lint
-npm run build
-```
-
-## Themes and default style
-
-Theme definitions live in [`src/configs/themes.ts`](./src/configs/themes.ts).
-
-To change the default theme used when no stored preference exists yet, edit:
-
-```ts
-export const DEFAULT_THEME: Theme = '...';
-```
-
-Important:
-
-- if a visitor already has a saved theme in local storage, that saved value overrides the default
-- the saved key is managed through [`src/features/graph_home/content/BioTheme.ts`](./src/features/graph_home/content/BioTheme.ts)
-
-## UI copy and localization
-
-Most body/article content is already data-driven in JSON. Shared UI labels that are still in code are centralized in:
-
+- [`src/configs/domains.ts`](./src/configs/domains.ts)
+- [`src/configs/themes.ts`](./src/configs/themes.ts)
+- [`src/configs/icons.ts`](./src/configs/icons.ts)
 - [`src/configs/uiCopy.ts`](./src/configs/uiCopy.ts)
+- [`src/configs/graphHighlight.ts`](./src/configs/graphHighlight.ts)
+- [`src/configs/graphFocus.ts`](./src/configs/graphFocus.ts)
+- [`src/configs/pageTransitions.ts`](./src/configs/pageTransitions.ts)
 
-That is the right place to start if you want to support language switching later.
+To change the default theme, edit `DEFAULT_THEME` in [`src/configs/themes.ts`](./src/configs/themes.ts).
 
-## Routing
+Note:
 
-The main routes are:
-
-- `/` for the graph homepage
-- `/nodes/:nodeId` for node detail pages
-- `/nodes/bio` for the bio detail page
+- a saved theme in local storage overrides the default
 
 ## Deployment
 
@@ -328,10 +315,7 @@ Relevant pieces:
 
 - [`vite.config.ts`](./vite.config.ts) sets `base: "/greenpage/"`
 - [`src/main.tsx`](./src/main.tsx) uses `BrowserRouter basename="/greenpage"`
-- [`package.json`](./package.json) includes:
-  - `predeploy`: runs the build
-  - `postbuild`: copies `dist/index.html` to `dist/404.html`
-  - `deploy`: publishes `dist` with `gh-pages`
+- [`package.json`](./package.json) includes `predeploy`, `postbuild`, and `deploy`
 
 Typical deploy command:
 
