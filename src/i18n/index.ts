@@ -1,6 +1,8 @@
 import {
+  DEFAULT_LANGUAGE_CHOICE,
   DEFAULT_LANGUAGE,
   LANGUAGE_STORAGE_KEY,
+  getDefaultAppLanguage,
   normalizeLanguage,
   type AppLanguage,
 } from './config';
@@ -9,7 +11,7 @@ import { ZH_CN_MESSAGES } from './locales/zh_cn';
 import type { LocaleMessages } from './types';
 
 export type { AppLanguage } from './config';
-export { CONTENT_LANGUAGE_BEHAVIOR, DEFAULT_LANGUAGE, LANGUAGE_OPTIONS, LANGUAGE_STORAGE_KEY } from './config';
+export { DEFAULT_LANGUAGE, DEFAULT_LANGUAGE_CHOICE, LANGUAGE_OPTIONS, LANGUAGE_STORAGE_KEY } from './config';
 
 const LOCALE_MESSAGES: Record<AppLanguage, LocaleMessages> = {
   en: EN_MESSAGES,
@@ -22,11 +24,10 @@ export function getInitialLanguage(): AppLanguage {
   if (typeof window !== 'undefined') {
     const storedLanguage = normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY));
     if (storedLanguage) return storedLanguage;
-    const browserLanguage = normalizeLanguage(window.navigator.language);
-    if (browserLanguage) return browserLanguage;
+    return getDefaultAppLanguage(window.navigator.language);
   }
 
-  return DEFAULT_LANGUAGE;
+  return DEFAULT_LANGUAGE_CHOICE === 'app-language' ? DEFAULT_LANGUAGE : DEFAULT_LANGUAGE_CHOICE;
 }
 
 export function getActiveLanguage() {

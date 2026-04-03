@@ -7,14 +7,11 @@ export const LANGUAGE_OPTIONS = [
   { id: 'zh-CN', shortLabel: '中' },
 ] as const satisfies ReadonlyArray<{ id: AppLanguage; shortLabel: string }>;
 
-export type ContentLanguageBehavior =
-  | { mode: 'app-language' }
-  | { mode: 'language-list'; languages: AppLanguage[] };
+export type DefaultLanguageChoice = 'app-language' | AppLanguage;
 
-export const CONTENT_LANGUAGE_BEHAVIOR: ContentLanguageBehavior = {
-  mode: 'language-list',
-  languages: ['en', 'zh-CN'],
-};
+// This only controls the initial language choice when the user has not already
+// selected and saved a preference. Users can still switch languages normally.
+export const DEFAULT_LANGUAGE_CHOICE: DefaultLanguageChoice = 'en';
 
 export function isAppLanguage(value: unknown): value is AppLanguage {
   return value === 'en' || value === 'zh-CN';
@@ -28,11 +25,20 @@ export function normalizeLanguage(value: string | null | undefined): AppLanguage
   return null;
 }
 
+export function getDefaultAppLanguage(browserLanguage: string | null | undefined): AppLanguage {
+  if (DEFAULT_LANGUAGE_CHOICE === 'app-language') {
+    return normalizeLanguage(browserLanguage) ?? DEFAULT_LANGUAGE;
+  }
+
+  return DEFAULT_LANGUAGE_CHOICE;
+}
+
 export function getConfiguredContentLanguageOrder(appLanguage: AppLanguage): AppLanguage[] {
-  const ordered =
-    CONTENT_LANGUAGE_BEHAVIOR.mode === 'language-list'
-      ? [...CONTENT_LANGUAGE_BEHAVIOR.languages]
-      : [appLanguage, DEFAULT_LANGUAGE];
+  const ordered = [appLanguage];
+
+  if (appLanguage !== DEFAULT_LANGUAGE) {
+    ordered.push(DEFAULT_LANGUAGE);
+  }
 
   for (const option of LANGUAGE_OPTIONS) {
     if (!ordered.includes(option.id)) {
