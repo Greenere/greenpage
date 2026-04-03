@@ -1,13 +1,13 @@
 import { lazy, Suspense } from 'react'
 import './App.css'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import NodeHomePage from './features/graph_home/NodeHomePage'
-import NodeDetailPage from './features/graph_home/NodeDetailPage'
-import BioDetailPage from './features/graph_home/BioDetailPage'
+import NodeHomePage from './pages/graph/NodeHomePage'
+import NodeDetailPage from './pages/graph/NodeDetailPage'
+import BioDetailPage from './pages/graph/BioDetailPage'
 import { useAppLanguage } from './i18n/LanguageProvider'
 
 const DevNodeEditorPage = import.meta.env.DEV
-  ? lazy(() => import('./features/node_editor/NodeEditorPage'))
+  ? lazy(() => import('./pages/editor/NodeEditorPage'))
   : null
 
 function App() {

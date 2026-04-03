@@ -1,7 +1,7 @@
 export const EN_MESSAGES = {
   siteMeta: {
-    title: 'Haoyang\'s Life in Graphs',
-    iconHref: '/public/assets/icons/user.svg',
+    title: 'Entangled Life',
+    iconHref: '/assets/icons/user.svg',
     iconType: 'image/svg+xml',
   },
   appShell: {
@@ -134,6 +134,7 @@ export const EN_MESSAGES = {
         failedCreateDomain: 'Failed to create domain.',
         deletedDomainReloading: (domainId: string) => `Deleted domain "${domainId}". Reloading editor...`,
         failedDeleteDomain: 'Failed to delete domain.',
+        duplicateExplicitConnection: 'This connection already exists.',
       },
       confirmations: {
         titleConfirm: 'Please confirm',
@@ -191,6 +192,8 @@ export const EN_MESSAGES = {
           'Timeline links within the same domain are inferred automatically from chronology. Use the connected-node cards on the right to add, remove, and select explicit relations.',
         incompleteConnectionsHint:
           'Incomplete connection drafts stay in the editor, but they will not be saved until both ends are chosen.',
+        duplicateConnectionsHint:
+          'Duplicate connections to the same node are not allowed. Remove or change the repeated connection before saving.',
         connectionEditing: 'Editing',
         untitledConnection: 'Untitled connection',
         currentNode: 'Current node',
@@ -202,6 +205,8 @@ export const EN_MESSAGES = {
         kind: 'Kind',
         strength: 'Strength',
         label: 'Label',
+        duplicateConnectionSelected:
+          'This connection duplicates another existing connection to the same node.',
         explicitConnectionEmpty:
           'Select an explicit connection card on the right to edit its direction, kind, strength, and label.',
         sidebarHint: 'Edit header, metadata, and hero from this panel. Click any section on the right to edit it.',

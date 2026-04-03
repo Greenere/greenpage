@@ -1,0 +1,104 @@
+{
+  "title": "加州一号公路",
+  "subtitle": "Verily 那个夏天的一次海岸自驾",
+  "summary": "一个和加州实习阶段紧密相连的太平洋海岸旅行节点，路线串起了 Half Moon Bay、Santa Cruz、Monterey 和 17-Mile Drive 等地方。",
+  "tags": [
+    "旅行",
+    "海岸"
+  ],
+  "hero": {
+    "image": {
+      "src": "assets/portrait_haoyang_mty.jpg",
+      "alt": "皓阳在一号公路旅行中的 Monterey",
+      "caption": "Monterey 成了那一天最清晰的视觉记忆：从湾区出发，路线缓慢向南倾斜。"
+    }
+  },
+  "meta": {
+    "dateLabel": "2022 年 5 月 29 日",
+    "location": "加州海岸",
+    "readingTime": "3 分钟",
+    "status": "archive"
+  },
+  "sections": [
+    {
+      "id": "overview",
+      "label": "概览",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "在旧旅行材料里，这个节点尤其偏视觉化。它读起来更像一张路线草图，而不是日记：海岸线、观景点，以及在[Verily 实习](/nodes/verily-intern)期间，从湾区一路向 Monterey 延展的一整天。"
+        },
+        {
+          "type": "text",
+          "text": "真正留下来的不是某一个停靠点，而是整段路程按顺序展开的感觉，几乎像在走过一幅活着的加州`分镜板`。"
+        }
+      ]
+    },
+    {
+      "id": "route",
+      "label": "路线",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "**Half Moon Bay** 像是离开湾区节奏后的第一个明显过渡",
+            "*Santa Cruz* 像是中点，让海岸线开始显得更悠闲而不是功能性",
+            "**Monterey** 成了这趟旅行的情绪中心",
+            "*17-Mile Drive* 则让整条路线显得是刻意追求风景，而不是单纯效率"
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "为什么它留了下来",
+          "tone": "highlight",
+          "text": "这是我在加州第一次真正觉得自己“住进了这里”的旅行，而不是暂借一地的停留。它让那个夏天读起来不再只是临时搬迁，而更像一个完整章节。"
+        }
+      ]
+    },
+    {
+      "id": "photographs",
+      "label": "照片",
+      "blocks": [
+        {
+          "type": "gallery",
+          "columns": 3,
+          "align": "natural",
+          "items": [
+            {
+              "src": "assets/portrait_haoyang_sfbay.jpg",
+              "alt": "2022 年夏天，皓阳在湾区",
+              "caption": "湾区是出发点，然后这一天慢慢被拉长成一段海岸旅行。"
+            },
+            {
+              "src": "assets/portrait_haoyang_mty.jpg",
+              "alt": "皓阳在一号公路旅行中的 Monterey",
+              "caption": "到了 Monterey，旅程终于慢下来，开始从快速经过变成真正能记住的东西。"
+            },
+            {
+              "src": "assets/portrait_haoyang_mty.jpg",
+              "alt": "皓阳在一号公路旅行中的 Monterey",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "type": "gallery",
+          "columns": 2,
+          "align": "natural",
+          "items": [
+            {
+              "src": "assets/sf_fog.jpg",
+              "alt": "2022 年夏天的湾区雾景",
+              "caption": "湾区是这趟海岸线长日子的起点。"
+            },
+            {
+              "src": "assets/portrait_haoyang_mty.jpg",
+              "alt": "皓阳在一号公路旅行中的 Monterey",
+              "caption": "到了 Monterey，旅程终于慢下来，开始从快速经过变成真正能记住的东西。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "title": "牛津暑期学校",
+  "subtitle": "知识表示，2018 年 8 月",
+  "summary": "在 Oriel College 的一段短暂学术支线，在后来研究更重的几年到来之前先把本科阶段的视野打开了一些。",
+  "tags": [
+    "牛津",
+    "暑校"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "概览",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "旧简历里把它列为在牛津 Oriel College 参加的一次知识表示暑期学校。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Oriel College",
+            "知识表示",
+            "一次短暂的国际化学术绕行"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -38,7 +38,7 @@
       "id": "cornell",
       "kind": "education",
       "domain": "education",
-      "chronology": "202212"
+      "chronology": "20210807"
     },
     {
       "id": "naec",
@@ -110,7 +110,7 @@
       "id": "programming-languages",
       "kind": "project",
       "domain": "project",
-      "chronology": "202112"
+      "chronology": "20211215"
     },
     {
       "id": "signature-attack",
@@ -191,22 +191,6 @@
       "strength": 2
     },
     {
-      "id": "project-online-cornell",
-      "from": "online-kitchen",
-      "to": "cornell",
-      "kind": "time",
-      "label": "Data Visualization work at Cornell",
-      "strength": 2
-    },
-    {
-      "id": "project-pl-cornell",
-      "from": "programming-languages",
-      "to": "cornell",
-      "kind": "time",
-      "label": "Data Visualization work at Cornell",
-      "strength": 2
-    },
-    {
       "id": "project-louvre-history",
       "from": "louvre-evacuation",
       "to": "history-writing",
@@ -223,44 +207,12 @@
       "strength": 2
     },
     {
-      "id": "verily-cornell",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "outcome",
-      "label": "internship emerged from the Cornell period",
-      "strength": 2
-    },
-    {
-      "id": "travel-northeast-cornell",
-      "from": "northeast-2022",
-      "to": "cornell",
-      "kind": "time",
-      "label": "travel branch of Ithaca life",
-      "strength": 2
-    },
-    {
-      "id": "travel-puerto-cornell",
-      "from": "puerto-rico-2022",
-      "to": "cornell",
-      "kind": "time",
-      "label": "trip during the Cornell years",
-      "strength": 2
-    },
-    {
       "id": "travel-california-verily",
       "from": "california-one-2022",
       "to": "verily-intern",
       "kind": "location",
       "label": "same California summer as the internship",
       "strength": 3
-    },
-    {
-      "id": "travel-california-cornell",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "label": "summer trip in the graduate-school stretch",
-      "strength": 1
     },
     {
       "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
@@ -275,7 +227,10 @@
       "from": "signature-attack",
       "to": "hust",
       "kind": "time",
-      "label": "started from HUST coursework and lab access",
+      "labels": {
+        "en": "started from HUST coursework and lab access",
+        "zh-CN": "started from HUST coursework and lab access"
+      },
       "strength": 2
     },
     {
@@ -283,7 +238,10 @@
       "from": "wellmail",
       "to": "hust",
       "kind": "time",
-      "label": "software project at HUST",
+      "labels": {
+        "en": "software project at HUST",
+        "zh-CN": "software project at HUST"
+      },
       "strength": 2
     },
     {
@@ -291,7 +249,10 @@
       "from": "louvre-evacuation",
       "to": "hust",
       "kind": "time",
-      "label": "modeling contest during HUST years",
+      "labels": {
+        "en": "modeling contest during HUST years",
+        "zh-CN": "modeling contest during HUST years"
+      },
       "strength": 1
     },
     {
@@ -299,7 +260,10 @@
       "from": "weibe",
       "to": "hust",
       "kind": "time",
-      "label": "big-data systems course project",
+      "labels": {
+        "en": "big-data systems course project",
+        "zh-CN": "big-data systems course project"
+      },
       "strength": 2
     },
     {
@@ -307,7 +271,10 @@
       "from": "faceswap",
       "to": "hust",
       "kind": "time",
-      "label": "undergraduate capstone period",
+      "labels": {
+        "en": "undergraduate capstone period",
+        "zh-CN": "本科期间的项目经历"
+      },
       "strength": 2
     },
     {
@@ -315,7 +282,10 @@
       "from": "hust-mclab",
       "to": "hust",
       "kind": "time",
-      "label": "still rooted in the HUST period",
+      "labels": {
+        "en": "still rooted in the HUST period",
+        "zh-CN": "still rooted in the HUST period"
+      },
       "strength": 2
     },
     {
@@ -323,7 +293,70 @@
       "from": "hust",
       "to": "naec",
       "kind": "time",
-      "label": "during my third year in college",
+      "labels": {
+        "en": "during my third year in college",
+        "zh-CN": "during my third year in college"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-online-kitchen-cornell-1",
+      "from": "online-kitchen",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "Data Visualization work at Cornell"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-outcome-verily-intern-cornell-2",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "outcome",
+      "labels": {
+        "zh-CN": "internship emerged from the Cornell period"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-northeast-2022-cornell-3",
+      "from": "northeast-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "travel branch of Ithaca life"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-puerto-rico-2022-cornell-4",
+      "from": "puerto-rico-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "trip during the Cornell years"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-california-one-2022-cornell-5",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "summer trip in the graduate-school stretch"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-cornell-time-programming-languages-cornell-6",
+      "from": "programming-languages",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "Data Visualization work at Cornell"
+      },
       "strength": 2
     }
   ]

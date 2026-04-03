@@ -1,0 +1,29 @@
+{
+  "title": "WELLMAIL",
+  "subtitle": "Python 邮件客户端",
+  "summary": "第一个真正像样的软件项目：一个带 GUI 的 Python 邮件客户端，以团队课程项目的形式完成，也被记作迈向“真正软件构建”的早期一步。",
+  "tags": [
+    "Python",
+    "GUI"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "概览",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "最大的收获不只是这个客户端本身，而是第一次认真学习如何把一个图形化软件系统拆成模块，并真正做出一套有界面流转的软件。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "负责 Receive Box 与 Main Module",
+            "《软件工程》课程项目",
+            "班级里完成度很高的一组作品之一"
+          ]
+        }
+      ]
+    }
+  ]
+}

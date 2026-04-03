@@ -2,8 +2,8 @@ import type { LocaleMessages } from '../types';
 
 export const ZH_CN_MESSAGES = {
   siteMeta: {
-    title: 'Haoyang 的人生图谱',
-    iconHref: '/public/assets/icons/user.svg',
+    title: '纠缠人生',
+    iconHref: '/assets/icons/user.svg',
     iconType: 'image/svg+xml',
   },
   appShell: {
@@ -25,7 +25,7 @@ export const ZH_CN_MESSAGES = {
   },
   uiCopy: {
     graphRelations: {
-      nextInTimeline: '时间线上相邻',
+      nextInTimeline: '时间上相邻',
       latestNodeInDomain: '该领域中的最新节点',
     },
     graphHome: {
@@ -136,9 +136,10 @@ export const ZH_CN_MESSAGES = {
         failedCreateDomain: '创建领域失败。',
         deletedDomainReloading: (domainId: string) => `已删除领域“${domainId}”。正在重新加载编辑器...`,
         failedDeleteDomain: '删除领域失败。',
+        duplicateExplicitConnection: '这条连接已经存在。',
       },
       confirmations: {
-        titleConfirm: '请确认',
+        titleConfirm: '你确定？',
         titleSuccess: '操作完成',
         titleError: '操作失败',
         prompt: (actionDescription: string) => `确定要${actionDescription}吗？`,
@@ -172,7 +173,7 @@ export const ZH_CN_MESSAGES = {
         chronology: '时间',
         tags: '标签',
         tagsPlaceholder: 'tag1, tag2, …',
-        header: '头部',
+        header: '抬头',
         title: '标题',
         subtitle: '副标题',
         summary: '摘要',
@@ -190,9 +191,11 @@ export const ZH_CN_MESSAGES = {
         },
         connectionDetails: '连接详情',
         connectionDetailsHint:
-          '同一领域内的时间线连接会根据 chronology 自动推导。使用右侧的相关节点卡片来添加、删除和选择显式关系。',
+          '同一领域内的时间线连接会根据时间顺序自动推导。使用右侧的相关节点卡片来添加、删除和选择显式关系。',
         incompleteConnectionsHint:
           '未完成的连接草稿会保留在编辑器里，但在两端都选定之前不会被保存。',
+        duplicateConnectionsHint:
+          '不允许与同一节点建立重复连接。请先删除或修改重复连接后再保存。',
         connectionEditing: '正在编辑',
         untitledConnection: '未命名连接',
         currentNode: '当前节点',
@@ -204,6 +207,8 @@ export const ZH_CN_MESSAGES = {
         kind: '类型',
         strength: '强度',
         label: '标签',
+        duplicateConnectionSelected:
+          '这条连接与另一条指向同一节点的现有连接重复了。',
         explicitConnectionEmpty:
           '在右侧选择一张显式连接卡片，以编辑其方向、类型、强度和标签。',
         sidebarHint: '在此面板编辑头部、元数据和头图。点击右侧任意章节即可编辑。',

@@ -269,6 +269,40 @@ body,
   box-shadow: none;
 }
 
+.greenpage-node-editor input,
+.greenpage-node-editor textarea,
+.greenpage-node-editor select {
+  outline: none;
+  box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, 0 0 0)
+    calc(var(--greenpage-detail-action-border-width-idle, 1.35) * 1px)
+    color-mix(
+      in srgb,
+      var(--color-secondary) calc(var(--greenpage-detail-action-border-opacity-idle, 0.45) * 100%),
+      transparent
+    );
+  transition:
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.greenpage-node-editor input:focus,
+.greenpage-node-editor input:focus-visible,
+.greenpage-node-editor textarea:focus,
+.greenpage-node-editor textarea:focus-visible,
+.greenpage-node-editor select:focus,
+.greenpage-node-editor select:focus-visible {
+  outline: none;
+  box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, 0 0 0)
+    calc(var(--greenpage-detail-action-border-width-active, 3) * 1px)
+    color-mix(
+      in srgb,
+      var(--color-secondary) calc(var(--greenpage-detail-action-border-opacity-active, 0.9) * 100%),
+      transparent
+    );
+}
+
 .greenpage-node-editor button:not([aria-label]):not(.node-card-detail-link):not(.greenpage-editor-text-toggle) {
   box-shadow: var(--greenpage-detail-action-ring-shadow-prefix, 0 0 0)
     calc(var(--greenpage-detail-action-border-width-idle, 1.35) * 1px)
@@ -310,6 +344,9 @@ body,
   .node-card-detail-link,
   .node-card-detail-link::after,
   .node-detail-related-link,
+  .greenpage-node-editor input,
+  .greenpage-node-editor textarea,
+  .greenpage-node-editor select,
   .greenpage-node-editor button:not([aria-label]):not(.node-card-detail-link):not(.greenpage-editor-text-toggle) {
     transition: none !important;
   }
