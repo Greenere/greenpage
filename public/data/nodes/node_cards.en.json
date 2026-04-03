@@ -221,7 +221,7 @@
     ]
   },
   "verily-intern": {
-    "title": "Software Engineer Intern at Verily",
+    "title": "Verily Summer Intern",
     "subtitle": "Summer 2022, from Cornell to California",
     "summary": "The internship that turned graduate school into a clearer engineering path, connecting Cornell coursework with California life and later full-time work.",
     "tags": [
@@ -248,9 +248,9 @@
     ]
   },
   "verily": {
-    "title": "Software Engineer at Verily",
+    "title": "Verily",
     "subtitle": "Full-time chapter beginning in 2023",
-    "summary": "The current long-running chapter: product engineering, system ownership, and the part of the graph that connects most directly back to the present-day bio node.",
+    "summary": "The once long-running chapter: product engineering, system ownership, and the part of the graph that connects most directly back to the present-day bio node.",
     "tags": [
       "current",
       "software"
@@ -271,7 +271,7 @@
     ]
   },
   "waymo": {
-    "title": "Software Engineer at Waymo",
+    "title": "Waymo",
     "subtitle": "Full-time job since Dec 15th, 2025, still enjoying it",
     "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
     "detail": [
@@ -394,7 +394,7 @@
     ]
   },
   "programming-languages": {
-    "title": "Programming Languages Visualizations",
+    "title": "Visualizations",
     "subtitle": "Interactive D3 project",
     "summary": "A Cornell visualization piece exploring programming-language history, family relationships, and popularity through interactive graphics.",
     "tags": [

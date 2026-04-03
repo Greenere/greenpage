@@ -207,22 +207,6 @@
       "strength": 2
     },
     {
-      "id": "travel-california-verily",
-      "from": "california-one-2022",
-      "to": "verily-intern",
-      "kind": "location",
-      "label": "same California summer as the internship",
-      "strength": 3
-    },
-    {
-      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
-      "from": "layoff-journey",
-      "to": "verily",
-      "kind": "reason",
-      "label": "laid-off by Verily",
-      "strength": 3
-    },
-    {
       "id": "editor-hust-time-signature-attack-hust-1",
       "from": "signature-attack",
       "to": "hust",
@@ -310,17 +294,6 @@
       "strength": 2
     },
     {
-      "id": "editor-cornell-outcome-verily-intern-cornell-2",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "outcome",
-      "labels": {
-        "zh-CN": "在康村找到的暑期实习",
-        "en": "internship emerged from the Cornell period"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-cornell-time-northeast-2022-cornell-3",
       "from": "northeast-2022",
       "to": "cornell",
@@ -354,12 +327,41 @@
       "strength": 1
     },
     {
-      "id": "editor-cornell-time-programming-languages-cornell-6",
+      "id": "editor-verily-intern-location-california-one-2022-verily-intern-1",
+      "from": "california-one-2022",
+      "to": "verily-intern",
+      "kind": "location",
+      "labels": {
+        "en": "same California summer as the internship"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-verily-intern-outcome-verily-intern-cornell-2",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "outcome",
+      "labels": {
+        "en": "internship emerged from the Cornell period"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-verily-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "labels": {
+        "en": "laid-off by Verily"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-programming-languages-time-programming-languages-cornell-1",
       "from": "programming-languages",
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "zh-CN": "Data Visualization work at Cornell",
         "en": "Data Visualization work at Cornell"
       },
       "strength": 2

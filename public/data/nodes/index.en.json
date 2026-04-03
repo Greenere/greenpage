@@ -424,29 +424,19 @@
     ]
   },
   "verily-intern": {
-    "title": "Software Engineer Intern at Verily",
+    "title": "Verily Summer Intern",
     "subtitle": "Summer 2022, from Cornell to California",
     "summary": "The internship that turned graduate school into a clearer engineering path, connecting Cornell coursework with California life and later full-time work.",
     "tags": [
       "internship",
       "engineering"
     ],
-    "hero": {
-      "image": {
-        "src": "assets/portrait_haoyang_sfbay.jpg",
-        "alt": "Haoyang in the Bay Area during the Verily internship summer",
-        "caption": "Work, relocation, and weekend travel started to blur into one California chapter."
-      }
-    },
     "meta": {
       "dateLabel": "Summer 2022",
-      "location": "South San Francisco",
-      "readingTime": "3 min",
-      "status": "milestone"
+      "location": "South San Francisco"
     },
     "sections": [
       {
-        "id": "shift",
         "label": "Shift",
         "blocks": [
           {
@@ -457,10 +447,10 @@
             "type": "text",
             "text": "It also changed how the summer itself felt. Workdays at Verily and weekend drives like [California State Route 1](/nodes/california-one-2022) started to belong to the same chapter rather than separate categories."
           }
-        ]
+        ],
+        "id": "shift"
       },
       {
-        "id": "what-changed",
         "label": "What changed",
         "blocks": [
           {
@@ -476,21 +466,39 @@
             "title": "Practical effect",
             "text": "The important part was not just learning new tools. It was seeing how engineering decisions accumulate in a team setting and how much clarity can come from shipping something that other people actually depend on."
           }
+        ],
+        "id": "what-changed"
+      }
+    ],
+    "detail": [
+      {
+        "type": "text",
+        "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
+      },
+      {
+        "type": "text",
+        "text": "It also changed how the summer itself felt. Workdays at Verily and weekend drives like [California State Route 1](/nodes/california-one-2022) started to belong to the same chapter rather than separate categories."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Software engineering became a concrete path rather than an abstract possibility",
+          "The distance between coursework and real product work became much smaller",
+          "The internship later connected forward into the full-time role that follows in the graph"
         ]
       }
     ]
   },
   "verily": {
-    "title": "Software Engineer at Verily",
+    "title": "Verily",
     "subtitle": "Full-time chapter beginning in 2023",
-    "summary": "The current long-running chapter: product engineering, system ownership, and the part of the graph that connects most directly back to the present-day bio node.",
+    "summary": "The once long-running chapter: product engineering, system ownership, and the part of the graph that connects most directly back to the present-day bio node.",
     "tags": [
       "current",
       "software"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
@@ -505,12 +513,27 @@
               "A natural bridge back to the central bio node and present tense"
             ]
           }
+        ],
+        "id": "overview"
+      }
+    ],
+    "detail": [
+      {
+        "type": "text",
+        "text": "Compared with the earlier nodes, this one reflects a steadier and less school-shaped rhythm. It is about longer projects, production responsibility, and a deeper engineering identity that can later branch into writing, side projects, or future moves."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Continuation of the Verily internship into a full-time role",
+          "Represents the most up-to-date experience thread in the graph",
+          "A natural bridge back to the central bio node and present tense"
         ]
       }
     ]
   },
   "waymo": {
-    "title": "Software Engineer at Waymo",
+    "title": "Waymo",
     "subtitle": "Full-time job since Dec 15th, 2025, still enjoying it",
     "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
     "sections": [
@@ -528,19 +551,7 @@
     "detail": [
       {
         "type": "text",
-        "text": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo."
-      },
-      {
-        "type": "list",
-        "items": [
-          "Responsibility",
-          "Project",
-          "Outcome"
-        ]
-      },
-      {
-        "type": "quote",
-        "text": "What did this period change about how you work or think?"
+        "text": "I am in a team spanning across data, model and ops, a lot of new stuff to learn with a lot of new opportunities. The progress that Waymo is making is very exciting and I wish to be able to stay here until its potential IPO."
       }
     ]
   },
@@ -701,7 +712,7 @@
     ]
   },
   "programming-languages": {
-    "title": "Programming Languages Visualizations",
+    "title": "Visualizations",
     "subtitle": "Interactive D3 project",
     "summary": "A Cornell visualization piece exploring programming-language history, family relationships, and popularity through interactive graphics.",
     "tags": [
