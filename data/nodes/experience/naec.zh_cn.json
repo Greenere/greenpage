@@ -1,0 +1,34 @@
+{
+  "title": "国家防伪工程技术研究中心科研工程实习",
+  "subtitle": "National Anti-counterfeit Engineering Research Center",
+  "summary": "一段兼职科研实习：课程里对对抗样本的兴趣在这里变成了持续性的研究工作，主题是手写签名验证，后来也发展成了一篇期刊论文。",
+  "tags": [
+    "研究",
+    "安全"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "概览",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "这是对抗机器学习从课程主题转变为真实研究方向的时期。和袁伟教授团队合作时，我主要关注在现实黑盒约束下攻击签名验证系统。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "华科本科阶段的兼职实习",
+            "研究手写签名验证攻击",
+            "直接延伸出 RSAEG / 区域限制签名攻击论文"
+          ]
+        },
+        {
+          "type": "link",
+          "label": "Pattern Recognition 论文",
+          "href": "http://www.sciencedirect.com/science/article/pii/S0031320320304921"
+        }
+      ]
+    }
+  ]
+}

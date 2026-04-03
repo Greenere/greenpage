@@ -1,0 +1,27 @@
+{
+  "title": "Santa Barbara Trip",
+  "subtitle": "My first time going to California, yet on a rainy day",
+  "summary": "I was in my tedious searching for my first job out of Cornell, yet the return offer from the summer internship was pending. It was a trip reimbursed by a company onsite, and Santa Babara was truly a beautiful city.",
+  "meta": {
+    "dateLabel": "Oct, 2022",
+    "location": "Santa Barbara, CA"
+  },
+  "sections": [
+    {
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "It was an interesting company based in this touristy town outside of Los Angeles area. The city was all in Spanish colonial style, said to be enforced by the local law. I remember that the court was very picturistic, the mission was an interesting history classroom, where I first learned that California is a state of missions."
+        }
+      ],
+      "id": "overview"
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "It was an interesting company based in this touristy town outside of Los Angeles area. The city was all in Spanish colonial style, said to be enforced by the local law. I remember that the court was very picturistic, the mission was an interesting history classroom, where I first learned that California is a state of missions."
+    }
+  ]
+}

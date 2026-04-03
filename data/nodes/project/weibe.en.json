@@ -1,0 +1,29 @@
+{
+  "title": "WEIBE",
+  "subtitle": "Weibo emotion analysis system",
+  "summary": "A course-built system that crawled Weibo trending topics, stored posts, and visualized emotional tendencies across those conversations.",
+  "tags": [
+    "crawler",
+    "visualization"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "The main contribution was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Capstone Project in Big Data Processing System",
+            "Python, Flask, Gevent, MongoDB",
+            "Captured topics during the early COVID-19 moment"
+          ]
+        }
+      ]
+    }
+  ]
+}

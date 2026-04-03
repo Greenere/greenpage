@@ -1,0 +1,29 @@
+{
+  "title": "Platform Work",
+  "subtitle": "Placeholder role node",
+  "summary": "A node for the work of making systems more durable, understandable, and easier for teams to build on.",
+  "tags": [
+    "platform",
+    "systems"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Placeholder: this could later include teams, projects, outcomes, and the tools involved."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Reliability",
+            "Developer ergonomics",
+            "Shared systems"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,353 @@
+{
+  "settings": {
+    "deriveTemporalRelationsByDomain": true,
+    "deriveLatestBioLinksByDomain": true
+  },
+  "nodes": [
+    {
+      "id": "history-writing",
+      "kind": "writing",
+      "domain": "blog",
+      "chronology": "202103"
+    },
+    {
+      "id": "adversarial-writing",
+      "kind": "writing",
+      "domain": "blog",
+      "chronology": "202104"
+    },
+    {
+      "id": "layoff-journey",
+      "domain": "blog",
+      "kind": "writing",
+      "chronology": "20260315"
+    },
+    {
+      "id": "oxford",
+      "kind": "education",
+      "domain": "education",
+      "chronology": "201808"
+    },
+    {
+      "id": "hust",
+      "kind": "education",
+      "domain": "education",
+      "chronology": "202006"
+    },
+    {
+      "id": "cornell",
+      "kind": "education",
+      "domain": "education",
+      "chronology": "20210807"
+    },
+    {
+      "id": "naec",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202005"
+    },
+    {
+      "id": "hust-mclab",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202104"
+    },
+    {
+      "id": "realai",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202107"
+    },
+    {
+      "id": "verily-intern",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202208"
+    },
+    {
+      "id": "verily",
+      "kind": "experience",
+      "domain": "experience",
+      "chronology": "202301"
+    },
+    {
+      "id": "waymo",
+      "domain": "experience",
+      "kind": "experience",
+      "chronology": "202512"
+    },
+    {
+      "id": "wellmail",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "201812"
+    },
+    {
+      "id": "louvre-evacuation",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "201901"
+    },
+    {
+      "id": "weibe",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "201912"
+    },
+    {
+      "id": "faceswap",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "202005"
+    },
+    {
+      "id": "programming-languages",
+      "kind": "project",
+      "domain": "project",
+      "chronology": "20211215"
+    },
+    {
+      "id": "signature-attack",
+      "kind": "research",
+      "domain": "research",
+      "chronology": "201909"
+    },
+    {
+      "id": "noise-modulation",
+      "kind": "research",
+      "domain": "research",
+      "chronology": "202102"
+    },
+    {
+      "id": "northeast-2022",
+      "kind": "travel",
+      "domain": "travel",
+      "chronology": "202203"
+    },
+    {
+      "id": "california-one-2022",
+      "kind": "travel",
+      "domain": "travel",
+      "chronology": "202205"
+    },
+    {
+      "id": "california-santa-barbara-2022",
+      "domain": "travel",
+      "kind": "travel",
+      "chronology": "202210"
+    },
+    {
+      "id": "puerto-rico-2022",
+      "kind": "travel",
+      "domain": "travel",
+      "chronology": "202212"
+    }
+  ],
+  "relations": [
+    {
+      "id": "research-signature-naec",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "reason",
+      "label": "internship work became a publication",
+      "strength": 3
+    },
+    {
+      "id": "research-noise-mclab",
+      "from": "noise-modulation",
+      "to": "hust-mclab",
+      "kind": "reason",
+      "label": "took shape during the research assistant period",
+      "strength": 3
+    },
+    {
+      "id": "research-signature-writing",
+      "from": "signature-attack",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "label": "fed later writing on adversarial examples",
+      "strength": 2
+    },
+    {
+      "id": "research-noise-writing",
+      "from": "noise-modulation",
+      "to": "adversarial-writing",
+      "kind": "outcome",
+      "label": "became part of the later robustness writing trail",
+      "strength": 3
+    },
+    {
+      "id": "faceswap-signature",
+      "from": "faceswap",
+      "to": "signature-attack",
+      "kind": "topic",
+      "label": "shared computer-vision and adversarial interests",
+      "strength": 2
+    },
+    {
+      "id": "project-louvre-history",
+      "from": "louvre-evacuation",
+      "to": "history-writing",
+      "kind": "reason",
+      "label": "technical modeling touched a parallel history interest",
+      "strength": 1
+    },
+    {
+      "id": "realai-research",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "tool",
+      "label": "AI security internship echoed robustness research",
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-signature-attack-hust-1",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "started from HUST coursework and lab access",
+        "zh-CN": "started from HUST coursework and lab access"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-louvre-evacuation-hust-3",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "modeling contest during HUST years",
+        "zh-CN": "modeling contest during HUST years"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-hust-time-weibe-hust-4",
+      "from": "weibe",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "big-data systems course project",
+        "zh-CN": "big-data systems course project"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-faceswap-hust-5",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "undergraduate capstone period",
+        "zh-CN": "本科期间的项目经历"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-hust-mclab-hust-6",
+      "from": "hust-mclab",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "still rooted in the HUST period",
+        "zh-CN": "still rooted in the HUST period"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-hust-naec-7",
+      "from": "hust",
+      "to": "naec",
+      "kind": "time",
+      "labels": {
+        "en": "during my third year in college",
+        "zh-CN": "during my third year in college"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-wellmail-time-wellmail-hust-1",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "software project at HUST"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-northeast-2022-cornell-3",
+      "from": "northeast-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "travel branch of Ithaca life",
+        "en": "travel branch of Ithaca life"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-puerto-rico-2022-cornell-4",
+      "from": "puerto-rico-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "trip during the Cornell years",
+        "en": "trip during the Cornell years"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-california-one-2022-cornell-5",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "summer trip in the graduate-school stretch",
+        "en": "summer trip in the graduate-school stretch"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-verily-intern-location-california-one-2022-verily-intern-1",
+      "from": "california-one-2022",
+      "to": "verily-intern",
+      "kind": "location",
+      "labels": {
+        "en": "same California summer as the internship"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-verily-intern-outcome-verily-intern-cornell-2",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "outcome",
+      "labels": {
+        "en": "internship emerged from the Cornell period"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-verily-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "labels": {
+        "en": "laid-off by Verily"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-programming-languages-time-programming-languages-cornell-1",
+      "from": "programming-languages",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "Data Visualization work at Cornell"
+      },
+      "strength": 2
+    }
+  ]
+}

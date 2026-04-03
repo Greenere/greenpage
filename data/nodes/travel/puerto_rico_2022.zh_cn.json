@@ -1,0 +1,30 @@
+{
+  "title": "波多黎各",
+  "subtitle": "2022 年 12 月的海岛之旅",
+  "summary": "2022 年末的一次旅行，像是康奈尔章节与下一段生活之间的一个标记：海滩、海岸停靠点，以及一种与伊萨卡完全不同的空气。",
+  "tags": [
+    "旅行",
+    "海岛"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "概览",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "旧 tripline 作品把它变成了一个很鲜明的节点：老圣胡安、Punta Higuero Lighthouse、海滩、机场门槛，以及 2022 年末那次短而紧凑、却很有过渡感的旅行。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "老圣胡安",
+            "Punta Higuero Lighthouse",
+            "Playa Escondida 等海岸停靠点",
+            "2022 年 12 月 21–25 日"
+          ]
+        }
+      ]
+    }
+  ]
+}

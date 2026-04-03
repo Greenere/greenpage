@@ -1,0 +1,39 @@
+{
+  "title": "Layoff Journey",
+  "subtitle": "An article about my first layoff experience happening in Aug 25th, 2025",
+  "summary": "I was laid off in August 2025.To be honest, it didn’t come completely out of nowhere. The industry had already been going through waves of layoffs, and deep down I knew it was possible. Still, when it actually happened, it felt abrupt and strangely disorienting. ",
+  "sections": [
+    {
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "The company had apparently planned it earlier, but due to internal processes—legal reviews, coordination—it got delayed. Then one Monday, it finally happened. A Monday layoff. That alone felt off, almost symbolic of how chaotic things had become."
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "Links",
+      "blocks": [
+        {
+          "type": "link",
+          "label": "硅谷裁员潮，终究逃不掉——2025年中失业故事",
+          "href": "https://zhuanlan.zhihu.com/p/2016698679558426815"
+        }
+      ],
+      "id": "links"
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "The company had apparently planned it earlier, but due to internal processes—legal reviews, coordination—it got delayed. Then one Monday, it finally happened. A Monday layoff. That alone felt off, almost symbolic of how chaotic things had become."
+    },
+    {
+      "type": "link",
+      "label": "硅谷裁员潮，终究逃不掉——2025年中失业故事",
+      "href": "https://zhuanlan.zhihu.com/p/2016698679558426815"
+    }
+  ]
+}

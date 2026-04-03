@@ -1,0 +1,46 @@
+{
+  "eyebrow": "个人简介",
+  "name": "李皓阳",
+  "subtitle": "旧金山湾区软件工程师",
+  "summary": "这是图谱的叙事入口：一份简短的自我介绍、当前的照片风格，以及几条深入档案的路径。",
+  "themeFactLabel": "当前风格",
+  "facts": [
+    {
+      "label": "所在地",
+      "value": "旧金山湾区"
+    },
+    {
+      "label": "联系方式",
+      "value": "lihaoyangjingzhou@outlook.com",
+      "href": "mailto:lihaoyangjingzhou@outlook.com"
+    }
+  ],
+  "sections": [
+    {
+      "label": "关于",
+      "paragraphs": [
+        "我在产品界面、基础设施与交互系统之间构建软件。首页的图谱是我工作、旅行、写作与项目的地图——这些经历共同塑造了我的思维方式。",
+        "我希望这个站点更接近一次探索，而不是一份线性的简历。每个节点都是一个有自己纹理的时刻；边则试图说明两个时刻为何属于同一段对话。"
+      ]
+    },
+    {
+      "label": "读懂这张图",
+      "paragraphs": [
+        "中心节点是有意设计成个人化的——它是整个档案的锚点。从这里开始，图谱向外延伸至研究、教育、旅行、写作、工作经历与项目。",
+        "风格切换改变了站点的摄影框架，却不改变其下的结构。这对于一张围绕记忆构建的图谱来说恰到好处：事实保持原位，但记忆它们的方式可以转换。"
+      ]
+    }
+  ],
+  "pathsSectionLabel": "探索路径",
+  "linksSectionLabel": "其他地方找到我",
+  "links": [
+    {
+      "label": "LinkedIn",
+      "href": "https://www.linkedin.com/in/haoyanghowyoung/"
+    },
+    {
+      "label": "邮件",
+      "href": "mailto:lihaoyangjingzhou@outlook.com"
+    }
+  ]
+}

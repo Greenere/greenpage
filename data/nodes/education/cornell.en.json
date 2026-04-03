@@ -1,0 +1,108 @@
+{
+  "title": "Cornell University",
+  "subtitle": "ECE M.Eng in Ithaca from Jan, 2021 to Dec, 2022",
+  "summary": "It was a fun period when I enjoyed my life in a serene, quiet and remote college town. I did my best to explore the beautiful Upstate New York and I really enjoyed the fall. I took the last chance to take all courses I am interested, 6 of them are PE classes :)",
+  "tags": [
+    "Cornell",
+    "Graduate",
+    "Ithaca"
+  ],
+  "meta": {
+    "dateLabel": "Aug, 2021 -  Dec, 2022",
+    "location": "Ithaca"
+  },
+  "sections": [
+    {
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "I was supposed to attend in 2021, but we all know what happened. The world-wide tragedy forever changed our lives, and I had to spend a gap year to do all hussles but I finally got to Ithaca in August,2022."
+        },
+        {
+          "type": "text",
+          "text": "I lived my first year in the North Campus in a house of nine bedrooms, and had to walk ten kilometers in a daily basis since the Engineering school is in the south. The first few months were very vivid, we almost had some gatherings every week to celebrate the birthday of a classmate, or just to have fun."
+        },
+        {
+          "type": "text",
+          "text": "The tedious job search for a summer internship came with the extremely cold winter of Ithaca later on, and I had to spend a lot of time balance between interview preparations and courseworks. I never landed a job in my first semester."
+        },
+        {
+          "type": "text",
+          "text": "The winter break was short and harsh. One day it was as cold as -20 degrees celcius but I still went out for a nice picture of the frozen water falls."
+        },
+        {
+          "type": "image",
+          "alt": "the Frozen Ithaca Falls",
+          "src": "https://picx.zhimg.com/v2-e0773f6f1738c21c160b9b33ccf4e928_1440w.jpg?source=d16d100b",
+          "caption": "my first time ever saw a frozen waterfall"
+        },
+        {
+          "type": "text",
+          "text": "The winter lasts until the next April, but I was lucky to get an internship offer in March, two weeks before my birthday. At that time, I really had no choice, so I signed the offer and started to plan for the summer in California."
+        },
+        {
+          "type": "text",
+          "text": "I ended up getting a return offer, so I got to enjoy my last semester, when I moved to the South Campus. I took the wine tasting class, listened to multiple concerts and watched the games in ice rinks. I also got to try my first white water rafting in Watertown."
+        },
+        {
+          "type": "text",
+          "text": "Cornell really had a good policy that allows you to enroll courses you like in a relatively free way, so I took the chance with six PE classes, small boat sailing and squash for the first semester, ice skating and achery in the second semester, boxing and    paddleboarding for the last semester."
+        },
+        {
+          "type": "gallery",
+          "items": [
+            {
+              "alt": "I am standing on an ice rink",
+              "src": "https://pic3.zhimg.com/v2-832b21e9f52b438871e1d0efe01f392c_1440w.jpg",
+              "caption": "Ice skating feels very different from skiing or snowboarding"
+            },
+            {
+              "alt": "Our graduation ceremony",
+              "src": "https://picx.zhimg.com/v2-f84dd59ed7ceca7195660cf451af7b10_1440w.jpg?source=d16d100b",
+              "caption": "we graduated!"
+            }
+          ],
+          "columns": 2,
+          "align": "height"
+        },
+        {
+          "type": "text",
+          "text": "I thought we would not have a graduation ceremony in the winter. We did not have one back in the summer of 2020. But Cornell did have a large group of students graduating in December, so there was a decent graduation ceremony."
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "Zhihu Articles",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Some articles about this experience:"
+        },
+        {
+          "type": "list",
+          "items": [
+            "[康村基本情况—— Cornell ECE MENG 就读体验 - 1](https://zhuanlan.zhihu.com/p/673558343)",
+            "[选课和课程体验 —— Cornell ECE MENG 就读体验 - 2](https://zhuanlan.zhihu.com/p/673560250)",
+            "[找实习和找工作——Cornell ECE MENG 就读体验 - 3](https://zhuanlan.zhihu.com/p/673614414)"
+          ]
+        }
+      ]
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "I was supposed to attend in 2021, but we all know what happened. The world-wide tragedy forever changed our lives, and I had to spend a gap year to do all hussles but I finally got to Ithaca in August,2022."
+    },
+    {
+      "type": "text",
+      "text": "I lived my first year in the North Campus in a house of nine bedrooms, and had to walk ten kilometers in a daily basis since the Engineering school is in the south. The first few months were very vivid, we almost had some gatherings every week to celebrate the birthday of a classmate, or just to have fun."
+    },
+    {
+      "type": "text",
+      "text": "Some articles about this experience:"
+    }
+  ]
+}

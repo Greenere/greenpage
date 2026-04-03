@@ -1,0 +1,29 @@
+{
+  "title": "WEIBE",
+  "subtitle": "微博情感分析系统",
+  "summary": "一个课程项目：抓取微博热搜、存储帖子，并对这些讨论中的情绪倾向进行可视化展示。",
+  "tags": [
+    "爬虫",
+    "可视化"
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "label": "概览",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "这个项目最主要的价值在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "《大数据处理系统》课程毕业设计",
+            "Python、Flask、Gevent、MongoDB",
+            "记录了新冠疫情早期的一批热门话题"
+          ]
+        }
+      ]
+    }
+  ]
+}

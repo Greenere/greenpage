@@ -1,0 +1,54 @@
+{
+  "title": "Adversarial ML Writing Trail",
+  "subtitle": "Zhihu articles, surveys, and dense notes",
+  "summary": "A long writing trail on adversarial examples, robustness, and interpretability, spanning public explainers, research maps, and paper notes.",
+  "tags": [
+    "writing",
+    "research"
+  ],
+  "meta": {
+    "readingTime": "4 min",
+    "status": "archive",
+    "links": [
+      {
+        "label": "Old blog index",
+        "href": "https://greenere.github.io/blogs.html"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "The old site held a large body of writing on adversarial machine learning. Some pieces explained ideas for a broad audience. Others worked more like study notes, mapping papers, concepts, and debates into something I could revisit later."
+        },
+        {
+          "type": "text",
+          "text": "In retrospect, these pieces were less about publishing polished essays than about building a durable reading trail. Writing was a way to turn dense research into something that felt *navigable*."
+        }
+      ]
+    },
+    {
+      "id": "formats",
+      "label": "Formats",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "Zhihu explainers on **adversarial examples**, adversarial training, and regularization",
+            "Long-form note collections such as *A Map of Adversarial Example Research*",
+            "Single-paper and dense-paper notes on robustness, defense, and interpretation"
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "Writing function",
+          "text": "A lot of this work sat between reading and research. The pieces were public enough to share, but they were also a way to keep an internal map of a field that could otherwise sprawl too quickly."
+        }
+      ]
+    }
+  ]
+}
