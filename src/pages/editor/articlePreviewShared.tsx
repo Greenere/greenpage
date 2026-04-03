@@ -1,7 +1,7 @@
 import { UI_COPY } from '../../configs/uiCopy';
+import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
 import { resolveAssetUrl, type ArticleBlock, type ContentBlock, type NodeArticleMeta } from '../graph/content/Nodes';
-import ArticleGallery from './ArticleGallery';
 import { renderInlineMarkdown } from './inlineMarkdown';
 export const DETAIL_READING_WIDTH = '46rem';
 export const DETAIL_SECTION_WIDTH = '48rem';
@@ -215,13 +215,16 @@ export function renderContentBlock(block: ContentBlock | ArticleBlock, index: nu
   }
 
   if (block.type === 'gallery') {
-    const galleryColumns = block.columns ?? Math.min(3, Math.max(1, block.items.length));
-    const galleryAlign = block.align ?? 'height';
-
     return (
-      <div key={`gallery-${index}`} style={{ maxWidth: DETAIL_SECTION_WIDTH, marginBottom: '1.3rem' }}>
-        <ArticleGallery items={block.items} columns={galleryColumns} align={galleryAlign} keyPrefix={`gallery-${index}`} />
-      </div>
+      <ArticleGalleryBlock
+        key={`gallery-${index}`}
+        items={block.items}
+        columns={block.columns}
+        align={block.align}
+        keyPrefix={`gallery-${index}`}
+        maxWidth={DETAIL_SECTION_WIDTH}
+        renderCaption={(caption, captionKeyPrefix) => renderInlineMarkdown(caption, captionKeyPrefix)}
+      />
     );
   }
 

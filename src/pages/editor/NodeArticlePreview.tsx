@@ -1,7 +1,7 @@
 import { UI_COPY } from '../../configs/uiCopy';
+import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
 import { getDisplayDomain, resolveAssetUrl, type GraphContentNode, type NodeArticleSection } from '../graph/content/Nodes';
-import ArticleGallery from './ArticleGallery';
 import {
   DETAIL_READING_WIDTH,
   DETAIL_SECTION_WIDTH,
@@ -105,7 +105,15 @@ const NodeArticlePreview = ({ node }: NodeArticlePreviewProps) => {
       {node.gallery && node.gallery.length > 0 && (
         <section style={{ marginTop: '2.2rem', maxWidth: DETAIL_SECTION_WIDTH, marginInline: 'auto' }}>
           {renderSectionHeading(UI_COPY.nodeDetailPage.sections.gallery)}
-          <ArticleGallery items={node.gallery} columns={Math.min(3, Math.max(1, node.gallery.length))} align="height" keyPrefix="top-gallery" />
+          <ArticleGalleryBlock
+            items={node.gallery}
+            columns={Math.min(3, Math.max(1, node.gallery.length))}
+            align="height"
+            keyPrefix="top-gallery"
+            maxWidth={DETAIL_SECTION_WIDTH}
+            marginBottom="0"
+            renderCaption={(caption, captionKeyPrefix) => renderInlineMarkdown(caption, captionKeyPrefix)}
+          />
         </section>
       )}
 
