@@ -1,8 +1,7 @@
-import { useState, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 import { UI_COPY } from '../../configs/uiCopy';
 import { normalizeNodeContent, type GraphNodeContent } from '../graph/content/Nodes';
-import { prettyJson } from './nodeEditorState';
 
 // ── styles ──
 
@@ -61,46 +60,37 @@ function lenientParse(text: string): unknown {
 // ── component ──
 
 type JsonEditorPanelProps = {
-  content: GraphNodeContent;
+  text: string;
   nodeId: string;
+  jsonError: string | null;
   validationError: string | null;
   actionPending: boolean;
-  onApplyContent: (content: GraphNodeContent) => void;
+  onChangeText: (value: string, parsedContent: GraphNodeContent | null, error: string | null) => void;
   onWriteToFile: () => void;
   onSaveDraft: () => void;
 };
 
-/**
- * Self-contained JSON editor panel. Owns local text state initialized from `content`
- * at mount time. Because this component is conditionally rendered (`tab === 'json'`),
- * it unmounts when the user switches tabs — so re-mounting always starts from the
- * latest canonical content. No sync effects needed.
- */
 export default function JsonEditorPanel({
-  content,
+  text,
   nodeId,
+  jsonError,
   validationError,
   actionPending,
-  onApplyContent,
+  onChangeText,
   onWriteToFile,
   onSaveDraft,
 }: JsonEditorPanelProps) {
-  const [text, setText] = useState(() => prettyJson(content));
-  const [parseError, setParseError] = useState<string | null>(null);
-
   const handleChange = (value: string) => {
-    setText(value);
     try {
       const parsed = lenientParse(value);
       const normalized = normalizeNodeContent(parsed, nodeId);
-      setParseError(null);
-      onApplyContent(normalized);
+      onChangeText(value, normalized, null);
     } catch (error) {
-      setParseError(error instanceof Error ? error.message : 'Invalid JSON.');
+      onChangeText(value, null, error instanceof Error ? error.message : 'Invalid JSON.');
     }
   };
 
-  const displayError = parseError ?? validationError;
+  const displayError = jsonError ?? validationError;
   const canWrite = !displayError && !actionPending;
 
   return (

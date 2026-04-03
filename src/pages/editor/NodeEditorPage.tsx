@@ -1126,6 +1126,8 @@ const NodeEditorPage: React.FC = () => {
     currentNodeRef,
     originalContent,
     draftContent,
+    jsonDraft,
+    jsonError,
     tagInput,
     explicitRelations,
     validation,
@@ -1414,6 +1416,20 @@ const NodeEditorPage: React.FC = () => {
       type: 'apply_draft_content',
       content: nextContent,
       nodeId: decodedNodeId || 'preview-node',
+    });
+  };
+
+  const handleJsonDraftChange = (
+    nextText: string,
+    parsedContent: GraphNodeContent | null,
+    error: string | null,
+  ) => {
+    dispatch({
+      type: 'edit_json_draft',
+      value: nextText,
+      nodeId: decodedNodeId || 'preview-node',
+      parsedContent: parsedContent ?? undefined,
+      error,
     });
   };
 
@@ -2472,12 +2488,12 @@ const NodeEditorPage: React.FC = () => {
                   <div style={{ opacity: 0.65, fontSize: '0.88rem' }}>{UI_COPY.nodeEditor.jsonTab.emptyState}</div>
                 ) : (
                   <JsonEditorPanel
-                    key={`${decodedNodeId}:${language}`}
-                    content={draftContent}
+                    text={jsonDraft}
                     nodeId={decodedNodeId}
+                    jsonError={jsonError}
                     validationError={validation.error}
                     actionPending={actionPending}
-                    onApplyContent={updateDraftContent}
+                    onChangeText={handleJsonDraftChange}
                     onWriteToFile={() =>
                       openDangerDialog({
                         actionDescription: UI_COPY.nodeEditor.confirmations.writeJsonChanges,

@@ -29,6 +29,8 @@ export type NodeEditorWorkspaceState = {
   currentNodeRef: GraphNodeRef | null;
   originalContent: GraphNodeContent | null;
   draftContent: GraphNodeContent | null;
+  jsonDraft: string;
+  jsonError: string | null;
   tagInput: string;
   explicitRelations: EditorExplicitRelation[];
   validation: ValidationState;
@@ -114,6 +116,8 @@ export function createInitialNodeEditorWorkspaceState({
     currentNodeRef: null,
     originalContent: null,
     draftContent: null,
+    jsonDraft: '',
+    jsonError: null,
     tagInput: '',
     explicitRelations: [],
     validation: { error: null },
@@ -164,6 +168,13 @@ type NodeEditorWorkspaceAction =
   | NodeLoadSuccessAction
   | { type: 'set_tag_input'; value: string }
   | { type: 'apply_draft_content'; content: GraphNodeContent; nodeId: string }
+  | {
+      type: 'edit_json_draft';
+      value: string;
+      nodeId: string;
+      parsedContent?: GraphNodeContent;
+      error: string | null;
+    }
   | { type: 'reset_draft_to_original'; nodeId: string }
   | {
       type: 'commit_saved_node';
@@ -300,6 +311,8 @@ export function nodeEditorWorkspaceReducer(
         currentNodeRef: action.node,
         originalContent: action.originalContent,
         draftContent: action.draftContent,
+        jsonDraft: prettyJson(action.draftContent),
+        jsonError: null,
         tagInput: serializeTags(action.draftContent.tags),
         explicitRelations: action.explicitRelations,
         selectedExplicitRelationIndex: action.nodeChanged
@@ -322,13 +335,28 @@ export function nodeEditorWorkspaceReducer(
       return {
         ...state,
         draftContent: action.content,
+        jsonDraft: prettyJson(action.content),
+        jsonError: null,
         validation: validateContent(action.content, action.nodeId),
+      };
+    case 'edit_json_draft':
+      return {
+        ...state,
+        jsonDraft: action.value,
+        jsonError: action.error,
+        draftContent: action.parsedContent ?? state.draftContent,
+        validation:
+          action.parsedContent && !action.error
+            ? validateContent(action.parsedContent, action.nodeId)
+            : state.validation,
       };
     case 'reset_draft_to_original':
       return state.originalContent
         ? {
             ...state,
             draftContent: state.originalContent,
+            jsonDraft: prettyJson(state.originalContent),
+            jsonError: null,
             tagInput: serializeTags(state.originalContent.tags),
             validation: validateContent(state.originalContent, action.nodeId),
             editingSectionIndex: clampEditingSectionIndex(state.editingSectionIndex, state.originalContent),
@@ -339,6 +367,9 @@ export function nodeEditorWorkspaceReducer(
         ...state,
         currentNodeRef: action.node,
         originalContent: action.content,
+        draftContent: action.content,
+        jsonDraft: prettyJson(action.content),
+        jsonError: null,
         isFallbackContent: false,
         resolvedContentLanguage: action.resolvedContentLanguage,
       };
