@@ -234,17 +234,6 @@
       "strength": 2
     },
     {
-      "id": "editor-hust-time-wellmail-hust-2",
-      "from": "wellmail",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "software project at HUST",
-        "zh-CN": "software project at HUST"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-hust-time-louvre-evacuation-hust-3",
       "from": "louvre-evacuation",
       "to": "hust",
@@ -300,12 +289,23 @@
       "strength": 2
     },
     {
+      "id": "editor-wellmail-time-wellmail-hust-1",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "software project at HUST"
+      },
+      "strength": 2
+    },
+    {
       "id": "editor-cornell-time-online-kitchen-cornell-1",
       "from": "online-kitchen",
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "zh-CN": "Data Visualization work at Cornell"
+        "zh-CN": "Data Visualization work at Cornell",
+        "en": "Data Visualization work at Cornell"
       },
       "strength": 2
     },
@@ -315,7 +315,8 @@
       "to": "cornell",
       "kind": "outcome",
       "labels": {
-        "zh-CN": "internship emerged from the Cornell period"
+        "zh-CN": "internship emerged from the Cornell period",
+        "en": "internship emerged from the Cornell period"
       },
       "strength": 2
     },
@@ -325,7 +326,8 @@
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "zh-CN": "travel branch of Ithaca life"
+        "zh-CN": "travel branch of Ithaca life",
+        "en": "travel branch of Ithaca life"
       },
       "strength": 2
     },
@@ -335,7 +337,8 @@
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "zh-CN": "trip during the Cornell years"
+        "zh-CN": "trip during the Cornell years",
+        "en": "trip during the Cornell years"
       },
       "strength": 2
     },
@@ -345,7 +348,8 @@
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "zh-CN": "summer trip in the graduate-school stretch"
+        "zh-CN": "summer trip in the graduate-school stretch",
+        "en": "summer trip in the graduate-school stretch"
       },
       "strength": 1
     },
@@ -355,7 +359,8 @@
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "zh-CN": "Data Visualization work at Cornell"
+        "zh-CN": "Data Visualization work at Cornell",
+        "en": "Data Visualization work at Cornell"
       },
       "strength": 2
     }

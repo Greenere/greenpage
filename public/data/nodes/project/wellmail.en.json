@@ -1,28 +1,39 @@
 {
   "title": "WELLMAIL",
-  "subtitle": "Python e-mail client",
-  "summary": "A first serious software project: a Python e-mail client with a GUI, built as a team course project and remembered as an early step into real software construction.",
+  "subtitle": "An e-mail client with GUI written in Python",
+  "summary": "My first serious software project. It was a course project finished with a group of three. We built a Python e-mail client with a GUI, and spent a lot of time figuring out how to make SMTP and QT work.",
   "tags": [
     "Python",
-    "GUI"
+    "GUI",
+    "Email"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
           "type": "text",
-          "text": "The main lesson was not only the client itself. It was learning how to divide a graphical software system into modules and build something with a real interface flow."
+          "text": "It's a tiny project, almost useless in that sense, but I really enjoyed it. We spent most of the time trying to get the UI work, which seems dumb to try to use QT to write a UI in Python rather than just pull up a localhost and write a web frontend."
         },
         {
-          "type": "list",
-          "items": [
-            "Receive Box and Main Module ownership",
-            "Course project for Software Project",
-            "One of the strongest projects in the class cohort"
-          ]
+          "type": "text",
+          "text": "Check it out here: [WELLMAIL](https://github.com/Greenere/wellmail)"
         }
+      ],
+      "id": "overview"
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "The main lesson was not only the client itself. It was learning how to divide a graphical software system into modules and build something with a real interface flow."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Receive Box and Main Module ownership",
+        "Course project for Software Project",
+        "One of the strongest projects in the class cohort"
       ]
     }
   ]

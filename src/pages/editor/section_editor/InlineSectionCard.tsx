@@ -119,6 +119,15 @@ export default function InlineSectionCard({
 }: InlineSectionCardProps) {
   return (
     <section
+      onBlur={
+        isEditing
+          ? (event) => {
+              const nextFocused = event.relatedTarget;
+              if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) return;
+              onStopEditing();
+            }
+          : undefined
+      }
       style={{
         marginTop: sectionIndex === 0 ? '2.2rem' : '1.8rem',
         maxWidth: DETAIL_SECTION_WIDTH,
@@ -194,14 +203,7 @@ export default function InlineSectionCard({
       </div>
 
       {isEditing ? (
-        <div
-          tabIndex={-1}
-          onBlur={(event) => {
-            const nextFocused = event.relatedTarget;
-            if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) return;
-            onStopEditing();
-          }}
-        >
+        <div>
           <SectionEditor section={section} onChange={onChange} />
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.65rem' }}>
             <button

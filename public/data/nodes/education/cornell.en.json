@@ -1,28 +1,60 @@
 {
-  "title": "Cornell M.Eng. in ECE",
-  "subtitle": "Graduate study in Ithaca",
-  "summary": "The Cornell period connected data visualization, machine learning, systems, and the path from internship to full-time work at Verily.",
+  "title": "Cornell University",
+  "subtitle": "ECE M.Eng in Ithaca from Jan, 2021 to Dec, 2022",
+  "summary": "It was a fun period when I enjoyed my life in a serene, quiet and remote college town. I did my best to explore the beautiful Upstate New York and I really enjoyed the fall. I took the last chance to take all courses I am interested, 6 of them are PE classes :)",
   "tags": [
     "Cornell",
-    "graduate"
+    "Graduate",
+    "Ithaca"
   ],
+  "meta": {
+    "dateLabel": "Aug, 2021 -  Dec, 2022",
+    "location": "Ithaca"
+  },
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
           "type": "text",
-          "text": "Coursework and projects stretched across visualization, vision, and systems. Life in Ithaca also opened into travel and, later, work in California."
+          "text": "I was supposed to attend in 2021, but we all know what happened. The world-wide tragedy forever changed our lives, and I had to spend a gap year to do all hussles but I finally got to Ithaca in August,2022."
+        },
+        {
+          "type": "text",
+          "text": "I lived my first year in the North Campus in a house of nine bedrooms, and had to walk ten kilometers in a daily basis since the Engineering school is in the south. The first few months were very vivid, we almost had some gatherings every week to celebrate the birthday of a classmate, or just to have fun."
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "Zhihu Articles",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Some articles about this experience:"
         },
         {
           "type": "list",
           "items": [
-            "INFO 5100 data visualization projects",
-            "CS 6670 and ECE project work",
-            "Bridge into the Verily internship"
+            "[康村基本情况—— Cornell ECE MENG 就读体验 - 1](https://zhuanlan.zhihu.com/p/673558343)",
+            "[选课和课程体验 —— Cornell ECE MENG 就读体验 - 2](https://zhuanlan.zhihu.com/p/673560250)",
+            "[找实习和找工作——Cornell ECE MENG 就读体验 - 3](https://zhuanlan.zhihu.com/p/673614414)"
           ]
         }
+      ]
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "Coursework and projects stretched across visualization, vision, and systems. Life in Ithaca also opened into travel and, later, work in California."
+    },
+    {
+      "type": "list",
+      "items": [
+        "INFO 5100 data visualization projects",
+        "CS 6670 and ECE project work",
+        "Bridge into the Verily internship"
       ]
     }
   ]

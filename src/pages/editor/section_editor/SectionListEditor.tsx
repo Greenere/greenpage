@@ -26,7 +26,7 @@ export default function SectionListEditor({
     <>
       {sections.map((section, sectionIndex) => (
         <InlineSectionCard
-          key={`${section.id ?? section.label}-${sectionIndex}`}
+          key={section.id ?? `section-${sectionIndex}`}
           section={section}
           sectionIndex={sectionIndex}
           isEditing={editingSectionIndex === sectionIndex}
