@@ -7,6 +7,7 @@ import {
     useNodesState,
     useEdgesState,
     useReactFlow,
+    useNodesInitialized,
     type ReactFlowInstance,
     type NodeMouseHandler,
     ReactFlowProvider,
@@ -20,6 +21,7 @@ import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { getChronologySortKey } from '../../shared/chronology';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graphFocus';
+import { GRAPH_LAYOUT } from '../../configs/graphLayout';
 import {
     GRAPH_BIO_PORTRAIT_BORDER_OPACITY,
     GRAPH_BIO_PORTRAIT_BORDER_WIDTH,
@@ -65,17 +67,18 @@ type StoryNodeData = {
     badges?: string[];
 };
 
-const CONTENT_NODE_WIDTH = 196;
-const CONTENT_NODE_HEIGHT = 190;
-const BIO_NODE_WIDTH = 228;
-const BIO_NODE_HEIGHT = 248;
-const CONTENT_COLLISION_PADDING = 18;
-const BIO_COLLISION_PADDING = 24;
-const TOGGLE_COLLISION_PADDING = 10;
-const TOGGLE_NODE_WIDTH = 170;
-const TOGGLE_NODE_HEIGHT = 48;
-const HANDLE_MARGIN = 0.14;
-const PREFERRED_HANDLE_GAP = 0.11;
+const CONTENT_NODE_WIDTH = GRAPH_LAYOUT.contentNodeWidth;
+const CONTENT_NODE_HEIGHT = GRAPH_LAYOUT.contentNodeHeight;
+const BIO_NODE_WIDTH = GRAPH_LAYOUT.bioNodeWidth;
+const BIO_NODE_HEIGHT = GRAPH_LAYOUT.bioNodeHeight;
+const CONTENT_COLLISION_PADDING = GRAPH_LAYOUT.contentCollisionPadding;
+const BIO_COLLISION_PADDING = GRAPH_LAYOUT.bioCollisionPadding;
+const BIO_CLEARANCE_PADDING = GRAPH_LAYOUT.bioClearancePadding;
+const TOGGLE_COLLISION_PADDING = GRAPH_LAYOUT.toggleCollisionPadding;
+const TOGGLE_NODE_WIDTH = GRAPH_LAYOUT.toggleNodeWidth;
+const TOGGLE_NODE_HEIGHT = GRAPH_LAYOUT.toggleNodeHeight;
+const HANDLE_MARGIN = GRAPH_LAYOUT.handleMargin;
+const PREFERRED_HANDLE_GAP = GRAPH_LAYOUT.preferredHandleGap;
 const HANDLE_SMOOTHING = 0.35;
 const FLOATING_NODE_Z_INDEX = 10000;
 const FLOATING_EDGE_Z_INDEX = 10001;
@@ -90,11 +93,11 @@ const GRAPH_MIN_ZOOM = 0.5;
 const GRAPH_MAX_ZOOM = 2;
 const DRAG_EDGE_SYNC_INTERVAL_MS = 34;
 const DRAG_EDGE_SYNC_DISTANCE = 16;
-const DOMAIN_LAYOUT_INNER_RADIUS_MIN = 228;
-const DOMAIN_LAYOUT_INNER_RADIUS_MAX = 292;
-const DOMAIN_LAYOUT_RADIAL_GAP_MIN = 98;
-const DOMAIN_LAYOUT_RADIAL_GAP_MAX = 134;
-const DOMAIN_LAYOUT_MAX_ANGLE_OFFSET = 0.42;
+const DOMAIN_LAYOUT_INNER_RADIUS_MIN = GRAPH_LAYOUT.ring.innerRadiusMin;
+const DOMAIN_LAYOUT_INNER_RADIUS_MAX = GRAPH_LAYOUT.ring.innerRadiusMax;
+const DOMAIN_LAYOUT_RADIAL_GAP_MIN = GRAPH_LAYOUT.ring.radialGapMin;
+const DOMAIN_LAYOUT_RADIAL_GAP_MAX = GRAPH_LAYOUT.ring.radialGapMax;
+const DOMAIN_LAYOUT_MAX_ANGLE_OFFSET = GRAPH_LAYOUT.maxAngleOffset;
 
 type ProjectedHandle = DynamicHandle & {
     nodeId: string;
@@ -1127,6 +1130,114 @@ function relaxInitialNodes(nodes: Node[]) {
     });
 }
 
+function enforceAnchorClearance(
+    pos: Map<string, BoxState>,
+    anchorId: string,
+    extraPadding: number,
+    {
+        maxIters = 8,
+        damping = 0.88,
+        maxStep = 52,
+    }: {
+        maxIters?: number;
+        damping?: number;
+        maxStep?: number;
+    } = {}
+) {
+    const anchor = pos.get(anchorId);
+    if (!anchor) {
+        return;
+    }
+
+    for (let iter = 0; iter < maxIters; iter++) {
+        let movedAny = false;
+
+        for (const [nodeId, node] of pos) {
+            if (nodeId === anchorId) continue;
+
+            const [dx, dy] = mtvSeparateAABB(
+                anchor.x - (anchor.pad + extraPadding),
+                anchor.y - (anchor.pad + extraPadding),
+                anchor.w + (anchor.pad + extraPadding) * 2,
+                anchor.h + (anchor.pad + extraPadding) * 2,
+                node.x - node.pad,
+                node.y - node.pad,
+                node.w + node.pad * 2,
+                node.h + node.pad * 2
+            );
+
+            if (dx === 0 && dy === 0) continue;
+
+            const nextX = node.x + Math.max(-maxStep, Math.min(maxStep, dx * damping));
+            const nextY = node.y + Math.max(-maxStep, Math.min(maxStep, dy * damping));
+
+            if (nextX !== node.x || nextY !== node.y) {
+                node.x = nextX;
+                node.y = nextY;
+                movedAny = true;
+            }
+        }
+
+        if (!movedAny) break;
+    }
+}
+
+function settleNodesAroundAnchor(
+    nodes: Node[],
+    anchorId: string,
+    {
+        maxIters = 16,
+        damping = 0.72,
+        maxStep = 42,
+    }: {
+        maxIters?: number;
+        damping?: number;
+        maxStep?: number;
+    } = {}
+) {
+    const pos = new Map<string, BoxState>();
+
+    for (const node of nodes) {
+        if (!participatesInCollision(node.id)) continue;
+        const { w, h } = getNodeDimensions(node);
+        pos.set(node.id, {
+            x: node.position.x,
+            y: node.position.y,
+            w,
+            h,
+            pad: getCollisionPadding(node.id),
+        });
+    }
+
+    if (!pos.has(anchorId)) {
+        return nodes;
+    }
+
+    relaxBoxPositions(pos, {
+        immovableIds: new Set([anchorId]),
+        maxIters,
+        damping,
+        maxStep,
+    });
+    enforceAnchorClearance(pos, anchorId, BIO_CLEARANCE_PADDING);
+
+    return nodes.map((node) => {
+        if (!participatesInCollision(node.id)) {
+            return node;
+        }
+
+        const point = pos.get(node.id);
+        if (!point) {
+            return node;
+        }
+
+        return {
+            ...node,
+            position: { x: point.x, y: point.y },
+        };
+    });
+}
+
 function buildInitialGraph(
     model: GraphModel,
     graphRelations: GraphModel['relations'],
@@ -1144,8 +1255,8 @@ function buildInitialGraph(
         y: bioPosition.y + BIO_NODE_HEIGHT / 2,
     };
     const togglePosition = {
-        x: bioPosition.x + BIO_NODE_WIDTH - TOGGLE_NODE_WIDTH * 0.68,
-        y: bioPosition.y - TOGGLE_NODE_HEIGHT - 26,
+        x: bioPosition.x + GRAPH_LAYOUT.styleNodeOffsetFromBio.x,
+        y: bioPosition.y + GRAPH_LAYOUT.styleNodeOffsetFromBio.y,
     };
     const contentNodes = getContentNodes(model);
     const targetCenters = buildLaneTargetPositions(
@@ -1211,6 +1322,8 @@ const NodeCanvas: React.FC = () => {
     const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
     const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
     const hasHydratedStoredViewRef = useRef(false);
+    const restoredStoredViewRef = useRef(false);
+    const hasAppliedMeasuredInitialLayoutRef = useRef(false);
     const flowReadyRef = useRef(false);
     const pendingGraphRestoreRef = useRef<PendingGraphRestore | null>(null);
     const viewport = useMemo(
@@ -1233,6 +1346,11 @@ const NodeCanvas: React.FC = () => {
     const initialGraph = useMemo(
         () => graphModel ? buildInitialGraph(graphModel, graphRelations, initialThemeRef.current, setTheme, viewport.width, viewport.height) : { nodes: [], edges: [] },
         [graphModel, graphRelations, viewport.height, viewport.width]
+    );
+    const nodesInitialized = useNodesInitialized();
+    const graphNodeSetSignature = useMemo(
+        () => initialGraph.nodes.map((node) => node.id).sort().join('|'),
+        [initialGraph.nodes]
     );
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
@@ -1275,10 +1393,19 @@ const NodeCanvas: React.FC = () => {
         lastDragEdgeSyncAtRef.current = 0;
         lastDragEdgeSyncPositionRef.current = null;
 
+        const measuredNodesById = new Map(nodesRef.current.map((node) => [node.id, node]));
         const resetNodes = initialGraph.nodes.map((node) => {
+            const measuredNode = measuredNodesById.get(node.id);
+            const dimensionPatch = {
+                measured: measuredNode?.measured,
+                width: measuredNode?.width ?? node.width,
+                height: measuredNode?.height ?? node.height,
+            };
+
             if (node.id === 'bio') {
                 return {
                     ...node,
+                    ...dimensionPatch,
                     data: {
                         ...node.data,
                         theme,
@@ -1291,6 +1418,7 @@ const NodeCanvas: React.FC = () => {
             if (node.id === 'biotoggle') {
                 return {
                     ...node,
+                    ...dimensionPatch,
                     data: {
                         ...node.data,
                         theme,
@@ -1302,11 +1430,13 @@ const NodeCanvas: React.FC = () => {
 
             return {
                 ...node,
+                ...dimensionPatch,
                 className: GRAPH_NODE_CLASS_NAME,
             };
         });
 
-        const resetGraph = buildEdgesForNodes(resetNodes, orderedGraphRelations, null);
+        const settledResetNodes = settleNodesAroundAnchor(resetNodes, 'bio');
+        const resetGraph = buildEdgesForNodes(settledResetNodes, orderedGraphRelations, null);
         setNodes(resetGraph.nodes);
         setEdges(resetGraph.edges);
         edgesRef.current = resetGraph.edges;
@@ -1401,6 +1531,7 @@ const NodeCanvas: React.FC = () => {
         } else {
             // First hydration — restore from persisted view if available.
             const storedView = readStoredGraphView();
+            restoredStoredViewRef.current = Boolean(storedView?.nodes.length);
             storedViewport = storedView?.viewport;
             const storedPositions = new Map(storedView?.nodes.map((node) => [node.id, node]) ?? []);
             restoredNodes = initialGraph.nodes.map((node) => {
@@ -1426,6 +1557,45 @@ const NodeCanvas: React.FC = () => {
         };
         applyPendingGraphRestore();
     }, [applyPendingGraphRestore, graphModel, initialGraph, orderedGraphRelations, setEdges, setNodes]);
+
+    useEffect(() => {
+        restoredStoredViewRef.current = false;
+        hasAppliedMeasuredInitialLayoutRef.current = false;
+    }, [graphNodeSetSignature]);
+
+    useEffect(() => {
+        if (!graphModel || !nodesInitialized) return;
+        if (!hasHydratedStoredViewRef.current) return;
+        if (restoredStoredViewRef.current) return;
+        if (hasAppliedMeasuredInitialLayoutRef.current) return;
+        if (nodes.length === 0) return;
+
+        const relaxedNodes = settleNodesAroundAnchor(nodes, 'bio');
+        const hasMovedNode = relaxedNodes.some((node, index) => {
+            const previous = nodes[index];
+            return (
+                previous &&
+                (previous.position.x !== node.position.x || previous.position.y !== node.position.y)
+            );
+        });
+
+        hasAppliedMeasuredInitialLayoutRef.current = true;
+
+        if (!hasMovedNode) {
+            return;
+        }
+
+        const relaxedGraph = buildEdgesForNodes(
+            relaxedNodes,
+            orderedGraphRelations,
+            highlightedNodeIdRef.current,
+            edgesRef.current
+        );
+        setNodes(relaxedGraph.nodes);
+        setEdges(relaxedGraph.edges);
+        edgesRef.current = relaxedGraph.edges;
+        persistCurrentGraphView(relaxedGraph.nodes);
+    }, [graphModel, nodes, nodesInitialized, orderedGraphRelations, persistCurrentGraphView, setEdges, setNodes]);
 
     useEffect(() => {
         nodesRef.current = nodes;

@@ -1,7 +1,7 @@
 export const EN_MESSAGES = {
   siteMeta: {
     title: 'Entangled Life',
-    iconHref: '/assets/icons/user.svg',
+    iconHref: '/assets/icons/smile.svg',
     iconType: 'image/svg+xml',
   },
   appShell: {
