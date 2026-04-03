@@ -31,8 +31,6 @@ export type NodeEditorWorkspaceState = {
   draftContent: GraphNodeContent | null;
   tagInput: string;
   explicitRelations: EditorExplicitRelation[];
-  jsonDraft: string;
-  jsonError: string | null;
   validation: ValidationState;
   statusMessage: string | null;
   loadingNode: boolean;
@@ -118,8 +116,6 @@ export function createInitialNodeEditorWorkspaceState({
     draftContent: null,
     tagInput: '',
     explicitRelations: [],
-    jsonDraft: '',
-    jsonError: null,
     validation: { error: null },
     statusMessage: null,
     loadingNode: false,
@@ -167,8 +163,7 @@ type NodeEditorWorkspaceAction =
   | { type: 'reset_for_empty_node'; language: AppLanguage }
   | NodeLoadSuccessAction
   | { type: 'set_tag_input'; value: string }
-  | { type: 'apply_form_content'; content: GraphNodeContent; nodeId: string }
-  | { type: 'apply_json_content'; content: GraphNodeContent; nodeId: string }
+  | { type: 'apply_draft_content'; content: GraphNodeContent; nodeId: string }
   | { type: 'reset_draft_to_original'; nodeId: string }
   | {
       type: 'commit_saved_node';
@@ -176,8 +171,6 @@ type NodeEditorWorkspaceAction =
       content: GraphNodeContent;
       resolvedContentLanguage: AppLanguage;
     }
-  | { type: 'set_json_draft'; value: string }
-  | { type: 'set_json_error'; error: string | null }
   | { type: 'replace_explicit_relations'; relations: EditorExplicitRelation[] }
   | { type: 'append_explicit_relation'; relation: EditorExplicitRelation; select?: boolean }
   | { type: 'remove_explicit_relation'; index: number }
@@ -312,8 +305,6 @@ export function nodeEditorWorkspaceReducer(
         selectedExplicitRelationIndex: action.nodeChanged
           ? null
           : clampSelectedExplicitRelationIndex(state.selectedExplicitRelationIndex, action.explicitRelations),
-        jsonDraft: prettyJson(action.draftContent),
-        jsonError: null,
         validation: validateContent(action.draftContent, action.nodeId),
         isFallbackContent: action.isFallbackContent,
         resolvedContentLanguage: action.resolvedContentLanguage,
@@ -327,20 +318,11 @@ export function nodeEditorWorkspaceReducer(
       };
     case 'set_tag_input':
       return { ...state, tagInput: action.value };
-    case 'apply_form_content':
-      return {
-        ...state,
-        draftContent: action.content,
-        jsonDraft: prettyJson(action.content),
-        validation: validateContent(action.content, action.nodeId),
-        jsonError: null,
-      };
-    case 'apply_json_content':
+    case 'apply_draft_content':
       return {
         ...state,
         draftContent: action.content,
         validation: validateContent(action.content, action.nodeId),
-        jsonError: null,
       };
     case 'reset_draft_to_original':
       return state.originalContent
@@ -348,9 +330,7 @@ export function nodeEditorWorkspaceReducer(
             ...state,
             draftContent: state.originalContent,
             tagInput: serializeTags(state.originalContent.tags),
-            jsonDraft: prettyJson(state.originalContent),
             validation: validateContent(state.originalContent, action.nodeId),
-            jsonError: null,
             editingSectionIndex: clampEditingSectionIndex(state.editingSectionIndex, state.originalContent),
           }
         : state;
@@ -362,10 +342,6 @@ export function nodeEditorWorkspaceReducer(
         isFallbackContent: false,
         resolvedContentLanguage: action.resolvedContentLanguage,
       };
-    case 'set_json_draft':
-      return { ...state, jsonDraft: action.value };
-    case 'set_json_error':
-      return { ...state, jsonError: action.error };
     case 'replace_explicit_relations':
       return {
         ...state,

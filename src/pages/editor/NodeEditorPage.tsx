@@ -31,6 +31,7 @@ import {
   type GraphNodeContent,
   type GraphNodeRef,
 } from '../graph/content/Nodes';
+import JsonEditorPanel from './JsonEditorPanel';
 import NodeArticlePreview from './NodeArticlePreview';
 import {
   DETAIL_READING_WIDTH,
@@ -1064,6 +1065,35 @@ function inputStyle(multiline = false) {
   };
 }
 
+const btnPrimary: CSSProperties = {
+  padding: '0.48rem 0.9rem',
+  borderRadius: '10px',
+  fontSize: '0.83rem',
+  fontWeight: 600,
+  fontFamily: 'inherit',
+  cursor: 'pointer',
+  border: '1px solid transparent',
+  background: 'var(--color-text)',
+  color: 'var(--color-background)',
+};
+const btnSecondary: CSSProperties = {
+  padding: '0.48rem 0.9rem',
+  borderRadius: '10px',
+  fontSize: '0.83rem',
+  fontWeight: 500,
+  fontFamily: 'inherit',
+  cursor: 'pointer',
+  border: '1px solid color-mix(in srgb, var(--color-secondary) 34%, transparent)',
+  background: 'transparent',
+  color: 'var(--color-text)',
+};
+const btnDanger: CSSProperties = {
+  ...btnSecondary,
+  border: '1px solid color-mix(in srgb, crimson 28%, transparent)',
+  color: 'color-mix(in srgb, crimson 70%, var(--color-text))',
+};
+const btnDisabled: CSSProperties = { opacity: 0.38, cursor: 'not-allowed' };
+
 const NodeEditorPage: React.FC = () => {
   const { language, messages } = useAppLanguage();
   const nodeTemplateOptions = getNodeTemplateOptions();
@@ -1098,8 +1128,6 @@ const NodeEditorPage: React.FC = () => {
     draftContent,
     tagInput,
     explicitRelations,
-    jsonDraft,
-    jsonError,
     validation,
     statusMessage,
     loadingNode,
@@ -1383,7 +1411,7 @@ const NodeEditorPage: React.FC = () => {
 
   const updateDraftContent = (nextContent: GraphNodeContent) => {
     dispatch({
-      type: 'apply_form_content',
+      type: 'apply_draft_content',
       content: nextContent,
       nodeId: decodedNodeId || 'preview-node',
     });
@@ -1422,24 +1450,6 @@ const NodeEditorPage: React.FC = () => {
         index === selectedExplicitRelationIndex ? nextRelation : entry
       ),
     });
-  };
-
-  const handleJsonDraftChange = (value: string) => {
-    dispatch({ type: 'set_json_draft', value });
-    try {
-      const parsed = JSON.parse(value);
-      const normalized = normalizeNodeContent(parsed, decodedNodeId || 'preview-node');
-      dispatch({
-        type: 'apply_json_content',
-        content: normalized,
-        nodeId: decodedNodeId || 'preview-node',
-      });
-    } catch (error) {
-      dispatch({
-        type: 'set_json_error',
-        error: error instanceof Error ? error.message : 'Invalid JSON.',
-      });
-    }
   };
 
   const handleOpenNode = (nextNodeId: string) => {
@@ -1723,34 +1733,6 @@ const NodeEditorPage: React.FC = () => {
   };
 
   // Shared button style variants
-  const btnPrimary: CSSProperties = {
-    padding: '0.48rem 0.9rem',
-    borderRadius: '10px',
-    fontSize: '0.83rem',
-    fontWeight: 600,
-    fontFamily: 'inherit',
-    cursor: 'pointer',
-    border: '1px solid transparent',
-    background: 'var(--color-text)',
-    color: 'var(--color-background)',
-  };
-  const btnSecondary: CSSProperties = {
-    padding: '0.48rem 0.9rem',
-    borderRadius: '10px',
-    fontSize: '0.83rem',
-    fontWeight: 500,
-    fontFamily: 'inherit',
-    cursor: 'pointer',
-    border: '1px solid color-mix(in srgb, var(--color-secondary) 34%, transparent)',
-    background: 'transparent',
-    color: 'var(--color-text)',
-  };
-  const btnDanger: CSSProperties = {
-    ...btnSecondary,
-    border: '1px solid color-mix(in srgb, crimson 28%, transparent)',
-    color: 'color-mix(in srgb, crimson 70%, var(--color-text))',
-  };
-  const btnDisabled: CSSProperties = { opacity: 0.38, cursor: 'not-allowed' };
   const editorPageStyle = {
     minHeight: '100vh',
     color: 'var(--color-text)',
@@ -2486,61 +2468,28 @@ const NodeEditorPage: React.FC = () => {
             {/* ── JSON tab ── */}
             {tab === 'json' && (
               <div style={{ marginTop: '0.85rem' }}>
-                {!decodedNodeId ? (
+                {!decodedNodeId || !draftContent ? (
                   <div style={{ opacity: 0.65, fontSize: '0.88rem' }}>{UI_COPY.nodeEditor.jsonTab.emptyState}</div>
                 ) : (
-                  <>
-                    <textarea
-                      value={jsonDraft}
-                      onChange={(event) => handleJsonDraftChange(event.target.value)}
-                      rows={30}
-                      style={{
-                        ...inputStyle(true),
-                        fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace',
-                        fontSize: '0.8rem',
-                        lineHeight: 1.6,
-                      }}
-                    />
-                    {jsonError && (
-                      <div style={{ marginTop: '0.55rem', color: 'crimson', fontSize: '0.82rem' }}>{jsonError}</div>
-                    )}
-                    {validation.error && !jsonError && (
-                      <div style={{ marginTop: '0.55rem', color: 'crimson', fontSize: '0.82rem' }}>
-                        {validation.error}
-                      </div>
-                    )}
-                    <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openDangerDialog({
-                            actionDescription: UI_COPY.nodeEditor.confirmations.writeJsonChanges,
-                            proceedLabel: UI_COPY.nodeEditor.common.proceed,
-                            tone: 'primary',
-                            showResult: true,
-                            pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
-                            onProceed: handleWriteToFile,
-                          })
-                        }
-                        disabled={Boolean(jsonError || validation.error) || actionPending}
-                        style={
-                          Boolean(jsonError || validation.error) || actionPending
-                            ? { ...btnPrimary, ...btnDisabled }
-                            : btnPrimary
-                        }
-                      >
-                        {UI_COPY.nodeEditor.jsonTab.writeToFile}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleSaveDraft}
-                        disabled={!draftContent}
-                        style={!draftContent ? { ...btnSecondary, ...btnDisabled } : btnSecondary}
-                      >
-                        {UI_COPY.nodeEditor.jsonTab.saveDraft}
-                      </button>
-                    </div>
-                  </>
+                  <JsonEditorPanel
+                    key={`${decodedNodeId}:${language}`}
+                    content={draftContent}
+                    nodeId={decodedNodeId}
+                    validationError={validation.error}
+                    actionPending={actionPending}
+                    onApplyContent={updateDraftContent}
+                    onWriteToFile={() =>
+                      openDangerDialog({
+                        actionDescription: UI_COPY.nodeEditor.confirmations.writeJsonChanges,
+                        proceedLabel: UI_COPY.nodeEditor.common.proceed,
+                        tone: 'primary',
+                        showResult: true,
+                        pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
+                        onProceed: handleWriteToFile,
+                      })
+                    }
+                    onSaveDraft={handleSaveDraft}
+                  />
                 )}
               </div>
             )}
