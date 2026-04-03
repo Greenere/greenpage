@@ -101,7 +101,15 @@ export type GraphNodeContent = {
   detail?: ContentBlock[];
 };
 
+export type GraphNodeCardContent = Pick<
+  GraphNodeContent,
+  'title' | 'subtitle' | 'summary' | 'tags' | 'detail'
+>;
+
+export type GraphCardNode = GraphNodeRef & GraphNodeCardContent;
+
 export type GraphNodeContentIndex = Record<string, GraphNodeContent>;
+export type GraphNodeCardIndex = Record<string, GraphNodeCardContent>;
 
 export type GraphRelation = {
   id: string;
@@ -118,7 +126,7 @@ export type GraphModelSettings = {
 };
 
 export type GraphModel = {
-  nodes: GraphContentNode[];
+  nodes: GraphCardNode[];
   relations: GraphRelation[];
   settings?: GraphModelSettings;
 };
@@ -138,6 +146,10 @@ export const GRAPH_NODE_CONTENT_DIR = 'data/nodes/';
 
 // Legacy index URL — used as a fallback during migration before locale-specific indexes exist.
 const LEGACY_NODE_CONTENT_INDEX_URL = `${import.meta.env.BASE_URL}data/nodes/index.json`;
+
+function getNodeCardIndexUrl(locale: AppLanguage): string {
+  return withBaseUrl(`${GRAPH_NODE_CONTENT_DIR}node_cards.${localeToFileSuffix(locale)}.json`);
+}
 
 export const DOMAIN_LAYOUTS: Record<DomainId, DomainLayout> = Object.fromEntries(
   Object.entries(DOMAIN_CONFIG).map(([domain, config]) => [domain, { seedAngle: config.seedAngle }])
@@ -520,6 +532,20 @@ export function normalizeNodeContent(raw: unknown, nodeId = 'unknown'): GraphNod
   } satisfies GraphNodeContent;
 }
 
+function toGraphNodeCardContent(content: GraphNodeContent): GraphNodeCardContent {
+  return {
+    title: content.title,
+    subtitle: content.subtitle,
+    summary: content.summary,
+    tags: content.tags,
+    detail: content.detail,
+  } satisfies GraphNodeCardContent;
+}
+
+export function normalizeNodeCardContent(raw: unknown, nodeId = 'unknown'): GraphNodeCardContent {
+  return toGraphNodeCardContent(normalizeNodeContent(raw, nodeId));
+}
+
 async function loadNodeContent(node: GraphNodeRef, locale: AppLanguage): Promise<GraphNodeContent> {
   const isUsable = (r: Response) => r.ok && isJsonResponse(r);
   let response: Response | null = null;
@@ -543,26 +569,27 @@ async function loadNodeContent(node: GraphNodeRef, locale: AppLanguage): Promise
   return normalizeNodeContent(raw, node.id);
 }
 
-function normalizeNodeContentIndex(raw: unknown): GraphNodeContentIndex {
+function normalizeNodeCardIndex(raw: unknown): GraphNodeCardIndex {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    throw new Error('Node content index must be an object.');
+    throw new Error('Node card index must be an object.');
   }
 
   return Object.fromEntries(
-    Object.entries(raw as Record<string, unknown>).map(([nodeId, content]) => [nodeId, normalizeNodeContent(content, nodeId)])
+    Object.entries(raw as Record<string, unknown>).map(([nodeId, content]) => [nodeId, normalizeNodeCardContent(content, nodeId)])
   );
 }
 
-async function loadNodeContentIndex(locale: AppLanguage): Promise<GraphNodeContentIndex | null> {
-  if (import.meta.env.DEV) {
-    return null;
-  }
+async function loadNodeCardIndex(locale: AppLanguage): Promise<GraphNodeCardIndex | null> {
+  const indexUrls = getLocaleFallbackOrder(locale).flatMap((fallbackLocale) => [
+    getNodeCardIndexUrl(fallbackLocale),
+    getNodeContentIndexUrl(fallbackLocale),
+  ]);
 
-  for (const fallbackLocale of getLocaleFallbackOrder(locale)) {
-    const response = await fetch(getNodeContentIndexUrl(fallbackLocale));
+  for (const url of [...new Set(indexUrls)]) {
+    const response = await fetch(url);
     if (response.ok && isJsonResponse(response)) {
       const raw = await response.json();
-      return normalizeNodeContentIndex(raw);
+      return normalizeNodeCardIndex(raw);
     }
   }
 
@@ -572,11 +599,11 @@ async function loadNodeContentIndex(locale: AppLanguage): Promise<GraphNodeConte
   }
 
   const raw = await legacyResponse.json();
-  return normalizeNodeContentIndex(raw);
+  return normalizeNodeCardIndex(raw);
 }
 
 async function loadGraphModelUncached(url: string, locale: AppLanguage): Promise<GraphModel> {
-  const [response, contentIndex] = await Promise.all([fetch(url), loadNodeContentIndex(locale)]);
+  const [response, cardIndex] = await Promise.all([fetch(url), loadNodeCardIndex(locale)]);
   if (!response.ok) {
     throw new Error(UI_COPY.contentLoaders.failedToLoadGraphModel(response.status));
   }
@@ -585,11 +612,11 @@ async function loadGraphModelUncached(url: string, locale: AppLanguage): Promise
   const structure = normalizeGraphStructure(raw, locale);
   const resolvedNodes = await Promise.all(
     structure.nodes.map(async (node) => {
-      const content = contentIndex?.[node.id] ?? await loadNodeContent(node, locale);
+      const content = cardIndex?.[node.id] ?? toGraphNodeCardContent(await loadNodeContent(node, locale));
       return {
         ...node,
         ...content,
-      } satisfies GraphContentNode;
+      } satisfies GraphCardNode;
     })
   );
 
@@ -608,14 +635,29 @@ async function loadGraphModelUncached(url: string, locale: AppLanguage): Promise
 
 const graphModelPromiseMap = new Map<AppLanguage, Promise<GraphModel>>();
 const graphModelCacheMap = new Map<AppLanguage, GraphModel>();
+const graphNodeContentPromiseMap = new Map<string, Promise<GraphNodeContent>>();
+const graphNodeContentCacheMap = new Map<string, GraphNodeContent>();
+
+function getGraphNodeContentCacheKey(nodeId: string, locale: AppLanguage) {
+  return `${locale}:${nodeId}`;
+}
 
 export function clearGraphModelCache() {
   graphModelPromiseMap.clear();
   graphModelCacheMap.clear();
 }
 
+export function clearGraphNodeContentCache() {
+  graphNodeContentPromiseMap.clear();
+  graphNodeContentCacheMap.clear();
+}
+
 export function readCachedGraphModel(locale: AppLanguage = getActiveLanguage()) {
   return graphModelCacheMap.get(locale) ?? null;
+}
+
+export function readCachedGraphNodeContent(nodeId: string, locale: AppLanguage = getActiveLanguage()) {
+  return graphNodeContentCacheMap.get(getGraphNodeContentCacheKey(nodeId, locale)) ?? null;
 }
 
 export async function loadGraphModel(url = GRAPH_MODEL_URL, locale: AppLanguage = getActiveLanguage()): Promise<GraphModel> {
@@ -635,12 +677,42 @@ export async function loadGraphModel(url = GRAPH_MODEL_URL, locale: AppLanguage 
   return promise;
 }
 
+export async function loadGraphNodeContent(
+  node: GraphNodeRef | GraphCardNode,
+  locale: AppLanguage = getActiveLanguage(),
+): Promise<GraphNodeContent> {
+  const cacheKey = getGraphNodeContentCacheKey(node.id, locale);
+  const cached = graphNodeContentCacheMap.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const existing = graphNodeContentPromiseMap.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+
+  const promise = loadNodeContent(node, locale)
+    .then((content) => {
+      graphNodeContentCacheMap.set(cacheKey, content);
+      graphNodeContentPromiseMap.delete(cacheKey);
+      return content;
+    })
+    .catch((error) => {
+      graphNodeContentPromiseMap.delete(cacheKey);
+      throw error;
+    });
+
+  graphNodeContentPromiseMap.set(cacheKey, promise);
+  return promise;
+}
+
 export function getContentNodes(model: GraphModel) {
   return model.nodes;
 }
 
 export function getLatestNodesByDomain(model: GraphModel) {
-  const latestByDomain = new Map<DomainId, GraphContentNode>();
+  const latestByDomain = new Map<DomainId, GraphCardNode>();
 
   for (const node of model.nodes) {
     const current = latestByDomain.get(node.domain);
@@ -661,7 +733,7 @@ export function getDisplayDomain(domain: DomainId) {
 }
 
 export function getTemporalDomainRelations(model: GraphModel) {
-  const byDomain = new Map<DomainId, GraphContentNode[]>();
+  const byDomain = new Map<DomainId, GraphCardNode[]>();
 
   for (const node of model.nodes) {
     const existing = byDomain.get(node.domain) ?? [];

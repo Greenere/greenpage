@@ -7,7 +7,7 @@ import {
   setActiveLanguage,
   type AppLanguage,
 } from './index';
-import { clearGraphModelCache } from '../pages/graph/content/Nodes';
+import { clearGraphModelCache, clearGraphNodeContentCache } from '../pages/graph/content/Nodes';
 import { clearBioPageContentCache } from '../pages/graph/content/BioPage';
 
 type LanguageContextValue = {
@@ -26,6 +26,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = useCallback((lang: AppLanguage) => {
     clearGraphModelCache();
+    clearGraphNodeContentCache();
     clearBioPageContentCache();
     setLanguageState(lang);
   }, []);

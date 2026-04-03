@@ -34,7 +34,7 @@ import { useAppLanguage } from '../../i18n/LanguageProvider';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
-    type GraphContentNode,
+    type GraphCardNode,
     type GraphModel,
     getContentNodes,
     getDisplayDomain,
@@ -61,7 +61,7 @@ type StoryNodeData = {
     title: string;
     subtitle?: string;
     summary: string;
-    detail?: GraphContentNode['detail'];
+    detail?: GraphCardNode['detail'];
     badges?: string[];
 };
 
@@ -805,7 +805,7 @@ function permuteDomainOrder(domains: DomainId[]) {
     return results;
 }
 
-function buildDomainLaneOrder(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
+function buildDomainLaneOrder(contentNodes: GraphCardNode[], graphRelations: GraphModel['relations']) {
     const domains = [...new Set(contentNodes.map((node) => node.domain))] as DomainId[];
     const fallbackOrder = [...domains].sort((left, right) => getDomainLayout(left).seedAngle - getDomainLayout(right).seedAngle);
     const fallbackIndex = new Map(fallbackOrder.map((domain, index) => [domain, index]));
@@ -869,7 +869,7 @@ function rotateDomains(domains: DomainId[], offset: number) {
     return domains.map((_, index) => domains[(index + offset) % domains.length]);
 }
 
-function buildDomainWeights(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
+function buildDomainWeights(contentNodes: GraphCardNode[], graphRelations: GraphModel['relations']) {
     const weights = new Map<DomainId, number>();
     const nodeById = new Map(contentNodes.map((node) => [node.id, node]));
 
@@ -921,7 +921,7 @@ function buildLaneAnglePlan(
     return plan;
 }
 
-function chooseBalancedDomainPlan(contentNodes: GraphContentNode[], graphRelations: GraphModel['relations']) {
+function chooseBalancedDomainPlan(contentNodes: GraphCardNode[], graphRelations: GraphModel['relations']) {
     const baseOrder = buildDomainLaneOrder(contentNodes, graphRelations);
     const domainWeights = buildDomainWeights(contentNodes, graphRelations);
     const preferredAngles = new Map(
@@ -961,7 +961,7 @@ function chooseBalancedDomainPlan(contentNodes: GraphContentNode[], graphRelatio
 }
 
 function buildLaneTargetPositions(
-    contentNodes: GraphContentNode[],
+    contentNodes: GraphCardNode[],
     graphRelations: GraphModel['relations'],
     centerX: number,
     centerY: number,

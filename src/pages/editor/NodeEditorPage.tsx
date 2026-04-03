@@ -23,6 +23,8 @@ import ThemePicker from '../graph/ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph/content/BioTheme';
 import {
   getDisplayDomain,
+  clearGraphModelCache,
+  clearGraphNodeContentCache,
   normalizeNodeContent,
   resolveAssetUrl,
   type GraphContentNode,
@@ -1483,6 +1485,8 @@ const NodeEditorPage: React.FC = () => {
         completeRelations,
         language
       );
+      clearGraphModelCache();
+      clearGraphNodeContentCache();
       dispatch({
         type: 'commit_saved_node',
         node: normalizedCurrentNode,
@@ -1532,6 +1536,8 @@ const NodeEditorPage: React.FC = () => {
         },
         content,
       });
+      clearGraphModelCache();
+      clearGraphNodeContentCache();
       dispatch({
         type: 'upsert_bootstrap_node',
         node: {

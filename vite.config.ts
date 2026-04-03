@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises'
+import { execFile } from 'node:child_process'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import path from 'node:path'
+import { promisify } from 'node:util'
 
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -10,6 +12,7 @@ const ROOT_DIR = path.resolve()
 const GRAPH_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/graph.json')
 const NODES_DIR = path.resolve(ROOT_DIR, 'public/data/nodes')
 const DOMAINS_CONFIG_PATH = path.resolve(ROOT_DIR, 'src/configs/domains.ts')
+const execFileAsync = promisify(execFile)
 
 type EditorGraphNode = {
   id: string
@@ -84,6 +87,10 @@ async function readJsonFile<T>(filePath: string): Promise<T> {
 async function writeJsonFile(filePath: string, value: unknown) {
   await fs.mkdir(path.dirname(filePath), { recursive: true })
   await fs.writeFile(filePath, serializeJson(value), 'utf8')
+}
+
+async function refreshGeneratedNodeIndexes() {
+  await execFileAsync('node', ['scripts/generate_node_index.mjs'], { cwd: ROOT_DIR })
 }
 
 function isNotFoundError(error: unknown) {
@@ -513,6 +520,7 @@ function createNodeEditorPlugin(): Plugin {
               ...nextRelations,
             ]
             await writeJsonFile(GRAPH_JSON_PATH, graph)
+            await refreshGeneratedNodeIndexes()
             sendJson(response, 200, { ok: true })
             return
           }
@@ -570,6 +578,7 @@ function createNodeEditorPlugin(): Plugin {
             // New nodes are always created as English files first.
             await writeJsonFile(getLocaleNodeContentPath(createdNode, 'en'), body.content ?? {})
             await writeJsonFile(GRAPH_JSON_PATH, graph)
+            await refreshGeneratedNodeIndexes()
             sendJson(response, 200, { ok: true, nodeId, node: createdNode })
             return
           }

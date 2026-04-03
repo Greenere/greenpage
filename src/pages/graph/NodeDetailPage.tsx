@@ -24,14 +24,18 @@ import {
   getNodeDetailPath,
   getNodeTransitionName,
   loadGraphModel,
+  loadGraphNodeContent,
   readCachedGraphModel,
+  readCachedGraphNodeContent,
   resolveAssetUrl,
+  type GraphCardNode,
   type ArticleBlock,
   type ContentBlock,
   type GraphContentNode,
-    type GraphModel,
-    type GraphRelation,
-    type NodeArticleMeta,
+  type GraphNodeContent,
+  type GraphModel,
+  type GraphRelation,
+  type NodeArticleMeta,
     type NodeArticleSection,
   } from './content/Nodes';
 
@@ -57,7 +61,7 @@ type RelatedEntry = {
   isBio: boolean;
 };
 
-function getRelatedEntries(model: GraphModel, node: GraphContentNode, bioSubtitle: string | null) {
+function getRelatedEntries(model: GraphModel, node: Pick<GraphCardNode, 'id'>, bioSubtitle: string | null) {
   const nodeById = new Map(model.nodes.map((entry) => [entry.id, entry]));
 
   return getGraphRelations(model)
@@ -517,6 +521,15 @@ const NodeDetailPage: React.FC = () => {
   const decodedNodeId = nodeId ? decodeURIComponent(nodeId) : '';
   const [graphModel, setGraphModel] = useState<GraphModel | null>(() => readCachedGraphModel(language));
   const [graphError, setGraphError] = useState<string | null>(null);
+  const [nodeContentState, setNodeContentState] = useState<{ nodeId: string; content: GraphNodeContent } | null>(() => {
+    if (!decodedNodeId) {
+      return null;
+    }
+
+    const cachedContent = readCachedGraphNodeContent(decodedNodeId, language);
+    return cachedContent ? { nodeId: decodedNodeId, content: cachedContent } : null;
+  });
+  const [nodeError, setNodeError] = useState<string | null>(null);
   const [bioSubtitle, setBioSubtitle] = useState<string | null>(() => readCachedBioPageContent(language)?.subtitle ?? null);
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const transitionName = decodedNodeId ? getNodeTransitionName(decodedNodeId) : undefined;
@@ -570,7 +583,14 @@ const NodeDetailPage: React.FC = () => {
   useEffect(() => {
     setBioSubtitle(readCachedBioPageContent(language)?.subtitle ?? null);
     setGraphModel(readCachedGraphModel(language));
-  }, [language]);
+    if (!decodedNodeId) {
+      setNodeContentState(null);
+    } else {
+      const cachedContent = readCachedGraphNodeContent(decodedNodeId, language);
+      setNodeContentState(cachedContent ? { nodeId: decodedNodeId, content: cachedContent } : null);
+    }
+    setNodeError(null);
+  }, [decodedNodeId, language]);
 
   useEffect(() => {
     let cancelled = false;
@@ -620,18 +640,57 @@ const NodeDetailPage: React.FC = () => {
     };
   }, [graphModel]);
 
-  const node = graphModel?.nodes.find((entry) => entry.id === decodedNodeId) ?? null;
-  const relatedEntries = graphModel && node ? getRelatedEntries(graphModel, node, bioSubtitle) : [];
+  const graphNode = graphModel?.nodes.find((entry) => entry.id === decodedNodeId) ?? null;
 
-  if (graphError) {
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!graphNode) {
+      setNodeContentState(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (nodeContentState?.nodeId === graphNode.id) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    loadGraphNodeContent(graphNode, language)
+      .then((content) => {
+        if (cancelled) return;
+        setNodeContentState({ nodeId: graphNode.id, content });
+        setNodeError(null);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setNodeError(error instanceof Error ? error.message : UI_COPY.nodeDetailPage.errorLoading);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [graphNode, language, nodeContentState]);
+
+  const node = graphNode && nodeContentState?.nodeId === graphNode.id
+    ? ({
+        ...graphNode,
+        ...nodeContentState.content,
+      } satisfies GraphContentNode)
+    : null;
+  const relatedEntries = graphModel && graphNode ? getRelatedEntries(graphModel, graphNode, bioSubtitle) : [];
+
+  if (graphError || nodeError) {
     return (
         <div style={{ minHeight: '100vh', padding: '2rem', color: 'crimson' }}>
-        {UI_COPY.nodeDetailPage.errorLoading}: {graphError}
+        {UI_COPY.nodeDetailPage.errorLoading}: {graphError ?? nodeError}
       </div>
     );
   }
 
-  if (!graphModel) {
+  if (!graphModel || (graphNode && !node)) {
     return (
       <div style={{ minHeight: '100vh', padding: '2rem', color: 'var(--color-text)' }}>
         {UI_COPY.nodeDetailPage.loading}
@@ -639,7 +698,7 @@ const NodeDetailPage: React.FC = () => {
     );
   }
 
-  if (!node) {
+  if (!graphNode || !node) {
     return (
       <div
         style={{

@@ -26,7 +26,7 @@ import {
   loadGraphModel,
   readCachedGraphModel,
   resolveAssetUrl,
-  type GraphContentNode,
+  type GraphCardNode,
   type GraphModel,
 } from './content/Nodes';
 import { useAppLanguage } from '../../i18n/LanguageProvider';
@@ -103,7 +103,7 @@ function getBioPathEntries(model: GraphModel) {
   const latestByDomain = new Map(getLatestNodesByDomain(model).map((node) => [node.domain, node]));
 
   return DOMAIN_ORDER.map((domain) => latestByDomain.get(domain))
-    .filter((node): node is GraphContentNode => node !== undefined)
+    .filter((node): node is GraphCardNode => node !== undefined)
     .sort((left, right) => DOMAIN_ORDER.indexOf(left.domain) - DOMAIN_ORDER.indexOf(right.domain));
 }
 
