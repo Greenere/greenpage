@@ -38,3 +38,8 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+.gallery-image-frame:hover .gallery-image {
+  transform: scale(1.04);
+  filter: brightness(1.04);
+}

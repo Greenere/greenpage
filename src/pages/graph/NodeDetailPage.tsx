@@ -337,7 +337,7 @@ function renderContentBlock(block: ContentBlock | ArticleBlock, index: number, o
       <Paragraph
         key={`text-${index}`}
         style={{
-          maxWidth: DETAIL_READING_WIDTH,
+          maxWidth: DETAIL_SECTION_WIDTH,
           fontSize: '0.92rem',
           lineHeight: 1.78,
           paddingLeft: 0,
@@ -356,8 +356,8 @@ function renderContentBlock(block: ContentBlock | ArticleBlock, index: number, o
       <blockquote
         key={`quote-${index}`}
         style={{
-          maxWidth: DETAIL_READING_WIDTH,
-          margin: '0 0 1.35rem',
+          maxWidth: DETAIL_SECTION_WIDTH,
+          margin: '0 0 1.2rem',
           padding: '0.15rem 0 0.15rem 1rem',
           color: 'var(--color-text)',
           fontStyle: 'italic',
@@ -376,7 +376,7 @@ function renderContentBlock(block: ContentBlock | ArticleBlock, index: number, o
       <ul
         key={`list-${index}`}
         style={{
-          maxWidth: DETAIL_READING_WIDTH,
+          maxWidth: DETAIL_SECTION_WIDTH,
           margin: '0 0 1.2rem',
           paddingLeft: '1.15rem',
           color: 'var(--color-text)',
@@ -397,8 +397,8 @@ function renderContentBlock(block: ContentBlock | ArticleBlock, index: number, o
       <figure
         key={`image-${index}`}
         style={{
-          maxWidth: DETAIL_READING_WIDTH,
-          margin: '0 0 1.35rem',
+          maxWidth: DETAIL_SECTION_WIDTH,
+          margin: '0 0 1.2rem',
         }}
       >
         <img
@@ -432,7 +432,7 @@ function renderContentBlock(block: ContentBlock | ArticleBlock, index: number, o
 
   if (block.type === 'link') {
     return (
-      <div key={`link-${index}`} style={{ maxWidth: DETAIL_READING_WIDTH, marginBottom: '1rem' }}>
+      <div key={`link-${index}`} style={{ maxWidth: DETAIL_SECTION_WIDTH, marginBottom: '1.2rem' }}>
         <ArticleLink href={block.href} onNavigate={onNavigate} style={{ fontWeight: 600 }}>
           {block.label}
         </ArticleLink>
@@ -464,8 +464,8 @@ function renderContentBlock(block: ContentBlock | ArticleBlock, index: number, o
       <div
         key={`callout-${index}`}
         style={{
-          maxWidth: DETAIL_READING_WIDTH,
-          marginBottom: '1.3rem',
+          maxWidth: DETAIL_SECTION_WIDTH,
+          marginBottom: '1.2rem',
           padding: '1rem 1.05rem',
           borderRadius: '18px',
           background:

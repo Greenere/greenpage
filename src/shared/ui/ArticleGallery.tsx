@@ -105,35 +105,49 @@ export default function ArticleGallery({
                 gridColumn: `span ${rowSpans[imageIndex] ?? GALLERY_TRACKS_PER_COLUMN}`,
               }}
             >
-              <img
-                src={resolveAssetUrl(image.src)}
-                alt={image.alt}
-                onLoad={(event) => {
-                  const { naturalWidth, naturalHeight } = event.currentTarget;
-                  if (!naturalWidth || !naturalHeight) return;
-
-                  const nextAspectRatio = naturalWidth / naturalHeight;
-                  setAspectRatios((current) =>
-                    current[itemKey] === nextAspectRatio ? current : { ...current, [itemKey]: nextAspectRatio }
-                  );
-                }}
+              <div
                 style={{
-                  display: 'block',
-                  width: '100%',
-                  height: align === 'height' ? '15rem' : 'auto',
-                  borderRadius: '15px',
-                  objectFit: align === 'height' ? 'contain' : undefined,
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  background: 'color-mix(in srgb, var(--color-secondary) 10%, transparent)',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.10)',
                 }}
-              />
+                className="gallery-image-frame"
+              >
+                <img
+                  src={resolveAssetUrl(image.src)}
+                  alt={image.alt}
+                  onLoad={(event) => {
+                    const { naturalWidth, naturalHeight } = event.currentTarget;
+                    if (!naturalWidth || !naturalHeight) return;
+
+                    const nextAspectRatio = naturalWidth / naturalHeight;
+                    setAspectRatios((current) =>
+                      current[itemKey] === nextAspectRatio ? current : { ...current, [itemKey]: nextAspectRatio }
+                    );
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    height: align === 'height' ? '15rem' : 'auto',
+                    objectFit: align === 'height' ? 'cover' : undefined,
+                    objectPosition: 'center',
+                    transition: 'transform 0.3s ease, filter 0.3s ease',
+                  }}
+                  className="gallery-image"
+                />
+              </div>
               {image.caption && (
                 <figcaption
                   style={{
-                    padding: '0.8rem 0.15rem 0 0.15rem',
+                    padding: '0.55rem 0.2rem 0',
                     color: 'var(--color-text)',
-                    fontSize: '0.76rem',
-                    lineHeight: 1.55,
-                    opacity: 0.84,
-                    textAlign: 'center',
+                    fontSize: '0.74rem',
+                    lineHeight: 1.5,
+                    opacity: 0.6,
+                    fontStyle: 'italic',
+                    letterSpacing: '0.01em',
                   }}
                 >
                   {renderCaption ? renderCaption(image.caption, `${itemKey}-caption`) : image.caption}
