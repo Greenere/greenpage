@@ -370,29 +370,6 @@
       }
     ]
   },
-  "online-kitchen": {
-    "title": "Online Kitchen",
-    "subtitle": "Interactive visualization project",
-    "summary": "A Cornell data visualization project built with D3.js around food, nutrition, and production stories.",
-    "tags": [
-      "D3",
-      "visualization"
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "This sat in the Cornell cluster where interface storytelling and data structure started to feel central rather than peripheral."
-      },
-      {
-        "type": "list",
-        "items": [
-          "INFO 5100 course project",
-          "Collaborative Cornell build",
-          "Interactive web visualization"
-        ]
-      }
-    ]
-  },
   "programming-languages": {
     "title": "Visualizations",
     "subtitle": "Interactive D3 project",

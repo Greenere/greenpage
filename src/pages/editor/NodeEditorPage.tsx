@@ -40,6 +40,7 @@ import {
 } from './articlePreviewShared';
 import {
   createEditorDomain,
+  deleteEditorNode,
   deleteEditorDomain,
   createEditorNode,
   type EditorExplicitRelation,
@@ -1624,6 +1625,36 @@ const NodeEditorPage: React.FC = () => {
     }
   };
 
+  const handleDeleteNode = async () => {
+    if (!decodedNodeId) return;
+
+    dispatch({ type: 'set_action_pending', value: true });
+    try {
+      await deleteEditorNode({ nodeId: decodedNodeId });
+      clearGraphModelCache();
+      clearGraphNodeContentCache();
+      for (const option of LANGUAGE_OPTIONS) {
+        window.localStorage.removeItem(getDraftStorageKey(decodedNodeId, option.id));
+      }
+      dispatch({
+        type: 'set_bootstrap_nodes',
+        nodes: bootstrapNodes.filter((node) => node.id !== decodedNodeId),
+      });
+      dispatch({
+        type: 'set_status_message',
+        message: UI_COPY.nodeEditor.status.deletedNodeReturning(decodedNodeId),
+      });
+      navigate('/editor');
+      return UI_COPY.nodeEditor.status.deletedNodeReturning(decodedNodeId);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : UI_COPY.nodeEditor.status.failedDeleteNode;
+      dispatch({ type: 'set_status_message', message });
+      throw new Error(message);
+    } finally {
+      dispatch({ type: 'set_action_pending', value: false });
+    }
+  };
+
   const openDangerDialog = (config: DangerDialogConfig) => {
     setDangerDialog({
       ...config,
@@ -2423,6 +2454,23 @@ const NodeEditorPage: React.FC = () => {
                         style={!originalContent ? { ...btnDanger, ...btnDisabled } : btnDanger}
                       >
                         {UI_COPY.nodeEditor.contentTab.reset}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openDangerDialog({
+                            actionDescription: UI_COPY.nodeEditor.confirmations.deleteNode(decodedNodeId),
+                            proceedLabel: UI_COPY.nodeEditor.contentTab.deleteNode,
+                            tone: 'danger',
+                            showResult: true,
+                            pendingMessage: UI_COPY.nodeEditor.confirmations.deletingNode,
+                            onProceed: handleDeleteNode,
+                          })
+                        }
+                        disabled={!decodedNodeId || actionPending}
+                        style={!decodedNodeId || actionPending ? { ...btnDanger, ...btnDisabled } : btnDanger}
+                      >
+                        {UI_COPY.nodeEditor.contentTab.deleteNode}
                       </button>
                     </div>
                     {validation.error && (

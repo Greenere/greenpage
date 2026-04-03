@@ -136,6 +136,8 @@ export const ZH_CN_MESSAGES = {
         failedCreateDomain: '创建领域失败。',
         deletedDomainReloading: (domainId: string) => `已删除领域“${domainId}”。正在重新加载编辑器...`,
         failedDeleteDomain: '删除领域失败。',
+        deletedNodeReturning: (nodeId: string) => `已删除节点“${nodeId}”。正在返回编辑器首页...`,
+        failedDeleteNode: '删除节点失败。',
         duplicateExplicitConnection: '这条连接已经存在。',
       },
       confirmations: {
@@ -151,8 +153,10 @@ export const ZH_CN_MESSAGES = {
         deleteExplicitConnection: '删除这条显式连接',
         deleteSection: (label: string) => `删除“${label}”章节`,
         deleteDomain: (domainId: string) => `删除领域“${domainId}”`,
+        deleteNode: (nodeId: string) => `删除节点“${nodeId}”、其本地化内容文件以及图谱连接`,
         writingToFile: '正在写入文件…',
         deletingDomain: '正在删除领域…',
+        deletingNode: '正在删除节点…',
       },
       domainStats: {
         title: '领域统计',
@@ -215,6 +219,7 @@ export const ZH_CN_MESSAGES = {
         writeToFile: '写入文件',
         saveDraft: '保存草稿',
         reset: '重置',
+        deleteNode: '删除节点',
       },
       jsonTab: {
         emptyState: '请先在上方选择一个节点来编辑原始 JSON。',

@@ -134,6 +134,8 @@ export const EN_MESSAGES = {
         failedCreateDomain: 'Failed to create domain.',
         deletedDomainReloading: (domainId: string) => `Deleted domain "${domainId}". Reloading editor...`,
         failedDeleteDomain: 'Failed to delete domain.',
+        deletedNodeReturning: (nodeId: string) => `Deleted node "${nodeId}". Returning to editor home...`,
+        failedDeleteNode: 'Failed to delete node.',
         duplicateExplicitConnection: 'This connection already exists.',
       },
       confirmations: {
@@ -149,8 +151,10 @@ export const EN_MESSAGES = {
         deleteExplicitConnection: 'delete this explicit connection',
         deleteSection: (label: string) => `delete the "${label}" section`,
         deleteDomain: (domainId: string) => `delete the "${domainId}" domain`,
+        deleteNode: (nodeId: string) => `delete the "${nodeId}" node, its localized content files, and its graph connections`,
         writingToFile: 'Writing to file…',
         deletingDomain: 'Deleting domain…',
+        deletingNode: 'Deleting node…',
       },
       domainStats: {
         title: 'Domain statistics',
@@ -213,6 +217,7 @@ export const EN_MESSAGES = {
         writeToFile: 'Write to file',
         saveDraft: 'Save draft',
         reset: 'Reset',
+        deleteNode: 'Delete node',
       },
       jsonTab: {
         emptyState: 'Choose a node above to edit raw JSON.',

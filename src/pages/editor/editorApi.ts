@@ -46,6 +46,10 @@ type DeleteDomainPayload = {
   domainId: string;
 };
 
+type DeleteNodePayload = {
+  nodeId: string;
+};
+
 async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let message = `Request failed: ${response.status}`;
@@ -127,6 +131,18 @@ export async function deleteEditorDomain(payload: DeleteDomainPayload) {
   });
 
   return parseResponse<{ ok: true; domainId: string }>(response);
+}
+
+export async function deleteEditorNode(payload: DeleteNodePayload) {
+  const response = await fetch('/__editor/node/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return parseResponse<{ ok: true; nodeId: string }>(response);
 }
 
 export type NewNodeDraft = {

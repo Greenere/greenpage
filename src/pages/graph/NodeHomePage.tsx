@@ -118,6 +118,7 @@ type BoxState = {
 type StoredGraphView = {
     nodes: Array<{ id: string; x: number; y: number }>;
     viewport?: Viewport;
+    signature?: string;
 };
 
 type PendingGraphRestore = {
@@ -321,6 +322,22 @@ function participatesInCollision(nodeId: string) {
     return nodeId !== 'biotoggle';
 }
 
+function buildNodeSetSignature(nodeIds: Iterable<string>) {
+    return [...nodeIds].sort().join('|');
+}
+
+function getStoredGraphViewSignature(view: StoredGraphView | null) {
+    if (!view) {
+        return null;
+    }
+
+    if (typeof view.signature === 'string' && view.signature.length > 0) {
+        return view.signature;
+    }
+
+    return buildNodeSetSignature(view.nodes.map((node) => node.id));
+}
+
 function readStoredGraphView(): StoredGraphView | null {
     if (typeof window === 'undefined') return null;
 
@@ -347,7 +364,8 @@ function readStoredGraphView(): StoredGraphView | null {
                 ? parsed.viewport
                 : undefined;
 
-        return { nodes, viewport };
+        const signature = typeof parsed.signature === 'string' ? parsed.signature : undefined;
+        return { nodes, viewport, signature };
     } catch {
         return null;
     }
@@ -363,6 +381,7 @@ function persistGraphView(nodes: Node[], viewport?: Viewport) {
             y: node.position.y,
         })),
         viewport,
+        signature: buildNodeSetSignature(nodes.map((node) => node.id)),
     };
 
     window.sessionStorage.setItem(GRAPH_VIEW_STORAGE_KEY, JSON.stringify(payload));
@@ -1324,6 +1343,7 @@ const NodeCanvas: React.FC = () => {
     const hasHydratedStoredViewRef = useRef(false);
     const restoredStoredViewRef = useRef(false);
     const hasAppliedMeasuredInitialLayoutRef = useRef(false);
+    const hydratedGraphNodeSetSignatureRef = useRef<string | null>(null);
     const flowReadyRef = useRef(false);
     const pendingGraphRestoreRef = useRef<PendingGraphRestore | null>(null);
     const viewport = useMemo(
@@ -1349,7 +1369,7 @@ const NodeCanvas: React.FC = () => {
     );
     const nodesInitialized = useNodesInitialized();
     const graphNodeSetSignature = useMemo(
-        () => initialGraph.nodes.map((node) => node.id).sort().join('|'),
+        () => buildNodeSetSignature(initialGraph.nodes.map((node) => node.id)),
         [initialGraph.nodes]
     );
 
@@ -1521,24 +1541,40 @@ const NodeCanvas: React.FC = () => {
         let storedViewport: Viewport | undefined;
 
         if (hasHydratedStoredViewRef.current) {
-            // Already laid out — preserve live positions so language switches and other model
-            // updates don't scramble the graph. Only update node data (titles, summaries, etc.).
-            const livePositions = new Map(nodesRef.current.map((n) => [n.id, n.position]));
-            restoredNodes = initialGraph.nodes.map((node) => {
-                const pos = livePositions.get(node.id);
-                return pos ? { ...node, position: pos } : node;
-            });
+            const canReuseLiveLayout = hydratedGraphNodeSetSignatureRef.current === graphNodeSetSignature;
+
+            if (canReuseLiveLayout) {
+                // Same graph, new copy/theme data: preserve live positions.
+                const livePositions = new Map(nodesRef.current.map((n) => [n.id, n.position]));
+                restoredNodes = initialGraph.nodes.map((node) => {
+                    const pos = livePositions.get(node.id);
+                    return pos ? { ...node, position: pos } : node;
+                });
+            } else {
+                // Node set changed (add/remove): rebuild from fresh seed layout rather than
+                // mixing stale positions for old nodes with new seed positions.
+                restoredStoredViewRef.current = false;
+                restoredNodes = initialGraph.nodes;
+            }
         } else {
             // First hydration — restore from persisted view if available.
             const storedView = readStoredGraphView();
-            restoredStoredViewRef.current = Boolean(storedView?.nodes.length);
-            storedViewport = storedView?.viewport;
-            const storedPositions = new Map(storedView?.nodes.map((node) => [node.id, node]) ?? []);
-            restoredNodes = initialGraph.nodes.map((node) => {
-                const storedNode = storedPositions.get(node.id);
-                if (!storedNode) return node;
-                return { ...node, position: { x: storedNode.x, y: storedNode.y } };
-            });
+            const canRestoreStoredView =
+                Boolean(storedView?.nodes.length) &&
+                getStoredGraphViewSignature(storedView) === graphNodeSetSignature;
+            restoredStoredViewRef.current = canRestoreStoredView;
+            storedViewport = canRestoreStoredView ? storedView?.viewport : undefined;
+
+            if (canRestoreStoredView) {
+                const storedPositions = new Map(storedView?.nodes.map((node) => [node.id, node]) ?? []);
+                restoredNodes = initialGraph.nodes.map((node) => {
+                    const storedNode = storedPositions.get(node.id);
+                    if (!storedNode) return node;
+                    return { ...node, position: { x: storedNode.x, y: storedNode.y } };
+                });
+            } else {
+                restoredNodes = initialGraph.nodes;
+            }
         }
         const restoredGraph = buildEdgesForNodes(restoredNodes, orderedGraphRelations);
 
@@ -1549,6 +1585,7 @@ const NodeCanvas: React.FC = () => {
         if (!hasHydratedStoredViewRef.current) {
             hasHydratedStoredViewRef.current = true;
         }
+        hydratedGraphNodeSetSignatureRef.current = graphNodeSetSignature;
 
         pendingGraphRestoreRef.current = {
             nodes: restoredGraph.nodes,
@@ -1723,7 +1760,7 @@ const NodeCanvas: React.FC = () => {
 
         if (initialGraph.nodes.length === 0) return;
         const storedView = readStoredGraphView();
-        if (storedView?.viewport) {
+        if (storedView?.viewport && getStoredGraphViewSignature(storedView) === graphNodeSetSignature) {
             instance.setViewport(storedView.viewport, { duration: 0 });
             return;
         }

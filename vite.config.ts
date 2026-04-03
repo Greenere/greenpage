@@ -93,6 +93,17 @@ async function refreshGeneratedNodeIndexes() {
   await execFileAsync('node', ['scripts/generate_node_index.mjs'], { cwd: ROOT_DIR })
 }
 
+async function deleteFileIfExists(filePath: string) {
+  try {
+    await fs.rm(filePath, { force: true })
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      return
+    }
+    throw error
+  }
+}
+
 function isNotFoundError(error: unknown) {
   return error !== null && typeof error === 'object' && 'code' in error && (error as { code?: string }).code === 'ENOENT'
 }
@@ -150,6 +161,46 @@ function getLegacyNodeContentPath(node: EditorGraphNode): string {
     return path.resolve(ROOT_DIR, 'public', normalized)
   }
   return path.resolve(NODES_DIR, node.domain, getNodeContentFileName(node.id))
+}
+
+async function deleteNodeContentFiles(node: EditorGraphNode) {
+  if (node.contentPath) {
+    const absoluteContentPath = getLegacyNodeContentPath(node)
+    const directory = path.dirname(absoluteContentPath)
+    const extension = path.extname(absoluteContentPath)
+    const baseName = path.basename(absoluteContentPath, extension)
+    const localePattern = new RegExp(`^${baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\.[a-z_]+)?${extension.replace('.', '\\.')}$`)
+    const siblingEntries = await fs.readdir(directory).catch((error) => {
+      if (isNotFoundError(error)) {
+        return [] as string[]
+      }
+      throw error
+    })
+
+    await Promise.all(
+      siblingEntries
+        .filter((entry) => localePattern.test(entry))
+        .map((entry) => deleteFileIfExists(path.join(directory, entry)))
+    )
+    await deleteFileIfExists(absoluteContentPath)
+    return
+  }
+
+  const directory = path.resolve(NODES_DIR, node.domain)
+  const baseName = node.id.replace(/-/g, '_')
+  const filePattern = new RegExp(`^${baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\.[a-z_]+)?\\.json$`)
+  const entries = await fs.readdir(directory).catch((error) => {
+    if (isNotFoundError(error)) {
+      return [] as string[]
+    }
+    throw error
+  })
+
+  await Promise.all(
+    entries
+      .filter((entry) => filePattern.test(entry))
+      .map((entry) => deleteFileIfExists(path.join(directory, entry)))
+  )
 }
 
 // Tries locale path → English path → legacy path, returns content and whether a fallback was used.
@@ -580,6 +631,31 @@ function createNodeEditorPlugin(): Plugin {
             await writeJsonFile(GRAPH_JSON_PATH, graph)
             await refreshGeneratedNodeIndexes()
             sendJson(response, 200, { ok: true, nodeId, node: createdNode })
+            return
+          }
+
+          if (request.method === 'POST' && requestUrl.pathname === '/__editor/node/delete') {
+            const body = await parseBody(request)
+            const nodeId = typeof body.nodeId === 'string' ? body.nodeId.trim() : ''
+
+            if (!nodeId) {
+              sendJson(response, 400, { error: 'Missing nodeId.' })
+              return
+            }
+
+            const graph = await readGraphModel()
+            const node = graph.nodes.find((entry) => entry.id === nodeId)
+            if (!node) {
+              sendJson(response, 404, { error: `Node "${nodeId}" was not found.` })
+              return
+            }
+
+            await deleteNodeContentFiles(node)
+            graph.nodes = graph.nodes.filter((entry) => entry.id !== nodeId)
+            graph.relations = graph.relations.filter((relation) => relation.from !== nodeId && relation.to !== nodeId)
+            await writeJsonFile(GRAPH_JSON_PATH, graph)
+            await refreshGeneratedNodeIndexes()
+            sendJson(response, 200, { ok: true, nodeId })
             return
           }
 

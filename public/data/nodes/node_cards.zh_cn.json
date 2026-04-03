@@ -373,29 +373,6 @@
       }
     ]
   },
-  "online-kitchen": {
-    "title": "Online Kitchen",
-    "subtitle": "交互可视化项目",
-    "summary": "一个康奈尔数据可视化课程项目，使用 D3.js 围绕食物、营养与生产故事做交互式表达。",
-    "tags": [
-      "D3",
-      "可视化"
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "它属于康奈尔那一簇项目，在那里界面叙事与数据结构开始显得不再是边缘，而逐渐成为核心。"
-      },
-      {
-        "type": "list",
-        "items": [
-          "INFO 5100 课程项目",
-          "与康奈尔同学协作完成",
-          "交互式网页可视化"
-        ]
-      }
-    ]
-  },
   "programming-languages": {
     "title": "编程语言可视化",
     "subtitle": "交互式 D3 项目",
