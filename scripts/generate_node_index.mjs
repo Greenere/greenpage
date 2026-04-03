@@ -7,6 +7,10 @@ const graphPath = path.join(publicDir, 'data', 'graph.json');
 const nodesDir = path.join(publicDir, 'data', 'nodes');
 const indexPath = path.join(nodesDir, 'index.json');
 
+function getNodeContentFileName(nodeId) {
+  return `${nodeId.replace(/-/g, '_')}.json`;
+}
+
 function resolveContentPath(nodeRef) {
   if (typeof nodeRef.contentPath === 'string' && nodeRef.contentPath.length > 0) {
     return path.join(publicDir, nodeRef.contentPath.replace(/^\//, ''));
@@ -16,7 +20,7 @@ function resolveContentPath(nodeRef) {
     throw new Error(`Graph node ref "${String(nodeRef.id)}" must include a "domain" to resolve its content path.`);
   }
 
-  return path.join(nodesDir, nodeRef.domain, `${nodeRef.id}.json`);
+  return path.join(nodesDir, nodeRef.domain, getNodeContentFileName(nodeRef.id));
 }
 
 async function main() {

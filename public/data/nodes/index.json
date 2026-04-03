@@ -165,7 +165,6 @@
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
@@ -180,6 +179,21 @@
               "Student associations and design work"
             ]
           }
+        ],
+        "id": "overview"
+      }
+    ],
+    "detail": [
+      {
+        "type": "text",
+        "text": "I graduated in the top 10 with a 3.91/4.0 GPA. Research, contests, design work, and course projects gradually pulled the path toward machine learning and software."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Electronic and Information Engineering",
+          "Research and capstone project work",
+          "Student associations and design work"
         ]
       }
     ]
@@ -340,7 +354,7 @@
     ],
     "hero": {
       "image": {
-        "src": "assets/portrait-haoyang-sfbay.jpg",
+        "src": "assets/portrait_haoyang_sfbay.jpg",
         "alt": "Haoyang in the Bay Area during the Verily internship summer",
         "caption": "Work, relocation, and weekend travel started to blur into one California chapter."
       }
@@ -721,7 +735,7 @@
             "columns": 1,
             "items": [
               {
-                "src": "assets/portrait-haoyang-nyc.jpg",
+                "src": "assets/portrait_haoyang_nyc.jpg",
                 "alt": "Haoyang in New York City during the Cornell period",
                 "caption": "New York became one of the recurring anchors in that travel season."
               }
@@ -741,7 +755,7 @@
     ],
     "hero": {
       "image": {
-        "src": "assets/portrait-haoyang-mty.jpg",
+        "src": "assets/portrait_haoyang_mty.jpg",
         "alt": "Haoyang in Monterey during the Route 1 trip",
         "caption": "Monterey became the clearest visual memory in a day that started in the Bay and slowly tilted south."
       }
@@ -798,17 +812,17 @@
             "align": "natural",
             "items": [
               {
-                "src": "assets/portrait-haoyang-sfbay.jpg",
+                "src": "assets/portrait_haoyang_sfbay.jpg",
                 "alt": "Haoyang in the Bay Area during summer 2022",
                 "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
               },
               {
-                "src": "assets/portrait-haoyang-mty.jpg",
+                "src": "assets/portrait_haoyang_mty.jpg",
                 "alt": "Haoyang in Monterey during the Route 1 trip",
                 "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
               },
               {
-                "src": "assets/portrait-haoyang-mty.jpg",
+                "src": "assets/portrait_haoyang_mty.jpg",
                 "alt": "Haoyang in Monterey during the Route 1 trip",
                 "caption": ""
               }
@@ -820,12 +834,12 @@
             "align": "natural",
             "items": [
               {
-                "src": "assets/sf-fog.jpg",
+                "src": "assets/sf_fog.jpg",
                 "alt": "Haoyang in the Bay Area during summer 2022",
                 "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
               },
               {
-                "src": "assets/portrait-haoyang-mty.jpg",
+                "src": "assets/portrait_haoyang_mty.jpg",
                 "alt": "Haoyang in Monterey during the Route 1 trip",
                 "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
               }

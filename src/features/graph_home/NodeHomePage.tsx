@@ -30,6 +30,7 @@ import {
     getHighlightBorderShadowPrefix,
 } from '../../configs/graphHighlight';
 import { UI_COPY } from '../../configs/uiCopy';
+import { useAppLanguage } from '../../i18n/LanguageProvider';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
@@ -1202,6 +1203,7 @@ function buildInitialGraph(
 }
 
 const NodeCanvas: React.FC = () => {
+    const { language } = useAppLanguage();
     const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
     const initialThemeRef = useRef(theme);
     const [graphModel, setGraphModel] = useState<GraphModel | null>(() => readCachedGraphModel());
@@ -1424,6 +1426,39 @@ const NodeCanvas: React.FC = () => {
     useEffect(() => {
         edgesRef.current = edges;
     }, [edges]);
+
+    useEffect(() => {
+        setNodes((prev) => {
+            let updated = false;
+
+            const nextNodes = prev.map((node) => {
+                if (node.id === 'biotoggle' || node.id === 'bio') {
+                    return node;
+                }
+
+                const nodeData = node.data as StoryNodeData | undefined;
+                if (!nodeData || nodeData.nodeRole !== 'content') {
+                    return node;
+                }
+
+                const nextDomainTag = getDisplayDomain(nodeData.domain);
+                if (nodeData.domainTag === nextDomainTag) {
+                    return node;
+                }
+
+                updated = true;
+                return {
+                    ...node,
+                    data: {
+                        ...nodeData,
+                        domainTag: nextDomainTag,
+                    },
+                };
+            });
+
+            return updated ? nextNodes : prev;
+        });
+    }, [language, setNodes]);
 
     useEffect(() => {
         const previousHighlightedNodeId = highlightedNodeIdRef.current;

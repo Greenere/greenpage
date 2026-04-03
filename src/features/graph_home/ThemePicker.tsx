@@ -6,9 +6,10 @@ type ThemePickerProps = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   variant?: 'floating' | 'inline';
+  children?: React.ReactNode;
 };
 
-const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'floating' }) => {
+const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'floating', children }) => {
   const isInline = variant === 'inline';
 
   return (
@@ -71,6 +72,18 @@ const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'f
           />
         );
       })}
+      {!isInline && children ? (
+        <div
+          style={{
+            marginTop: '0.22rem',
+            paddingTop: '0.22rem',
+            paddingBottom: '0.14rem',
+            borderTop: '1px solid color-mix(in srgb, var(--color-secondary) 18%, transparent)',
+          }}
+        >
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 };

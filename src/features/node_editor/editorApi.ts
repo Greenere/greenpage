@@ -1,6 +1,6 @@
 import type { DomainId } from '../../configs/domains';
 import type { ChronologyValue } from '../../shared/chronology';
-import type { GraphNodeContent, GraphNodeRef, NodeKind, RelationKind } from '../graph-home/content/Nodes';
+import type { GraphNodeContent, GraphNodeRef, NodeKind, RelationKind } from '../graph_home/content/Nodes';
 
 export type EditorNodeOption = GraphNodeRef & {
   title?: string;

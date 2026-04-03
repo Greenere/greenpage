@@ -8,7 +8,7 @@
   ],
   "hero": {
     "image": {
-      "src": "assets/portrait-haoyang-mty.jpg",
+      "src": "assets/portrait_haoyang_mty.jpg",
       "alt": "Haoyang in Monterey during the Route 1 trip",
       "caption": "Monterey became the clearest visual memory in a day that started in the Bay and slowly tilted south."
     }
@@ -65,17 +65,17 @@
           "align": "natural",
           "items": [
             {
-              "src": "assets/portrait-haoyang-sfbay.jpg",
+              "src": "assets/portrait_haoyang_sfbay.jpg",
               "alt": "Haoyang in the Bay Area during summer 2022",
               "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
             },
             {
-              "src": "assets/portrait-haoyang-mty.jpg",
+              "src": "assets/portrait_haoyang_mty.jpg",
               "alt": "Haoyang in Monterey during the Route 1 trip",
               "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
             },
             {
-              "src": "assets/portrait-haoyang-mty.jpg",
+              "src": "assets/portrait_haoyang_mty.jpg",
               "alt": "Haoyang in Monterey during the Route 1 trip",
               "caption": ""
             }
@@ -87,12 +87,12 @@
           "align": "natural",
           "items": [
             {
-              "src": "assets/sf-fog.jpg",
+              "src": "assets/sf_fog.jpg",
               "alt": "Haoyang in the Bay Area during summer 2022",
               "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
             },
             {
-              "src": "assets/portrait-haoyang-mty.jpg",
+              "src": "assets/portrait_haoyang_mty.jpg",
               "alt": "Haoyang in Monterey during the Route 1 trip",
               "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
             }

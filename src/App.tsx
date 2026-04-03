@@ -1,16 +1,18 @@
 import { lazy, Suspense } from 'react'
 import './App.css'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import NodeHomePage from './features/graph-home/NodeHomePage'
-import NodeDetailPage from './features/graph-home/NodeDetailPage'
-import BioDetailPage from './features/graph-home/BioDetailPage'
+import NodeHomePage from './features/graph_home/NodeHomePage'
+import NodeDetailPage from './features/graph_home/NodeDetailPage'
+import BioDetailPage from './features/graph_home/BioDetailPage'
+import { useAppLanguage } from './i18n/LanguageProvider'
 
 const DevNodeEditorPage = import.meta.env.DEV
-  ? lazy(() => import('./features/node-editor/NodeEditorPage'))
+  ? lazy(() => import('./features/node_editor/NodeEditorPage'))
   : null
 
 function App() {
   const location = useLocation()
+  const { messages } = useAppLanguage()
 
   return (
     <Routes>
@@ -20,7 +22,7 @@ function App() {
           <Route
             path="/editor"
             element={
-              <Suspense fallback={<div style={{ padding: '1rem' }}>Loading editor...</div>}>
+              <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
                 <DevNodeEditorPage />
               </Suspense>
             }
@@ -28,7 +30,7 @@ function App() {
           <Route
             path="/editor/nodes/:nodeId"
             element={
-              <Suspense fallback={<div style={{ padding: '1rem' }}>Loading editor...</div>}>
+              <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
                 <DevNodeEditorPage />
               </Suspense>
             }

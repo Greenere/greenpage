@@ -127,6 +127,19 @@ body,
   --greenpage-bio-portrait-border-opacity: var(--greenpage-bio-portrait-border-opacity-connected, 1);
 }
 
+.react-flow__node.greenpage-style-node button {
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.react-flow__node.greenpage-style-node button:focus,
+.react-flow__node.greenpage-style-node button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 .node-card-detail-shell {
   margin-top: auto;
   padding-top: 0.5rem;

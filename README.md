@@ -40,13 +40,13 @@ npm run generate:node-index
 
 ## Project structure
 
-- [`src/features/graph-home`](./src/features/graph-home)
+- [`src/features/graph_home`](./src/features/graph_home)
   The active graph homepage, node detail pages, and graph-specific components.
 - [`src/configs`](./src/configs)
   Small centralized config files for themes, domains, copy, highlight behavior, focus behavior, and transitions.
 - [`public/data`](./public/data)
   Data files for the graph structure, bio page, and node content.
-- [`src/features/legacy-home`](./src/features/legacy-home)
+- [`src/features/legacy_home`](./src/features/legacy_home)
   Older homepage implementation kept as reference/archive material.
 
 ## Important data/config files
@@ -302,7 +302,7 @@ export const DEFAULT_THEME: Theme = '...';
 Important:
 
 - if a visitor already has a saved theme in local storage, that saved value overrides the default
-- the saved key is managed through [`src/features/graph-home/content/BioTheme.ts`](./src/features/graph-home/content/BioTheme.ts)
+- the saved key is managed through [`src/features/graph_home/content/BioTheme.ts`](./src/features/graph_home/content/BioTheme.ts)
 
 ## UI copy and localization
 

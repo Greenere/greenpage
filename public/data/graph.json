@@ -159,14 +159,6 @@
       "strength": 3
     },
     {
-      "id": "research-signature-hust",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "label": "started from HUST coursework and lab access",
-      "strength": 2
-    },
-    {
       "id": "research-noise-mclab",
       "from": "noise-modulation",
       "to": "hust-mclab",
@@ -189,38 +181,6 @@
       "kind": "outcome",
       "label": "became part of the later robustness writing trail",
       "strength": 3
-    },
-    {
-      "id": "wellmail-hust",
-      "from": "wellmail",
-      "to": "hust",
-      "kind": "time",
-      "label": "software project at HUST",
-      "strength": 2
-    },
-    {
-      "id": "project-louvre-hust",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "label": "modeling contest during HUST years",
-      "strength": 1
-    },
-    {
-      "id": "weibe-hust",
-      "from": "weibe",
-      "to": "hust",
-      "kind": "time",
-      "label": "big-data systems course project",
-      "strength": 2
-    },
-    {
-      "id": "faceswap-hust",
-      "from": "faceswap",
-      "to": "hust",
-      "kind": "time",
-      "label": "undergraduate capstone period",
-      "strength": 2
     },
     {
       "id": "faceswap-signature",
@@ -253,14 +213,6 @@
       "kind": "reason",
       "label": "technical modeling touched a parallel history interest",
       "strength": 1
-    },
-    {
-      "id": "experience-mclab-hust",
-      "from": "hust-mclab",
-      "to": "hust",
-      "kind": "time",
-      "label": "still rooted in the HUST period",
-      "strength": 2
     },
     {
       "id": "realai-research",
@@ -317,6 +269,62 @@
       "kind": "reason",
       "label": "laid-off by Verily",
       "strength": 3
+    },
+    {
+      "id": "editor-hust-time-signature-attack-hust-1",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "label": "started from HUST coursework and lab access",
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-wellmail-hust-2",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "label": "software project at HUST",
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-louvre-evacuation-hust-3",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "label": "modeling contest during HUST years",
+      "strength": 1
+    },
+    {
+      "id": "editor-hust-time-weibe-hust-4",
+      "from": "weibe",
+      "to": "hust",
+      "kind": "time",
+      "label": "big-data systems course project",
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-faceswap-hust-5",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "label": "undergraduate capstone period",
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-hust-mclab-hust-6",
+      "from": "hust-mclab",
+      "to": "hust",
+      "kind": "time",
+      "label": "still rooted in the HUST period",
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-hust-naec-7",
+      "from": "hust",
+      "to": "naec",
+      "kind": "time",
+      "label": "during my third year in college",
+      "strength": 2
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { resolveAssetUrl, type NodeGalleryAlignment, type NodeGalleryImage } from '../graph-home/content/Nodes';
+import { resolveAssetUrl, type NodeGalleryAlignment, type NodeGalleryImage } from '../graph_home/content/Nodes';
 import { renderInlineMarkdown } from './inlineMarkdown';
 
 const DEFAULT_GALLERY_RATIO = 4 / 3;

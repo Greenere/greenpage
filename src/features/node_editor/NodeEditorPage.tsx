@@ -9,6 +9,8 @@ import {
 } from '../../configs/graphHighlight';
 import { EDIT_RELATION_ICON, type ConfigurableIcon } from '../../configs/icons';
 import { UI_COPY } from '../../configs/uiCopy';
+import { LANGUAGE_OPTIONS, getLocaleMessages } from '../../i18n';
+import { useAppLanguage } from '../../i18n/LanguageProvider';
 import {
   CHRONOLOGY_FORMAT_HINT,
   getChronologySortKeySafe,
@@ -17,23 +19,20 @@ import {
   normalizeChronologyValue,
 } from '../../shared/chronology';
 import { applyThemeVars } from '../../shared/styles/colors';
-import ThemePicker from '../graph-home/ThemePicker';
-import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph-home/content/BioTheme';
+import ThemePicker from '../graph_home/ThemePicker';
+import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph_home/content/BioTheme';
 import {
   getDisplayDomain,
   normalizeNodeContent,
   resolveAssetUrl,
-  type ArticleBlock,
   type GraphContentNode,
   type GraphNodeContent,
   type GraphNodeRef,
-  type NodeArticleSection,
-} from '../graph-home/content/Nodes';
+} from '../graph_home/content/Nodes';
 import NodeArticlePreview from './NodeArticlePreview';
 import {
   DETAIL_READING_WIDTH,
   DETAIL_SECTION_WIDTH,
-  renderContentBlock,
   renderMeta,
   renderSectionHeading,
 } from './articlePreviewShared';
@@ -48,19 +47,67 @@ import {
   saveEditorNode,
   type NewNodeDraft,
 } from './editorApi';
-import { createTemplateContent, getDefaultKindForDomain, NODE_TEMPLATE_OPTIONS } from './templates';
+import SectionListEditor from './section_editor/SectionListEditor';
+import { createEmptySection } from './section_editor/sectionMarkdown';
+import { createTemplateContent, getDefaultKindForDomain, getNodeTemplateOptions, NODE_TEMPLATE_IDS } from './templates';
 
 const EDITOR_DRAFT_STORAGE_PREFIX = 'greenpage-node-editor-draft:';
 const EDITOR_PENDING_NEW_DOMAIN_KEY = 'greenpage-node-editor-pending-new-domain';
 
 type EditorTab = 'content' | 'json' | 'new-node' | 'new-domain';
 
-const TAB_LABELS: Record<EditorTab, string> = {
-  content: 'Edit',
-  json: 'JSON',
-  'new-node': 'New Node',
-  'new-domain': 'New Domain',
-};
+function getTabLabel(tab: EditorTab) {
+  if (tab === 'content') return UI_COPY.nodeEditor.tabs.content;
+  if (tab === 'json') return UI_COPY.nodeEditor.tabs.json;
+  if (tab === 'new-node') return UI_COPY.nodeEditor.tabs.newNode;
+  return UI_COPY.nodeEditor.tabs.newDomain;
+}
+
+function PreviewPanelLanguageToggle() {
+  const { language, setLanguage, messages } = useAppLanguage();
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.2rem',
+      }}
+      aria-label={messages.appShell.languageLabel}
+    >
+      {LANGUAGE_OPTIONS.map((option) => {
+        const selected = option.id === language;
+        const label = messages.appShell.languageOptions[option.id];
+
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => setLanguage(option.id)}
+            aria-pressed={selected}
+            aria-label={messages.appShell.languageMenuLabel(label)}
+            title={label}
+            style={{
+              padding: '0.12rem 0.25rem',
+              border: 'none',
+              background: 'transparent',
+              color: selected ? 'var(--color-text)' : 'color-mix(in srgb, var(--color-text) 58%, transparent)',
+              fontSize: '0.75rem',
+              fontWeight: selected ? 700 : 500,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              lineHeight: 1.2,
+            }}
+          >
+            {option.shortLabel}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 type ValidationState = {
   error: string | null;
@@ -135,429 +182,6 @@ function validateContent(content: GraphNodeContent, nodeId: string): ValidationS
   } catch (error) {
     return { error: error instanceof Error ? error.message : 'Invalid node content.' };
   }
-}
-
-function createEmptySection(): NodeArticleSection {
-  return {
-    label: UI_COPY.nodeEditor.sectionEditor.newSectionLabel,
-    blocks: [
-      {
-        type: 'text',
-        text: UI_COPY.nodeEditor.sectionEditor.newSectionText,
-      },
-    ],
-  };
-}
-
-const IMAGE_LINE_PATTERN = /^!\[([^\]]*)\]\((\S+?)(?:\s+"([^"]*)")?\)$/;
-const LINK_LINE_PATTERN = /^\[([^\]]+)\]\((\S+?)\)$/;
-
-function trimBlockText(value: string) {
-  return value.trim().replace(/\n{3,}/g, '\n\n');
-}
-
-function serializeImageLine(src: string, alt: string, caption?: string) {
-  return `![${alt}](${src}${caption ? ` "${caption}"` : ''})`;
-}
-
-function serializeSectionMarkdown(section: NodeArticleSection) {
-  return section.blocks
-    .map((block) => {
-      if (block.type === 'text') return block.text.trim();
-      if (block.type === 'quote') return block.text.split('\n').map((line) => `> ${line}`).join('\n');
-      if (block.type === 'list') return block.items.map((item) => `- ${item}`).join('\n');
-      if (block.type === 'image') return serializeImageLine(block.src, block.alt, block.caption);
-      if (block.type === 'link') {
-        if (block.description) {
-          return `::link [${block.label}](${block.href})\n${block.description}\n:::`;
-        }
-        return `[${block.label}](${block.href})`;
-      }
-      if (block.type === 'gallery') {
-        const header = `:::gallery columns=${block.columns ?? 2} align=${block.align ?? 'height'}`;
-        const body = block.items.map((item) => serializeImageLine(item.src, item.alt, item.caption)).join('\n');
-        return `${header}\n${body}\n:::`;
-      }
-      if (block.type === 'callout') {
-        const titleSuffix = block.title ? ` ${block.title}` : '';
-        return `:::${block.tone ?? 'note'}${titleSuffix}\n${block.text}\n:::`;
-      }
-      return '';
-    })
-    .filter(Boolean)
-    .join('\n\n');
-}
-
-function parseSectionMarkdown(markdown: string): ArticleBlock[] {
-  const source = markdown.replace(/\r\n/g, '\n');
-  const lines = source.split('\n');
-  const blocks: ArticleBlock[] = [];
-  let index = 0;
-
-  const flushParagraph = (paragraphLines: string[]) => {
-    const text = trimBlockText(paragraphLines.join('\n'));
-    if (!text) return;
-
-    const imageMatch = text.match(IMAGE_LINE_PATTERN);
-    if (imageMatch) {
-      blocks.push({ type: 'image', alt: imageMatch[1], src: imageMatch[2], caption: imageMatch[3] || undefined });
-      return;
-    }
-
-    const linkMatch = text.match(LINK_LINE_PATTERN);
-    if (linkMatch) {
-      blocks.push({ type: 'link', label: linkMatch[1], href: linkMatch[2] });
-      return;
-    }
-
-    blocks.push({ type: 'text', text });
-  };
-
-  while (index < lines.length) {
-    const line = lines[index].trimEnd();
-
-    if (!line.trim()) {
-      index += 1;
-      continue;
-    }
-
-    if (line.startsWith(':::gallery')) {
-      const columnsMatch = line.match(/columns=(1|2|3)/);
-      const alignMatch = line.match(/align=(height|natural)/);
-      const items: NonNullable<Extract<ArticleBlock, { type: 'gallery' }>['items']> = [];
-      index += 1;
-
-      while (index < lines.length && lines[index].trim() !== ':::') {
-        const imageLine = lines[index].trim();
-        if (imageLine) {
-          const imageMatch = imageLine.match(IMAGE_LINE_PATTERN);
-          if (!imageMatch) throw new Error('Gallery blocks only support markdown image lines.');
-          items.push({ alt: imageMatch[1], src: imageMatch[2], caption: imageMatch[3] || undefined });
-        }
-        index += 1;
-      }
-
-      if (lines[index]?.trim() !== ':::') throw new Error('Gallery block is missing closing :::.');
-      if (items.length === 0) throw new Error('Gallery block needs at least one image.');
-
-      blocks.push({
-        type: 'gallery',
-        items,
-        columns: columnsMatch ? (Number(columnsMatch[1]) as 1 | 2 | 3) : 2,
-        align: alignMatch ? (alignMatch[1] as 'height' | 'natural') : 'height',
-      });
-      index += 1;
-      continue;
-    }
-
-    if (line.startsWith(':::note') || line.startsWith(':::highlight')) {
-      const tone = line.startsWith(':::highlight') ? 'highlight' : 'note';
-      const title = line.replace(/^:::(?:note|highlight)\s*/, '').trim() || undefined;
-      const bodyLines: string[] = [];
-      index += 1;
-
-      while (index < lines.length && lines[index].trim() !== ':::') {
-        bodyLines.push(lines[index]);
-        index += 1;
-      }
-
-      if (lines[index]?.trim() !== ':::') throw new Error('Callout block is missing closing :::.');
-      blocks.push({ type: 'callout', tone, title, text: trimBlockText(bodyLines.join('\n')) });
-      index += 1;
-      continue;
-    }
-
-    if (line.startsWith('::link ')) {
-      const linkMatch = line.slice('::link '.length).trim().match(LINK_LINE_PATTERN);
-      if (!linkMatch) throw new Error('Custom link blocks should start with ::link [label](href).');
-
-      const bodyLines: string[] = [];
-      index += 1;
-      while (index < lines.length && lines[index].trim() !== ':::') {
-        bodyLines.push(lines[index]);
-        index += 1;
-      }
-
-      if (lines[index]?.trim() !== ':::') throw new Error('Custom link block is missing closing :::.');
-      blocks.push({
-        type: 'link',
-        label: linkMatch[1],
-        href: linkMatch[2],
-        description: trimBlockText(bodyLines.join('\n')) || undefined,
-      });
-      index += 1;
-      continue;
-    }
-
-    if (line.startsWith(':::')) {
-      blocks.push({ type: 'text', text: line });
-      index += 1;
-      continue;
-    }
-
-    if (line.startsWith('> ')) {
-      const quoteLines: string[] = [];
-      while (index < lines.length && lines[index].trim().startsWith('> ')) {
-        quoteLines.push(lines[index].trim().slice(2));
-        index += 1;
-      }
-      blocks.push({ type: 'quote', text: trimBlockText(quoteLines.join('\n')) });
-      continue;
-    }
-
-    if (line.startsWith('- ')) {
-      const items: string[] = [];
-      while (index < lines.length && lines[index].trim().startsWith('- ')) {
-        items.push(lines[index].trim().slice(2));
-        index += 1;
-      }
-      blocks.push({ type: 'list', items });
-      continue;
-    }
-
-    const paragraphLines: string[] = [];
-    while (
-      index < lines.length &&
-      lines[index].trim() &&
-      !lines[index].trim().startsWith(':::') &&
-      !lines[index].trim().startsWith('> ') &&
-      !lines[index].trim().startsWith('- ')
-    ) {
-      paragraphLines.push(lines[index]);
-      index += 1;
-    }
-    flushParagraph(paragraphLines);
-  }
-
-  return blocks.length > 0 ? blocks : createEmptySection().blocks;
-}
-
-function SectionSyntaxHint() {
-  return (
-    <div
-      style={{
-        marginTop: '0.5rem',
-        fontSize: '0.75rem',
-        opacity: 0.75,
-        lineHeight: 1.7,
-        padding: '0.65rem 0.8rem',
-        borderRadius: '10px',
-        background: 'color-mix(in srgb, var(--color-background) 82%, white 18%)',
-      }}
-    >
-      <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintInlineLabel}</strong> {UI_COPY.nodeEditor.sectionEditor.syntaxHintInlineBody} &nbsp;·&nbsp; <code>{'> quote'}</code> &nbsp;·&nbsp; <code>- item</code> for lists
-      <br />
-      <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintMediaLabel}</strong> <code>![alt](src "caption")</code> &nbsp;·&nbsp; <code>[label](href)</code> {UI_COPY.nodeEditor.sectionEditor.syntaxHintMediaBody}
-      <br />
-      <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintBlocksLabel}</strong> <code>:::gallery columns=2 align=height</code>…<code>:::</code>
-      &nbsp;·&nbsp; <code>:::note</code> or <code>:::highlight</code>…<code>:::</code>
-    </div>
-  );
-}
-
-// SectionEditor — markdown textarea only; label and controls live in InlineSectionCard
-function SectionEditor({
-  section,
-  onChange,
-}: {
-  section: NodeArticleSection;
-  onChange: (next: NodeArticleSection) => void;
-}) {
-  const [markdown, setMarkdown] = useState(() => serializeSectionMarkdown(section));
-  const [markdownError, setMarkdownError] = useState<string | null>(null);
-  const [showHint, setShowHint] = useState(false);
-
-  const handleMarkdownChange = (value: string) => {
-    setMarkdown(value);
-    try {
-      onChange({ ...section, blocks: parseSectionMarkdown(value) });
-      setMarkdownError(null);
-    } catch (error) {
-      setMarkdownError(error instanceof Error ? error.message : 'Invalid section syntax.');
-    }
-  };
-
-  return (
-    <div style={{ marginTop: '0.65rem' }}>
-      <textarea
-        autoFocus
-        value={markdown}
-        onChange={(event) => handleMarkdownChange(event.target.value)}
-        rows={12}
-        style={{
-          width: '100%',
-          padding: '0.85rem',
-          borderRadius: '12px',
-          border: '1px solid color-mix(in srgb, var(--color-secondary) 35%, transparent)',
-          background: 'color-mix(in srgb, var(--color-background) 88%, white 12%)',
-          color: 'var(--color-text)',
-          fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace',
-          fontSize: '0.83rem',
-          lineHeight: 1.65,
-          resize: 'vertical',
-          boxSizing: 'border-box',
-        }}
-      />
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.3rem' }}>
-        <button
-          type="button"
-          onClick={() => setShowHint((v) => !v)}
-          style={{
-            fontSize: '0.73rem',
-            opacity: 0.6,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text)',
-            padding: 0,
-            fontFamily: 'inherit',
-          }}
-        >
-          {showHint ? UI_COPY.nodeEditor.sectionEditor.syntaxGuideHide : UI_COPY.nodeEditor.sectionEditor.syntaxGuideShow}
-        </button>
-        {markdownError && <div style={{ fontSize: '0.8rem', color: 'crimson' }}>{markdownError}</div>}
-      </div>
-      {showHint && <SectionSyntaxHint />}
-    </div>
-  );
-}
-
-function InlineSectionCard({
-  section,
-  sectionIndex,
-  isEditing,
-  onStartEditing,
-  onStopEditing,
-  onChange,
-  onDelete,
-}: {
-  section: NodeArticleSection;
-  sectionIndex: number;
-  isEditing: boolean;
-  onStartEditing: () => void;
-  onStopEditing: () => void;
-  onChange: (next: NodeArticleSection) => void;
-  onDelete: () => void;
-}) {
-  return (
-    <section
-      style={{
-        marginTop: sectionIndex === 0 ? '2.2rem' : '1.8rem',
-        maxWidth: DETAIL_SECTION_WIDTH,
-        marginInline: 'auto',
-        borderRadius: '18px',
-        padding: isEditing ? '0.85rem 1rem 0.9rem' : '0',
-        border: isEditing
-          ? '1px solid color-mix(in srgb, var(--color-secondary) 32%, transparent)'
-          : '1px solid transparent',
-        transition: 'border-color 0.15s, padding 0.15s, background 0.15s',
-      }}
-    >
-      {/* Header row: grip + label + actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: isEditing ? '0' : '0.15rem' }}>
-        {isEditing ? (
-          <input
-            value={section.label}
-            onChange={(event) => onChange({ ...section, label: event.target.value })}
-            style={{
-              flex: 1,
-              padding: '0.28rem 0.5rem',
-              borderRadius: '7px',
-              border: '1px solid color-mix(in srgb, var(--color-secondary) 35%, transparent)',
-              background: 'transparent',
-              color: 'var(--color-text)',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              fontFamily: 'inherit',
-            }}
-          />
-        ) : (
-          <div style={{ flex: 1 }}>{renderSectionHeading(section.label)}</div>
-        )}
-        <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center', flexShrink: 0 }}>
-          {!isEditing && (
-            <button
-              type="button"
-              onClick={onStartEditing}
-              style={{
-                padding: '0.25rem 0.6rem',
-                borderRadius: '7px',
-                fontSize: '0.76rem',
-                border: '1px solid color-mix(in srgb, var(--color-secondary) 32%, transparent)',
-                background: 'transparent',
-                color: 'var(--color-text)',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                opacity: 0.8,
-              }}
-            >
-              {UI_COPY.nodeEditor.common.edit}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={onDelete}
-            title={UI_COPY.nodeEditor.sectionEditor.deleteSectionTitle}
-            style={{
-              padding: '0.25rem 0.5rem',
-              borderRadius: '7px',
-              fontSize: '0.76rem',
-              border: '1px solid color-mix(in srgb, crimson 22%, transparent)',
-              background: 'transparent',
-              color: 'color-mix(in srgb, crimson 65%, var(--color-text))',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-            }}
-          >
-            ✕
-          </button>
-        </div>
-      </div>
-
-      {/* Content: editor or preview */}
-      {isEditing ? (
-        <div
-          tabIndex={-1}
-          onBlur={(event) => {
-            const nextFocused = event.relatedTarget;
-            if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) return;
-            onStopEditing();
-          }}
-        >
-          <SectionEditor section={section} onChange={onChange} />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.65rem' }}>
-            <button
-              type="button"
-              onClick={onStopEditing}
-              style={{
-                padding: '0.38rem 0.85rem',
-                borderRadius: '9px',
-                fontSize: '0.82rem',
-                border: '1px solid transparent',
-                background: 'var(--color-text)',
-                color: 'var(--color-background)',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontFamily: 'inherit',
-              }}
-            >
-              {UI_COPY.nodeEditor.common.done}
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div
-          onClick={onStartEditing}
-          style={{ cursor: 'text' }}
-        >
-          {section.blocks.map((block, blockIndex) => renderContentBlock(block, blockIndex))}
-        </div>
-      )}
-
-    </section>
-  );
 }
 
 function ControlLabel({ children }: { children: React.ReactNode }) {
@@ -1117,14 +741,14 @@ function AddConnectedNodeCard({ onClick }: { onClick: () => void }) {
         transform: hovered ? 'translateY(-1px)' : 'translateY(0)',
         transition: 'box-shadow 180ms ease, background-color 180ms ease, transform 180ms ease',
       }}
-      title="Add explicit connection"
+      title={UI_COPY.nodeEditor.connectedNodes.addExplicitConnection}
     >
       <div style={{ fontSize: '1.1rem', fontWeight: 700, lineHeight: 1 }}>+</div>
       <div style={{ marginTop: '0.5rem', fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.35 }}>
-        Add explicit connection
+        {UI_COPY.nodeEditor.connectedNodes.addExplicitConnection}
       </div>
       <div style={{ marginTop: '0.38rem', fontSize: '0.76rem', lineHeight: 1.45, opacity: 0.8 }}>
-        Link this node to an existing node.
+        {UI_COPY.nodeEditor.connectedNodes.addExplicitConnectionHint}
       </div>
     </button>
   );
@@ -1135,7 +759,7 @@ function SearchableNodePicker({
   value,
   currentDomain,
   onSelect,
-  placeholder = 'Search node…',
+  placeholder = UI_COPY.nodeEditor.contentTab.otherNodePlaceholder,
 }: {
   options: EditorNodeOption[];
   value: string;
@@ -1143,6 +767,7 @@ function SearchableNodePicker({
   onSelect: (nodeId: string) => void;
   placeholder?: string;
 }) {
+  const { language } = useAppLanguage();
   const selectedOption = options.find((node) => node.id === value);
   const [query, setQuery] = useState(() => (selectedOption ? formatEditorNodeOptionLabel(selectedOption) : ''));
   const [open, setOpen] = useState(false);
@@ -1183,7 +808,7 @@ function SearchableNodePicker({
         return sortNodeRefs(left, right);
       })
       .slice(0, 8);
-  }, [currentDomain, options, query]);
+  }, [currentDomain, language, options, query]);
 
   const resetQuery = () => {
     setQuery(selectedOption ? formatEditorNodeOptionLabel(selectedOption) : '');
@@ -1296,6 +921,9 @@ function inputStyle(multiline = false) {
 }
 
 const NodeEditorPage: React.FC = () => {
+  const { language } = useAppLanguage();
+  const nodeTemplateOptions = getNodeTemplateOptions();
+  const templateDefaults = getLocaleMessages().nodeTemplates.defaults;
   const navigate = useNavigate();
   const { nodeId } = useParams();
   const decodedNodeId = nodeId ? decodeURIComponent(nodeId) : '';
@@ -1324,10 +952,10 @@ const NodeEditorPage: React.FC = () => {
     domain: DOMAIN_ORDER[0],
     kind: getDefaultKindForDomain(DOMAIN_ORDER[0]),
     chronology: getCurrentMonthChronologyValue(),
-    title: 'Untitled node',
+    title: templateDefaults.untitledNodeTitle,
     subtitle: '',
-    summary: 'Short summary goes here.',
-    template: NODE_TEMPLATE_OPTIONS[0].id,
+    summary: templateDefaults.summary,
+    template: NODE_TEMPLATE_IDS[0],
   });
   const [newDomainDraft, setNewDomainDraft] = useState<NewDomainDraft>({
     domainId: '',
@@ -1505,16 +1133,16 @@ const NodeEditorPage: React.FC = () => {
 
         return sortNodeRefs(left, right);
       });
-  }, [bootstrapNodes, currentNodeRef]);
+  }, [bootstrapNodes, currentNodeRef, language]);
 
   const timelineConnectionEntries = useMemo(
     () => (currentNodeRef ? buildTimelineConnectionEntries(currentNodeRef, bootstrapNodes) : []),
-    [bootstrapNodes, currentNodeRef]
+    [bootstrapNodes, currentNodeRef, language]
   );
 
   const bioConnectionEntry = useMemo(
     () => (currentNodeRef ? buildBioConnectionEntry(currentNodeRef, bootstrapNodes) : null),
-    [bootstrapNodes, currentNodeRef]
+    [bootstrapNodes, currentNodeRef, language]
   );
 
   const explicitConnectionEntries = useMemo(
@@ -1524,19 +1152,19 @@ const NodeEditorPage: React.FC = () => {
             buildExplicitConnectionEntry(relation, relationIndex, currentNodeRef.id, editorNodeById)
           )
         : [],
-    [currentNodeRef, editorNodeById, explicitRelations]
+    [currentNodeRef, editorNodeById, explicitRelations, language]
   );
 
   const domainTreemapEntries = useMemo<DomainTreemapEntry[]>(
     () =>
       DOMAIN_ORDER.map((domain) => ({
         domain,
-        display: DOMAIN_CONFIG[domain].display,
+        display: getDisplayDomain(domain),
         cardTag: DOMAIN_CONFIG[domain].cardTag,
         count: bootstrapNodes.filter((node) => node.domain === domain).length,
         removable: bootstrapNodes.every((node) => node.domain !== domain),
       })),
-    [bootstrapNodes]
+    [bootstrapNodes, language]
   );
 
   const selectedExplicitRelation =
@@ -1936,7 +1564,7 @@ const NodeEditorPage: React.FC = () => {
                     transition: 'background 0.12s, color 0.12s',
                   }}
                 >
-                  {TAB_LABELS[tabId]}
+                  {getTabLabel(tabId)}
                 </button>
               ))}
             </div>
@@ -2617,7 +2245,7 @@ const NodeEditorPage: React.FC = () => {
                   >
                     {DOMAIN_ORDER.map((domain) => (
                       <option key={domain} value={domain}>
-                        {DOMAIN_CONFIG[domain].display}
+                        {getDisplayDomain(domain)}
                       </option>
                     ))}
                   </select>
@@ -2661,7 +2289,7 @@ const NodeEditorPage: React.FC = () => {
                     onChange={(event) => setNewNodeDraft((current) => ({ ...current, template: event.target.value }))}
                     style={inputStyle()}
                   >
-                    {NODE_TEMPLATE_OPTIONS.map((option) => (
+                    {nodeTemplateOptions.map((option) => (
                       <option key={option.id} value={option.id}>
                         {option.label}
                       </option>
@@ -2880,6 +2508,7 @@ const NodeEditorPage: React.FC = () => {
                       : UI_COPY.nodeEditor.rightPanel.previewSelectionHint}
                 </div>
               </div>
+              <PreviewPanelLanguageToggle />
             </div>
 
             {/* Content editor (inline editing mode) */}
@@ -3002,72 +2631,40 @@ const NodeEditorPage: React.FC = () => {
                 </section>
 
                 {/* Section cards */}
-                {(draftContent.sections ?? []).map((section, sectionIndex, sections) => (
-                  <InlineSectionCard
-                    key={`${section.id ?? section.label}-${sectionIndex}`}
-                    section={section}
-                    sectionIndex={sectionIndex}
-                    isEditing={editingSectionIndex === sectionIndex}
-                    onStartEditing={() => setEditingSectionIndex(sectionIndex)}
-                    onStopEditing={() =>
-                      setEditingSectionIndex((current) => (current === sectionIndex ? null : current))
-                    }
-                    onChange={(nextSection) =>
-                      updateDraftContent({
-                        ...draftContent,
-                        sections: sections.map((entry, index) => (index === sectionIndex ? nextSection : entry)),
-                      })
-                    }
-                    onDelete={() =>
-                      openDangerDialog({
-                        actionDescription: UI_COPY.nodeEditor.confirmations.deleteSection(section.label),
-                        proceedLabel: UI_COPY.nodeEditor.common.delete,
-                        tone: 'danger',
-                        onProceed: () => {
-                          updateDraftContent({
-                            ...draftContent,
-                            sections: sections.filter((_, index) => index !== sectionIndex),
-                          });
-                        },
-                      })
-                    }
-                  />
-                ))}
-
-                {/* Add section at end */}
-                <div
-                  style={{
-                    maxWidth: DETAIL_SECTION_WIDTH,
-                    marginInline: 'auto',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    paddingTop: '0.5rem',
-                    paddingBottom: '2rem',
+                <SectionListEditor
+                  sections={draftContent.sections ?? []}
+                  editingSectionIndex={editingSectionIndex}
+                  onStartEditing={setEditingSectionIndex}
+                  onStopEditing={(sectionIndex) =>
+                    setEditingSectionIndex((current) => (current === sectionIndex ? null : current))
+                  }
+                  onChangeSection={(sectionIndex, nextSection) =>
+                    updateDraftContent({
+                      ...draftContent,
+                      sections: (draftContent.sections ?? []).map((entry, index) =>
+                        index === sectionIndex ? nextSection : entry,
+                      ),
+                    })
+                  }
+                  onDeleteSection={(sectionIndex, section) =>
+                    openDangerDialog({
+                      actionDescription: UI_COPY.nodeEditor.confirmations.deleteSection(section.label),
+                      proceedLabel: UI_COPY.nodeEditor.common.delete,
+                      tone: 'danger',
+                      onProceed: () => {
+                        updateDraftContent({
+                          ...draftContent,
+                          sections: (draftContent.sections ?? []).filter((_, index) => index !== sectionIndex),
+                        });
+                      },
+                    })
+                  }
+                  onAddSection={() => {
+                    const nextSections = [...(draftContent.sections ?? []), createEmptySection()];
+                    updateDraftContent({ ...draftContent, sections: nextSections });
+                    setEditingSectionIndex(nextSections.length - 1);
                   }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const nextSections = [...(draftContent.sections ?? []), createEmptySection()];
-                      updateDraftContent({ ...draftContent, sections: nextSections });
-                      setEditingSectionIndex(nextSections.length - 1);
-                    }}
-                    style={{
-                      padding: '0.38rem 1rem',
-                      borderRadius: '999px',
-                      border: '1px solid color-mix(in srgb, var(--color-secondary) 30%, transparent)',
-                      background: 'transparent',
-                      color: 'var(--color-text)',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem',
-                      fontFamily: 'inherit',
-                      opacity: 0.7,
-                    }}
-                      title={UI_COPY.nodeEditor.sectionEditor.addSectionTitle}
-                    >
-                      {UI_COPY.nodeEditor.sectionEditor.addSection}
-                    </button>
-                </div>
+                />
 
                 <section
                   style={{

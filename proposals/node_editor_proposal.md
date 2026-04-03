@@ -129,8 +129,8 @@ The preview should not be a “fake editor preview.”
 
 It should reuse the same rendering logic as:
 
-- [`NodeDetailPage.tsx`](../src/features/graph-home/NodeDetailPage.tsx)
-- [`BioDetailPage.tsx`](../src/features/graph-home/BioDetailPage.tsx)
+- [`NodeDetailPage.tsx`](../src/features/graph_home/NodeDetailPage.tsx)
+- [`BioDetailPage.tsx`](../src/features/graph_home/BioDetailPage.tsx)
 
 That likely means extracting the shared article rendering into one or two presentational components such as:
 
@@ -434,7 +434,7 @@ The validator should not be invented separately from the runtime content model.
 
 Reuse the existing normalization rules in:
 
-- [`Nodes.ts`](../src/features/graph-home/content/Nodes.ts)
+- [`Nodes.ts`](../src/features/graph_home/content/Nodes.ts)
 
 Ideally:
 

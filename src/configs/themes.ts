@@ -29,7 +29,7 @@ export const THEME_CONFIG = {
             accent: '#B4B9BD',
         },
         portrait: {
-            imgSrc: './assets/portrait-haoyang-nyc.jpg',
+            imgSrc: './assets/portrait_haoyang_nyc.jpg',
             url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'New York, 2023',
         },
@@ -44,7 +44,7 @@ export const THEME_CONFIG = {
             accent: '#28272Bff',
         },
         portrait: {
-            imgSrc: './assets/portrait-haoyang-joshua.jpg',
+            imgSrc: './assets/portrait_haoyang_joshua.jpg',
             url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'Joshua Tree, 2023',
         },
@@ -59,7 +59,7 @@ export const THEME_CONFIG = {
             accent: '#43444Dff',
         },
         portrait: {
-            imgSrc: './assets/portrait-haoyang-mty.jpg',
+            imgSrc: './assets/portrait_haoyang_mty.jpg',
             url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'Monterey, 2023',
         },
@@ -74,7 +74,7 @@ export const THEME_CONFIG = {
             accent: '#43444Dff',
         },
         portrait: {
-            imgSrc: './assets/portrait-haoyang-atlp.jpg',
+            imgSrc: './assets/portrait_haoyang_atlp.jpg',
             url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'Antelope Valley, 2023',
         },

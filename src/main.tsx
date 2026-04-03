@@ -2,7 +2,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
-import { SITE_META } from './configs/siteMeta'
+import { LanguageProvider } from './i18n/LanguageProvider'
+import { getInitialLanguage, getLocaleMessages, setActiveLanguage } from './i18n'
 
 function resolveSiteAsset(path: string) {
   if (path.startsWith('http://') || path.startsWith('https://')) return path
@@ -10,9 +11,13 @@ function resolveSiteAsset(path: string) {
   return `${base}${path.replace(/^\.\//, '').replace(/^\//, '')}`
 }
 
-document.title = SITE_META.title
+const initialLanguage = getInitialLanguage()
+setActiveLanguage(initialLanguage)
+const siteMeta = getLocaleMessages(initialLanguage).siteMeta
 
-const iconHref = resolveSiteAsset(SITE_META.iconHref)
+document.title = siteMeta.title
+
+const iconHref = resolveSiteAsset(siteMeta.iconHref)
 let favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
 
 if (!favicon) {
@@ -21,11 +26,13 @@ if (!favicon) {
   document.head.appendChild(favicon)
 }
 
-favicon.type = SITE_META.iconType
+favicon.type = siteMeta.iconType
 favicon.href = iconHref
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter basename={import.meta.env.BASE_URL}>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </BrowserRouter>,
 )

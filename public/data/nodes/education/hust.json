@@ -8,7 +8,6 @@
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
@@ -23,6 +22,21 @@
             "Student associations and design work"
           ]
         }
+      ],
+      "id": "overview"
+    }
+  ],
+  "detail": [
+    {
+      "type": "text",
+      "text": "I graduated in the top 10 with a 3.91/4.0 GPA. Research, contests, design work, and course projects gradually pulled the path toward machine learning and software."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Electronic and Information Engineering",
+        "Research and capstone project work",
+        "Student associations and design work"
       ]
     }
   ]

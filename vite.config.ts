@@ -46,6 +46,10 @@ function serializeJson(value: unknown) {
   return `${JSON.stringify(value, null, 2)}\n`
 }
 
+function getNodeContentFileName(nodeId: string) {
+  return `${nodeId.replace(/-/g, '_')}.json`
+}
+
 async function readJsonFile<T>(filePath: string): Promise<T> {
   const content = await fs.readFile(filePath, 'utf8')
   return JSON.parse(content) as T
@@ -87,7 +91,7 @@ function getNodeContentPath(node: EditorGraphNode) {
     return path.resolve(ROOT_DIR, 'public', normalized)
   }
 
-  return path.resolve(NODES_DIR, node.domain, `${node.id}.json`)
+  return path.resolve(NODES_DIR, node.domain, getNodeContentFileName(node.id))
 }
 
 async function readNodeSummary(node: EditorGraphNode): Promise<EditorNodeSummary> {

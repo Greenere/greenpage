@@ -1,6 +1,6 @@
 import { UI_COPY } from '../../configs/uiCopy';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
-import { getDisplayDomain, resolveAssetUrl, type GraphContentNode, type NodeArticleSection } from '../graph-home/content/Nodes';
+import { getDisplayDomain, resolveAssetUrl, type GraphContentNode, type NodeArticleSection } from '../graph_home/content/Nodes';
 import ArticleGallery from './ArticleGallery';
 import {
   DETAIL_READING_WIDTH,

@@ -1,5 +1,6 @@
 import { DOMAIN_CONFIG, isDomainId, type DomainId } from '../../../configs/domains';
 import { UI_COPY } from '../../../configs/uiCopy';
+import { getLocaleMessages } from '../../../i18n';
 import {
   getChronologySortKey,
   normalizeChronologyValue,
@@ -143,6 +144,10 @@ function withBaseUrl(path: string) {
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
   const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
   return `${base}${path.replace(/^\.\//, '').replace(/^\//, '')}`;
+}
+
+function getNodeContentFileName(nodeId: string) {
+  return `${nodeId.replace(/-/g, '_')}.json`;
 }
 
 export function resolveAssetUrl(path: string) {
@@ -467,7 +472,7 @@ export function normalizeNodeContent(raw: unknown, nodeId = 'unknown'): GraphNod
 }
 
 function getNodeContentUrl(node: GraphNodeRef) {
-  return withBaseUrl(node.contentPath ?? `${GRAPH_NODE_CONTENT_DIR}${node.domain}/${node.id}.json`);
+  return withBaseUrl(node.contentPath ?? `${GRAPH_NODE_CONTENT_DIR}${node.domain}/${getNodeContentFileName(node.id)}`);
 }
 
 async function loadNodeContent(node: GraphNodeRef) {
@@ -578,7 +583,7 @@ export function getDomainLayout(domain: DomainId) {
 }
 
 export function getDisplayDomain(domain: DomainId) {
-  return DOMAIN_CONFIG[domain].display;
+  return getLocaleMessages().domainLabels[domain] ?? DOMAIN_CONFIG[domain].display;
 }
 
 export function getTemporalDomainRelations(model: GraphModel) {

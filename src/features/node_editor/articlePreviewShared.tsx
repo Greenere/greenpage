@@ -1,6 +1,6 @@
 import { UI_COPY } from '../../configs/uiCopy';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
-import { resolveAssetUrl, type ArticleBlock, type ContentBlock, type NodeArticleMeta } from '../graph-home/content/Nodes';
+import { resolveAssetUrl, type ArticleBlock, type ContentBlock, type NodeArticleMeta } from '../graph_home/content/Nodes';
 import ArticleGallery from './ArticleGallery';
 import { renderInlineMarkdown } from './inlineMarkdown';
 export const DETAIL_READING_WIDTH = '46rem';
