@@ -173,6 +173,7 @@ body,
   -webkit-appearance: none;
   outline: none;
   box-shadow: none;
+  touch-action: manipulation;
 }
 
 .node-page-back-link {

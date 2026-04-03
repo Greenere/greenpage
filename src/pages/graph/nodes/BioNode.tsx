@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Footnote, Paragraph, Subtitle } from "../../../shared/ui/StyledTextBlocks";
 import { Position, useUpdateNodeInternals } from "@xyflow/react";
@@ -31,10 +31,6 @@ const BioNode: React.FC<BioNodeProps> = ({
     const { language } = useAppLanguage();
     const [focused, setFocused] = useState<boolean>(false);
     const [bioContent, setBioContent] = useState<BioPageContent | null>(() => readCachedBioPageContent(language));
-    const [bioLinkArmed, setBioLinkArmed] = useState(false);
-    const [resetArmed, setResetArmed] = useState(false);
-    const bioLinkArmTimeoutRef = useRef<number | null>(null);
-    const resetArmTimeoutRef = useRef<number | null>(null);
     const updateNodeInternals = useUpdateNodeInternals();
 
     useLayoutEffect(() => {
@@ -67,77 +63,22 @@ const BioNode: React.FC<BioNodeProps> = ({
         };
     }, [language]);
 
-    useEffect(() => {
-        return () => {
-            if (bioLinkArmTimeoutRef.current !== null) {
-                window.clearTimeout(bioLinkArmTimeoutRef.current);
-            }
-            if (resetArmTimeoutRef.current !== null) {
-                window.clearTimeout(resetArmTimeoutRef.current);
-            }
-        };
-    }, []);
-
     const bioName = bioContent?.name ?? UI_COPY.bioNode.fallbackName;
     const bioSubtitle = bioContent?.subtitle ?? UI_COPY.bioNode.fallbackSubtitle;
     const bioContact =
         bioContent?.facts?.find((fact) => fact.href?.startsWith("mailto:") || fact.value.includes("@"))?.value ??
         UI_COPY.bioNode.fallbackContact;
 
-    const armBioLink = useCallback(() => {
-        if (bioLinkArmTimeoutRef.current !== null) {
-            window.clearTimeout(bioLinkArmTimeoutRef.current);
-        }
-
-        bioLinkArmTimeoutRef.current = window.setTimeout(() => {
-            setBioLinkArmed(true);
-            bioLinkArmTimeoutRef.current = null;
-        }, 220);
-    }, []);
-
-    const disarmBioLink = useCallback(() => {
-        if (bioLinkArmTimeoutRef.current !== null) {
-            window.clearTimeout(bioLinkArmTimeoutRef.current);
-            bioLinkArmTimeoutRef.current = null;
-        }
-
-        setBioLinkArmed(false);
-    }, []);
-
-    const armReset = useCallback(() => {
-        if (resetArmTimeoutRef.current !== null) {
-            window.clearTimeout(resetArmTimeoutRef.current);
-        }
-
-        resetArmTimeoutRef.current = window.setTimeout(() => {
-            setResetArmed(true);
-            resetArmTimeoutRef.current = null;
-        }, 220);
-    }, []);
-
-    const disarmReset = useCallback(() => {
-        if (resetArmTimeoutRef.current !== null) {
-            window.clearTimeout(resetArmTimeoutRef.current);
-            resetArmTimeoutRef.current = null;
-        }
-
-        setResetArmed(false);
-    }, []);
-
     const stopEventPropagation = (event: React.SyntheticEvent) => {
         event.stopPropagation();
     };
 
     const handleResetPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-        if (!resetArmed) {
-            return;
-        }
-
         stopEventPropagation(event);
     };
 
     const handleResetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        if (!resetArmed || !data.onResetGraph) {
+        if (!data.onResetGraph) {
             event.preventDefault();
             return;
         }
@@ -148,19 +89,10 @@ const BioNode: React.FC<BioNodeProps> = ({
     };
 
     const handleBioPointerDown = (event: React.PointerEvent<HTMLAnchorElement>) => {
-        if (!bioLinkArmed) {
-            return;
-        }
-
         stopEventPropagation(event);
     };
 
     const handleOpenBio = (event: React.MouseEvent<HTMLAnchorElement>) => {
-        if (!bioLinkArmed) {
-            event.preventDefault();
-            return;
-        }
-
         stopEventPropagation(event);
         event.preventDefault();
         navigateWithViewTransition(() => {
@@ -237,33 +169,23 @@ const BioNode: React.FC<BioNodeProps> = ({
                 className="node-card-detail-shell"
                 style={{ gap: "0.9rem" }}
             >
-                <div
-                    onPointerEnter={armBioLink}
-                    onPointerLeave={disarmBioLink}
-                >
+                <div>
                     <Link
                         to={getNodeDetailPath('bio')}
-                        className={`node-card-detail-link ${bioLinkArmed ? 'nodrag nopan' : ''}`.trim()}
+                        className="node-card-detail-link nodrag nopan"
                         onPointerDown={handleBioPointerDown}
                         onClick={handleOpenBio}
-                        onFocus={armBioLink}
-                        onBlur={disarmBioLink}
                         aria-label={UI_COPY.bioNode.openBioDetailPageAriaLabel}
                     >
                         <span>{UI_COPY.bioNode.aboutMe}</span>
                     </Link>
                 </div>
-                <div
-                    onPointerEnter={armReset}
-                    onPointerLeave={disarmReset}
-                >
+                <div>
                     <button
                         type="button"
-                        className={`node-card-detail-link ${resetArmed ? 'nodrag nopan' : ''}`.trim()}
+                        className="node-card-detail-link nodrag nopan"
                         onPointerDown={handleResetPointerDown}
                         onClick={handleResetClick}
-                        onFocus={armReset}
-                        onBlur={disarmReset}
                         aria-label={UI_COPY.bioNode.resetGraphLayoutAriaLabel}
                         style={{
                             background: "transparent",

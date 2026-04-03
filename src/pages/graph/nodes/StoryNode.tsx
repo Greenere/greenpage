@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Footnote, Paragraph, Subtitle } from "../../../shared/ui/StyledTextBlocks";
 import { useUpdateNodeInternals } from "@xyflow/react";
@@ -50,22 +50,12 @@ const StoryNode: React.FC<StoryNodeProps> = ({
     const layoutMode = data.layoutMode ?? 'card';
     const navigate = useNavigate();
     const updateNodeInternals = useUpdateNodeInternals();
-    const [detailLinkArmed, setDetailLinkArmed] = useState(false);
-    const detailLinkArmTimeoutRef = useRef<number | null>(null);
     const showDetailLink = layoutMode !== 'container' && Boolean(data.nodeId);
     const transitionName = showDetailLink ? getNodeTransitionName(data.nodeId ?? id) : undefined;
 
     useLayoutEffect(() => {
         updateNodeInternals(id);
     }, [data.handles, id, updateNodeInternals]);
-
-    useEffect(() => {
-        return () => {
-            if (detailLinkArmTimeoutRef.current !== null) {
-                window.clearTimeout(detailLinkArmTimeoutRef.current);
-            }
-        };
-    }, []);
 
     const containerStyle: React.CSSProperties =
         layoutMode === 'container'
@@ -124,40 +114,11 @@ const StoryNode: React.FC<StoryNodeProps> = ({
         event.stopPropagation();
     };
 
-    const armDetailLink = useCallback(() => {
-        if (detailLinkArmTimeoutRef.current !== null) {
-            window.clearTimeout(detailLinkArmTimeoutRef.current);
-        }
-
-        detailLinkArmTimeoutRef.current = window.setTimeout(() => {
-            setDetailLinkArmed(true);
-            detailLinkArmTimeoutRef.current = null;
-        }, 220);
-    }, []);
-
-    const disarmDetailLink = useCallback(() => {
-        if (detailLinkArmTimeoutRef.current !== null) {
-            window.clearTimeout(detailLinkArmTimeoutRef.current);
-            detailLinkArmTimeoutRef.current = null;
-        }
-
-        setDetailLinkArmed(false);
-    }, []);
-
     const handleDetailPointerDown = (event: React.PointerEvent<HTMLAnchorElement>) => {
-        if (!detailLinkArmed) {
-            return;
-        }
-
         stopEventPropagation(event);
     };
 
     const handleOpenDetail = (event: React.MouseEvent<HTMLAnchorElement>) => {
-        if (!detailLinkArmed) {
-            event.preventDefault();
-            return;
-        }
-
         stopEventPropagation(event);
         event.preventDefault();
         navigateWithViewTransition(() => {
@@ -259,16 +220,12 @@ const StoryNode: React.FC<StoryNodeProps> = ({
             {showDetailLink && (
                 <div
                     className="node-card-detail-shell"
-                    onPointerEnter={armDetailLink}
-                    onPointerLeave={disarmDetailLink}
                 >
                     <Link
                         to={getNodeDetailPath(data.nodeId ?? id)}
-                        className={`node-card-detail-link ${detailLinkArmed ? 'node-card-detail-link-armed nodrag nopan' : ''}`.trim()}
+                        className="node-card-detail-link nodrag nopan"
                         onPointerDown={handleDetailPointerDown}
                         onClick={handleOpenDetail}
-                        onFocus={armDetailLink}
-                        onBlur={disarmDetailLink}
                         aria-label={UI_COPY.storyNode.openDetailPageAriaLabel(data.title)}
                     >
                         <span>{UI_COPY.storyNode.moreDetails}</span>
