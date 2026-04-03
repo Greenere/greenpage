@@ -2,7 +2,7 @@ import type { LocaleMessages } from '../types';
 
 export const ZH_CN_MESSAGES = {
   siteMeta: {
-    title: '纠缠人生',
+    title: '有线人生',
     iconHref: '/assets/icons/user.svg',
     iconType: 'image/svg+xml',
   },

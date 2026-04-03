@@ -28,8 +28,13 @@ const BioToggleNode: React.FC<BioToggleNodeProps> = ({
         updateNodeInternals(id);
     }, [data.handles, id, language, updateNodeInternals]);
 
-    return (<>
-        <div>
+    return (
+        <div
+            style={{
+                position: 'relative',
+                display: 'inline-block',
+            }}
+        >
             <ThemePicker theme={data.theme} setTheme={data.setTheme}>
                 <div
                     style={{
@@ -90,7 +95,7 @@ const BioToggleNode: React.FC<BioToggleNodeProps> = ({
                 />
             ))}
         </div>
-    </>)
+    )
 }
 
 export default React.memo(BioToggleNode);
