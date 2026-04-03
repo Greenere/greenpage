@@ -7,6 +7,8 @@ import { promisify } from 'node:util'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { getChronologySortKey, normalizeChronologyValue, type ChronologyValue } from './src/shared/chronology'
+import { getLocaleFallbackOrder, localeToFileSuffix } from './src/i18n/localeFiles'
+import type { AppLanguage } from './src/i18n/config'
 
 const ROOT_DIR = path.resolve()
 const GRAPH_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/graph.json')
@@ -41,30 +43,8 @@ type EditorExplicitRelation = {
   strength: 1 | 2 | 3
 }
 
-const SUPPORTED_LANGUAGES = ['en', 'zh-CN'] as const
-
-// Maps app locale id (e.g. 'zh-CN') to file suffix (e.g. 'zh_cn').
-// Unrecognised locales fall back to 'en'.
-function localeToFileSuffix(lang: string): string {
-  if (lang === 'zh-CN') return 'zh_cn'
-  return 'en'
-}
-
-function getLocaleFallbackLanguages(lang: string): string[] {
-  const normalized = lang === 'zh-CN' ? 'zh-CN' : 'en'
-  const ordered = [normalized]
-
-  if (normalized !== 'en') {
-    ordered.push('en')
-  }
-
-  for (const locale of SUPPORTED_LANGUAGES) {
-    if (!ordered.includes(locale)) {
-      ordered.push(locale)
-    }
-  }
-
-  return ordered
+function normalizeEditorLanguage(lang: string): AppLanguage {
+  return lang === 'zh-CN' ? 'zh-CN' : 'en'
 }
 
 function isSafeSlug(value: string) {
@@ -208,7 +188,7 @@ async function readNodeContentWithFallback(
   node: EditorGraphNode,
   lang: string,
 ): Promise<{ content: Record<string, unknown>; isFallbackContent: boolean; resolvedLanguage: string; resolvedPath: string }> {
-  for (const fallbackLanguage of getLocaleFallbackLanguages(lang)) {
+  for (const fallbackLanguage of getLocaleFallbackOrder(normalizeEditorLanguage(lang))) {
     const filePath = getLocaleNodeContentPath(node, localeToFileSuffix(fallbackLanguage))
     const content = await readJsonFileIfExists<Record<string, unknown>>(filePath)
 
@@ -252,7 +232,7 @@ function resolveRelationLabel(relation: Record<string, unknown>, lang: string): 
   const labels = relation.labels
   if (labels && typeof labels === 'object' && !Array.isArray(labels)) {
     const labelsObj = labels as Record<string, unknown>
-    for (const fallbackLanguage of getLocaleFallbackLanguages(lang)) {
+    for (const fallbackLanguage of getLocaleFallbackOrder(normalizeEditorLanguage(lang))) {
       if (typeof labelsObj[fallbackLanguage] === 'string') return labelsObj[fallbackLanguage] as string
     }
   }
@@ -457,7 +437,7 @@ function createNodeEditorPlugin(): Plugin {
             const body = await parseBody(request)
             const nodeId = typeof body.nodeId === 'string' ? body.nodeId.trim() : ''
             const lang = typeof body.lang === 'string' ? body.lang : 'en'
-            const suffix = localeToFileSuffix(lang)
+            const suffix = localeToFileSuffix(normalizeEditorLanguage(lang))
 
             if (!nodeId) {
               sendJson(response, 400, { error: 'Missing nodeId.' })

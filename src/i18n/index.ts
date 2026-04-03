@@ -1,15 +1,15 @@
+import {
+  DEFAULT_LANGUAGE,
+  LANGUAGE_STORAGE_KEY,
+  normalizeLanguage,
+  type AppLanguage,
+} from './config';
 import { EN_MESSAGES } from './locales/en';
 import { ZH_CN_MESSAGES } from './locales/zh_cn';
 import type { LocaleMessages } from './types';
 
-export type AppLanguage = 'en' | 'zh-CN';
-
-export const DEFAULT_LANGUAGE: AppLanguage = 'en';
-export const LANGUAGE_STORAGE_KEY = 'greenpage-language';
-export const LANGUAGE_OPTIONS = [
-  { id: 'en', shortLabel: 'EN' },
-  { id: 'zh-CN', shortLabel: '中' },
-] as const satisfies ReadonlyArray<{ id: AppLanguage; shortLabel: string }>;
+export type { AppLanguage } from './config';
+export { CONTENT_LANGUAGE_BEHAVIOR, DEFAULT_LANGUAGE, LANGUAGE_OPTIONS, LANGUAGE_STORAGE_KEY } from './config';
 
 const LOCALE_MESSAGES: Record<AppLanguage, LocaleMessages> = {
   en: EN_MESSAGES,
@@ -17,18 +17,6 @@ const LOCALE_MESSAGES: Record<AppLanguage, LocaleMessages> = {
 };
 
 let activeLanguage: AppLanguage = DEFAULT_LANGUAGE;
-
-export function isAppLanguage(value: unknown): value is AppLanguage {
-  return value === 'en' || value === 'zh-CN';
-}
-
-function normalizeLanguage(value: string | null | undefined): AppLanguage | null {
-  if (!value) return null;
-  if (isAppLanguage(value)) return value;
-  if (value.toLowerCase().startsWith('zh')) return 'zh-CN';
-  if (value.toLowerCase().startsWith('en')) return 'en';
-  return null;
-}
 
 export function getInitialLanguage(): AppLanguage {
   if (typeof window !== 'undefined') {
