@@ -113,17 +113,6 @@
         ],
         "id": "links"
       }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "The company had apparently planned it earlier, but due to internal processes—legal reviews, coordination—it got delayed. Then one Monday, it finally happened. A Monday layoff. That alone felt off, almost symbolic of how chaotic things had become."
-      },
-      {
-        "type": "link",
-        "label": "硅谷裁员潮，终究逃不掉——2025年中失业故事",
-        "href": "https://zhuanlan.zhihu.com/p/2016698679558426815"
-      }
     ]
   },
   "oxford": {
@@ -181,20 +170,6 @@
           }
         ],
         "id": "overview"
-      }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "I graduated in the top 10 with a 3.91/4.0 GPA. Research, contests, design work, and course projects gradually pulled the path toward machine learning and software."
-      },
-      {
-        "type": "list",
-        "items": [
-          "Electronic and Information Engineering",
-          "Research and capstone project work",
-          "Student associations and design work"
-        ]
       }
     ]
   },
@@ -290,20 +265,6 @@
           }
         ]
       }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "I was supposed to attend in 2021, but we all know what happened. The world-wide tragedy forever changed our lives, and I had to spend a gap year to do all hussles but I finally got to Ithaca in August,2022."
-      },
-      {
-        "type": "text",
-        "text": "I lived my first year in the North Campus in a house of nine bedrooms, and had to walk ten kilometers in a daily basis since the Engineering school is in the south. The first few months were very vivid, we almost had some gatherings every week to celebrate the birthday of a classmate, or just to have fun."
-      },
-      {
-        "type": "text",
-        "text": "Some articles about this experience:"
-      }
     ]
   },
   "naec": {
@@ -372,25 +333,6 @@
           }
         ],
         "id": "overview"
-      }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "This lab period deepened the adversarial-ML thread that began with the signature project. Much of the reading, experimentation, and writing around noise modulation came together here."
-      },
-      {
-        "type": "list",
-        "items": [
-          "Studied adversarial training and robustness literature in depth",
-          "Developed the noise modulation idea around interpretable input gradients",
-          "Balanced paper-writing ambitions with unresolved accuracy tradeoffs"
-        ]
-      },
-      {
-        "type": "link",
-        "label": "Noise Modulation preprint",
-        "href": "https://arxiv.org/abs/2103.10603"
       }
     ]
   },
@@ -469,24 +411,6 @@
         ],
         "id": "what-changed"
       }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
-      },
-      {
-        "type": "text",
-        "text": "It also changed how the summer itself felt. Workdays at Verily and weekend drives like [California State Route 1](/nodes/california-one-2022) started to belong to the same chapter rather than separate categories."
-      },
-      {
-        "type": "list",
-        "items": [
-          "Software engineering became a concrete path rather than an abstract possibility",
-          "The distance between coursework and real product work became much smaller",
-          "The internship later connected forward into the full-time role that follows in the graph"
-        ]
-      }
     ]
   },
   "verily": {
@@ -516,20 +440,6 @@
         ],
         "id": "overview"
       }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "Compared with the earlier nodes, this one reflects a steadier and less school-shaped rhythm. It is about longer projects, production responsibility, and a deeper engineering identity that can later branch into writing, side projects, or future moves."
-      },
-      {
-        "type": "list",
-        "items": [
-          "Continuation of the Verily internship into a full-time role",
-          "Represents the most up-to-date experience thread in the graph",
-          "A natural bridge back to the central bio node and present tense"
-        ]
-      }
     ]
   },
   "waymo": {
@@ -546,12 +456,6 @@
           }
         ],
         "id": "overview"
-      }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "I am in a team spanning across data, model and ops, a lot of new stuff to learn with a lot of new opportunities. The progress that Waymo is making is very exciting and I wish to be able to stay here until its potential IPO."
       }
     ]
   },
@@ -578,20 +482,6 @@
           }
         ],
         "id": "overview"
-      }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "The main lesson was not only the client itself. It was learning how to divide a graphical software system into modules and build something with a real interface flow."
-      },
-      {
-        "type": "list",
-        "items": [
-          "Receive Box and Main Module ownership",
-          "Course project for Software Project",
-          "One of the strongest projects in the class cohort"
-        ]
       }
     ]
   },
@@ -708,20 +598,6 @@
           }
         ],
         "id": "overview"
-      }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "The project combined history, relation maps, and trend views. In hindsight, it feels especially close to the graph-based personal-site idea."
-      },
-      {
-        "type": "list",
-        "items": [
-          "Language family network",
-          "Popularity and speed views",
-          "Collaborative Cornell course project"
-        ]
       }
     ]
   },
@@ -953,12 +829,6 @@
           }
         ],
         "id": "overview"
-      }
-    ],
-    "detail": [
-      {
-        "type": "text",
-        "text": "It was an interesting company based in this touristy town outside of Los Angeles area. The city was all in Spanish colonial style, said to be enforced by the local law. I remember that the court was very picturistic, the mission was an interesting history classroom, where I first learned that California is a state of missions."
       }
     ]
   },
