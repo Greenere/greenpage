@@ -1,5 +1,5 @@
-import { DOMAIN_CONFIG, isDomainId, type DomainId } from '../../../configs/domains';
-import { UI_COPY } from '../../../configs/uiCopy';
+import { DOMAIN_CONFIG, isDomainId, type DomainId } from '../../../configs/content/domains';
+import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { getActiveLanguage, getLocaleMessages, type AppLanguage } from '../../../i18n';
 import { getLocaleFallbackOrder, localeToFileSuffix } from '../../../i18n/localeFiles';
 import {
@@ -8,7 +8,7 @@ import {
   type ChronologyValue,
 } from '../../../shared/chronology';
 
-export type { DomainId } from '../../../configs/domains';
+export type { DomainId } from '../../../configs/content/domains';
 export type AnchorId = DomainId;
 
 export type NodeKind = DomainId | 'writing';

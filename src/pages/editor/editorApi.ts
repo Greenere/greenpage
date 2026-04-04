@@ -1,4 +1,4 @@
-import type { DomainId } from '../../configs/domains';
+import type { DomainId } from '../../configs/content/domains';
 import type { ChronologyValue } from '../../shared/chronology';
 import type { AppLanguage } from '../../i18n';
 import { localeToFileSuffix } from '../../i18n/localeFiles';

@@ -1,4 +1,4 @@
-import { UI_COPY } from '../../configs/uiCopy';
+import { UI_COPY } from '../../configs/ui/uiCopy';
 import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
 import { resolveAssetUrl, type ArticleBlock, type ContentBlock, type NodeArticleMeta } from '../graph/content/Nodes';

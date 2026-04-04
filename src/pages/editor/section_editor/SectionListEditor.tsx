@@ -1,4 +1,4 @@
-import { UI_COPY } from '../../../configs/uiCopy';
+import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { DETAIL_SECTION_WIDTH } from '../articlePreviewShared';
 import { type NodeArticleSection } from '../../graph/content/Nodes';
 import InlineSectionCard from './InlineSectionCard';

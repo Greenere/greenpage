@@ -4,8 +4,8 @@ import {
   DETAIL_PAGE_ACTION_BORDER,
   DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
   getHighlightBorderShadowPrefix,
-} from '../../configs/graphHighlight';
-import { UI_COPY } from '../../configs/uiCopy';
+} from '../../configs/graph/highlight';
+import { UI_COPY } from '../../configs/ui/uiCopy';
 import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';

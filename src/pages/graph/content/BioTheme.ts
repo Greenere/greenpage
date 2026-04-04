@@ -1,8 +1,8 @@
 import {
-    DEFAULT_THEME,
-    THEME_CONFIG,
-    type Theme,
-} from "../../../configs/themes";
+  DEFAULT_THEME,
+  THEME_CONFIG,
+  type Theme,
+} from '../../../configs/ui/themes';
 
 const THEME_STORAGE_KEY = 'greenpage-active-theme';
 

@@ -1,4 +1,4 @@
-import { UI_COPY } from '../../../configs/uiCopy';
+import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { type ArticleBlock, type NodeArticleSection } from '../../graph/content/Nodes';
 
 const IMAGE_LINE_PATTERN = /^!\[([^\]]*)\]\((\S+?)(?:\s+"([^"]*)")?\)$/;

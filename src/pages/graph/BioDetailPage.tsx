@@ -4,10 +4,10 @@ import {
   DETAIL_PAGE_ACTION_BORDER,
   DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
   getHighlightBorderShadowPrefix,
-} from '../../configs/graphHighlight';
-import { DOMAIN_ORDER } from '../../configs/domains';
-import { THEME_CONFIG } from '../../configs/themes';
-import { UI_COPY } from '../../configs/uiCopy';
+} from '../../configs/graph/highlight';
+import { DOMAIN_ORDER } from '../../configs/content/domains';
+import { THEME_CONFIG } from '../../configs/ui/themes';
+import { UI_COPY } from '../../configs/ui/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
 import {

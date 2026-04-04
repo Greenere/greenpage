@@ -1,4 +1,4 @@
-import { UI_COPY } from '../../configs/uiCopy';
+import { UI_COPY } from '../../configs/ui/uiCopy';
 import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
 import { getDisplayDomain, resolveAssetUrl, type GraphContentNode, type NodeArticleSection } from '../graph/content/Nodes';

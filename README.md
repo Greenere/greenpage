@@ -179,7 +179,7 @@ Then open:
 Important notes:
 
 - the editor uses Vite dev-only endpoints, so it is only available during `npm run dev`
-- create/delete domain operations still reload the editor because domains are stored in [`src/configs/domains.ts`](./src/configs/domains.ts)
+- create/delete domain operations still reload the editor because domains are stored in [`src/configs/content/domains.ts`](./src/configs/content/domains.ts)
 
 ### What it can do
 
@@ -278,7 +278,7 @@ Example explicit relation entry:
 
 ## Domains
 
-Domains are defined in [`src/configs/domains.ts`](./src/configs/domains.ts).
+Domains are defined in [`src/configs/content/domains.ts`](./src/configs/content/domains.ts).
 
 Each domain entry controls:
 
@@ -293,15 +293,15 @@ If you add a domain manually, also create its folder under [`public/data/nodes`]
 
 Important config files:
 
-- [`src/configs/domains.ts`](./src/configs/domains.ts)
-- [`src/configs/themes.ts`](./src/configs/themes.ts)
-- [`src/configs/icons.ts`](./src/configs/icons.ts)
-- [`src/configs/uiCopy.ts`](./src/configs/uiCopy.ts)
-- [`src/configs/graphHighlight.ts`](./src/configs/graphHighlight.ts)
-- [`src/configs/graphFocus.ts`](./src/configs/graphFocus.ts)
-- [`src/configs/pageTransitions.ts`](./src/configs/pageTransitions.ts)
+- [`src/configs/content/domains.ts`](./src/configs/content/domains.ts)
+- [`src/configs/ui/themes.ts`](./src/configs/ui/themes.ts)
+- [`src/configs/ui/icons.ts`](./src/configs/ui/icons.ts)
+- [`src/configs/ui/uiCopy.ts`](./src/configs/ui/uiCopy.ts)
+- [`src/configs/graph/highlight.ts`](./src/configs/graph/highlight.ts)
+- [`src/configs/graph/focus.ts`](./src/configs/graph/focus.ts)
+- [`src/configs/ui/pageTransitions.ts`](./src/configs/ui/pageTransitions.ts)
 
-To change the default theme, edit `DEFAULT_THEME` in [`src/configs/themes.ts`](./src/configs/themes.ts).
+To change the default theme, edit `DEFAULT_THEME` in [`src/configs/ui/themes.ts`](./src/configs/ui/themes.ts).
 
 Note:
 

@@ -7,7 +7,7 @@ import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./
 import { type Theme, BIOTHEME } from "../content/BioTheme";
 import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from "../content/BioPage";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
-import { UI_COPY } from "../../../configs/uiCopy";
+import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { getNodeDetailPath, getNodeTransitionName, resolveAssetUrl } from "../content/Nodes";
 import { useAppLanguage } from '../../../i18n/useAppLanguage';
 

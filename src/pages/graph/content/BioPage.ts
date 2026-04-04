@@ -1,6 +1,6 @@
 import { getActiveLanguage, type AppLanguage } from '../../../i18n';
 import { getLocaleFallbackOrder, localeToFileSuffix } from '../../../i18n/localeFiles';
-import { UI_COPY } from '../../../configs/uiCopy';
+import { UI_COPY } from '../../../configs/ui/uiCopy';
 
 export type BioPageLink = {
   label: string;

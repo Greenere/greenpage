@@ -1,5 +1,5 @@
 import type { AppLanguage } from '../../i18n';
-import type { DomainId } from '../../configs/domains';
+import type { DomainId } from '../../configs/content/domains';
 import type { GraphNodeContent, GraphNodeRef, NodeKind } from '../graph/content/Nodes';
 import { normalizeNodeContent } from '../graph/content/Nodes';
 import type { EditorExplicitRelation, EditorNodeOption, NewNodeDraft } from './editorApi';

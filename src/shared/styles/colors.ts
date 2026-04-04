@@ -4,7 +4,7 @@ import {
   THEME_ORDER,
   type Theme,
   type ThemePalette,
-} from "../../configs/themes";
+} from '../../configs/ui/themes';
 
 export const themes2color: Record<Theme, ThemePalette> = Object.fromEntries(
   THEME_ORDER.map((theme) => [theme, THEME_CONFIG[theme].colors])

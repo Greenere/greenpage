@@ -1,5 +1,5 @@
 import { getLocaleMessages } from '../../i18n';
-import type { DomainId } from '../../configs/domains';
+import type { DomainId } from '../../configs/content/domains';
 import type { GraphNodeContent, NodeKind } from '../graph/content/Nodes';
 import type { NewNodeDraft } from './editorApi';
 

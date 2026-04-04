@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { THEME_CONFIG, THEME_ORDER, type Theme } from '../../configs/themes';
+import { THEME_CONFIG, THEME_ORDER, type Theme } from '../../configs/ui/themes';
 
 type ThemePickerProps = {
   theme: Theme;

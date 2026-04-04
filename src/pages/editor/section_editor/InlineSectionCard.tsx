@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { UI_COPY } from '../../../configs/uiCopy';
+import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { type NodeArticleSection } from '../../graph/content/Nodes';
 import {
   DETAIL_SECTION_WIDTH,

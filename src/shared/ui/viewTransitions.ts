@@ -1,6 +1,6 @@
 import { flushSync } from 'react-dom';
 
-import { PAGE_TRANSITION_CONFIG } from '../../configs/pageTransitions';
+import { PAGE_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 
 type StartViewTransition = (update: () => void | Promise<void>) => {
   finished: Promise<void>;

@@ -5,8 +5,8 @@ import { useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
-import { UI_COPY } from "../../../configs/uiCopy";
-import { DOMAIN_CONFIG } from "../../../configs/domains";
+import { UI_COPY } from '../../../configs/ui/uiCopy';
+import { DOMAIN_CONFIG } from '../../../configs/content/domains';
 import {
     getNodeDetailPath,
     getNodeTransitionName,

@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { DOMAIN_CONFIG, DOMAIN_ORDER, isDomainId, type DomainId } from '../../configs/domains';
+import { DOMAIN_CONFIG, DOMAIN_ORDER, isDomainId, type DomainId } from '../../configs/content/domains';
 import {
   DETAIL_PAGE_ACTION_BORDER,
   DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
   getHighlightBorderShadowPrefix,
-} from '../../configs/graphHighlight';
-import { EDIT_RELATION_ICON, type ConfigurableIcon } from '../../configs/icons';
-import { UI_COPY } from '../../configs/uiCopy';
+} from '../../configs/graph/highlight';
+import { EDIT_RELATION_ICON, type ConfigurableIcon } from '../../configs/ui/icons';
+import { UI_COPY } from '../../configs/ui/uiCopy';
 import { LANGUAGE_OPTIONS, getLocaleMessages, type AppLanguage } from '../../i18n';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {

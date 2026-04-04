@@ -20,8 +20,8 @@ import BioToggleNode from './nodes/BioToggleNode';
 import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { getChronologySortKey } from '../../shared/chronology';
-import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graphFocus';
-import { GRAPH_LAYOUT } from '../../configs/graphLayout';
+import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graph/focus';
+import { GRAPH_LAYOUT } from '../../configs/graph/layout';
 import {
     GRAPH_BIO_PORTRAIT_BORDER_OPACITY,
     GRAPH_BIO_PORTRAIT_BORDER_WIDTH,
@@ -30,8 +30,8 @@ import {
     GRAPH_NODE_HIGHLIGHT_RING_OPACITY,
     GRAPH_NODE_HIGHLIGHT_RING_WIDTH,
     getHighlightBorderShadowPrefix,
-} from '../../configs/graphHighlight';
-import { UI_COPY } from '../../configs/uiCopy';
+} from '../../configs/graph/highlight';
+import { UI_COPY } from '../../configs/ui/uiCopy';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {

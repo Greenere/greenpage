@@ -13,7 +13,7 @@ import type { AppLanguage } from './src/i18n/config'
 const ROOT_DIR = path.resolve()
 const GRAPH_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/graph.json')
 const NODES_DIR = path.resolve(ROOT_DIR, 'public/data/nodes')
-const DOMAINS_CONFIG_PATH = path.resolve(ROOT_DIR, 'src/configs/domains.ts')
+const DOMAINS_CONFIG_PATH = path.resolve(ROOT_DIR, 'src/configs/content/domains.ts')
 const execFileAsync = promisify(execFile)
 
 type EditorGraphNode = {
