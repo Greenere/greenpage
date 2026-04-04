@@ -1,10 +1,10 @@
 {
-  "title": "HUST Electronic and Information Engineering",
-  "subtitle": "Bachelor's degree, 2016-2020",
-  "summary": "The undergraduate base where software, computer vision, modeling, and student-organization work first started to braid together.",
+  "title": "Huazhong University of Science and Technology",
+  "subtitle": "Bachelor's degree in Electronic and Information Engineering, 2016-2020",
+  "summary": "I spent four years for my undergraduate study in Wuhan, China. Originally I was in the School of Environment but later transferred to the School of Electronic Information and Communications. We have a huge campus with lush trees, making the summer feels pleasant rather than tortuous like other places in Wuhan. ",
   "tags": [
     "HUST",
-    "undergraduate"
+    "Undergraduate"
   ],
   "sections": [
     {
@@ -12,15 +12,23 @@
       "blocks": [
         {
           "type": "text",
-          "text": "I graduated in the top 10 with a 3.91/4.0 GPA. Research, contests, design work, and course projects gradually pulled the path toward machine learning and software."
+          "text": "I graduated in the top 10 with a 3.91/4.0 GPA, toped the class in the end but never got to top any single semester, so it was funny."
         },
         {
-          "type": "list",
-          "items": [
-            "Electronic and Information Engineering",
-            "Research and capstone project work",
-            "Student associations and design work"
-          ]
+          "type": "text",
+          "text": "The first two years were occupied by trying to have fun while keeping up with the courses. I did tour most places in Wuhan that I found interesting and actively participated in Poestry Association and SICA (Student International Communication Association), and tried to found a Spanish club but failed."
+        },
+        {
+          "type": "text",
+          "text": "The thrid year came with the burden to lay bedrock for the future, as I tried to get admitted to a pre-graduate program summer school, I did not find myself lucky when other students were talking about research and projects, yet the only thing I could talk was reading."
+        },
+        {
+          "type": "text",
+          "text": "So I came back to the school in the summer of 2019 to do some research, when I picked the adversarial machine learning as the domain by accident and nurtured a published paper eventually (but it won't be officially published until 2021)."
+        },
+        {
+          "type": "text",
+          "text": "In the first month of 2020, the world gets paused and I had to postpone my plan to study abroad. We did not even get a graduation ceremony because of it."
         }
       ],
       "id": "overview"
