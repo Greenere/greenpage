@@ -90,11 +90,11 @@ export const ZH_CN_MESSAGES = {
       title: '节点编辑器',
       subtitle: '开发工作区 · 编辑内容、预览文章，并写入 JSON 文件。',
       productionSubtitle:
-        '生产环境工作区 · 编辑内容、预览文章，并将本地 JSON 包导出到你的设备，而不会修改线上数据。',
+        '生产环境工作区 · 仅在本地编辑内容并预览文章，这里不会写入项目文件。',
       fallbackContentWriteNotice: (requestedLanguage: string, resolvedLanguage: string) =>
         `当前还没有 ${requestedLanguage} 内容，正在显示 ${resolvedLanguage} 回退版本。保存后会创建 ${requestedLanguage} 版本。`,
-      fallbackContentExportNotice: (requestedLanguage: string, resolvedLanguage: string) =>
-        `当前还没有 ${requestedLanguage} 内容，正在显示 ${resolvedLanguage} 回退版本。导出后会生成一个本地 ${requestedLanguage} 文件。`,
+      fallbackContentReadOnlyNotice: (requestedLanguage: string, resolvedLanguage: string) =>
+        `当前还没有 ${requestedLanguage} 内容，正在显示 ${resolvedLanguage} 回退版本。这个生产环境工作区不会执行写入。`,
       tabs: {
         content: '编辑',
         json: 'JSON',
@@ -138,11 +138,7 @@ export const ZH_CN_MESSAGES = {
         wroteNodeFile: '已将节点 JSON 写入文件。',
         wroteNodeFileSkipped: (count: number) =>
           `已将节点 JSON 写入文件。跳过了 ${count} 个未完成的连接。`,
-        exportedNodeFile: '已导出本地节点 JSON 包。',
-        exportedNodeFileSkipped: (count: number) =>
-          `已导出本地节点 JSON 包。跳过了 ${count} 个未完成的连接。`,
         failedWriteNodeFile: '写入节点文件失败。',
-        failedExportNodeFile: '导出节点文件失败。',
         createdNode: (nodeId: string) => `已创建节点“${nodeId}”。`,
         failedCreateNode: '创建节点失败。',
         createdDomainOpening: (domainId: string) => `已创建领域“${domainId}”。正在打开新的节点编辑器...`,
@@ -162,15 +158,12 @@ export const ZH_CN_MESSAGES = {
         actionFailed: '操作失败。',
         writeChanges: '将这些编辑器改动写入文件',
         writeJsonChanges: '将这些 JSON 编辑写入文件',
-        exportChanges: '将这些编辑器改动导出到本地文件',
-        exportJsonChanges: '将这些 JSON 编辑导出到本地文件',
         resetDraft: '将此草稿重置为上次保存的文件版本',
         deleteExplicitConnection: '删除这条显式连接',
         deleteSection: (label: string) => `删除“${label}”章节`,
         deleteDomain: (domainId: string) => `删除领域“${domainId}”`,
         deleteNode: (nodeId: string) => `删除节点“${nodeId}”、其本地化内容文件以及图谱连接`,
         writingToFile: '正在写入文件…',
-        exportingToFile: '正在导出到本地文件…',
         deletingDomain: '正在删除领域…',
         deletingNode: '正在删除节点…',
       },
@@ -233,7 +226,6 @@ export const ZH_CN_MESSAGES = {
           '在右侧选择一张显式连接卡片，以编辑其方向、类型、强度和标签。',
         sidebarHint: '在此面板编辑头部、元数据和头图。点击右侧任意章节即可编辑。',
         writeToFile: '写入文件',
-        exportToFile: '导出到文件',
         reset: '重置',
         deleteNode: '删除节点',
       },
@@ -245,7 +237,6 @@ export const ZH_CN_MESSAGES = {
         explicitConnectionsJsonHint:
           '编辑这个节点会写入图谱的显式连接。时间线连接和 bio 连接是自动推导的，不在这里编辑。',
         writeToFile: '写入文件',
-        exportToFile: '导出到文件',
       },
       newNodeTab: {
         domain: '领域',

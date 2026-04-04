@@ -12,7 +12,6 @@ import {
 } from '../graph/content/Nodes';
 
 export const EDITOR_CAN_MUTATE_PROJECT = import.meta.env.DEV;
-export const EDITOR_EXPORTS_TO_LOCAL_FILE = !EDITOR_CAN_MUTATE_PROJECT;
 
 export type EditorNodeOption = GraphNodeRef & {
   title?: string;
@@ -59,21 +58,6 @@ type DeleteDomainPayload = {
 
 type DeleteNodePayload = {
   nodeId: string;
-};
-
-type SavePickerWindow = Window & {
-  showSaveFilePicker?: (options?: {
-    suggestedName?: string;
-    types?: Array<{
-      description?: string;
-      accept: Record<string, string[]>;
-    }>;
-  }) => Promise<{
-    createWritable: () => Promise<{
-      write: (data: string | Blob) => Promise<void>;
-      close: () => Promise<void>;
-    }>;
-  }>;
 };
 
 async function parseResponse<T>(response: Response): Promise<T> {
@@ -149,39 +133,6 @@ export async function fetchEditorNode(nodeId: string, lang: AppLanguage) {
   return parseResponse<EditorNodeResponse>(response);
 }
 
-async function writeLocalFile(suggestedName: string, payload: string) {
-  const savePickerWindow = window as SavePickerWindow;
-
-  if (savePickerWindow.showSaveFilePicker) {
-    const fileHandle = await savePickerWindow.showSaveFilePicker({
-      suggestedName,
-      types: [
-        {
-          description: 'JSON file',
-          accept: {
-            'application/json': ['.json'],
-          },
-        },
-      ],
-    });
-
-    const writable = await fileHandle.createWritable();
-    await writable.write(payload);
-    await writable.close();
-    return;
-  }
-
-  const blob = new Blob([payload], { type: 'application/json' });
-  const objectUrl = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = objectUrl;
-  link.download = suggestedName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(objectUrl);
-}
-
 export async function saveEditorNode(
   nodeId: string,
   content: GraphNodeContent,
@@ -190,23 +141,7 @@ export async function saveEditorNode(
   lang: AppLanguage,
 ) {
   if (!EDITOR_CAN_MUTATE_PROJECT) {
-    const exportPayload = {
-      exportType: 'greenpage-node-editor-export',
-      schemaVersion: 1,
-      exportedAt: new Date().toISOString(),
-      nodeId,
-      lang,
-      node,
-      content,
-      explicitRelations,
-    };
-
-    await writeLocalFile(
-      `${nodeId}.${localeToFileSuffix(lang)}.greenpage-node-export.json`,
-      `${JSON.stringify(exportPayload, null, 2)}\n`,
-    );
-
-    return { ok: true as const };
+    throw new Error('Writing node files is only available in development mode.');
   }
 
   const response = await fetch('/__editor/node/save', {

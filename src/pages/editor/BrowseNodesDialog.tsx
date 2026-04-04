@@ -142,6 +142,9 @@ export default function BrowseNodesDialog({
             style={{
               background: 'none',
               border: 'none',
+              outline: 'none',
+              boxShadow: 'none',
+              WebkitTapHighlightColor: 'transparent',
               cursor: 'pointer',
               color: 'color-mix(in srgb, crimson 72%, var(--color-text))',
               padding: 0,
