@@ -51,7 +51,7 @@ import {
     enforceAnchorClearance,
     buildLaneTargetPositions,
 } from './layout/graphLayout';
-import { RELAX_INITIAL_NODES_CONFIG } from './layout/graphLayoutConfig';
+import { RELAX_INITIAL_NODES_CONFIG, SETTLE_NODES_AROUND_ANCHOR_CONFIG } from './layout/graphLayoutConfig';
 
 const nodeTypes = {
     bioNode: BioNode,
@@ -768,9 +768,9 @@ function settleNodesAroundAnchor(
     nodes: Node[],
     anchorId: string,
     {
-        maxIters = 16,
-        damping = 0.72,
-        maxStep = 42,
+        maxIters = SETTLE_NODES_AROUND_ANCHOR_CONFIG.maxIters,
+        damping = SETTLE_NODES_AROUND_ANCHOR_CONFIG.damping,
+        maxStep = SETTLE_NODES_AROUND_ANCHOR_CONFIG.maxStep,
     }: {
         maxIters?: number;
         damping?: number;

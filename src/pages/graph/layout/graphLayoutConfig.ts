@@ -5,7 +5,7 @@
  */
 
 /** Side length of each cell in the spatial-hash collision grid (pixels). */
-export const COLLISION_CELL_SIZE = 240;
+export const COLLISION_CELL_SIZE = 220;
 
 /**
  * Arc over which content nodes are distributed around the bio node.
@@ -18,23 +18,30 @@ export const LAYOUT_ARC = {
     spanDeg: 320,
 } as const;
 
-/** Collision-relaxation parameters for the first pass (content nodes against the bio node). */
+/**
+ * Collision-relaxation parameters for the first pass (uses estimated node sizes).
+ * maxStep should be ≥ half the node width so a fully-stacked pair separates in 2 steps.
+ * With 23 nodes and cascading overlaps, maxIters needs room for full propagation.
+ */
 export const RELAX_INITIAL_NODES_CONFIG = {
-    maxIters: 34,
-    damping: 0.82,
-    maxStep: 44,
+    maxIters: 80,
+    damping: 0.88,
+    maxStep: 150,
 } as const;
 
-/** Collision-relaxation parameters for the secondary settlement pass. */
+/**
+ * Collision-relaxation parameters for the settle pass (uses measured node sizes).
+ * Runs after ReactFlow has measured real dimensions, so it must fully resolve all overlap.
+ */
 export const SETTLE_NODES_AROUND_ANCHOR_CONFIG = {
-    maxIters: 16,
-    damping: 0.72,
-    maxStep: 42,
+    maxIters: 80,
+    damping: 0.88,
+    maxStep: 90,
 } as const;
 
 /** Parameters for the clearance pass that keeps nodes out of the bio node's halo. */
 export const ENFORCE_ANCHOR_CLEARANCE_CONFIG = {
-    maxIters: 8,
-    damping: 0.88,
-    maxStep: 52,
+    maxIters: 24,
+    damping: 0.90,
+    maxStep: 80,
 } as const;
