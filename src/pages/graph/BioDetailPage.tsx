@@ -10,9 +10,9 @@ import { THEME_CONFIG } from '../../configs/ui/themes';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
-import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
+import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
-import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
+import { getBioPortraitHref, loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
 import DetailPageLanguageToggle from './DetailPageLanguageToggle';
 import ThemePicker from './ThemePicker';
 import {
@@ -113,7 +113,9 @@ const BioDetailPage: React.FC = () => {
   const [graphError, setGraphError] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const portrait = BIOTHEME[theme];
+  const portraitTransitionName = getStableImageViewTransitionName(`bio-portrait-${theme}`);
   const themeLabel = THEME_CONFIG[theme].label;
+  const portraitHref = bioContent ? getBioPortraitHref(bioContent, portrait.url) : portrait.url;
   const handleThemeChange = (nextTheme: Theme) => {
     setTheme(nextTheme);
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
@@ -374,7 +376,7 @@ const BioDetailPage: React.FC = () => {
               }}
             >
               <a
-                href={portrait.url}
+                href={portraitHref}
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -393,6 +395,7 @@ const BioDetailPage: React.FC = () => {
                     objectFit: 'cover',
                     borderRadius: '24px',
                     border: '2px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
+                    viewTransitionName: portraitTransitionName,
                   }}
                 />
               </a>

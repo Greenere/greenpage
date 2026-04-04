@@ -7,9 +7,9 @@ import {
   setActiveLanguage,
   type AppLanguage,
 } from './index';
-import { clearGraphModelCache, clearGraphNodeContentCache } from '../pages/graph/content/Nodes';
-import { clearBioPageContentCache } from '../pages/graph/content/BioPage';
 import { LanguageContext } from './appLanguageContext';
+import { LANGUAGE_SWITCH_TRANSITION_CONFIG } from '../configs/ui/pageTransitions';
+import { runWithViewTransition } from '../shared/ui/viewTransitions';
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(() => getInitialLanguage());
@@ -18,11 +18,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const messages = getLocaleMessages(language);
 
   const setLanguage = useCallback((lang: AppLanguage) => {
-    clearGraphModelCache();
-    clearGraphNodeContentCache();
-    clearBioPageContentCache();
-    setLanguageState(lang);
-  }, []);
+    if (lang === language) {
+      return;
+    }
+
+    runWithViewTransition(() => {
+      setLanguageState(lang);
+    }, { transitionConfig: LANGUAGE_SWITCH_TRANSITION_CONFIG });
+  }, [language]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

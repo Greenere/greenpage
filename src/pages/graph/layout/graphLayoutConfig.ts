@@ -45,3 +45,6 @@ export const ENFORCE_ANCHOR_CLEARANCE_CONFIG = {
     damping: 0.90,
     maxStep: 80,
 } as const;
+
+/** Camera animation used when returning from a detail page and recentring the graph. */
+export const GRAPH_RETURN_FOCUS_CAMERA_DURATION_MS = 420;

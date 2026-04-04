@@ -22,10 +22,14 @@ export default function DetailPageLanguageToggle() {
           <button
             key={option.id}
             type="button"
-            onClick={() => setLanguage(option.id)}
+            onClick={(event) => {
+              setLanguage(option.id);
+              event.currentTarget.blur();
+            }}
             aria-pressed={selected}
             aria-label={messages.appShell.languageMenuLabel(label)}
             title={label}
+            className="detail-page-language-toggle-button"
             style={{
               padding: '0.12rem 0.25rem',
               border: 'none',
@@ -38,6 +42,8 @@ export default function DetailPageLanguageToggle() {
               cursor: 'pointer',
               fontFamily: 'inherit',
               lineHeight: 1.2,
+              outline: 'none',
+              boxShadow: 'none',
             }}
           >
             {option.shortLabel}

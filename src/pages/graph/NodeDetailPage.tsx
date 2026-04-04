@@ -9,7 +9,7 @@ import { UI_COPY } from '../../configs/ui/uiCopy';
 import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
-import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
+import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from './content/BioPage';
 import DetailPageLanguageToggle from './DetailPageLanguageToggle';
@@ -551,6 +551,10 @@ const NodeDetailPage: React.FC = () => {
     handleNavigateWithTransition(getNodeDetailPath(relatedNodeId));
   };
 
+  const heroImageTransitionName = decodedNodeId
+    ? getStableImageViewTransitionName(`node-hero-${decodedNodeId}`)
+    : undefined;
+
   useEffect(() => {
     applyThemeVars(theme);
   }, [theme]);
@@ -863,6 +867,7 @@ const NodeDetailPage: React.FC = () => {
                   objectFit: 'cover',
                   aspectRatio: '16 / 9',
                   background: 'color-mix(in srgb, var(--color-background) 94%, white 6%)',
+                  viewTransitionName: heroImageTransitionName,
                 }}
               />
               {node.hero.image.caption && (

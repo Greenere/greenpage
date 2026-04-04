@@ -228,6 +228,7 @@ function sanitizeBioContentForSave(content: BioPageContent): BioPageContent {
     name: content.name,
     subtitle: content.subtitle,
     summary: content.summary,
+    portraitHref: content.portraitHref?.trim() ? content.portraitHref.trim() : undefined,
     themeFactLabel: content.themeFactLabel?.trim() ? content.themeFactLabel.trim() : undefined,
     pathsSectionLabel: content.pathsSectionLabel?.trim() ? content.pathsSectionLabel.trim() : undefined,
     linksSectionLabel: content.linksSectionLabel?.trim() ? content.linksSectionLabel.trim() : undefined,
@@ -785,6 +786,12 @@ export default function BioEditorWorkspace() {
                         rows={4}
                         placeholder={UI_COPY.nodeEditor.bioContentTab.summary}
                         style={inputStyle(true)}
+                      />
+                      <input
+                        value={draftContent.portraitHref ?? ''}
+                        onChange={(event) => updateDraftContent({ ...draftContent, portraitHref: event.target.value || undefined })}
+                        placeholder={UI_COPY.nodeEditor.bioContentTab.portraitHref}
+                        style={inputStyle()}
                       />
                     </div>
                   </FieldShell>

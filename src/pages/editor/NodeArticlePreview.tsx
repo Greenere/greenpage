@@ -1,6 +1,7 @@
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
+import { getStableImageViewTransitionName } from '../../shared/ui/viewTransitions';
 import { getDisplayDomain, resolveAssetUrl, type GraphContentNode, type NodeArticleSection } from '../graph/content/Nodes';
 import {
   DETAIL_READING_WIDTH,
@@ -33,6 +34,7 @@ type NodeArticlePreviewProps = {
 
 const NodeArticlePreview = ({ node }: NodeArticlePreviewProps) => {
   const articleSections = node.sections;
+  const heroImageTransitionName = getStableImageViewTransitionName(`editor-node-hero-${node.id}`);
 
   return (
     <div
@@ -91,6 +93,7 @@ const NodeArticlePreview = ({ node }: NodeArticlePreviewProps) => {
                 objectFit: 'cover',
                 aspectRatio: '16 / 9',
                 background: 'color-mix(in srgb, var(--color-background) 94%, white 6%)',
+                viewTransitionName: heroImageTransitionName,
               }}
             />
             {node.hero.image.caption && (

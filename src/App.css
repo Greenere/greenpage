@@ -252,6 +252,19 @@ body,
   outline: none;
 }
 
+.detail-page-language-toggle-button {
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.detail-page-language-toggle-button:focus,
+.detail-page-language-toggle-button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 .greenpage-node-editor button {
   appearance: none;
   -webkit-appearance: none;

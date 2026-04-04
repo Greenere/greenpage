@@ -19,6 +19,7 @@ import StoryNode from './nodes/StoryNode';
 import BioToggleNode from './nodes/BioToggleNode';
 import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
+import { waitForCurrentViewTransition } from '../../shared/ui/viewTransitions';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graph/focus';
 import { GRAPH_LAYOUT } from '../../configs/graph/layout';
 import {
@@ -51,7 +52,11 @@ import {
     enforceAnchorClearance,
     buildLaneTargetPositions,
 } from './layout/graphLayout';
-import { RELAX_INITIAL_NODES_CONFIG, SETTLE_NODES_AROUND_ANCHOR_CONFIG } from './layout/graphLayoutConfig';
+import {
+    GRAPH_RETURN_FOCUS_CAMERA_DURATION_MS,
+    RELAX_INITIAL_NODES_CONFIG,
+    SETTLE_NODES_AROUND_ANCHOR_CONFIG,
+} from './layout/graphLayoutConfig';
 
 const nodeTypes = {
     bioNode: BioNode,
@@ -1067,11 +1072,13 @@ const NodeCanvas: React.FC = () => {
             const targetZoom = pendingRestore.viewport?.zoom ?? getViewport().zoom;
 
             requestAnimationFrame(() => {
-                setCenter(center.x, center.y, {
-                    zoom: targetZoom,
-                    duration: 420,
+                void waitForCurrentViewTransition().finally(() => {
+                    setCenter(center.x, center.y, {
+                        zoom: targetZoom,
+                        duration: GRAPH_RETURN_FOCUS_CAMERA_DURATION_MS,
+                    });
+                    clearReturnFocusNodeId();
                 });
-                clearReturnFocusNodeId();
             });
         });
 

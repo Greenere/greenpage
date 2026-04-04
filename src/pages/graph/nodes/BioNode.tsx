@@ -5,8 +5,9 @@ import { Position, useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
 import { type Theme, BIOTHEME } from "../content/BioTheme";
-import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from "../content/BioPage";
+import { getBioPortraitHref, loadBioPageContent, readCachedBioPageContent, type BioPageContent } from "../content/BioPage";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
+import { getStableImageViewTransitionName } from "../../../shared/ui/viewTransitions";
 import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { getNodeDetailPath, resolveAssetUrl } from "../content/Nodes";
 import { useAppLanguage } from '../../../i18n/useAppLanguage';
@@ -32,6 +33,8 @@ const BioNode: React.FC<BioNodeProps> = ({
     const [focused, setFocused] = useState<boolean>(false);
     const [bioContent, setBioContent] = useState<BioPageContent | null>(() => readCachedBioPageContent(language));
     const updateNodeInternals = useUpdateNodeInternals();
+    const portraitTransitionName = getStableImageViewTransitionName(`graph-bio-portrait-${data.theme}`);
+    const portraitHref = getBioPortraitHref(bioContent ?? {}, BIOTHEME[data.theme].url);
 
     useLayoutEffect(() => {
         updateNodeInternals(id);
@@ -117,7 +120,7 @@ const BioNode: React.FC<BioNodeProps> = ({
             }}>
                 <div style={{ position: "relative", display: "inline-block", background: "transparent" }}>
                     <a
-                        href={BIOTHEME[data.theme].url}
+                        href={portraitHref}
                         target="_blank"
                         onMouseOver={() => {
                             setFocused(true);
@@ -132,7 +135,8 @@ const BioNode: React.FC<BioNodeProps> = ({
                             objectFit: "cover",
                             borderRadius: "50%",
                             border: `calc(var(--greenpage-bio-portrait-border-width, 1.35) * 1px) solid color-mix(in srgb, var(--color-secondary) calc(var(--greenpage-bio-portrait-border-opacity, 1) * 100%), transparent)`,
-                            filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`
+                            filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`,
+                            viewTransitionName: portraitTransitionName,
                         }} />
                     </a>
 

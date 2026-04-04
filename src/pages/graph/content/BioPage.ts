@@ -21,6 +21,7 @@ export type BioPageContent = {
   name: string;
   subtitle: string;
   summary: string;
+  portraitHref?: string;
   themeFactLabel?: string;
   facts?: BioPageFact[];
   sections?: BioPageSection[];
@@ -128,6 +129,7 @@ export function normalizeBioPageContent(value: unknown): BioPageContent | null {
     name: value.name,
     subtitle: value.subtitle,
     summary: value.summary,
+    portraitHref: typeof value.portraitHref === 'string' ? value.portraitHref : undefined,
     themeFactLabel: typeof value.themeFactLabel === 'string' ? value.themeFactLabel : undefined,
     facts: normalizeBioPageFacts(value.facts),
     sections: normalizeBioPageSections(value.sections),
@@ -135,6 +137,20 @@ export function normalizeBioPageContent(value: unknown): BioPageContent | null {
     linksSectionLabel: typeof value.linksSectionLabel === 'string' ? value.linksSectionLabel : undefined,
     links: normalizeBioPageLinks(value.links),
   };
+}
+
+export function getBioPortraitHref(content: Pick<BioPageContent, 'portraitHref' | 'links'>, fallbackHref?: string) {
+  const explicitHref = content.portraitHref?.trim();
+  if (explicitHref) {
+    return explicitHref;
+  }
+
+  const firstLinkHref = content.links?.find((link) => link.href.trim().length > 0)?.href.trim();
+  if (firstLinkHref) {
+    return firstLinkHref;
+  }
+
+  return fallbackHref;
 }
 
 async function loadBioPageContentUncached(locale: AppLanguage): Promise<BioPageLoadResult> {

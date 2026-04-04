@@ -4,10 +4,10 @@ export const PAGE_TRANSITION_CONFIG = {
 
   /** Exit: old page fades out. Short — don't make users wait for content to leave. */
   exitDurationMs: 100,
-  exitEasing: 'ease-in',
+  exitEasing: 'ease-out',
 
   /** Enter: new page fades in while scaling up from `enterScaleFrom`. */
-  enterDurationMs: 320,
+  enterDurationMs: 420,
   enterEasing: 'cubic-bezier(0.22, 1, 0.36, 1)',
 
   /**
@@ -15,4 +15,13 @@ export const PAGE_TRANSITION_CONFIG = {
    * "opening" feel without looking like a zoom. 1.0 = pure crossfade.
    */
   enterScaleFrom: 0.97,
+} as const;
+
+export const LANGUAGE_SWITCH_TRANSITION_CONFIG = {
+  /** Slightly softer than route changes because the user is staying on the same page. */
+  exitDurationMs: 120,
+  exitEasing: 'ease-out',
+  enterDurationMs: 420,
+  enterEasing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  enterScaleFrom: 1,
 } as const;

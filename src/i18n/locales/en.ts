@@ -246,6 +246,7 @@ export const EN_MESSAGES = {
         name: 'Name',
         subtitle: 'Subtitle',
         summary: 'Summary',
+        portraitHref: 'Portrait link (defaults to first bio link)',
         labels: 'Labels',
         facts: 'Facts',
         sections: 'Sections',

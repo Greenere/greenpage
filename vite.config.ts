@@ -66,6 +66,7 @@ type EditorBioContent = {
   name: string
   subtitle: string
   summary: string
+  portraitHref?: string
   themeFactLabel?: string
   facts?: EditorBioFact[]
   sections?: EditorBioSection[]
@@ -202,6 +203,7 @@ function normalizeBioContentPayload(value: unknown): EditorBioContent | null {
     name: candidate.name,
     subtitle: candidate.subtitle,
     summary: candidate.summary,
+    portraitHref: typeof candidate.portraitHref === 'string' ? candidate.portraitHref : undefined,
     themeFactLabel: typeof candidate.themeFactLabel === 'string' ? candidate.themeFactLabel : undefined,
     facts: facts && facts.length > 0 ? facts : undefined,
     sections: sections && sections.length > 0 ? sections : undefined,

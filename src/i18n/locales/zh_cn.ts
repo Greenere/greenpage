@@ -248,6 +248,7 @@ export const ZH_CN_MESSAGES = {
         name: '姓名',
         subtitle: '副标题',
         summary: '摘要',
+        portraitHref: '头像链接（默认使用第一个 bio 链接）',
         labels: '标签文案',
         facts: '事实信息',
         sections: '章节',
