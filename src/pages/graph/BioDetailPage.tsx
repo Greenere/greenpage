@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   DETAIL_PAGE_ACTION_BORDER,
@@ -27,75 +27,15 @@ import {
   type GraphModel,
 } from './content/Nodes';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
-import { renderContentBlock } from '../editor/articlePreviewShared';
+import {
+  DETAIL_READING_WIDTH,
+  DETAIL_SECTION_WIDTH,
+  DetailTextLink,
+  renderDetailContentBlock,
+  renderDetailSectionHeading,
+} from './DetailContent';
 
 const GRAPH_RETURN_FOCUS_NODE_KEY = 'greenpage-graph-return-focus-node';
-const DETAIL_READING_WIDTH = '46rem';
-const DETAIL_SECTION_WIDTH = '48rem';
-
-type BioLinkProps = {
-  href: string;
-  children: ReactNode;
-};
-
-function BioLink({ href, children }: BioLinkProps) {
-  const sharedStyle: CSSProperties = {
-    color: 'var(--color-text)',
-    textDecoration: 'underline',
-    textUnderlineOffset: '0.2em',
-    textDecorationThickness: '1px',
-    textDecorationColor: 'color-mix(in srgb, var(--color-secondary) 62%, transparent)',
-  };
-
-  const isExternal = href.startsWith('http://') || href.startsWith('https://');
-
-  if (!href.startsWith('/') || isExternal) {
-    return (
-      <a href={href} target={isExternal ? '_blank' : undefined} rel={isExternal ? 'noreferrer' : undefined} style={sharedStyle}>
-        {children}
-      </a>
-    );
-  }
-
-  return (
-    <Link to={href} style={sharedStyle}>
-      {children}
-    </Link>
-  );
-}
-
-function renderSectionHeading(label: string) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.9rem',
-        marginBottom: '1.1rem',
-        maxWidth: DETAIL_SECTION_WIDTH,
-      }}
-    >
-      <Footnote
-        style={{
-          textTransform: 'uppercase',
-          letterSpacing: '0.14em',
-          fontSize: '0.68rem',
-          opacity: 0.74,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {label}
-      </Footnote>
-      <div
-        style={{
-          flex: 1,
-          height: '1px',
-          background: 'color-mix(in srgb, var(--color-secondary) 28%, transparent)',
-        }}
-      />
-    </div>
-  );
-}
 
 function getBioPathEntries(model: GraphModel) {
   const latestByDomain = new Map(getLatestNodesByDomain(model).map((node) => [node.domain, node]));
@@ -155,6 +95,8 @@ const BioDetailPage: React.FC = () => {
   useEffect(() => {
     setBioContent(readCachedBioPageContent(language));
     setGraphModel(readCachedGraphModel(language));
+    setBioError(null);
+    setGraphError(null);
   }, [language]);
 
   useEffect(() => {
@@ -351,7 +293,13 @@ const BioDetailPage: React.FC = () => {
                       {fact.label}
                     </Footnote>
                     <div style={{ marginTop: '0.22rem', fontSize: '0.93rem', lineHeight: 1.45 }}>
-                      {fact.href ? <BioLink href={fact.href}>{fact.value}</BioLink> : fact.value}
+                      {fact.href ? (
+                        <DetailTextLink href={fact.href} onNavigate={handleNavigateWithTransition}>
+                          {fact.value}
+                        </DetailTextLink>
+                      ) : (
+                        fact.value
+                      )}
                     </div>
                   </div>
                 ))}
@@ -379,10 +327,9 @@ const BioDetailPage: React.FC = () => {
               }}
             >
               {portraitHref ? (
-                <a
+                <DetailTextLink
                   href={portraitHref}
-                  target="_blank"
-                  rel="noreferrer"
+                  onNavigate={handleNavigateWithTransition}
                   style={{
                     display: 'block',
                     color: 'inherit',
@@ -402,7 +349,7 @@ const BioDetailPage: React.FC = () => {
                       viewTransitionName: portraitTransitionName,
                     }}
                   />
-                </a>
+                </DetailTextLink>
               ) : (
                 <img
                   src={resolveAssetUrl(portrait.imgSrc)}
@@ -447,8 +394,12 @@ const BioDetailPage: React.FC = () => {
                 marginTop: sectionIndex === 0 ? 0 : '2.5rem',
               }}
             >
-              {renderSectionHeading(section.label)}
-              <div>{section.blocks.map((block, blockIndex) => renderContentBlock(block, blockIndex))}</div>
+              {renderDetailSectionHeading(section.label)}
+              <div>
+                {section.blocks.map((block, blockIndex) =>
+                  renderDetailContentBlock(block, blockIndex, handleNavigateWithTransition),
+                )}
+              </div>
             </section>
           ))}
         </section>
@@ -460,7 +411,7 @@ const BioDetailPage: React.FC = () => {
             marginInline: 'auto',
           }}
         >
-          {renderSectionHeading(bioContent.pathsSectionLabel ?? UI_COPY.bioDetailPage.fallbackPathsSectionLabel)}
+          {renderDetailSectionHeading(bioContent.pathsSectionLabel ?? UI_COPY.bioDetailPage.fallbackPathsSectionLabel)}
           <div
             style={{
               display: 'grid',
@@ -528,7 +479,7 @@ const BioDetailPage: React.FC = () => {
               marginInline: 'auto',
             }}
           >
-            {renderSectionHeading(bioContent.linksSectionLabel ?? UI_COPY.bioDetailPage.fallbackLinksSectionLabel)}
+            {renderDetailSectionHeading(bioContent.linksSectionLabel ?? UI_COPY.bioDetailPage.fallbackLinksSectionLabel)}
             <div
               style={{
                 maxWidth: DETAIL_READING_WIDTH,
@@ -538,9 +489,9 @@ const BioDetailPage: React.FC = () => {
               }}
             >
               {bioContent.links.map((link) => (
-                <BioLink key={`${link.label}-${link.href}`} href={link.href}>
+                <DetailTextLink key={`${link.label}-${link.href}`} href={link.href} onNavigate={handleNavigateWithTransition}>
                   {link.label}
-                </BioLink>
+                </DetailTextLink>
               ))}
             </div>
           </section>

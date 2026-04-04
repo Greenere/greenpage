@@ -11,6 +11,7 @@ import { getStableImageViewTransitionName } from "../../../shared/ui/viewTransit
 import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { getNodeDetailPath, resolveAssetUrl } from "../content/Nodes";
 import { useAppLanguage } from '../../../i18n/useAppLanguage';
+import { isExternalHref, isInternalHref } from '../DetailContent';
 
 interface BioData {
     theme: Theme
@@ -35,6 +36,8 @@ const BioNode: React.FC<BioNodeProps> = ({
     const updateNodeInternals = useUpdateNodeInternals();
     const portraitTransitionName = getStableImageViewTransitionName(`graph-bio-portrait-${data.theme}`);
     const portraitHref = getBioPortraitHref(bioContent ?? {});
+    const portraitUsesInternalNavigation = portraitHref ? isInternalHref(portraitHref) : false;
+    const portraitUsesExternalNavigation = portraitHref ? isExternalHref(portraitHref) : false;
 
     useLayoutEffect(() => {
         updateNodeInternals(id);
@@ -95,6 +98,31 @@ const BioNode: React.FC<BioNodeProps> = ({
         stopEventPropagation(event);
     };
 
+    const handlePortraitClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        stopEventPropagation(event);
+
+        if (!portraitHref || !portraitUsesInternalNavigation) {
+            return;
+        }
+
+        event.preventDefault();
+        navigateWithViewTransition(() => {
+            navigate(portraitHref);
+        }, { resetScrollTop: portraitHref.startsWith('/nodes/') });
+    };
+
+    const portraitImage = (
+        <img src={resolveAssetUrl(BIOTHEME[data.theme].imgSrc)} style={{
+            width: `96px`,
+            height: `96px`,
+            objectFit: "cover",
+            borderRadius: "50%",
+            border: `calc(var(--greenpage-bio-portrait-border-width, 1.35) * 1px) solid color-mix(in srgb, var(--color-secondary) calc(var(--greenpage-bio-portrait-border-opacity, 1) * 100%), transparent)`,
+            filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`,
+            viewTransitionName: portraitTransitionName,
+        }} />
+    );
+
     const handleOpenBio = (event: React.MouseEvent<HTMLAnchorElement>) => {
         stopEventPropagation(event);
         event.preventDefault();
@@ -122,8 +150,10 @@ const BioNode: React.FC<BioNodeProps> = ({
                     {portraitHref ? (
                         <a
                             href={portraitHref}
-                            target="_blank"
-                            rel="noreferrer"
+                            target={portraitUsesExternalNavigation ? "_blank" : undefined}
+                            rel={portraitUsesExternalNavigation ? "noreferrer" : undefined}
+                            onPointerDown={handleBioPointerDown}
+                            onClick={handlePortraitClick}
                             onMouseOver={() => {
                                 setFocused(true);
                             }}
@@ -131,26 +161,10 @@ const BioNode: React.FC<BioNodeProps> = ({
                                 setFocused(false);
                             }}
                         >
-                            <img src={resolveAssetUrl(BIOTHEME[data.theme].imgSrc)} style={{
-                                width: `96px`,
-                                height: `96px`,
-                                objectFit: "cover",
-                                borderRadius: "50%",
-                                border: `calc(var(--greenpage-bio-portrait-border-width, 1.35) * 1px) solid color-mix(in srgb, var(--color-secondary) calc(var(--greenpage-bio-portrait-border-opacity, 1) * 100%), transparent)`,
-                                filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`,
-                                viewTransitionName: portraitTransitionName,
-                            }} />
+                            {portraitImage}
                         </a>
                     ) : (
-                        <img src={resolveAssetUrl(BIOTHEME[data.theme].imgSrc)} style={{
-                            width: `96px`,
-                            height: `96px`,
-                            objectFit: "cover",
-                            borderRadius: "50%",
-                            border: `calc(var(--greenpage-bio-portrait-border-width, 1.35) * 1px) solid color-mix(in srgb, var(--color-secondary) calc(var(--greenpage-bio-portrait-border-opacity, 1) * 100%), transparent)`,
-                            filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`,
-                            viewTransitionName: portraitTransitionName,
-                        }} />
+                        portraitImage
                     )}
 
                     <GreenHandle
