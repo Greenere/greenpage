@@ -7,6 +7,7 @@ type DocumentWithViewTransition = Document & {
 };
 
 let latestViewTransitionFinished: Promise<void> = Promise.resolve();
+let latestTransitionConfigToken = 0;
 
 export type ViewTransitionConfig = {
   exitDurationMs: number;
@@ -55,6 +56,7 @@ export function runWithViewTransition(update: () => void, options?: RunWithViewT
   }
 
   if (options?.transitionConfig) {
+    latestTransitionConfigToken += 1;
     applyTransitionCssVars(options.transitionConfig);
   }
 
@@ -64,8 +66,11 @@ export function runWithViewTransition(update: () => void, options?: RunWithViewT
   latestViewTransitionFinished = transition.finished;
 
   if (options?.transitionConfig) {
+    const transitionConfigToken = latestTransitionConfigToken;
     void transition.finished.finally(() => {
-      applyTransitionCssVars(PAGE_TRANSITION_CONFIG);
+      if (transitionConfigToken === latestTransitionConfigToken) {
+        applyTransitionCssVars(PAGE_TRANSITION_CONFIG);
+      }
     });
   }
 }

@@ -25,7 +25,7 @@ export const THEME_CONFIG = {
             primary: '#373C42',
             secondary: '#696B6A',
             background: '#D3B090',
-            text: '#373C42',
+            text: '#000000',
             accent: '#B4B9BD',
         },
         portrait: {

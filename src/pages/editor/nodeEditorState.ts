@@ -105,16 +105,18 @@ export function createInitialNewDomainDraft(): NewDomainDraft {
 export function createInitialNodeEditorWorkspaceState({
   decodedNodeId,
   language,
+  initialTab,
   newNodeDraft,
   newDomainDraft = createInitialNewDomainDraft(),
 }: {
   decodedNodeId: string;
   language: AppLanguage;
+  initialTab?: EditorTab;
   newNodeDraft: NewNodeDraft;
   newDomainDraft?: NewDomainDraft;
 }): NodeEditorWorkspaceState {
   return {
-    tab: decodedNodeId ? 'content' : 'new-node',
+    tab: initialTab ?? (decodedNodeId ? 'content' : 'new-node'),
     bootstrapNodes: [],
     bootstrapError: null,
     currentNodeRef: null,

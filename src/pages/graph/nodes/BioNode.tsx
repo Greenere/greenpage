@@ -122,6 +122,7 @@ const BioNode: React.FC<BioNodeProps> = ({
                     <a
                         href={portraitHref}
                         target="_blank"
+                        rel="noreferrer"
                         onMouseOver={() => {
                             setFocused(true);
                         }}

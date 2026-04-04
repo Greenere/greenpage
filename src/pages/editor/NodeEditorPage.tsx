@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { DOMAIN_CONFIG, DOMAIN_ORDER, isDomainId, type DomainId } from '../../configs/content/domains';
 import {
@@ -998,9 +998,10 @@ const btnDisabled: CSSProperties = { opacity: 0.38, cursor: 'not-allowed' };
 
 type StandardNodeEditorWorkspaceProps = {
   decodedNodeId: string;
+  initialTab?: EditorTab;
 };
 
-const StandardNodeEditorWorkspace = ({ decodedNodeId }: StandardNodeEditorWorkspaceProps) => {
+const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNodeEditorWorkspaceProps) => {
   const { language, messages } = useAppLanguage();
   const nodeTemplateOptions = getNodeTemplateOptions();
   const templateDefaults = getLocaleMessages().nodeTemplates.defaults;
@@ -1014,6 +1015,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId }: StandardNodeEditorWorksp
       createInitialNodeEditorWorkspaceState({
         decodedNodeId,
         language,
+        initialTab,
         newNodeDraft: createInitialNewNodeDraft({
           templateDefaults,
           domain: DOMAIN_ORDER[0],
@@ -3303,13 +3305,17 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId }: StandardNodeEditorWorksp
 
 const NodeEditorPage: React.FC = () => {
   const { nodeId } = useParams();
+  const location = useLocation();
   const decodedNodeId = nodeId ? decodeURIComponent(nodeId) : '';
+  const requestedTab = new URLSearchParams(location.search).get('tab');
+  const initialTab: EditorTab | undefined =
+    requestedTab === 'new-node' || requestedTab === 'new-domain' ? requestedTab : undefined;
 
   if (decodedNodeId === 'bio') {
     return <BioEditorWorkspace />;
   }
 
-  return <StandardNodeEditorWorkspace decodedNodeId={decodedNodeId} />;
+  return <StandardNodeEditorWorkspace decodedNodeId={decodedNodeId} initialTab={initialTab} />;
 };
 
 export default NodeEditorPage;

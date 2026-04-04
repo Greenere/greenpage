@@ -588,27 +588,25 @@ export default function BioEditorWorkspace() {
               {editorCanMutateProject
                 ? (
                     [
-                      { key: 'new-node', label: UI_COPY.nodeEditor.tabs.newNode },
-                      { key: 'new-domain', label: UI_COPY.nodeEditor.tabs.newDomain },
+                      { key: 'new-node', label: UI_COPY.nodeEditor.tabs.newNode, href: '/editor?tab=new-node' },
+                      { key: 'new-domain', label: UI_COPY.nodeEditor.tabs.newDomain, href: '/editor?tab=new-domain' },
                     ] as const
                   ).map((tab) => (
                     <button
                       key={tab.key}
                       type="button"
-                      aria-disabled="true"
-                      onClick={(event) => event.preventDefault()}
-                      title={UI_COPY.nodeEditor.common.leaveBioToCreate}
+                      onClick={() => navigate(tab.href)}
                       style={{
                         padding: '0.38rem 0.75rem',
                         borderRadius: '999px',
                         fontSize: '0.8rem',
                         fontWeight: 400,
                         fontFamily: 'inherit',
-                        cursor: 'not-allowed',
+                        cursor: 'pointer',
                         border: '1px solid color-mix(in srgb, var(--color-secondary) 30%, transparent)',
                         background: 'transparent',
                         color: 'var(--color-text)',
-                        opacity: 0.38,
+                        transition: 'background 0.12s, color 0.12s',
                       }}
                     >
                       {tab.label}
