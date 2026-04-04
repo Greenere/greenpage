@@ -738,8 +738,8 @@ function buildEdgesForNodes(
     };
 }
 
-function relaxInitialNodes(nodes: Node[]) {
-    const lockedIds = new Set(['bio']);
+function relaxInitialNodes(nodes: Node[], extraLockedIds?: ReadonlySet<string>) {
+    const lockedIds = new Set(['bio', ...(extraLockedIds ?? [])]);
     const pos = new Map<string, BoxState>();
 
     for (const node of nodes) {
@@ -863,6 +863,12 @@ function buildInitialGraph(
     );
     const positionById = new Map(contentNodes.map((node) => [node.id, targetCenters.get(node.id) ?? bioCenter]));
 
+    const bioConnectedIds = new Set<string>();
+    for (const rel of graphRelations) {
+        if (rel.from === 'bio') bioConnectedIds.add(rel.to);
+        if (rel.to === 'bio') bioConnectedIds.add(rel.from);
+    }
+
     const relaxedNodes = relaxInitialNodes([
         {
             id: 'bio',
@@ -902,7 +908,7 @@ function buildInitialGraph(
                 } satisfies StoryNodeData,
             };
         }),
-    ]);
+    ], bioConnectedIds);
 
     return buildEdgesForNodes(relaxedNodes, graphRelations);
 }

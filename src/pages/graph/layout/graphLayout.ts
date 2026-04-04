@@ -208,17 +208,32 @@ export function enforceAnchorClearance(
     const anchor = pos.get(anchorId);
     if (!anchor) return;
 
+    // Synthetic box for the anchor's full clearance footprint.
+    // Kept constant because the anchor never moves in this pass.
+    const halo: BoxState = {
+        x: anchor.x - (anchor.pad + extraPadding),
+        y: anchor.y - (anchor.pad + extraPadding),
+        w: anchor.w + (anchor.pad + extraPadding) * 2,
+        h: anchor.h + (anchor.pad + extraPadding) * 2,
+        pad: 0,
+    };
+
     for (let iter = 0; iter < maxIters; iter++) {
         let movedAny = false;
 
-        for (const [nodeId, node] of pos) {
-            if (nodeId === anchorId) continue;
+        // Rebuild the spatial index each iteration so nodes pushed outward
+        // in the previous iteration are no longer returned as candidates.
+        const collisionIndex = buildCollisionIndex(pos, COLLISION_CELL_SIZE);
+
+        // Only visit nodes whose cells overlap the halo — O(k) instead of O(N).
+        const candidateIds = getPotentialCollisionIds(anchorId, halo, collisionIndex, COLLISION_CELL_SIZE);
+
+        for (const nodeId of candidateIds) {
+            const node = pos.get(nodeId);
+            if (!node) continue;
 
             const [dx, dy] = mtvSeparateAABB(
-                anchor.x - (anchor.pad + extraPadding),
-                anchor.y - (anchor.pad + extraPadding),
-                anchor.w + (anchor.pad + extraPadding) * 2,
-                anchor.h + (anchor.pad + extraPadding) * 2,
+                halo.x, halo.y, halo.w, halo.h,
                 node.x - node.pad,
                 node.y - node.pad,
                 node.w + node.pad * 2,
@@ -492,16 +507,39 @@ export function buildLaneTargetPositions(
     const minViewport = Math.min(viewportWidth, viewportHeight);
     const innerRadius = Math.max(innerRadiusMin, Math.min(innerRadiusMax, minViewport * 0.245));
     const radialGap = Math.max(radialGapMin, Math.min(radialGapMax, minViewport * 0.128));
+    // Outermost ring must not exceed this distance from center.
+    const maxOuterRadius = minViewport * 0.44;
+
+    // Build the set of nodes directly connected to the bio anchor so they can
+    // be placed at layer 0 (innermost ring) in their respective lanes.
+    const bioConnectedIds = new Set<string>();
+    for (const rel of graphRelations) {
+        if (rel.from === 'bio') bioConnectedIds.add(rel.to);
+        if (rel.to === 'bio') bioConnectedIds.add(rel.from);
+    }
+
     const targets = new Map<string, Point>();
 
     for (const domain of domainOrder) {
         const laneNodes = contentNodes
             .filter((node) => node.domain === domain)
-            .sort((left, right) => getChronologySortKey(right.chronology) - getChronologySortKey(left.chronology));
+            .sort((left, right) => {
+                // Bio-connected nodes always come first so they land at layer 0.
+                const leftBio = bioConnectedIds.has(left.id) ? 1 : 0;
+                const rightBio = bioConnectedIds.has(right.id) ? 1 : 0;
+                if (leftBio !== rightBio) return rightBio - leftBio;
+                // Within each tier, sort by chronology descending (most recent first).
+                return getChronologySortKey(right.chronology) - getChronologySortKey(left.chronology);
+            });
         const lane = lanePlan.get(domain);
         if (!lane) continue;
 
         const outerLayerCount = Math.max(1, Math.ceil((laneNodes.length - 1) / 2));
+        // Shrink the gap when there are many nodes so the outermost ring stays
+        // within maxOuterRadius. With few nodes the cap has no effect.
+        const effectiveRadialGap = outerLayerCount > 1
+            ? Math.min(radialGap, (maxOuterRadius - innerRadius) / outerLayerCount)
+            : radialGap;
         const effectiveMaxAngleOffset = Math.min(maxAngleOffset, lane.span * 0.34);
         const angleStep = outerLayerCount > 0 ? effectiveMaxAngleOffset / outerLayerCount : 0;
 
@@ -510,8 +548,8 @@ export function buildLaneTargetPositions(
             const side = index === 0 ? 0 : index % 2 === 1 ? -1 : 1;
             const angleOffset = side * angleStep * layer;
             const angle = lane.centerAngle + angleOffset;
-            const radius = innerRadius + layer * radialGap;
-            const tangentOffset = side === 0 ? 0 : side * radialGap * 0.14;
+            const radius = innerRadius + layer * effectiveRadialGap;
+            const tangentOffset = side === 0 ? 0 : side * effectiveRadialGap * 0.14;
 
             targets.set(node.id, {
                 x: centerX + Math.cos(angle) * radius - Math.sin(angle) * tangentOffset,
