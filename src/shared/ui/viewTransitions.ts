@@ -12,6 +12,8 @@ let latestTransitionConfigToken = 0;
 export type ViewTransitionConfig = {
   exitDurationMs: number;
   exitEasing: string;
+  /** Scale the exiting page reaches at the end of its exit animation. Default 1 (no scale). */
+  exitScaleTo?: number;
   enterDurationMs: number;
   enterEasing: string;
   enterScaleFrom: number;
@@ -27,6 +29,7 @@ function applyTransitionCssVars(config: ViewTransitionConfig) {
   const root = document.documentElement;
   root.style.setProperty('--page-exit-duration', `${config.exitDurationMs}ms`);
   root.style.setProperty('--page-exit-easing', config.exitEasing);
+  root.style.setProperty('--page-exit-scale-to', String(config.exitScaleTo ?? 1));
   root.style.setProperty('--page-enter-duration', `${config.enterDurationMs}ms`);
   root.style.setProperty('--page-enter-easing', config.enterEasing);
   root.style.setProperty('--page-enter-scale-from', String(config.enterScaleFrom));

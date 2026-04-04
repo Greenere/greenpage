@@ -11,6 +11,7 @@ import { UI_COPY } from '../../configs/ui/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
 import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
+import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { getBioPortraitHref, loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
 import DetailPageLanguageToggle from './DetailPageLanguageToggle';
@@ -129,7 +130,9 @@ const BioDetailPage: React.FC = () => {
 
   const handleBackToGraph = () => {
     window.sessionStorage.setItem(GRAPH_RETURN_FOCUS_NODE_KEY, 'bio');
-    handleNavigateWithTransition('/');
+    navigateWithViewTransition(() => {
+      navigate('/');
+    }, { transitionConfig: PAGE_BACK_TRANSITION_CONFIG });
   };
 
   useEffect(() => {

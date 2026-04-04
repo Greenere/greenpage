@@ -49,7 +49,8 @@ body,
 /* Driven by PAGE_TRANSITION_CONFIG — values written by viewTransitions.ts at module load. */
 :root {
   --page-exit-duration: 100ms;
-  --page-exit-easing: ease-in;
+  --page-exit-easing: ease-out;
+  --page-exit-scale-to: 1;
   --page-enter-duration: 220ms;
   --page-enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
   --page-enter-scale-from: 0.97;
@@ -64,8 +65,8 @@ body,
 }
 
 @keyframes greenpage-page-exit {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from { opacity: 1; scale: 1; }
+  to   { opacity: 0; scale: var(--page-exit-scale-to); }
 }
 
 @keyframes greenpage-page-enter {

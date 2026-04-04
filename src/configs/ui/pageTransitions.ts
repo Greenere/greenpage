@@ -17,6 +17,20 @@ export const PAGE_TRANSITION_CONFIG = {
   enterScaleFrom: 0.97,
 } as const;
 
+/**
+ * Used when navigating *back* to the graph (detail → graph).
+ * The exiting detail page shrinks away (1.0 → 0.97) while the graph
+ * crossfades in at full scale — the reverse of the forward zoom-in.
+ */
+export const PAGE_BACK_TRANSITION_CONFIG = {
+  exitDurationMs: 180,
+  exitEasing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  exitScaleTo: 0.97,
+  enterDurationMs: 320,
+  enterEasing: 'ease-out',
+  enterScaleFrom: 1,
+} as const;
+
 export const LANGUAGE_SWITCH_TRANSITION_CONFIG = {
   /** Slightly softer than route changes because the user is staying on the same page. */
   exitDurationMs: 120,
