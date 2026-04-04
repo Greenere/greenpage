@@ -162,7 +162,7 @@ type NodeLoadSuccessAction = {
   statusMessage: string | null;
 };
 
-type NodeEditorWorkspaceAction =
+export type NodeEditorWorkspaceAction =
   | { type: 'set_tab'; tab: EditorTab }
   | { type: 'set_bootstrap_nodes'; nodes: EditorNodeOption[] }
   | { type: 'upsert_bootstrap_node'; node: EditorNodeOption }
