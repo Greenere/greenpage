@@ -16,6 +16,7 @@ import {
 } from '../../shared/ui/viewTransitions';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from './content/BioPage';
+import DetailPageLanguageToggle from './DetailPageLanguageToggle';
 import ThemePicker from './ThemePicker';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {
@@ -770,7 +771,17 @@ const NodeDetailPage: React.FC = () => {
           >
             <span>{UI_COPY.nodeDetailPage.backToGraph}</span>
           </Link>
-          <ThemePicker theme={theme} setTheme={handleThemeChange} variant="inline" />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '0.4rem',
+            }}
+          >
+            <DetailPageLanguageToggle />
+            <ThemePicker theme={theme} setTheme={handleThemeChange} variant="inline" />
+          </div>
         </div>
 
         <section

@@ -299,27 +299,6 @@
       "strength": 2
     },
     {
-      "id": "editor-cornell-time-california-one-2022-cornell-5",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "zh-CN": "summer trip in the graduate-school stretch",
-        "en": "summer trip in the graduate-school stretch"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-verily-intern-location-california-one-2022-verily-intern-1",
-      "from": "california-one-2022",
-      "to": "verily-intern",
-      "kind": "location",
-      "labels": {
-        "en": "same California summer as the internship"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-verily-intern-outcome-verily-intern-cornell-2",
       "from": "verily-intern",
       "to": "cornell",
@@ -348,6 +327,26 @@
         "en": "Data Visualization work at Cornell"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "summer trip in the graduate-school stretch"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
+      "from": "california-one-2022",
+      "to": "verily-intern",
+      "kind": "location",
+      "labels": {
+        "en": "same California summer as the internship"
+      },
+      "strength": 3
     }
   ]
 }

@@ -21,7 +21,6 @@
   },
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
@@ -32,10 +31,10 @@
           "type": "text",
           "text": "What stayed with me was not a single stop, but the feeling of the whole drive unfolding in sequence, almost like stepping through a living `storyboard` of California."
         }
-      ]
+      ],
+      "id": "overview"
     },
     {
-      "id": "route",
       "label": "Route",
       "blocks": [
         {
@@ -53,52 +52,36 @@
           "tone": "highlight",
           "text": "This was the first trip in California that felt fully inhabited rather than borrowed. It made the summer read less like a temporary relocation and more like a chapter."
         }
-      ]
+      ],
+      "id": "route"
     },
     {
-      "id": "photographs",
       "label": "Photographs",
       "blocks": [
         {
           "type": "gallery",
-          "columns": 3,
-          "align": "natural",
           "items": [
             {
+              "alt": "Haoyang in the Bay Area during summer 2022",
               "src": "assets/portrait_haoyang_sfbay.jpg",
-              "alt": "Haoyang in the Bay Area during summer 2022",
               "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
             },
             {
-              "src": "assets/portrait_haoyang_mty.jpg",
               "alt": "Haoyang in Monterey during the Route 1 trip",
+              "src": "assets/portrait_haoyang_mty.jpg",
               "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
             },
             {
-              "src": "assets/portrait_haoyang_mty.jpg",
-              "alt": "Haoyang in Monterey during the Route 1 trip",
-              "caption": ""
-            }
-          ]
-        },
-        {
-          "type": "gallery",
-          "columns": 2,
-          "align": "natural",
-          "items": [
-            {
+              "alt": "Haoyang in the Bay Area during summer 2022",
               "src": "assets/sf_fog.jpg",
-              "alt": "Haoyang in the Bay Area during summer 2022",
               "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
-            },
-            {
-              "src": "assets/portrait_haoyang_mty.jpg",
-              "alt": "Haoyang in Monterey during the Route 1 trip",
-              "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
             }
-          ]
+          ],
+          "columns": 3,
+          "align": "height:3"
         }
-      ]
+      ],
+      "id": "photographs"
     }
   ]
 }
