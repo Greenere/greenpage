@@ -22,7 +22,7 @@ interface StoryData {
     subtitle?: string,
     summary?: string,
     gallery?: NodeGalleryImage[],
-    detail?: ContentBlock[],
+    preview?: ContentBlock[],
     handles?: DynamicHandle[],
     domainTag?: string,
     badges?: string[],
@@ -107,7 +107,7 @@ const StoryNode: React.FC<StoryNodeProps> = ({
                     flexDirection: "column",
                 };
 
-    const visibleBlocks = data.detail?.slice(0, layoutMode === 'container' ? 2 : variant === 'anchor' ? 2 : 1) ?? [];
+    const visibleBlocks = data.preview?.slice(0, layoutMode === 'container' ? 2 : variant === 'anchor' ? 2 : 1) ?? [];
     const summaryLineClamp = layoutMode === 'container' ? undefined : variant === 'anchor' ? 5 : 4;
 
     const stopEventPropagation = (event: React.SyntheticEvent) => {

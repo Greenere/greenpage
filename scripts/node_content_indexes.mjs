@@ -140,7 +140,10 @@ function toNodeCardContent(raw, nodeId) {
     subtitle: typeof raw.subtitle === 'string' ? raw.subtitle : undefined,
     summary: raw.summary,
     tags: normalizeStringArray(raw.tags),
-    detail: derivePreviewBlocksFromSections(raw.sections) ?? normalizePreviewContentBlocks(raw.detail),
+    preview:
+      derivePreviewBlocksFromSections(raw.sections) ??
+      normalizePreviewContentBlocks(raw.preview) ??
+      normalizePreviewContentBlocks(raw.detail),
   };
 }
 

@@ -118,13 +118,6 @@ const NodeArticlePreview = ({ node }: NodeArticlePreviewProps) => {
       )}
 
       {articleSections && articleSections.length > 0 && articleSections.map((section, index) => renderSection(section, index))}
-
-      {(!articleSections || articleSections.length === 0) && node.detail && node.detail.length > 0 && (
-        <section style={{ marginTop: '2.2rem', maxWidth: DETAIL_SECTION_WIDTH, marginInline: 'auto' }}>
-          {renderSectionHeading(UI_COPY.nodeDetailPage.sections.story)}
-          <div>{node.detail.map((block, index) => renderContentBlock(block, index))}</div>
-        </section>
-      )}
     </div>
   );
 };

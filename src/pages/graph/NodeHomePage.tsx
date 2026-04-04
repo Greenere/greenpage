@@ -63,7 +63,7 @@ type StoryNodeData = {
     title: string;
     subtitle?: string;
     summary: string;
-    detail?: GraphCardNode['detail'];
+    preview?: GraphCardNode['preview'];
     badges?: string[];
 };
 
@@ -1322,7 +1322,7 @@ function buildInitialGraph(
                     title: node.title,
                     subtitle: node.subtitle,
                     summary: node.summary,
-                    detail: node.detail,
+                    preview: node.preview,
                     badges: node.tags,
                 } satisfies StoryNodeData,
             };

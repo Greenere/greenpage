@@ -903,19 +903,6 @@ const NodeDetailPage: React.FC = () => {
 
         {articleSections && articleSections.length > 0 && articleSections.map((section, index) => renderSection(section, index, handleNavigateWithTransition))}
 
-        {(!articleSections || articleSections.length === 0) && node.detail && node.detail.length > 0 && (
-          <section
-            style={{
-              marginTop: '2.2rem',
-              maxWidth: DETAIL_SECTION_WIDTH,
-              marginInline: 'auto',
-            }}
-          >
-            {renderSectionHeading(UI_COPY.nodeDetailPage.sections.story)}
-            <div>{node.detail.map((block, index) => renderContentBlock(block, index, handleNavigateWithTransition))}</div>
-          </section>
-        )}
-
         {relatedEntries.length > 0 && (
           <section
             style={{

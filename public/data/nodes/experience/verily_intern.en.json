@@ -44,23 +44,5 @@
       ],
       "id": "what-changed"
     }
-  ],
-  "detail": [
-    {
-      "type": "text",
-      "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
-    },
-    {
-      "type": "text",
-      "text": "It also changed how the summer itself felt. Workdays at Verily and weekend drives like [California State Route 1](/nodes/california-one-2022) started to belong to the same chapter rather than separate categories."
-    },
-    {
-      "type": "list",
-      "items": [
-        "Software engineering became a concrete path rather than an abstract possibility",
-        "The distance between coursework and real product work became much smaller",
-        "The internship later connected forward into the full-time role that follows in the graph"
-      ]
-    }
   ]
 }

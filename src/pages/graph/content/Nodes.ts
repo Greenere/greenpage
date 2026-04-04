@@ -78,7 +78,6 @@ export type GraphContentNode = {
   meta?: NodeArticleMeta;
   sections?: NodeArticleSection[];
   gallery?: NodeGalleryImage[];
-  detail?: ContentBlock[];
 };
 
 export type GraphNodeRef = {
@@ -98,13 +97,11 @@ export type GraphNodeContent = {
   meta?: NodeArticleMeta;
   sections?: NodeArticleSection[];
   gallery?: NodeGalleryImage[];
-  detail?: ContentBlock[];
 };
 
-export type GraphNodeCardContent = Pick<
-  GraphNodeContent,
-  'title' | 'subtitle' | 'summary' | 'tags' | 'detail'
->;
+export type GraphNodeCardContent = Pick<GraphNodeContent, 'title' | 'subtitle' | 'summary' | 'tags'> & {
+  preview?: ContentBlock[];
+};
 
 export type GraphCardNode = GraphNodeRef & GraphNodeCardContent;
 
@@ -517,7 +514,6 @@ export function normalizeNodeContent(raw: unknown, nodeId = 'unknown'): GraphNod
   }
 
   const sections = normalizeArticleSections(candidate.sections);
-  const detail = sections?.length ? derivePreviewBlocks(sections) : normalizeContentBlocks(candidate.detail);
 
   return {
     title: candidate.title,
@@ -528,7 +524,6 @@ export function normalizeNodeContent(raw: unknown, nodeId = 'unknown'): GraphNod
     meta: normalizeArticleMeta(candidate.meta),
     sections,
     gallery: normalizeGalleryImages(candidate.gallery),
-    detail,
   } satisfies GraphNodeContent;
 }
 
@@ -538,12 +533,21 @@ function toGraphNodeCardContent(content: GraphNodeContent): GraphNodeCardContent
     subtitle: content.subtitle,
     summary: content.summary,
     tags: content.tags,
-    detail: content.detail,
+    preview: derivePreviewBlocks(content.sections),
   } satisfies GraphNodeCardContent;
 }
 
 export function normalizeNodeCardContent(raw: unknown, nodeId = 'unknown'): GraphNodeCardContent {
-  return toGraphNodeCardContent(normalizeNodeContent(raw, nodeId));
+  const content = normalizeNodeContent(raw, nodeId);
+  const candidate = isRecord(raw) ? raw : {};
+
+  return {
+    ...toGraphNodeCardContent(content),
+    preview:
+      normalizeContentBlocks(candidate.preview) ??
+      normalizeContentBlocks(candidate.detail) ??
+      derivePreviewBlocks(content.sections),
+  } satisfies GraphNodeCardContent;
 }
 
 async function loadNodeContent(node: GraphNodeRef, locale: AppLanguage): Promise<GraphNodeContent> {

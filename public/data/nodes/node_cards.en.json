@@ -7,7 +7,7 @@
       "history",
       "essay"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "This node keeps the graph from collapsing into only study and work. The old site also made room for essays driven by curiosity about history, geography, and the movement of states and ideas over time."
@@ -35,7 +35,7 @@
       "writing",
       "research"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The old site held a large body of writing on adversarial machine learning. Some pieces explained ideas for a broad audience. Others worked more like study notes, mapping papers, concepts, and debates into something I could revisit later."
@@ -58,7 +58,7 @@
     "title": "Layoff Journey",
     "subtitle": "An article about my first layoff experience happening in Aug 25th, 2025",
     "summary": "I was laid off in August 2025.To be honest, it didn’t come completely out of nowhere. The industry had already been going through waves of layoffs, and deep down I knew it was possible. Still, when it actually happened, it felt abrupt and strangely disorienting. ",
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The company had apparently planned it earlier, but due to internal processes—legal reviews, coordination—it got delayed. Then one Monday, it finally happened. A Monday layoff. That alone felt off, almost symbolic of how chaotic things had become."
@@ -78,7 +78,7 @@
       "Oxford",
       "summer school"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The old resume lists this as a summer school in knowledge representation at Oriel College, Oxford."
@@ -101,7 +101,7 @@
       "HUST",
       "undergraduate"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "I graduated in the top 10 with a 3.91/4.0 GPA. Research, contests, design work, and course projects gradually pulled the path toward machine learning and software."
@@ -125,7 +125,7 @@
       "Graduate",
       "Ithaca"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "I was supposed to attend in 2021, but we all know what happened. The world-wide tragedy forever changed our lives, and I had to spend a gap year to do all hussles but I finally got to Ithaca in August,2022."
@@ -148,7 +148,7 @@
       "research",
       "security"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "This was the period when adversarial machine learning stopped being just a course topic and became a real research track. Working with Prof. Wei Yuan's group, I focused on attacking signature verification systems under realistic black-box constraints."
@@ -177,7 +177,7 @@
       "interpretability",
       "Adversarial ML"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "This lab period deepened the adversarial-ML thread that began with the signature project. Much of the reading, experimentation, and writing around noise modulation came together here."
@@ -205,7 +205,7 @@
       "industry",
       "ai security"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "RealAI felt like a bridge. The same adversarial-ML interests appeared in a more applied setting, shaped by industry pace and product constraints. It sharpened the sense that robustness ideas had to survive outside the paper world."
@@ -228,7 +228,7 @@
       "internship",
       "engineering"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
@@ -255,7 +255,7 @@
       "current",
       "software"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "Compared with the earlier nodes, this one reflects a steadier and less school-shaped rhythm. It is about longer projects, production responsibility, and a deeper engineering identity that can later branch into writing, side projects, or future moves."
@@ -274,7 +274,7 @@
     "title": "Waymo",
     "subtitle": "Full-time job since Dec 15th, 2025, still enjoying it",
     "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "I am in a team spanning across data, model and ops, a lot of new stuff to learn with a lot of new opportunities. The progress that Waymo is making is very exciting and I wish to be able to stay here until its potential IPO."
@@ -290,7 +290,7 @@
       "GUI",
       "Email"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "It's a tiny project, almost useless in that sense, but I really enjoyed it. We spent most of the time trying to get the UI work, which seems dumb to try to use QT to write a UI in Python rather than just pull up a localhost and write a web frontend."
@@ -309,7 +309,7 @@
       "modeling",
       "ICM"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "Instead of modeling each person as a cell, the system modeled representative exhibition halls. It then simulated how congestion-aware routing could accelerate evacuation."
@@ -332,7 +332,7 @@
       "crawler",
       "visualization"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The main contribution was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
@@ -355,7 +355,7 @@
       "deepfake",
       "computer vision"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The core work centered on the intracoder and color-correction modules. The broader challenge was stitching detection, alignment, fusion, and post-processing into one pipeline."
@@ -378,7 +378,7 @@
       "D3",
       "programming languages"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The project combined history, relation maps, and trend views. In hindsight, it feels especially close to the graph-based personal-site idea."
@@ -401,7 +401,7 @@
       "adversarial ML",
       "signature"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The work started from a course interest in adversarial examples. It focused on keeping perturbations inside the stroke region, so they stayed hard to notice and survived background cleaning."
@@ -424,7 +424,7 @@
       "interpretability",
       "robustness"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The idea was to multiply images with learned noise during training. That pushed the model to rely on the truly critical components, cleaning up the gradient signal at the cost of some accuracy."
@@ -447,7 +447,7 @@
       "travel",
       "east coast"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The old tripline files suggest this was less a single trip than a travel season: New York City in January, Philadelphia in February, Boston in June, and repeated returns to Ithaca and upstate New York through the rest of the year."
@@ -471,7 +471,7 @@
       "travel",
       "coast"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "Among the old travel artifacts, this one is especially visual. It reads more like a route sketch than a diary entry: coastlines, viewpoints, and a day-long line from the Bay toward Monterey during the [Verily internship](/nodes/verily-intern)."
@@ -495,7 +495,7 @@
     "title": "Santa Barbara Trip",
     "subtitle": "My first time going to California, yet on a rainy day",
     "summary": "I was in my tedious searching for my first job out of Cornell, yet the return offer from the summer internship was pending. It was a trip reimbursed by a company onsite, and Santa Babara was truly a beautiful city.",
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "It was an interesting company based in this touristy town outside of Los Angeles area. The city was all in Spanish colonial style, said to be enforced by the local law. I remember that the court was very picturistic, the mission was an interesting history classroom, where I first learned that California is a state of missions."
@@ -510,7 +510,7 @@
       "travel",
       "island"
     ],
-    "detail": [
+    "preview": [
       {
         "type": "text",
         "text": "The old tripline artwork turns this into a vivid node: Old San Juan, Punta Higuero Lighthouse, beaches, airport thresholds, and a compact trip at the end of 2022 that feels transitional in the larger story."
