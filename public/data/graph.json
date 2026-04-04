@@ -5,12 +5,6 @@
   },
   "nodes": [
     {
-      "id": "history-writing",
-      "kind": "writing",
-      "domain": "blog",
-      "chronology": "202103"
-    },
-    {
       "id": "adversarial-writing",
       "kind": "writing",
       "domain": "blog",
@@ -234,27 +228,6 @@
       "strength": 2
     },
     {
-      "id": "editor-faceswap-topic-faceswap-signature-attack-2",
-      "from": "faceswap",
-      "to": "signature-attack",
-      "kind": "topic",
-      "labels": {
-        "zh-CN": "同样是与AI安全相关的工作"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-louvre-evacuation-reason-louvre-evacuation-history-writing-1",
-      "from": "louvre-evacuation",
-      "to": "history-writing",
-      "kind": "reason",
-      "labels": {
-        "en": "technical modeling touched a parallel history interest",
-        "zh-CN": "technical modeling touched a parallel history interest"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-naec-reason-signature-attack-naec-2",
       "from": "signature-attack",
       "to": "naec",
@@ -299,17 +272,6 @@
       "strength": 2
     },
     {
-      "id": "editor-hust-time-faceswap-hust-4",
-      "from": "faceswap",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "graduation capstone project for bachelors",
-        "zh-CN": "本科毕业论文项目"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-hust-time-weibe-hust-5",
       "from": "weibe",
       "to": "hust",
@@ -321,24 +283,43 @@
       "strength": 2
     },
     {
-      "id": "editor-hust-time-louvre-evacuation-hust-6",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "modeling contest during HUST years",
-        "zh-CN": ""
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-hust-time-wellmail-hust-7",
+      "id": "editor-wellmail-time-wellmail-hust-1",
       "from": "wellmail",
       "to": "hust",
       "kind": "time",
       "labels": {
-        "en": "software project at HUST",
-        "zh-CN": ""
+        "zh-CN": "大二期间的课程项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-2",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "大学期间的比赛项目",
+        "en": "competition project during college"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-faceswap-topic-faceswap-signature-attack-1",
+      "from": "faceswap",
+      "to": "signature-attack",
+      "kind": "topic",
+      "labels": {
+        "en": "works also related to AI security"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-faceswap-time-faceswap-hust-2",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "graduation capstone project for bachelors"
       },
       "strength": 2
     }

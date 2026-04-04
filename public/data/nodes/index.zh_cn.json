@@ -1,38 +1,4 @@
 {
-  "history-writing": {
-    "title": "历史写作",
-    "subtitle": "技术轨道之外的文章",
-    "summary": "一条与工程平行的写作线索，更多关注历史而非技术，涉及战争、疆域与长期政治变化的文章。",
-    "tags": [
-      "历史",
-      "随笔"
-    ],
-    "sections": [
-      {
-        "id": "overview",
-        "label": "概览",
-        "blocks": [
-          {
-            "type": "text",
-            "text": "这个节点让整张图不至于坍缩成只有学习与工作。旧站点里也为那些出于对历史、地理，以及国家与思想如何在时间中移动的好奇而写下的文章留出了位置。"
-          },
-          {
-            "type": "list",
-            "items": [
-              "《The Ripples of War》",
-              "关于中国疆域变化的一篇历史文章",
-              "与技术写作并行的一条更安静的人文线索"
-            ]
-          },
-          {
-            "type": "link",
-            "label": "旧博客索引",
-            "href": "https://greenere.github.io/blogs.html"
-          }
-        ]
-      }
-    ]
-  },
   "adversarial-writing": {
     "title": "对抗机器学习写作轨迹",
     "subtitle": "知乎文章、综述与密集笔记",

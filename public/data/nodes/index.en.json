@@ -1,38 +1,4 @@
 {
-  "history-writing": {
-    "title": "History Writing",
-    "subtitle": "Essays from outside the technical track",
-    "summary": "A parallel writing thread focused on history rather than engineering, with essays on war, territory, and long arcs of political change.",
-    "tags": [
-      "history",
-      "essay"
-    ],
-    "sections": [
-      {
-        "id": "overview",
-        "label": "Overview",
-        "blocks": [
-          {
-            "type": "text",
-            "text": "This node keeps the graph from collapsing into only study and work. The old site also made room for essays driven by curiosity about history, geography, and the movement of states and ideas over time."
-          },
-          {
-            "type": "list",
-            "items": [
-              "The Ripples of War",
-              "A history essay on the territorial changes of China",
-              "A quieter humanities thread alongside technical writing"
-            ]
-          },
-          {
-            "type": "link",
-            "label": "Old blog index",
-            "href": "https://greenere.github.io/blogs.html"
-          }
-        ]
-      }
-    ]
-  },
   "adversarial-writing": {
     "title": "Adversarial ML Writing Trail",
     "subtitle": "Zhihu articles, surveys, and dense notes",
@@ -620,7 +586,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "The core work centered on the intracoder and color-correction modules. The broader challenge was stitching detection, alignment, fusion, and post-processing into one pipeline."
+            "text": "This is my graduate design for my bachelor's degree. The major focus is the generation of deepfakes, more specificly, face swapped videos. I adjust the existing method with some minor improvements for generation part. The detection of deepfakes appears as a survey in the final paper."
           },
           {
             "type": "text",
@@ -628,6 +594,109 @@
           }
         ],
         "id": "overview"
+      },
+      {
+        "label": "Scheme",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "It takes a lot of work for auxiliary modules to construct an end-to-end pipeline as shown below:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_skeleton.png",
+            "caption": "The Overall Architecture"
+          },
+          {
+            "type": "text",
+            "text": "Each video is first digested into frames, ceating two small datasets of faces after Face Detection and Face Alignment. These two datasets are then used to train Intracoder and Color Correction modules. At inference, these two modules together swap the original faces but maintain the original color, creating a new datasets of swapped faces. These swapped faces are then fused with corresponding original face and de-aligned to the original posture. Merging the original background with de-aligned swapped face creates a frame of final deepfake. Assemble these frames, there comes the final deepfake."
+          },
+          {
+            "type": "text",
+            "text": "I adopt a public MTCNN for Face Detection, warp affine for Face Alignment and Posture Reduction, Poisson image blending for Image Fusion. The major works are Intracoder and Color Correction."
+          }
+        ]
+      },
+      {
+        "label": "Intracoder",
+        "blocks": [
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_intracoder.png"
+          },
+          {
+            "type": "text",
+            "text": "Just like the initial scheme of deepfakes, two auto-encoders share the same encoder that force the encoder to map two types of faces into the same latent space. The decoders are owned distinctly by each type of face. After sufficient training, we can then map the origin face into the domain of target face. The synthesized face has the posture of original face and the identity of target face. The posture information is more abstract and the identity information is more concrete. To maintain the more abstract posture, I use a more deeper encoder compared with decoder."
+          }
+        ]
+      },
+      {
+        "label": "Color Correction",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Most of other implementations use a classical method to correct the color:"
+          },
+          {
+            "type": "text",
+            "text": "Reinhard E, Adhikhmin M, Gooch B, et al. Color transfer between images[J]. IEEE Computer graphics and applications, 2001."
+          },
+          {
+            "type": "text",
+            "text": "In my case, I also want the color correction module to super-resolute the swapped face and correct artifacts brought by Intracoder. So I use another pair of auto-encoders as shown below:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_colorcorrection.png"
+          },
+          {
+            "type": "text",
+            "text": "Color information is rather shallow, so the decoder is actually only one layer deep."
+          }
+        ]
+      },
+      {
+        "label": "Results",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Static images:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_faceswaps.png"
+          },
+          {
+            "type": "text",
+            "text": "Video example:"
+          },
+          {
+            "type": "gallery",
+            "items": [
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id1-4.gif",
+                "caption": "Gesture Donor"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id19-1.gif",
+                "caption": "Identity Donor"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id1-id19-4-1.gif",
+                "caption": "Deepfake generated"
+              }
+            ],
+            "columns": 3,
+            "align": "height:2"
+          }
+        ]
       }
     ]
   },
