@@ -8,7 +8,6 @@
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
@@ -16,14 +15,11 @@
           "text": "The core work centered on the intracoder and color-correction modules. The broader challenge was stitching detection, alignment, fusion, and post-processing into one pipeline."
         },
         {
-          "type": "list",
-          "items": [
-            "Generation-focused deepfake pipeline",
-            "Identity swap plus color correction modules",
-            "Detection treated as a survey in the final paper"
-          ]
+          "type": "text",
+          "text": "You can find it here on my github: [faceswap](https://github.com/Greenere/faceswap/tree/master)"
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }

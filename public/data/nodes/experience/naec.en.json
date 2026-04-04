@@ -1,14 +1,13 @@
 {
   "title": "Research Engineer Intern at NAEC",
   "subtitle": "National Anti-counterfeit Engineering Research Center",
-  "summary": "A part-time research internship where a course interest in adversarial examples became sustained work on handwritten signature verification and, later, a journal publication.",
+  "summary": "A part-time non-paid research internship where a course interest in adversarial examples became sustained work on handwritten signature verification and, later, a journal publication.",
   "tags": [
     "research",
     "security"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
@@ -16,19 +15,11 @@
           "text": "This was the period when adversarial machine learning stopped being just a course topic and became a real research track. Working with Prof. Wei Yuan's group, I focused on attacking signature verification systems under realistic black-box constraints."
         },
         {
-          "type": "list",
-          "items": [
-            "Part-time internship during the HUST years",
-            "Worked on handwritten signature verification attacks",
-            "Fed directly into the RSAEG / region-restricted signature paper"
-          ]
-        },
-        {
-          "type": "link",
-          "label": "Pattern Recognition paper",
-          "href": "http://www.sciencedirect.com/science/article/pii/S0031320320304921"
+          "type": "text",
+          "text": "It was a part-time non-paid research internship during the HUST years. I primarily worked on adversarial attacks against handwritten signature verification system starting from the summer of 2019 and later worked on a face-swap system for my graduation capstone project."
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }

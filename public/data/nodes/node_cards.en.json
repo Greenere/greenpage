@@ -135,7 +135,7 @@
   "naec": {
     "title": "Research Engineer Intern at NAEC",
     "subtitle": "National Anti-counterfeit Engineering Research Center",
-    "summary": "A part-time research internship where a course interest in adversarial examples became sustained work on handwritten signature verification and, later, a journal publication.",
+    "summary": "A part-time non-paid research internship where a course interest in adversarial examples became sustained work on handwritten signature verification and, later, a journal publication.",
     "tags": [
       "research",
       "security"
@@ -146,17 +146,8 @@
         "text": "This was the period when adversarial machine learning stopped being just a course topic and became a real research track. Working with Prof. Wei Yuan's group, I focused on attacking signature verification systems under realistic black-box constraints."
       },
       {
-        "type": "list",
-        "items": [
-          "Part-time internship during the HUST years",
-          "Worked on handwritten signature verification attacks",
-          "Fed directly into the RSAEG / region-restricted signature paper"
-        ]
-      },
-      {
-        "type": "link",
-        "label": "Pattern Recognition paper",
-        "href": "http://www.sciencedirect.com/science/article/pii/S0031320320304921"
+        "type": "text",
+        "text": "It was a part-time non-paid research internship during the HUST years. I primarily worked on adversarial attacks against handwritten signature verification system starting from the summer of 2019 and later worked on a face-swap system for my graduation capstone project."
       }
     ]
   },
@@ -276,7 +267,7 @@
   "wellmail": {
     "title": "WELLMAIL",
     "subtitle": "An e-mail client with GUI written in Python",
-    "summary": "My first serious software project. It was a course project finished with a group of three. We built a Python e-mail client with a GUI, and spent a lot of time figuring out how to make SMTP and QT work.",
+    "summary": " It was a course project finished with a group of three. We built a Python e-mail client with a GUI, and spent a lot of time figuring out how to make SMTP and QT work.",
     "tags": [
       "Python",
       "GUI",
@@ -285,11 +276,15 @@
     "preview": [
       {
         "type": "text",
-        "text": "It's a tiny project, almost useless in that sense, but I really enjoyed it. We spent most of the time trying to get the UI work, which seems dumb to try to use QT to write a UI in Python rather than just pull up a localhost and write a web frontend."
+        "text": "Check it out here: [WELLMAIL](https://github.com/Greenere/wellmail)"
       },
       {
         "type": "text",
-        "text": "Check it out here: [WELLMAIL](https://github.com/Greenere/wellmail)"
+        "text": "This is the very first project I ever participated that could be referred as a project. For the course, Software Project, an e-mail client is required to be designed and implemented."
+      },
+      {
+        "type": "text",
+        "text": "We were splitted into groups of three, and we had literally zero experience about how to begin. Most of the other groups chose Java to programmed it, while we chose Python after a few consideration. Python is light, new and all three members wanted to proceed into relevant areas that requires Python's help."
       }
     ]
   },
@@ -304,15 +299,17 @@
     "preview": [
       {
         "type": "text",
-        "text": "Instead of modeling each person as a cell, the system modeled representative exhibition halls. It then simulated how congestion-aware routing could accelerate evacuation."
+        "text": "In Janurary. 2019, I led a group of three competed in the Interdisciplinary Contest in Modeling (ICM). We chose the problem designated as \"D\" that required us to build a model for the Louvre Museum and design an evacuation strategy for it. It took us one day to discuss and decide an appropriate model and finally I proposed a cellular automata model for the Louvre. You may think that we represented each person to be evacuated as a cell, but actually we chose several representative exhibition halls to be the cells in our model."
       },
       {
-        "type": "list",
-        "items": [
-          "Interdisciplinary Contest in Modeling, 2019",
-          "Dynamic congestion-control plan",
-          "Honorable Mention"
-        ]
+        "type": "image",
+        "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/louvre.png",
+        "alt": "",
+        "caption": "The Louvre"
+      },
+      {
+        "type": "text",
+        "text": "This model of Louvre is presented above. For each cell, there was a state that represented the number of people stuck inside when the evacuation began. The neighbors were linked according to the structure of the building. For each iteration, the people in each cell would be evacuated to the neighbors following the strategy. The baseline strategy we considered was \"random wandering\", which meant that no instructions were given and people just walked randomly. The evacuation process of the five levels of the Louvre is presented below on the left. Our solution was called \"dynamic plan \""
       }
     ]
   },
@@ -327,15 +324,11 @@
     "preview": [
       {
         "type": "text",
-        "text": "The main contribution was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
+        "text": "The main workload was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
       },
       {
-        "type": "list",
-        "items": [
-          "Capstone Project in Big Data Processing System",
-          "Python, Flask, Gevent, MongoDB",
-          "Captured topics during the early COVID-19 moment"
-        ]
+        "type": "text",
+        "text": "I would say it was decent enough for a course project, and it was interesting enough for capturing the outbreaks of Covid 19. It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
       }
     ]
   },
@@ -353,12 +346,8 @@
         "text": "The core work centered on the intracoder and color-correction modules. The broader challenge was stitching detection, alignment, fusion, and post-processing into one pipeline."
       },
       {
-        "type": "list",
-        "items": [
-          "Generation-focused deepfake pipeline",
-          "Identity swap plus color correction modules",
-          "Detection treated as a survey in the final paper"
-        ]
+        "type": "text",
+        "text": "You can find it here on my github: [faceswap](https://github.com/Greenere/faceswap/tree/master)"
       }
     ]
   },

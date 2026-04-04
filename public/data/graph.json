@@ -161,14 +161,6 @@
       "strength": 3
     },
     {
-      "id": "project-louvre-history",
-      "from": "louvre-evacuation",
-      "to": "history-writing",
-      "kind": "reason",
-      "label": "technical modeling touched a parallel history interest",
-      "strength": 1
-    },
-    {
       "id": "realai-research",
       "from": "realai",
       "to": "noise-modulation",
@@ -249,39 +241,6 @@
       "strength": 3
     },
     {
-      "id": "editor-hust-time-louvre-evacuation-hust-2",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "modeling contest during HUST years",
-        "zh-CN": "modeling contest during HUST years"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-hust-time-weibe-hust-3",
-      "from": "weibe",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "big-data systems course project",
-        "zh-CN": "big-data systems course project"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-hust-time-faceswap-hust-4",
-      "from": "faceswap",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "undergraduate capstone period",
-        "zh-CN": "undergraduate capstone period"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-hust-time-hust-mclab-hust-5",
       "from": "hust-mclab",
       "to": "hust",
@@ -293,70 +252,110 @@
       "strength": 2
     },
     {
-      "id": "editor-hust-time-hust-naec-6",
-      "from": "hust",
-      "to": "naec",
-      "kind": "time",
-      "labels": {
-        "en": "during my third year in college",
-        "zh-CN": "during my third year in college"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-hust-time-wellmail-hust-7",
-      "from": "wellmail",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "software project at HUST",
-        "zh-CN": "software project at HUST"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-signature-attack-reason-signature-attack-naec-1",
-      "from": "signature-attack",
-      "to": "naec",
-      "kind": "reason",
-      "labels": {
-        "en": "internship work became a publication",
-        "zh-CN": "在期间完成的这项研究"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-2",
+      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-1",
       "from": "signature-attack",
       "to": "adversarial-writing",
       "kind": "topic",
       "labels": {
-        "en": "fed later writing on adversarial examples",
         "zh-CN": "这篇论文是之后类似研究的起点"
       },
       "strength": 2
     },
     {
-      "id": "editor-signature-attack-topic-faceswap-signature-attack-3",
+      "id": "editor-signature-attack-time-signature-attack-hust-3",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "在华科读书期间完成的科研"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-faceswap-time-faceswap-hust-1",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "本科毕业论文项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-faceswap-topic-faceswap-signature-attack-2",
       "from": "faceswap",
       "to": "signature-attack",
       "kind": "topic",
       "labels": {
-        "en": "shared computer-vision and adversarial interests",
         "zh-CN": "同样是与AI安全相关的工作"
       },
       "strength": 2
     },
     {
-      "id": "editor-signature-attack-time-signature-attack-hust-4",
-      "from": "signature-attack",
+      "id": "editor-weibe-time-weibe-hust-1",
+      "from": "weibe",
       "to": "hust",
       "kind": "time",
       "labels": {
-        "en": "started from HUST coursework and lab access",
-        "zh-CN": "在华科读书期间完成的科研"
+        "en": "big-data systems course project",
+        "zh-CN": "大数据课程设计项目"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-louvre-evacuation-reason-louvre-evacuation-history-writing-1",
+      "from": "louvre-evacuation",
+      "to": "history-writing",
+      "kind": "reason",
+      "labels": {
+        "en": "technical modeling touched a parallel history interest",
+        "zh-CN": "technical modeling touched a parallel history interest"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-2",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "modeling contest during HUST years",
+        "zh-CN": "modeling contest during HUST years"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-wellmail-time-wellmail-hust-1",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "software project at HUST",
+        "zh-CN": "大二期间的课程项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-naec-time-hust-naec-1",
+      "from": "hust",
+      "to": "naec",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "大三时期的经历",
+        "en": "it was during my junior year"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-naec-reason-signature-attack-naec-2",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "reason",
+      "labels": {
+        "zh-CN": "在这期间实习完成的工作",
+        "en": "在这期间实习完成的工作"
+      },
+      "strength": 3
     }
   ]
 }

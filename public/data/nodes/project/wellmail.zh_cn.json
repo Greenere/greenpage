@@ -1,29 +1,57 @@
 {
   "title": "WELLMAIL",
   "subtitle": "Python 邮件客户端",
-  "summary": "第一个真正像样的软件项目：一个带 GUI 的 Python 邮件客户端，以团队课程项目的形式完成，也被记作迈向“真正软件构建”的早期一步。",
+  "summary": "一个带有图形界面的 Python 邮件客户端，是本科大二《软件课程设计》的课程项目，由于组里的三个人都想学 Python，因此选择了最不适合做图形界面的编程语言来开发图形界面。",
   "tags": [
     "Python",
     "GUI"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
           "type": "text",
-          "text": "最大的收获不只是这个客户端本身，而是第一次认真学习如何把一个图形化软件系统拆成模块，并真正做出一套有界面流转的软件。"
+          "text": "源代码公开存档在我的Github上： [WELLMAIL](https://github.com/Greenere/wellmail)"
         },
         {
-          "type": "list",
-          "items": [
-            "负责 Receive Box 与 Main Module",
-            "《软件工程》课程项目",
-            "班级里完成度很高的一组作品之一"
-          ]
+          "type": "text",
+          "text": "这是我参与的第一个真正意义上的项目。这门课叫“软件项目”，要求设计并实现一个电子邮件客户端。"
+        },
+        {
+          "type": "text",
+          "text": "我们被分成三人一组，对如何入门几乎一窍不通。其他小组大多选择了Java来编程，而我们经过一番考虑后选择了Python。Python轻量级、新兴，而且我们三人都希望深入研究那些需要Python帮助的相关领域。"
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail_structure.jpg",
+          "caption": "The architecture for a GUI client"
+        },
+        {
+          "type": "text",
+          "text": "我们花了一周时间熟悉Python。我首先将整个项目分成三个部分：网络模块、管理模块和图形用户界面模块。然后我们每个人负责其中一个模块。但后来我们发现，我们的大部分工作都将与图形界面相关，这与我们之前编写的那些带控制台的程序截然不同。"
+        },
+        {
+          "type": "text",
+          "text": "因此，我根据图形用户界面的逻辑关系重新划分了项目。逻辑关系如下所示。我负责收件箱模块和主模块。"
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail0.png",
+          "caption": "The GUI of WELLMAIL"
+        },
+        {
+          "type": "text",
+          "text": "用户首先通过日志模块登录，然后主模块与邮件服务通信，获取邮件信息。之后，用户会看到收件箱模块。主模块左侧设有按钮，用于切换写作模块、设置模块、联系人模块等。上方设有搜索栏，用户可以使用关键词搜索相关邮件。"
+        },
+        {
+          "type": "text",
+          "text": "我们把这个客户命名为“WELLMAIL”，其中“W”代表王韵（Yun Wang），“L”和“L”分别代表刘鑫（Xin Liu）和李皓阳（Haoyang Li），“E”代表电子邮件（e-mail）。虽然作为处女作，这个项目存在许多未解决的问题，但它仍然被评为我们同行中最好的项目之一。无论如何，我从这次经历中获得的最重要的技能是Python的使用以及开发带有图形用户界面的软件的基本能力。"
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }

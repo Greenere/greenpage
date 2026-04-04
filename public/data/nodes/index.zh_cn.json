@@ -268,36 +268,27 @@
     ]
   },
   "naec": {
-    "title": "国家防伪工程技术研究中心科研工程实习",
-    "subtitle": "National Anti-counterfeit Engineering Research Center",
-    "summary": "一段兼职科研实习：课程里对对抗样本的兴趣在这里变成了持续性的研究工作，主题是手写签名验证，后来也发展成了一篇期刊论文。",
+    "title": "国家防伪工程中心",
+    "subtitle": "大三时期为了弥补科研经历找的兼职实习",
+    "summary": "起源于在袁巍老师一门课中对对抗样本的兴趣，后来暑假去他旗下的实验室做了一些相关工作，主要是针对手写签名验证系统的黑盒对抗攻击。",
     "tags": [
       "研究",
       "安全"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
             "type": "text",
-            "text": "这是对抗机器学习从课程主题转变为真实研究方向的时期。和袁伟教授团队合作时，我主要关注在现实黑盒约束下攻击签名验证系统。"
+            "text": "其实一开始想去研究 GAN，不过后来在袁巍老师课上了解到对抗样本（Adversarial Examples）感觉挺有意思的，然后刚好他们也在做安全相关的研究，于是暑假想找科研实习的时候就联系上了他。"
           },
           {
-            "type": "list",
-            "items": [
-              "华科本科阶段的兼职实习",
-              "研究手写签名验证攻击",
-              "直接延伸出 RSAEG / 区域限制签名攻击论文"
-            ]
-          },
-          {
-            "type": "link",
-            "label": "Pattern Recognition 论文",
-            "href": "http://www.sciencedirect.com/science/article/pii/S0031320320304921"
+            "type": "text",
+            "text": "他手下有另外一个本科生在研究签名验证系统，于是我就跟他联合了一下做了一篇针对签名验证系统的黑盒对抗攻击，最终居然成功发表成了一篇正式的论文。"
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
@@ -471,35 +462,63 @@
   "wellmail": {
     "title": "WELLMAIL",
     "subtitle": "Python 邮件客户端",
-    "summary": "第一个真正像样的软件项目：一个带 GUI 的 Python 邮件客户端，以团队课程项目的形式完成，也被记作迈向“真正软件构建”的早期一步。",
+    "summary": "一个带有图形界面的 Python 邮件客户端，是本科大二《软件课程设计》的课程项目，由于组里的三个人都想学 Python，因此选择了最不适合做图形界面的编程语言来开发图形界面。",
     "tags": [
       "Python",
       "GUI"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
             "type": "text",
-            "text": "最大的收获不只是这个客户端本身，而是第一次认真学习如何把一个图形化软件系统拆成模块，并真正做出一套有界面流转的软件。"
+            "text": "源代码公开存档在我的Github上： [WELLMAIL](https://github.com/Greenere/wellmail)"
           },
           {
-            "type": "list",
-            "items": [
-              "负责 Receive Box 与 Main Module",
-              "《软件工程》课程项目",
-              "班级里完成度很高的一组作品之一"
-            ]
+            "type": "text",
+            "text": "这是我参与的第一个真正意义上的项目。这门课叫“软件项目”，要求设计并实现一个电子邮件客户端。"
+          },
+          {
+            "type": "text",
+            "text": "我们被分成三人一组，对如何入门几乎一窍不通。其他小组大多选择了Java来编程，而我们经过一番考虑后选择了Python。Python轻量级、新兴，而且我们三人都希望深入研究那些需要Python帮助的相关领域。"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail_structure.jpg",
+            "caption": "The architecture for a GUI client"
+          },
+          {
+            "type": "text",
+            "text": "我们花了一周时间熟悉Python。我首先将整个项目分成三个部分：网络模块、管理模块和图形用户界面模块。然后我们每个人负责其中一个模块。但后来我们发现，我们的大部分工作都将与图形界面相关，这与我们之前编写的那些带控制台的程序截然不同。"
+          },
+          {
+            "type": "text",
+            "text": "因此，我根据图形用户界面的逻辑关系重新划分了项目。逻辑关系如下所示。我负责收件箱模块和主模块。"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail0.png",
+            "caption": "The GUI of WELLMAIL"
+          },
+          {
+            "type": "text",
+            "text": "用户首先通过日志模块登录，然后主模块与邮件服务通信，获取邮件信息。之后，用户会看到收件箱模块。主模块左侧设有按钮，用于切换写作模块、设置模块、联系人模块等。上方设有搜索栏，用户可以使用关键词搜索相关邮件。"
+          },
+          {
+            "type": "text",
+            "text": "我们把这个客户命名为“WELLMAIL”，其中“W”代表王韵（Yun Wang），“L”和“L”分别代表刘鑫（Xin Liu）和李皓阳（Haoyang Li），“E”代表电子邮件（e-mail）。虽然作为处女作，这个项目存在许多未解决的问题，但它仍然被评为我们同行中最好的项目之一。无论如何，我从这次经历中获得的最重要的技能是Python的使用以及开发带有图形用户界面的软件的基本能力。"
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "louvre-evacuation": {
     "title": "卢浮宫疏散模型",
-    "subtitle": "2019 ICM 建模项目",
+    "subtitle": "2019 ICM 建模比赛",
     "summary": "一个竞赛建模项目，用类似元胞自动机的方式抽象卢浮宫，并据此设计动态疏散策略。",
     "tags": [
       "建模",
@@ -507,80 +526,116 @@
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
             "type": "text",
-            "text": "项目没有把每个人都当成一个单元来模拟，而是把有代表性的展厅作为系统状态节点，进一步模拟基于拥堵感知的路线调整如何加快整体疏散。"
+            "text": "2019年1月，我带领一个三人小组参加了跨学科建模竞赛（ICM）。我们选择了编号为“D”的题目，要求我们为卢浮宫博物馆构建一个模型并设计一个疏散方案。我们花了一天时间讨论并确定合适的模型，最终我提出了一个卢浮宫的元胞自动机模型。你可能会认为我们把每个需要疏散的人都代表为一个“单元格”，但实际上，我们选择了几个具有代表性的展厅作为模型中的“单元格”。"
           },
           {
-            "type": "list",
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/louvre.png",
+            "caption": "卢浮宫模型"
+          },
+          {
+            "type": "text",
+            "text": "上图展示了卢浮宫的模型。每个单元格都代表一个状态，表示疏散开始时被困在里面的人数。相邻单元格根据建筑结构连接。每次迭代中，每个单元格中的人员都会按照既定策略疏散到相邻单元格。我们考虑的基准策略是“随机游荡”，这意味着没有给出任何指令，人们只是随机行走。卢浮宫五层的疏散过程如下图左侧所示。我们的解决方案被称为“动态方案”。"
+          },
+          {
+            "type": "gallery",
             "items": [
-              "2019 年美国大学生数学建模竞赛",
-              "动态拥堵控制方案",
-              "Honorable Mention"
-            ]
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/blob/master/subpages/imgs/randomwandering.png?raw=true",
+                "caption": "随机游荡的疏散过程"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/dynamicplan.png",
+                "caption": "动态方案下的疏散过程"
+              }
+            ],
+            "columns": 2,
+            "align": "natural"
+          },
+          {
+            "type": "text",
+            "text": "很明显，在我们的模拟中，我们的策略将整体疏散时间从3000秒缩短到了600秒。这个所谓的“动态方案”非常简单。其核心思想是确保整个过程中不会出现拥堵，也就是说，人们会被相对空旷的展厅迎接，而被几乎满员的展厅拒之门外。我们的模拟结果表明，无论最初的策略是什么，通过对拥堵情况进行动态控制，所有人都能快速疏散。"
+          },
+          {
+            "type": "text",
+            "text": "该模型是用MATLAB实现的。我们仓促地完成了论文，我认为获得“荣誉提名”是恰当且令人满意的。"
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "weibe": {
     "title": "WEIBE",
     "subtitle": "微博情感分析系统",
-    "summary": "一个课程项目：抓取微博热搜、存储帖子，并对这些讨论中的情绪倾向进行可视化展示。",
+    "summary": "课程项目：抓取微博热搜、存储帖子，并对这些讨论中的情绪倾向进行可视化展示。",
     "tags": [
       "爬虫",
       "可视化"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
             "type": "text",
-            "text": "这个项目最主要的价值在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。"
+            "text": "这个项目最主要的工作在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。其实现在看起来很简陋，但是对于一个课程项目来说足够了，并且比较有趣的是后来抓取到了疫情爆发的舆情。"
           },
           {
-            "type": "list",
+            "type": "gallery",
             "items": [
-              "《大数据处理系统》课程毕业设计",
-              "Python、Flask、Gevent、MongoDB",
-              "记录了新冠疫情早期的一批热门话题"
-            ]
+              {
+                "alt": "疫情爆发当天的微博",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-cloud.png",
+                "caption": "疫情爆发当天的微博"
+              },
+              {
+                "alt": "情绪散点图",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-scatter.png",
+                "caption": "情绪散点图"
+              }
+            ],
+            "columns": 2,
+            "align": "natural"
+          },
+          {
+            "type": "text",
+            "text": "项目存档在我的 Github 上: [WEIBE](https://github.com/Greenere/weibe)"
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "faceswap": {
-    "title": "FaceSwap 换脸系统",
-    "subtitle": "本科毕业设计项目",
-    "summary": "一个聚焦短视频换脸生成的本科毕业设计，关注点不只是核心模型，也包括完整生成流程如何被搭起来。",
+    "title": "深度伪造换脸系统",
+    "subtitle": "本科毕业设计项目，2020",
+    "summary": "一个聚焦短视频换脸生成的本科毕业设计，除了核心模型之外，主要关注完整的视频生成流程。采用的是两组交叉的卷积自回归模型，运行时训练因此即使数据量不大，效果也还行。",
     "tags": [
       "deepfake",
       "计算机视觉"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
             "type": "text",
-            "text": "核心工作主要围绕 intracoder 和颜色校正模块展开。更大的挑战其实是如何把检测、对齐、融合与后处理缝合成一条完整的流水线。"
+            "text": "当时深度伪造非常火，然后我毕业项目想做点有意思的，就去研究了一下。核心工作主要围绕交叉编码模块和颜色校正模块展开，主要的挑战是如何把检测、对齐、融合与后处理缝合成一条完整的流水线。"
           },
           {
-            "type": "list",
-            "items": [
-              "以生成为中心的 deepfake 流水线",
-              "身份替换加颜色校正模块",
-              "最终论文里把检测部分作为综述处理"
-            ]
+            "type": "text",
+            "text": "在我的 Github 上有公开存档：[faceswap](https://github.com/Greenere/faceswap/tree/master)"
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
@@ -614,7 +669,7 @@
     ]
   },
   "signature-attack": {
-    "title": "对抗样本",
+    "title": "针对签证验证系统的对抗攻击",
     "subtitle": "黑盒对抗攻击机器学习研究，2019",
     "summary": "大三暑假，我做了一项关于针对手写签名验证的区域限制黑盒攻击的研究，后来这项研究成果发表在了《模式识别》期刊上。我实际上只花了两个星期来调试主要算法，但最终它成功了，并且得以发表。",
     "tags": [
