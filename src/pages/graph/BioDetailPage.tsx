@@ -9,7 +9,7 @@ import { DOMAIN_ORDER } from '../../configs/content/domains';
 import { THEME_CONFIG } from '../../configs/ui/themes';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
-import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
+import { Footnote } from '../../shared/ui/StyledTextBlocks';
 import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
@@ -26,6 +26,7 @@ import {
   type GraphModel,
 } from './content/Nodes';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
+import { renderContentBlock } from '../editor/articlePreviewShared';
 
 const GRAPH_RETURN_FOCUS_NODE_KEY = 'greenpage-graph-return-focus-node';
 const DETAIL_READING_WIDTH = '46rem';
@@ -419,28 +420,13 @@ const BioDetailPage: React.FC = () => {
         >
           {bioContent.sections?.map((section, sectionIndex) => (
             <section
-              key={section.label}
+              key={section.id ?? section.label}
               style={{
                 marginTop: sectionIndex === 0 ? 0 : '2.5rem',
               }}
             >
               {renderSectionHeading(section.label)}
-              {section.paragraphs.map((paragraph) => (
-                <Paragraph
-                  key={paragraph}
-                  style={{
-                    maxWidth: DETAIL_READING_WIDTH,
-                    fontSize: '0.92rem',
-                    lineHeight: 1.78,
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                    marginTop: 0,
-                    marginBottom: '1rem',
-                  }}
-                >
-                  {paragraph}
-                </Paragraph>
-              ))}
+              <div>{section.blocks.map((block, blockIndex) => renderContentBlock(block, blockIndex))}</div>
             </section>
           ))}
         </section>

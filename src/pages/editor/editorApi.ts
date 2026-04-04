@@ -2,6 +2,7 @@ import type { DomainId } from '../../configs/content/domains';
 import type { ChronologyValue } from '../../shared/chronology';
 import type { AppLanguage } from '../../i18n';
 import { localeToFileSuffix } from '../../i18n/localeFiles';
+import { loadBioPageContentWithResolution, type BioPageContent } from '../graph/content/BioPage';
 import {
   loadGraphModel,
   loadGraphNodeContent,
@@ -38,6 +39,13 @@ export type EditorNodeResponse = {
   isFallbackContent: boolean;
   resolvedLanguage: AppLanguage;
   explicitRelations: EditorExplicitRelation[];
+};
+
+export type EditorBioResponse = {
+  content: BioPageContent;
+  contentPath: string;
+  isFallbackContent: boolean;
+  resolvedLanguage: AppLanguage;
 };
 
 type CreateNodePayload = {
@@ -133,6 +141,21 @@ export async function fetchEditorNode(nodeId: string, lang: AppLanguage) {
   return parseResponse<EditorNodeResponse>(response);
 }
 
+export async function fetchEditorBio(lang: AppLanguage) {
+  if (!EDITOR_CAN_MUTATE_PROJECT) {
+    const payload = await loadBioPageContentWithResolution(lang);
+    return {
+      content: payload.content,
+      contentPath: `/data/bio.${localeToFileSuffix(payload.resolvedLanguage)}.json`,
+      isFallbackContent: payload.isFallbackContent,
+      resolvedLanguage: payload.resolvedLanguage,
+    } satisfies EditorBioResponse;
+  }
+
+  const response = await fetch(`/__editor/bio?lang=${encodeURIComponent(lang)}`);
+  return parseResponse<EditorBioResponse>(response);
+}
+
 export async function saveEditorNode(
   nodeId: string,
   content: GraphNodeContent,
@@ -150,6 +173,22 @@ export async function saveEditorNode(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ nodeId, lang, content, node, explicitRelations }),
+  });
+
+  return parseResponse<{ ok: true }>(response);
+}
+
+export async function saveEditorBio(content: BioPageContent, lang: AppLanguage) {
+  if (!EDITOR_CAN_MUTATE_PROJECT) {
+    throw new Error('Writing bio files is only available in development mode.');
+  }
+
+  const response = await fetch('/__editor/bio/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ lang, content }),
   });
 
   return parseResponse<{ ok: true }>(response);
@@ -206,6 +245,10 @@ export async function deleteEditorDomain(payload: DeleteDomainPayload) {
 export async function deleteEditorNode(payload: DeleteNodePayload) {
   if (!EDITOR_CAN_MUTATE_PROJECT) {
     throw new Error('Deleting nodes is only available in development mode.');
+  }
+
+  if (payload.nodeId === 'bio') {
+    throw new Error('The bio node cannot be deleted.');
   }
 
   const response = await fetch('/__editor/node/delete', {

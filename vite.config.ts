@@ -13,6 +13,7 @@ import type { AppLanguage } from './src/i18n/config'
 const ROOT_DIR = path.resolve()
 const GRAPH_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/graph.json')
 const NODES_DIR = path.resolve(ROOT_DIR, 'public/data/nodes')
+const BIO_DATA_DIR = path.resolve(ROOT_DIR, 'public/data')
 const DOMAINS_CONFIG_PATH = path.resolve(ROOT_DIR, 'src/configs/content/domains.ts')
 const execFileAsync = promisify(execFile)
 
@@ -43,6 +44,36 @@ type EditorExplicitRelation = {
   strength: 1 | 2 | 3
 }
 
+type EditorBioFact = {
+  label: string
+  value: string
+  href?: string
+}
+
+type EditorBioSection = {
+  label: string
+  id?: string
+  blocks: Array<Record<string, unknown>>
+}
+
+type EditorBioLink = {
+  label: string
+  href: string
+}
+
+type EditorBioContent = {
+  eyebrow?: string
+  name: string
+  subtitle: string
+  summary: string
+  themeFactLabel?: string
+  facts?: EditorBioFact[]
+  sections?: EditorBioSection[]
+  pathsSectionLabel?: string
+  linksSectionLabel?: string
+  links?: EditorBioLink[]
+}
+
 function normalizeEditorLanguage(lang: string): AppLanguage {
   return lang === 'zh-CN' ? 'zh-CN' : 'en'
 }
@@ -57,6 +88,14 @@ function serializeJson(value: unknown) {
 
 function getNodeContentFileName(nodeId: string) {
   return `${nodeId.replace(/-/g, '_')}.json`
+}
+
+function getLocaleBioContentPath(suffix: string) {
+  return path.resolve(BIO_DATA_DIR, `bio.${suffix}.json`)
+}
+
+function getLegacyBioContentPath() {
+  return path.resolve(BIO_DATA_DIR, 'bio.json')
 }
 
 async function readJsonFile<T>(filePath: string): Promise<T> {
@@ -96,6 +135,79 @@ async function readJsonFileIfExists<T>(filePath: string): Promise<T | null> {
       return null
     }
     throw error
+  }
+}
+
+function normalizeBioContentPayload(value: unknown): EditorBioContent | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+
+  const candidate = value as Record<string, unknown>
+  if (
+    typeof candidate.name !== 'string' ||
+    typeof candidate.subtitle !== 'string' ||
+    typeof candidate.summary !== 'string'
+  ) {
+    return null
+  }
+
+  const facts = Array.isArray(candidate.facts)
+    ? candidate.facts.filter((entry): entry is EditorBioFact => {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false
+        const fact = entry as Record<string, unknown>
+        return (
+          typeof fact.label === 'string' &&
+          typeof fact.value === 'string' &&
+          (fact.href === undefined || typeof fact.href === 'string')
+        )
+      })
+    : undefined
+
+  const sections = Array.isArray(candidate.sections)
+    ? candidate.sections.filter((entry): entry is EditorBioSection => {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false
+        const section = entry as Record<string, unknown>
+        if (typeof section.label !== 'string') return false
+        if (Array.isArray(section.blocks)) return true
+        return Array.isArray(section.paragraphs) && section.paragraphs.every((paragraph) => typeof paragraph === 'string')
+      })
+        .map((section) => {
+          const rawSection = section as unknown as Record<string, unknown>
+          if (Array.isArray(rawSection.blocks)) {
+            return {
+              id: typeof rawSection.id === 'string' ? rawSection.id : undefined,
+              label: rawSection.label as string,
+              blocks: rawSection.blocks.filter((block) => Boolean(block) && typeof block === 'object' && !Array.isArray(block)) as Array<Record<string, unknown>>,
+            }
+          }
+
+          const paragraphs = (rawSection.paragraphs as string[]).filter(Boolean)
+          return {
+            id: typeof rawSection.id === 'string' ? rawSection.id : undefined,
+            label: rawSection.label as string,
+            blocks: paragraphs.map((paragraph) => ({ type: 'text', text: paragraph })),
+          }
+        })
+    : undefined
+
+  const links = Array.isArray(candidate.links)
+    ? candidate.links.filter((entry): entry is EditorBioLink => {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false
+        const link = entry as Record<string, unknown>
+        return typeof link.label === 'string' && typeof link.href === 'string'
+      })
+    : undefined
+
+  return {
+    eyebrow: typeof candidate.eyebrow === 'string' ? candidate.eyebrow : undefined,
+    name: candidate.name,
+    subtitle: candidate.subtitle,
+    summary: candidate.summary,
+    themeFactLabel: typeof candidate.themeFactLabel === 'string' ? candidate.themeFactLabel : undefined,
+    facts: facts && facts.length > 0 ? facts : undefined,
+    sections: sections && sections.length > 0 ? sections : undefined,
+    pathsSectionLabel: typeof candidate.pathsSectionLabel === 'string' ? candidate.pathsSectionLabel : undefined,
+    linksSectionLabel: typeof candidate.linksSectionLabel === 'string' ? candidate.linksSectionLabel : undefined,
+    links: links && links.length > 0 ? links : undefined,
   }
 }
 
@@ -225,6 +337,38 @@ async function readNodeSummary(node: EditorGraphNode, lang: string): Promise<Edi
   } catch {
     return { ...node, title: node.id }
   }
+}
+
+async function readBioContentWithFallback(
+  lang: string,
+): Promise<{ content: EditorBioContent; isFallbackContent: boolean; resolvedLanguage: string; resolvedPath: string }> {
+  for (const fallbackLanguage of getLocaleFallbackOrder(normalizeEditorLanguage(lang))) {
+    const filePath = getLocaleBioContentPath(localeToFileSuffix(fallbackLanguage))
+    const rawContent = await readJsonFileIfExists<unknown>(filePath)
+    const content = normalizeBioContentPayload(rawContent)
+
+    if (content) {
+      return {
+        content,
+        isFallbackContent: fallbackLanguage !== lang,
+        resolvedLanguage: fallbackLanguage,
+        resolvedPath: filePath,
+      }
+    }
+  }
+
+  const legacyPath = getLegacyBioContentPath()
+  const legacyContent = normalizeBioContentPayload(await readJsonFileIfExists<unknown>(legacyPath))
+  if (legacyContent) {
+    return {
+      content: legacyContent,
+      isFallbackContent: lang !== 'en',
+      resolvedLanguage: 'en',
+      resolvedPath: legacyPath,
+    }
+  }
+
+  throw new Error('No bio content file found.')
 }
 
 // Resolves a relation label for the given lang from the `labels` map or legacy `label` field.
@@ -433,6 +577,19 @@ function createNodeEditorPlugin(): Plugin {
             return
           }
 
+          if (request.method === 'GET' && requestUrl.pathname === '/__editor/bio') {
+            const lang = requestUrl.searchParams.get('lang') ?? 'en'
+            const { content, isFallbackContent, resolvedLanguage, resolvedPath } = await readBioContentWithFallback(lang)
+
+            sendJson(response, 200, {
+              content,
+              contentPath: path.relative(ROOT_DIR, resolvedPath),
+              isFallbackContent,
+              resolvedLanguage,
+            })
+            return
+          }
+
           if (request.method === 'POST' && requestUrl.pathname === '/__editor/node/save') {
             const body = await parseBody(request)
             const nodeId = typeof body.nodeId === 'string' ? body.nodeId.trim() : ''
@@ -556,6 +713,22 @@ function createNodeEditorPlugin(): Plugin {
             return
           }
 
+          if (request.method === 'POST' && requestUrl.pathname === '/__editor/bio/save') {
+            const body = await parseBody(request)
+            const lang = typeof body.lang === 'string' ? body.lang : 'en'
+            const suffix = localeToFileSuffix(normalizeEditorLanguage(lang))
+            const content = normalizeBioContentPayload(body.content)
+
+            if (!content) {
+              sendJson(response, 400, { error: 'Invalid bio content payload.' })
+              return
+            }
+
+            await writeJsonFile(getLocaleBioContentPath(suffix), content)
+            sendJson(response, 200, { ok: true })
+            return
+          }
+
           if (request.method === 'POST' && requestUrl.pathname === '/__editor/node/create') {
             const body = await parseBody(request)
             const node = body.node
@@ -620,6 +793,11 @@ function createNodeEditorPlugin(): Plugin {
 
             if (!nodeId) {
               sendJson(response, 400, { error: 'Missing nodeId.' })
+              return
+            }
+
+            if (nodeId === 'bio') {
+              sendJson(response, 400, { error: 'The bio node cannot be deleted.' })
               return
             }
 

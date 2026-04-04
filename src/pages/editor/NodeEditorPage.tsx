@@ -32,6 +32,7 @@ import {
 } from '../graph/content/Nodes';
 import JsonEditorPanel from './JsonEditorPanel';
 import NodeArticlePreview from './NodeArticlePreview';
+import BioEditorWorkspace from './BioEditorWorkspace';
 import BrowseNodesDialog from './BrowseNodesDialog';
 import {
   anchorExplicitRelationToNode,
@@ -995,14 +996,16 @@ const btnDanger: CSSProperties = {
 };
 const btnDisabled: CSSProperties = { opacity: 0.38, cursor: 'not-allowed' };
 
-const NodeEditorPage: React.FC = () => {
+type StandardNodeEditorWorkspaceProps = {
+  decodedNodeId: string;
+};
+
+const StandardNodeEditorWorkspace = ({ decodedNodeId }: StandardNodeEditorWorkspaceProps) => {
   const { language, messages } = useAppLanguage();
   const nodeTemplateOptions = getNodeTemplateOptions();
   const templateDefaults = getLocaleMessages().nodeTemplates.defaults;
   const editorCanMutateProject = EDITOR_CAN_MUTATE_PROJECT;
   const navigate = useNavigate();
-  const { nodeId } = useParams();
-  const decodedNodeId = nodeId ? decodeURIComponent(nodeId) : '';
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const [editorState, dispatch] = useReducer(
     nodeEditorWorkspaceReducer,
@@ -1646,7 +1649,11 @@ const NodeEditorPage: React.FC = () => {
           }}
         >
           {bioConnectionEntry && (
-            <ConnectedNodeCard key={bioConnectionEntry.key} entry={bioConnectionEntry} />
+            <ConnectedNodeCard
+              key={bioConnectionEntry.key}
+              entry={bioConnectionEntry}
+              onNavigate={() => handleOpenNode(bioConnectionEntry.relatedNodeId)}
+            />
           )}
           {timelineConnectionEntries.map((entry) => (
             <ConnectedNodeCard
@@ -3218,6 +3225,9 @@ const NodeEditorPage: React.FC = () => {
         nodes={bootstrapNodes}
         currentNodeId={decodedNodeId}
         currentDomain={currentNodeRef?.domain}
+        includeBioEntry
+        bioLabel={UI_COPY.nodeDetailPage.bioEntry.title}
+        bioSubtitle={UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle}
         onClose={() => setShowOpenNodeDialog(false)}
         onSelect={handleOpenNode}
       />
@@ -3289,6 +3299,17 @@ const NodeEditorPage: React.FC = () => {
       )}
     </div>
   );
+};
+
+const NodeEditorPage: React.FC = () => {
+  const { nodeId } = useParams();
+  const decodedNodeId = nodeId ? decodeURIComponent(nodeId) : '';
+
+  if (decodedNodeId === 'bio') {
+    return <BioEditorWorkspace />;
+  }
+
+  return <StandardNodeEditorWorkspace decodedNodeId={decodedNodeId} />;
 };
 
 export default NodeEditorPage;

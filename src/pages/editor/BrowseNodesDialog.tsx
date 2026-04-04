@@ -24,6 +24,9 @@ type BrowseNodesDialogProps = {
   nodes: EditorNodeOption[];
   currentNodeId: string;
   currentDomain?: DomainId;
+  includeBioEntry?: boolean;
+  bioLabel?: string;
+  bioSubtitle?: string;
   onClose: () => void;
   onSelect: (nodeId: string) => void;
 };
@@ -33,6 +36,9 @@ export default function BrowseNodesDialog({
   nodes,
   currentNodeId,
   currentDomain,
+  includeBioEntry = false,
+  bioLabel,
+  bioSubtitle,
   onClose,
   onSelect,
 }: BrowseNodesDialogProps) {
@@ -50,8 +56,26 @@ export default function BrowseNodesDialog({
     return [currentDomain, ...DOMAIN_ORDER.filter((domain) => domain !== currentDomain)];
   }, [currentDomain]);
 
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const showBioEntry = useMemo(() => {
+    if (!includeBioEntry) return false;
+    if (!normalizedQuery) return true;
+
+    const bioSearchText = [
+      bioLabel ?? UI_COPY.nodeDetailPage.bioEntry.title,
+      bioSubtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
+      UI_COPY.bioDetailPage.fallbackEyebrow,
+      UI_COPY.nodeDetailPage.bioEntry.kind,
+      'bio',
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return bioSearchText.includes(normalizedQuery);
+  }, [bioLabel, bioSubtitle, includeBioEntry, normalizedQuery]);
+
   const filteredNodeIds = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) return null;
 
     return new Set(
@@ -59,7 +83,7 @@ export default function BrowseNodesDialog({
         .filter((node) => getEditorNodeSearchText(node).includes(normalizedQuery))
         .map((node) => node.id),
     );
-  }, [nodes, query]);
+  }, [nodes, normalizedQuery]);
 
   const nodesByDomain = useMemo(
     () =>
@@ -75,12 +99,13 @@ export default function BrowseNodesDialog({
   );
 
   const firstMatch = useMemo(() => {
+    if (showBioEntry) return 'bio';
     for (const domain of domainOrder) {
       const match = nodesByDomain.get(domain)?.[0];
-      if (match) return match;
+      if (match) return match.id;
     }
     return null;
-  }, [domainOrder, nodesByDomain]);
+  }, [domainOrder, nodesByDomain, showBioEntry]);
 
   if (!open) return null;
 
@@ -172,7 +197,7 @@ export default function BrowseNodesDialog({
             }
             if (event.key === 'Enter' && firstMatch) {
               event.preventDefault();
-              onSelect(firstMatch.id);
+              onSelect(firstMatch);
               onClose();
             }
           }}
@@ -190,6 +215,93 @@ export default function BrowseNodesDialog({
             paddingBottom: '0.5rem',
           }}
         >
+          {showBioEntry ? (
+            <section>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '0.55rem',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    opacity: 0.72,
+                  }}
+                >
+                  {UI_COPY.bioDetailPage.fallbackEyebrow}
+                </div>
+                <div
+                  style={{
+                    flex: 1,
+                    height: '1px',
+                    background: 'color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+                  }}
+                />
+              </div>
+              <div style={{ display: 'grid', gap: '0.35rem', paddingRight: '0.35rem', paddingLeft: '0.35rem' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelect('bio');
+                    onClose();
+                  }}
+                  style={{
+                    width: 'calc(100% - 0.1rem)',
+                    justifySelf: 'start',
+                    padding: '0.7rem 0.8rem',
+                    borderRadius: '12px',
+                    border: '1px solid color-mix(in srgb, var(--color-secondary) 20%, transparent)',
+                    background:
+                      currentNodeId === 'bio'
+                        ? 'color-mix(in srgb, var(--color-background) 82%, white 18%)'
+                        : 'transparent',
+                    color: 'var(--color-text)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'baseline',
+                      gap: '0.8rem',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.92rem', fontWeight: 700, lineHeight: 1.35 }}>
+                      {bioLabel ?? UI_COPY.nodeDetailPage.bioEntry.title}
+                    </div>
+                    {currentNodeId === 'bio' ? (
+                      <div
+                        style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                          opacity: 0.6,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {UI_COPY.nodeEditor.common.currentNode}
+                      </div>
+                    ) : null}
+                  </div>
+                  <div style={{ marginTop: '0.18rem', fontSize: '0.74rem', opacity: 0.68, lineHeight: 1.45 }}>
+                    {UI_COPY.nodeDetailPage.bioEntry.kind} / bio
+                    {bioSubtitle ? ` · ${bioSubtitle}` : ''}
+                  </div>
+                </button>
+              </div>
+            </section>
+          ) : null}
           {domainOrder.map((domain) => {
             const domainNodes = nodesByDomain.get(domain) ?? [];
             if (domainNodes.length === 0) return null;

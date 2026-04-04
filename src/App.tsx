@@ -15,14 +15,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<NodeHomePage />} />
-      <Route
-        path="/editor"
-        element={
-          <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
-            <NodeEditorPage />
-          </Suspense>
-        }
-      />
+      <Route path="/editor" element={<Navigate to="/editor/nodes/bio" replace />} />
       <Route
         path="/editor/nodes/:nodeId"
         element={

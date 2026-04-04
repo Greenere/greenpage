@@ -1,13 +1,13 @@
 {
-  "eyebrow": "Bio node",
+  "eyebrow": "Biography",
   "name": "Haoyang Li",
-  "subtitle": "Software engineer in San Francisco Bay Area",
+  "subtitle": "I am currently a Software Engineer in San Francisco Bay Area",
   "summary": "This page is the narrative front door to the graph: a short profile, the current portrait frame, and a few strong paths into the archive.",
   "themeFactLabel": "Current frame",
   "facts": [
     {
-      "label": "Base",
-      "value": "San Francisco Bay Area"
+      "label": "Current Base",
+      "value": "Sunnyvale, CA, 94086"
     },
     {
       "label": "Reach me",
@@ -18,16 +18,28 @@
   "sections": [
     {
       "label": "About",
-      "paragraphs": [
-        "I build software across product surfaces, infrastructure, and interface systems. The graph on the home page is a map of the work, places, writing, and projects that most shaped how I think.",
-        "I wanted this site to feel closer to exploration than to a linear resume. Each node is a moment with its own texture; the edges try to capture why two moments belong in the same conversation."
+      "blocks": [
+        {
+          "type": "text",
+          "text": "I build software across product surfaces, infrastructure, and interface systems. The graph on the home page is a map of the work, places, writing, and projects that most shaped how I think."
+        },
+        {
+          "type": "text",
+          "text": "I wanted this site to feel closer to exploration than to a linear resume. Each node is a moment with its own texture; the edges try to capture why two moments belong in the same conversation."
+        }
       ]
     },
     {
       "label": "Reading the graph",
-      "paragraphs": [
-        "The center node is intentionally personal: it is the anchor for the rest of the archive. From there, the graph branches into research, education, travel, writing, experience, and projects.",
-        "The style toggle changes the photographic frame of the site without changing the structure beneath it. That felt right for a graph built around memory: the facts stay put, but the way they are remembered can shift."
+      "blocks": [
+        {
+          "type": "text",
+          "text": "The center node is intentionally personal: it is the anchor for the rest of the archive. From there, the graph branches into research, education, travel, writing, experience, and projects."
+        },
+        {
+          "type": "text",
+          "text": "The style toggle changes the photographic frame of the site without changing the structure beneath it. That felt right for a graph built around memory: the facts stay put, but the way they are remembered can shift."
+        }
       ]
     }
   ],
