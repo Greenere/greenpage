@@ -41,6 +41,7 @@ import {
   buildTimelineConnectionEntries,
   createEmptyExplicitRelation,
   findDuplicateExplicitRelationIndexes,
+  getExplicitRelationIdentityKey,
   getOccupiedConnectionPeerIds,
   isCompleteExplicitRelation,
   wouldCreateDuplicateExplicitRelation,
@@ -321,6 +322,71 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string): Restored
   }
 }
 
+function mergeExplicitRelationsForLanguageSwitch(
+  currentRelations: EditorExplicitRelation[],
+  previousLoadedRelations: EditorExplicitRelation[],
+  nextLanguageRelations: EditorExplicitRelation[],
+) {
+  const nextLanguageByIdentity = new Map(
+    nextLanguageRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
+  );
+  const previousLoadedByIdentity = new Map(
+    previousLoadedRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
+  );
+
+  return currentRelations.map((relation) => {
+    const identity = getExplicitRelationIdentityKey(relation);
+    const nextLanguageRelation = nextLanguageByIdentity.get(identity);
+    const previousLoadedRelation = previousLoadedByIdentity.get(identity);
+
+    if (!nextLanguageRelation) {
+      return {
+        ...relation,
+        label: '',
+      };
+    }
+
+    if (!previousLoadedRelation) {
+      return nextLanguageRelation;
+    }
+
+    const labelWasEditedLocally = relation.label !== previousLoadedRelation.label;
+    if (labelWasEditedLocally) {
+      return nextLanguageRelation;
+    }
+
+    return {
+      ...relation,
+      label: nextLanguageRelation.label,
+    };
+  });
+}
+
+function hydrateEmptyExplicitRelationLabels(
+  relations: EditorExplicitRelation[],
+  loadedRelations: EditorExplicitRelation[],
+) {
+  const loadedByIdentity = new Map(
+    loadedRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
+  );
+
+  return relations.map((relation) => {
+    if (relation.label.trim()) {
+      return relation;
+    }
+
+    const loadedRelation = loadedByIdentity.get(getExplicitRelationIdentityKey(relation));
+    if (!loadedRelation?.label.trim()) {
+      return relation;
+    }
+
+    return {
+      ...relation,
+      label: loadedRelation.label,
+    };
+  });
+}
+
 function clearStoredNodeDraft(nodeId: string, lang: AppLanguage) {
   window.localStorage.removeItem(getDraftStorageKey(nodeId, lang));
 }
@@ -537,6 +603,10 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     }
 
     const requestId = ++nodeLoadRequestIdRef.current;
+    const languageChangedForSameNode =
+      Boolean(previousOwner) &&
+      previousOwner?.nodeId === decodedNodeId &&
+      previousOwner.language !== language;
 
     if (!decodedNodeId) {
       lastLoadedNodeIdRef.current = '';
@@ -577,9 +647,23 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
         const hasUnsavedExplicitRelationChanges =
           !nodeChanged &&
           !areExplicitRelationsEquivalent(explicitRelationsRef.current, loadedExplicitRelationsRef.current);
-        const nextExplicitRelations = hasUnsavedExplicitRelationChanges
-          ? explicitRelationsRef.current
-          : storedExplicitRelations ?? anchoredRelations;
+        const nextExplicitRelationsBase = languageChangedForSameNode
+          ? mergeExplicitRelationsForLanguageSwitch(
+              explicitRelationsRef.current,
+              loadedExplicitRelationsRef.current,
+              storedExplicitRelations ?? anchoredRelations,
+            )
+          : hasUnsavedExplicitRelationChanges
+            ? explicitRelationsRef.current
+            : storedExplicitRelations ?? anchoredRelations;
+        const nextExplicitRelations = hydrateEmptyExplicitRelationLabels(nextExplicitRelationsBase, anchoredRelations);
+        const shouldRefreshStoredExplicitRelationsJsonDraft =
+          Boolean(storedDraft) &&
+          !storedDraft?.explicitRelationsJsonError &&
+          storedDraft?.explicitRelationsJsonDraft === prettyJson(storedExplicitRelations ?? []);
+        const nextExplicitRelationsJsonDraft = shouldRefreshStoredExplicitRelationsJsonDraft
+          ? prettyJson(nextExplicitRelations)
+          : storedDraft?.explicitRelationsJsonDraft ?? prettyJson(nextExplicitRelations);
 
         dispatch({
           type: 'load_node_success',
@@ -591,7 +675,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
           jsonDraft: storedDraft?.jsonDraft ?? prettyJson(nextContent),
           jsonError: storedDraft?.jsonError ?? null,
           explicitRelations: nextExplicitRelations,
-          explicitRelationsJsonDraft: storedDraft?.explicitRelationsJsonDraft ?? prettyJson(nextExplicitRelations),
+          explicitRelationsJsonDraft: nextExplicitRelationsJsonDraft,
           explicitRelationsJsonError: storedDraft?.explicitRelationsJsonError ?? null,
           isFallbackContent: payload.isFallbackContent ?? false,
           resolvedContentLanguage: payload.resolvedLanguage ?? language,

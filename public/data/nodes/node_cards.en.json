@@ -421,30 +421,6 @@
       }
     ]
   },
-  "northeast-2022": {
-    "title": "Northeast Corridor Trips",
-    "subtitle": "Cornell-year loops through NYC, Philly, Boston, and upstate",
-    "summary": "A cluster of 2022 trips radiating out from Ithaca during the Cornell period, mixing museums, city walks, nearby escapes, and the feeling of learning the U.S. Northeast through movement.",
-    "tags": [
-      "travel",
-      "east coast"
-    ],
-    "preview": [
-      {
-        "type": "text",
-        "text": "The old tripline files suggest this was less a single trip than a travel season: New York City in January, Philadelphia in February, Boston in June, and repeated returns to Ithaca and upstate New York through the rest of the year."
-      },
-      {
-        "type": "list",
-        "items": [
-          "New York City, Jan. 21-23, 2022",
-          "Philadelphia, Feb. 25-28, 2022",
-          "Boston and whale watching, Jun. 24-28, 2022",
-          "Ithaca and New York upstate loops across 2022"
-        ]
-      }
-    ]
-  },
   "california-one-2022": {
     "title": "California State Route 1",
     "subtitle": "A coastal drive during the Verily summer",

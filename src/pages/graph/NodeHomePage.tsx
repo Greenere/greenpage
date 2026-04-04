@@ -1297,7 +1297,17 @@ const NodeCanvas: React.FC = () => {
         setEdges(relaxedGraph.edges);
         edgesRef.current = relaxedGraph.edges;
         persistCurrentGraphView(relaxedGraph.nodes);
-    }, [graphModel, nodes, nodesInitialized, orderedGraphRelations, persistCurrentGraphView, setEdges, setNodes]);
+    }, [
+        graphModel,
+        initialGraph.nodeSpringK,
+        initialGraph.targets,
+        nodes,
+        nodesInitialized,
+        orderedGraphRelations,
+        persistCurrentGraphView,
+        setEdges,
+        setNodes,
+    ]);
 
     useEffect(() => {
         nodesRef.current = nodes;

@@ -23,6 +23,10 @@ export function createEmptyExplicitRelation(nodeId: string): EditorExplicitRelat
   };
 }
 
+export function getExplicitRelationIdentityKey(relation: EditorExplicitRelation) {
+  return relation.id ?? `${relation.from}::${relation.to}::${relation.kind}::${relation.strength}`;
+}
+
 export function areExplicitRelationsEquivalent(left: EditorExplicitRelation[], right: EditorExplicitRelation[]) {
   if (left.length !== right.length) {
     return false;
