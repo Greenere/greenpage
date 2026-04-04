@@ -3,6 +3,7 @@ import './App.css'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NodeHomePage from './pages/graph/NodeHomePage'
 import PageLoadingFallback from './shared/ui/PageLoadingFallback'
+import DetailPageSkeleton from './shared/ui/DetailPageSkeleton'
 
 const NodeEditorPage = lazy(() => import('./pages/editor/NodeEditorPage'))
 const NodeDetailPage = lazy(() => import('./pages/graph/NodeDetailPage'))
@@ -39,7 +40,7 @@ function App() {
       <Route
         path="/nodes/bio"
         element={
-          <Suspense fallback={<PageLoadingFallback />}>
+          <Suspense fallback={<DetailPageSkeleton variant="bio" />}>
             <BioDetailPage key={location.pathname} />
           </Suspense>
         }
@@ -47,7 +48,7 @@ function App() {
       <Route
         path="/nodes/:nodeId"
         element={
-          <Suspense fallback={<PageLoadingFallback />}>
+          <Suspense fallback={<DetailPageSkeleton variant="node" />}>
             <NodeDetailPage key={location.pathname} />
           </Suspense>
         }

@@ -9,6 +9,7 @@ import { DOMAIN_ORDER } from '../../configs/content/domains';
 import { THEME_CONFIG } from '../../configs/ui/themes';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
+import DetailPageSkeleton from '../../shared/ui/DetailPageSkeleton';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
 import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
@@ -160,11 +161,7 @@ const BioDetailPage: React.FC = () => {
   }
 
   if (!bioContent || !graphModel) {
-    return (
-      <div style={{ minHeight: '100vh', padding: '2rem', color: 'var(--color-text)' }}>
-        {UI_COPY.bioDetailPage.loading}
-      </div>
-    );
+    return <DetailPageSkeleton variant="bio" />;
   }
 
   const detailPageStyle = {

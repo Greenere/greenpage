@@ -8,6 +8,7 @@ import {
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { applyThemeVars } from '../../shared/styles/colors';
+import DetailPageSkeleton from '../../shared/ui/DetailPageSkeleton';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
 import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
@@ -269,11 +270,7 @@ const NodeDetailPage: React.FC = () => {
   }
 
   if (!graphModel || (graphNode && !node)) {
-    return (
-      <div style={{ minHeight: '100vh', padding: '2rem', color: 'var(--color-text)' }}>
-        {UI_COPY.nodeDetailPage.loading}
-      </div>
-    );
+    return <DetailPageSkeleton variant="node" />;
   }
 
   if (!graphNode || !node) {
