@@ -13,7 +13,6 @@ import { LANGUAGE_OPTIONS, getLocaleMessages, type AppLanguage } from '../../i18
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {
   CHRONOLOGY_FORMAT_HINT,
-  getChronologySortKeySafe,
   getChronologyValidationError,
   getCurrentMonthChronologyValue,
   normalizeChronologyValue,
@@ -34,6 +33,19 @@ import {
 import JsonEditorPanel from './JsonEditorPanel';
 import NodeArticlePreview from './NodeArticlePreview';
 import BrowseNodesDialog from './BrowseNodesDialog';
+import {
+  anchorExplicitRelationToNode,
+  areExplicitRelationsEquivalent,
+  buildBioConnectionEntry,
+  buildExplicitConnectionEntry,
+  buildTimelineConnectionEntries,
+  createEmptyExplicitRelation,
+  findDuplicateExplicitRelationIndexes,
+  getOccupiedConnectionPeerIds,
+  isCompleteExplicitRelation,
+  type EditorConnectedNodeEntry,
+  wouldCreateDuplicateExplicitRelation,
+} from './editorRelations';
 import {
   DETAIL_READING_WIDTH,
   DETAIL_SECTION_WIDTH,
@@ -61,6 +73,7 @@ import {
   serializeTags,
   type EditorTab,
 } from './nodeEditorState';
+import { formatEditorNodeOptionLabel, getEditorNodeSearchText, getEditorNodeTitle, sortNodeRefs } from './editorNodeUtils';
 import SectionListEditor from './section_editor/SectionListEditor';
 import { createEmptySection } from './section_editor/sectionMarkdown';
 import { createTemplateContent, getDefaultKindForDomain, getNodeTemplateOptions, NODE_TEMPLATE_IDS } from './templates';
@@ -483,86 +496,6 @@ function DomainTreemap({
   );
 }
 
-function createEmptyExplicitRelation(nodeId: string): EditorExplicitRelation {
-  return {
-    from: nodeId,
-    to: '',
-    kind: 'topic',
-    label: '',
-    strength: 2,
-  };
-}
-
-function areExplicitRelationsEquivalent(left: EditorExplicitRelation[], right: EditorExplicitRelation[]) {
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  return left.every((relation, index) => {
-    const other = right[index];
-    if (!other) {
-      return false;
-    }
-
-    return (
-      relation.id === other.id &&
-      relation.from === other.from &&
-      relation.to === other.to &&
-      relation.kind === other.kind &&
-      relation.label === other.label &&
-      relation.strength === other.strength
-    );
-  });
-}
-
-type EditorConnectedNodeEntry = {
-  key: string;
-  relatedNodeId: string;
-  relatedNodeTitle: string;
-  displayKind: string;
-  displayLabel: string;
-  removable: boolean;
-  explicitRelationIndex?: number;
-};
-
-function sortNodeRefs(left: GraphNodeRef, right: GraphNodeRef) {
-  if (left.domain !== right.domain) {
-    return left.domain.localeCompare(right.domain);
-  }
-
-  const chronologyDelta = getChronologySortKeySafe(left.chronology) - getChronologySortKeySafe(right.chronology);
-  if (chronologyDelta !== 0) {
-    return chronologyDelta;
-  }
-
-  return left.id.localeCompare(right.id);
-}
-
-function getEditorNodeTitle(node: EditorNodeOption | undefined, fallbackId: string) {
-  return node?.title?.trim() || fallbackId || node?.id || UI_COPY.nodeEditor.common.chooseNodeFallback;
-}
-
-function formatEditorNodeOptionLabel(node: GraphNodeRef & { title?: string; subtitle?: string }) {
-  if (node.title?.trim() && node.title !== node.id) {
-    return `${node.title} — ${node.domain} / ${node.id}`;
-  }
-
-  return `${node.domain} / ${node.id}`;
-}
-
-function getEditorNodeSearchText(node: EditorNodeOption) {
-  return [
-    node.title,
-    node.subtitle,
-    node.id,
-    node.domain,
-    getDisplayDomain(node.domain),
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
-
 function renderConfiguredIcon(icon: ConfigurableIcon, size = icon.size.idle) {
   if (icon.kind === 'unicode') {
     return (
@@ -642,206 +575,6 @@ function renderConfiguredIcon(icon: ConfigurableIcon, size = icon.size.idle) {
       ))}
     </svg>
   );
-}
-
-function getExplicitRelationPeerId(relation: EditorExplicitRelation, currentNodeId: string) {
-  if (relation.from === currentNodeId) {
-    return relation.to;
-  }
-
-  if (relation.to === currentNodeId) {
-    return relation.from;
-  }
-
-  return relation.to || relation.from;
-}
-
-function anchorExplicitRelationToNode(relation: EditorExplicitRelation, currentNodeId: string): EditorExplicitRelation {
-  if (relation.from === currentNodeId || relation.to === currentNodeId) {
-    return relation;
-  }
-
-  return {
-    ...relation,
-    from: currentNodeId,
-  };
-}
-
-function isCompleteExplicitRelation(relation: EditorExplicitRelation) {
-  return relation.from.trim().length > 0 && relation.to.trim().length > 0;
-}
-
-function getTimelineConnectionPeers(currentNode: GraphNodeRef, nodes: EditorNodeOption[]) {
-  const domainNodes = nodes
-    .map((node) => (node.id === currentNode.id ? { ...node, chronology: currentNode.chronology } : node))
-    .filter((node) => node.domain === currentNode.domain)
-    .sort(sortNodeRefs);
-  const currentIndex = domainNodes.findIndex((node) => node.id === currentNode.id);
-
-  if (currentIndex === -1) {
-    return [];
-  }
-
-  const neighbors = [domainNodes[currentIndex - 1], domainNodes[currentIndex + 1]].filter(
-    (node): node is EditorNodeOption => Boolean(node)
-  );
-
-  return neighbors;
-}
-
-function buildTimelineConnectionEntries(currentNode: GraphNodeRef, nodes: EditorNodeOption[]): EditorConnectedNodeEntry[] {
-  const neighbors = getTimelineConnectionPeers(currentNode, nodes);
-
-  return neighbors.map((node, index) => ({
-    key: `timeline-${node.id}-${index}`,
-    relatedNodeId: node.id,
-    relatedNodeTitle: getEditorNodeTitle(node, node.id),
-    displayKind: 'sequence',
-    displayLabel: UI_COPY.graphRelations.nextInTimeline,
-    removable: false,
-  }));
-}
-
-function getBioConnectionPeerId(currentNode: GraphNodeRef, nodes: EditorNodeOption[]) {
-  if (currentNode.id === 'bio') {
-    return null;
-  }
-
-  const domainNodes = nodes
-    .map((node) => (node.id === currentNode.id ? { ...node, chronology: currentNode.chronology } : node))
-    .filter((node) => node.domain === currentNode.domain)
-    .sort(sortNodeRefs);
-  const latestNode = domainNodes[domainNodes.length - 1];
-
-  if (!latestNode || latestNode.id !== currentNode.id) {
-    return null;
-  }
-
-  return 'bio';
-}
-
-function buildBioConnectionEntry(currentNode: GraphNodeRef, nodes: EditorNodeOption[]): EditorConnectedNodeEntry | null {
-  const relatedNodeId = getBioConnectionPeerId(currentNode, nodes);
-  if (!relatedNodeId) {
-    return null;
-  }
-
-  return {
-    key: 'bio-derived-connection',
-    relatedNodeId,
-    relatedNodeTitle: UI_COPY.nodeDetailPage.bioEntry.title,
-    displayKind: UI_COPY.nodeDetailPage.bioEntry.kind,
-    displayLabel: UI_COPY.graphRelations.latestNodeInDomain,
-    removable: false,
-  };
-}
-
-function getOccupiedConnectionPeerIds(
-  currentNode: GraphNodeRef,
-  nodes: EditorNodeOption[],
-  relations: EditorExplicitRelation[],
-  ignoredIndex: number | null = null,
-) {
-  const peerIds = new Set<string>();
-
-  getTimelineConnectionPeers(currentNode, nodes).forEach((node) => {
-    peerIds.add(node.id);
-  });
-
-  const bioPeerId = getBioConnectionPeerId(currentNode, nodes);
-  if (bioPeerId) {
-    peerIds.add(bioPeerId);
-  }
-
-  relations.forEach((relation, index) => {
-    if (ignoredIndex !== null && index === ignoredIndex) {
-      return;
-    }
-
-    const peerId = getExplicitRelationPeerId(relation, currentNode.id).trim();
-    if (peerId) {
-      peerIds.add(peerId);
-    }
-  });
-
-  return peerIds;
-}
-
-function findDuplicateExplicitRelationIndexes(
-  currentNode: GraphNodeRef | null,
-  nodes: EditorNodeOption[],
-  relations: EditorExplicitRelation[],
-) {
-  if (!currentNode) {
-    return new Set<number>();
-  }
-
-  const implicitPeerIds = getOccupiedConnectionPeerIds(currentNode, nodes, []);
-  const firstIndexByPeerId = new Map<string, number>();
-  const duplicateIndexes = new Set<number>();
-
-  relations.forEach((relation, index) => {
-    const peerId = getExplicitRelationPeerId(relation, currentNode.id).trim();
-    if (!peerId) {
-      return;
-    }
-
-    if (implicitPeerIds.has(peerId)) {
-      duplicateIndexes.add(index);
-      return;
-    }
-
-    const firstIndex = firstIndexByPeerId.get(peerId);
-    if (firstIndex === undefined) {
-      firstIndexByPeerId.set(peerId, index);
-      return;
-    }
-
-    duplicateIndexes.add(firstIndex);
-    duplicateIndexes.add(index);
-  });
-
-  return duplicateIndexes;
-}
-
-function wouldCreateDuplicateExplicitRelation(
-  currentNode: GraphNodeRef,
-  nodes: EditorNodeOption[],
-  relations: EditorExplicitRelation[],
-  candidate: EditorExplicitRelation,
-  ignoredIndex: number | null = null,
-) {
-  const candidatePeerId = getExplicitRelationPeerId(candidate, currentNode.id).trim();
-  if (!candidatePeerId) {
-    return false;
-  }
-
-  return getOccupiedConnectionPeerIds(currentNode, nodes, relations, ignoredIndex).has(candidatePeerId);
-}
-
-function buildExplicitConnectionEntry(
-  relation: EditorExplicitRelation,
-  relationIndex: number,
-  currentNodeId: string,
-  nodeById: Map<string, EditorNodeOption>
-): EditorConnectedNodeEntry {
-  const relatedNodeId = getExplicitRelationPeerId(relation, currentNodeId);
-  const relatedNode = nodeById.get(relatedNodeId);
-  const hasChosenPeer = Boolean(relatedNodeId);
-
-  return {
-    key: `explicit-${relationIndex}-${relation.from}-${relation.to}-${relation.kind}`,
-    relatedNodeId,
-    relatedNodeTitle: hasChosenPeer ? getEditorNodeTitle(relatedNode, relatedNodeId) : UI_COPY.nodeEditor.common.chooseNodeFallback,
-    displayKind: relation.kind,
-    displayLabel:
-      relation.label.trim() ||
-      (hasChosenPeer
-        ? UI_COPY.nodeEditor.connectedNodes.relationLabelFallback
-        : UI_COPY.nodeEditor.connectedNodes.relationIncompleteFallback),
-    removable: true,
-    explicitRelationIndex: relationIndex,
-  };
 }
 
 function ConnectedNodeCard({

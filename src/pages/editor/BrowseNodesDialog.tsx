@@ -2,33 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { DOMAIN_ORDER, type DomainId } from '../../configs/content/domains';
 import { UI_COPY } from '../../configs/ui/uiCopy';
-import { getChronologySortKeySafe } from '../../shared/chronology';
-import { getDisplayDomain, type GraphNodeRef } from '../graph/content/Nodes';
+import { getDisplayDomain } from '../graph/content/Nodes';
 import type { EditorNodeOption } from './editorApi';
-
-function sortNodeRefs(left: GraphNodeRef, right: GraphNodeRef) {
-  if (left.domain !== right.domain) {
-    return left.domain.localeCompare(right.domain);
-  }
-
-  const chronologyDelta = getChronologySortKeySafe(left.chronology) - getChronologySortKeySafe(right.chronology);
-  if (chronologyDelta !== 0) {
-    return chronologyDelta;
-  }
-
-  return left.id.localeCompare(right.id);
-}
-
-function getEditorNodeTitle(node: EditorNodeOption | undefined, fallbackId: string) {
-  return node?.title?.trim() || fallbackId || node?.id || UI_COPY.nodeEditor.common.chooseNodeFallback;
-}
-
-function getEditorNodeSearchText(node: EditorNodeOption) {
-  return [node.title, node.subtitle, node.id, node.domain, getDisplayDomain(node.domain)]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
+import { getEditorNodeSearchText, getEditorNodeTitle, sortNodeRefs } from './editorNodeUtils';
 
 function inputStyle() {
   return {
