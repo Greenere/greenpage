@@ -44,6 +44,8 @@ import {
   deleteEditorNode,
   deleteEditorDomain,
   createEditorNode,
+  EDITOR_CAN_MUTATE_PROJECT,
+  EDITOR_EXPORTS_TO_LOCAL_FILE,
   type EditorExplicitRelation,
   type EditorNodeOption,
   fetchEditorBootstrap,
@@ -1252,6 +1254,8 @@ const NodeEditorPage: React.FC = () => {
   const { language, messages } = useAppLanguage();
   const nodeTemplateOptions = getNodeTemplateOptions();
   const templateDefaults = getLocaleMessages().nodeTemplates.defaults;
+  const editorCanMutateProject = EDITOR_CAN_MUTATE_PROJECT;
+  const editorExportsToLocalFile = EDITOR_EXPORTS_TO_LOCAL_FILE;
   const navigate = useNavigate();
   const { nodeId } = useParams();
   const decodedNodeId = nodeId ? decodeURIComponent(nodeId) : '';
@@ -1306,6 +1310,33 @@ const NodeEditorPage: React.FC = () => {
   const explicitRelationsRef = useRef<EditorExplicitRelation[]>([]);
   const loadedExplicitRelationsRef = useRef<EditorExplicitRelation[]>([]);
   const loadedNodeRefRef = useRef<GraphNodeRef | null>(null);
+  const availableTabs = (editorCanMutateProject
+    ? (['content', 'json', 'new-node', 'new-domain'] as const)
+    : (['content', 'json'] as const));
+  const editorSubtitle = editorExportsToLocalFile
+    ? UI_COPY.nodeEditor.productionSubtitle
+    : UI_COPY.nodeEditor.subtitle;
+  const contentWriteActionLabel = editorExportsToLocalFile
+    ? UI_COPY.nodeEditor.contentTab.exportToFile
+    : UI_COPY.nodeEditor.contentTab.writeToFile;
+  const jsonWriteActionLabel = editorExportsToLocalFile
+    ? UI_COPY.nodeEditor.jsonTab.exportToFile
+    : UI_COPY.nodeEditor.jsonTab.writeToFile;
+  const writeChangesActionDescription = editorExportsToLocalFile
+    ? UI_COPY.nodeEditor.confirmations.exportChanges
+    : UI_COPY.nodeEditor.confirmations.writeChanges;
+  const writeJsonChangesActionDescription = editorExportsToLocalFile
+    ? UI_COPY.nodeEditor.confirmations.exportJsonChanges
+    : UI_COPY.nodeEditor.confirmations.writeJsonChanges;
+  const pendingWriteMessage = editorExportsToLocalFile
+    ? UI_COPY.nodeEditor.confirmations.exportingToFile
+    : UI_COPY.nodeEditor.confirmations.writingToFile;
+  const previewSelectionHint = editorCanMutateProject
+    ? UI_COPY.nodeEditor.rightPanel.previewSelectionHint
+    : UI_COPY.nodeEditor.rightPanel.previewSelectionHintExistingOnly;
+  const previewEmptyState = editorCanMutateProject
+    ? UI_COPY.nodeEditor.rightPanel.previewEmptyState
+    : UI_COPY.nodeEditor.rightPanel.previewEmptyStateExistingOnly;
 
   // Auto-dismiss status messages after 4 s
   useEffect(() => {
@@ -1322,6 +1353,13 @@ const NodeEditorPage: React.FC = () => {
     applyThemeVars(theme);
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (editorCanMutateProject) return;
+    if (tab === 'new-node' || tab === 'new-domain') {
+      dispatch({ type: 'set_tab', tab: 'content' });
+    }
+  }, [dispatch, editorCanMutateProject, tab]);
 
   useEffect(() => {
     fetchEditorBootstrap(language)
@@ -1731,6 +1769,7 @@ const NodeEditorPage: React.FC = () => {
     if (!decodedNodeId || !draftContent || !currentNodeRef || validation.error || currentChronologyError) return;
     dispatch({ type: 'set_action_pending', value: true });
     try {
+      const isLocalExport = editorExportsToLocalFile;
       const normalizedCurrentNode = {
         ...currentNodeRef,
         chronology: normalizeChronologyValue(currentNodeRef.chronology),
@@ -1750,21 +1789,28 @@ const NodeEditorPage: React.FC = () => {
         completeRelations,
         language
       );
-      loadedNodeRefRef.current = normalizedCurrentNode;
-      loadedExplicitRelationsRef.current = completeRelations;
-      clearStoredNodeDraft(decodedNodeId, language);
-      clearGraphModelCache();
-      clearGraphNodeContentCache();
-      dispatch({
-        type: 'commit_saved_node',
-        node: normalizedCurrentNode,
-        content: draftContent,
-        resolvedContentLanguage: language,
-      });
+      dispatch({ type: 'set_current_node_ref', value: normalizedCurrentNode });
+      if (!isLocalExport) {
+        loadedNodeRefRef.current = normalizedCurrentNode;
+        loadedExplicitRelationsRef.current = completeRelations;
+        clearStoredNodeDraft(decodedNodeId, language);
+        clearGraphModelCache();
+        clearGraphNodeContentCache();
+        dispatch({
+          type: 'commit_saved_node',
+          node: normalizedCurrentNode,
+          content: draftContent,
+          resolvedContentLanguage: language,
+        });
+      }
       const successMessage =
         incompleteExplicitRelationCount > 0
-          ? UI_COPY.nodeEditor.status.wroteNodeFileSkipped(incompleteExplicitRelationCount)
-          : UI_COPY.nodeEditor.status.wroteNodeFile;
+          ? isLocalExport
+            ? UI_COPY.nodeEditor.status.exportedNodeFileSkipped(incompleteExplicitRelationCount)
+            : UI_COPY.nodeEditor.status.wroteNodeFileSkipped(incompleteExplicitRelationCount)
+          : isLocalExport
+            ? UI_COPY.nodeEditor.status.exportedNodeFile
+            : UI_COPY.nodeEditor.status.wroteNodeFile;
       dispatch({ type: 'set_status_message', message: successMessage });
       dispatch({ type: 'set_bootstrap_error', error: null });
       dispatch({
@@ -1777,7 +1823,11 @@ const NodeEditorPage: React.FC = () => {
       });
       return successMessage;
     } catch (error) {
-      const message = error instanceof Error ? error.message : UI_COPY.nodeEditor.status.failedWriteNodeFile;
+      const message = error instanceof Error
+        ? error.message
+        : editorExportsToLocalFile
+          ? UI_COPY.nodeEditor.status.failedExportNodeFile
+          : UI_COPY.nodeEditor.status.failedWriteNodeFile;
       dispatch({ type: 'set_status_message', message });
       throw new Error(message);
     } finally {
@@ -2072,7 +2122,7 @@ const NodeEditorPage: React.FC = () => {
           <div>
             <div style={{ fontSize: '1.35rem', fontWeight: 700, letterSpacing: '-0.02em' }}>{UI_COPY.nodeEditor.title}</div>
             <div style={{ marginTop: '0.3rem', opacity: 0.62, fontSize: '0.88rem' }}>
-              {UI_COPY.nodeEditor.subtitle}
+              {editorSubtitle}
             </div>
           </div>
           <ThemePicker theme={theme} setTheme={setTheme} variant="inline" />
@@ -2100,7 +2150,7 @@ const NodeEditorPage: React.FC = () => {
           >
             {/* Tab switcher */}
             <div style={{ display: 'flex', gap: '0.35rem' }}>
-              {(['content', 'json', 'new-node', 'new-domain'] as const).map((tabId) => (
+              {availableTabs.map((tabId) => (
                 <button
                   key={tabId}
                   type="button"
@@ -2196,7 +2246,15 @@ const NodeEditorPage: React.FC = () => {
                   fontSize: '0.83rem',
                 }}
               >
-                No {messages.appShell.languageOptions[language]} content yet — showing {messages.appShell.languageOptions[resolvedContentLanguage]} fallback. Saving will create the {messages.appShell.languageOptions[language]} version.
+                {editorExportsToLocalFile
+                  ? UI_COPY.nodeEditor.fallbackContentExportNotice(
+                      messages.appShell.languageOptions[language],
+                      messages.appShell.languageOptions[resolvedContentLanguage],
+                    )
+                  : UI_COPY.nodeEditor.fallbackContentWriteNotice(
+                      messages.appShell.languageOptions[language],
+                      messages.appShell.languageOptions[resolvedContentLanguage],
+                    )}
               </div>
             )}
 
@@ -2706,11 +2764,11 @@ const NodeEditorPage: React.FC = () => {
                         type="button"
                         onClick={() =>
                           openDangerDialog({
-                            actionDescription: UI_COPY.nodeEditor.confirmations.writeChanges,
+                            actionDescription: writeChangesActionDescription,
                             proceedLabel: UI_COPY.nodeEditor.common.proceed,
                             tone: 'primary',
                             showResult: true,
-                            pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
+                            pendingMessage: pendingWriteMessage,
                             onProceed: handleWriteToFile,
                           })
                         }
@@ -2721,7 +2779,7 @@ const NodeEditorPage: React.FC = () => {
                             : btnPrimary
                         }
                       >
-                        {UI_COPY.nodeEditor.contentTab.writeToFile}
+                        {contentWriteActionLabel}
                       </button>
                       <button
                         type="button"
@@ -2740,23 +2798,25 @@ const NodeEditorPage: React.FC = () => {
                       >
                         {UI_COPY.nodeEditor.contentTab.reset}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openDangerDialog({
-                            actionDescription: UI_COPY.nodeEditor.confirmations.deleteNode(decodedNodeId),
-                            proceedLabel: UI_COPY.nodeEditor.contentTab.deleteNode,
-                            tone: 'danger',
-                            showResult: true,
-                            pendingMessage: UI_COPY.nodeEditor.confirmations.deletingNode,
-                            onProceed: handleDeleteNode,
-                          })
-                        }
-                        disabled={!decodedNodeId || actionPending}
-                        style={!decodedNodeId || actionPending ? { ...btnDanger, ...btnDisabled } : btnDanger}
-                      >
-                        {UI_COPY.nodeEditor.contentTab.deleteNode}
-                      </button>
+                      {editorCanMutateProject ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openDangerDialog({
+                              actionDescription: UI_COPY.nodeEditor.confirmations.deleteNode(decodedNodeId),
+                              proceedLabel: UI_COPY.nodeEditor.contentTab.deleteNode,
+                              tone: 'danger',
+                              showResult: true,
+                              pendingMessage: UI_COPY.nodeEditor.confirmations.deletingNode,
+                              onProceed: handleDeleteNode,
+                            })
+                          }
+                          disabled={!decodedNodeId || actionPending}
+                          style={!decodedNodeId || actionPending ? { ...btnDanger, ...btnDisabled } : btnDanger}
+                        >
+                          {UI_COPY.nodeEditor.contentTab.deleteNode}
+                        </button>
+                      ) : null}
                     </div>
                     {validation.error && (
                       <div style={{ marginTop: '0.6rem', color: 'crimson', fontSize: '0.82rem' }}>
@@ -2874,18 +2934,18 @@ const NodeEditorPage: React.FC = () => {
                         type="button"
                         onClick={() =>
                           openDangerDialog({
-                            actionDescription: UI_COPY.nodeEditor.confirmations.writeJsonChanges,
+                            actionDescription: writeJsonChangesActionDescription,
                             proceedLabel: UI_COPY.nodeEditor.common.proceed,
                             tone: 'primary',
                             showResult: true,
-                            pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
+                            pendingMessage: pendingWriteMessage,
                             onProceed: handleWriteToFile,
                           })
                         }
                         disabled={jsonWriteDisabled}
                         style={jsonWriteDisabled ? { ...btnPrimary, ...btnDisabled } : btnPrimary}
                       >
-                        {UI_COPY.nodeEditor.jsonTab.writeToFile}
+                        {jsonWriteActionLabel}
                       </button>
                     </div>
                     {(validation.error || currentChronologyError || duplicateExplicitRelationCount > 0) && (
@@ -3203,7 +3263,7 @@ const NodeEditorPage: React.FC = () => {
                     ? UI_COPY.nodeEditor.domainStats.subtitle(bootstrapNodes.length, domainTreemapEntries.length)
                     : previewNode
                       ? `${previewNode.domain} / ${previewNode.id}`
-                      : UI_COPY.nodeEditor.rightPanel.previewSelectionHint}
+                      : previewSelectionHint}
                 </div>
               </div>
               <PreviewPanelLanguageToggle />
@@ -3378,7 +3438,7 @@ const NodeEditorPage: React.FC = () => {
               </div>
             ) : (
               <div style={{ padding: '2.5rem 1.5rem', opacity: 0.55, fontSize: '0.9rem' }}>
-                {UI_COPY.nodeEditor.rightPanel.previewEmptyState}
+                {previewEmptyState}
               </div>
             )}
           </div>

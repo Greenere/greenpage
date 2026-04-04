@@ -87,6 +87,12 @@ export const EN_MESSAGES = {
     nodeEditor: {
       title: 'Node editor',
       subtitle: 'Dev workspace · edit content, preview the article, and write to JSON files.',
+      productionSubtitle:
+        'Production workspace · edit content, preview the article, and export a local JSON package without changing deployed data.',
+      fallbackContentWriteNotice: (requestedLanguage: string, resolvedLanguage: string) =>
+        `No ${requestedLanguage} content yet — showing ${resolvedLanguage} fallback. Saving will create the ${requestedLanguage} version.`,
+      fallbackContentExportNotice: (requestedLanguage: string, resolvedLanguage: string) =>
+        `No ${requestedLanguage} content yet — showing ${resolvedLanguage} fallback. Exporting will create a local ${requestedLanguage} file.`,
       tabs: {
         content: 'Edit',
         json: 'JSON',
@@ -125,7 +131,11 @@ export const EN_MESSAGES = {
         wroteNodeFile: 'Wrote node JSON to file.',
         wroteNodeFileSkipped: (count: number) =>
           `Wrote node JSON to file. Skipped ${count} incomplete connection${count === 1 ? '' : 's'}.`,
+        exportedNodeFile: 'Exported a local node JSON package.',
+        exportedNodeFileSkipped: (count: number) =>
+          `Exported a local node JSON package. Skipped ${count} incomplete connection${count === 1 ? '' : 's'}.`,
         failedWriteNodeFile: 'Failed to write node file.',
+        failedExportNodeFile: 'Failed to export node file.',
         createdNode: (nodeId: string) => `Created node "${nodeId}".`,
         failedCreateNode: 'Failed to create node.',
         createdDomainOpening: (domainId: string) => `Created domain "${domainId}". Opening new node editor...`,
@@ -145,12 +155,15 @@ export const EN_MESSAGES = {
         actionFailed: 'Action failed.',
         writeChanges: 'write these editor changes to file',
         writeJsonChanges: 'write these JSON edits to file',
+        exportChanges: 'export these editor changes to a local file',
+        exportJsonChanges: 'export these JSON edits to a local file',
         resetDraft: 'reset this draft back to the last saved file version',
         deleteExplicitConnection: 'delete this explicit connection',
         deleteSection: (label: string) => `delete the "${label}" section`,
         deleteDomain: (domainId: string) => `delete the "${domainId}" domain`,
         deleteNode: (nodeId: string) => `delete the "${nodeId}" node, its localized content files, and its graph connections`,
         writingToFile: 'Writing to file…',
+        exportingToFile: 'Exporting to local file…',
         deletingDomain: 'Deleting domain…',
         deletingNode: 'Deleting node…',
       },
@@ -213,6 +226,7 @@ export const EN_MESSAGES = {
           'Select an explicit connection card on the right to edit its direction, kind, strength, and label.',
         sidebarHint: 'Edit header, metadata, and hero from this panel. Click any section on the right to edit it.',
         writeToFile: 'Write to file',
+        exportToFile: 'Export to file',
         reset: 'Reset',
         deleteNode: 'Delete node',
       },
@@ -224,6 +238,7 @@ export const EN_MESSAGES = {
         explicitConnectionsJsonHint:
           'Edit the saved explicit graph connections for this node. Timeline and bio links are derived automatically and are not included here.',
         writeToFile: 'Write to file',
+        exportToFile: 'Export to file',
       },
       newNodeTab: {
         domain: 'Domain',
@@ -264,6 +279,8 @@ export const EN_MESSAGES = {
         livePreview: 'Live preview',
         previewSelectionHint: 'Select a node or template draft to preview.',
         previewEmptyState: 'Choose an existing node or start a new template to see the rendered article here.',
+        previewSelectionHintExistingOnly: 'Select an existing node to preview.',
+        previewEmptyStateExistingOnly: 'Choose an existing node to see the rendered article here.',
       },
     },
   },

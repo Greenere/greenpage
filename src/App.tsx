@@ -6,9 +6,7 @@ import NodeDetailPage from './pages/graph/NodeDetailPage'
 import BioDetailPage from './pages/graph/BioDetailPage'
 import { useAppLanguage } from './i18n/LanguageProvider'
 
-const DevNodeEditorPage = import.meta.env.DEV
-  ? lazy(() => import('./pages/editor/NodeEditorPage'))
-  : null
+const NodeEditorPage = lazy(() => import('./pages/editor/NodeEditorPage'))
 
 function App() {
   const location = useLocation()
@@ -17,26 +15,22 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<NodeHomePage />} />
-      {import.meta.env.DEV && DevNodeEditorPage ? (
-        <>
-          <Route
-            path="/editor"
-            element={
-              <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
-                <DevNodeEditorPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/editor/nodes/:nodeId"
-            element={
-              <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
-                <DevNodeEditorPage />
-              </Suspense>
-            }
-          />
-        </>
-      ) : null}
+      <Route
+        path="/editor"
+        element={
+          <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
+            <NodeEditorPage />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/editor/nodes/:nodeId"
+        element={
+          <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
+            <NodeEditorPage />
+          </Suspense>
+        }
+      />
       <Route path="/nodes/bio" element={<BioDetailPage key={location.pathname} />} />
       <Route path="/nodes/:nodeId" element={<NodeDetailPage key={location.pathname} />} />
       <Route path="*" element={<Navigate to="/" replace />} />
