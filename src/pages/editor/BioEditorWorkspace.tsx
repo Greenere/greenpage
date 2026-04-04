@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -50,6 +50,10 @@ type StoredBioEditorDraft = {
   jsonDraft: string;
 };
 
+type RestoredBioEditorDraft = StoredBioEditorDraft & {
+  jsonError: string | null;
+};
+
 function getDraftStorageKey(lang: AppLanguage) {
   return `${EDITOR_DRAFT_STORAGE_PREFIX}${lang}:bio`;
 }
@@ -58,17 +62,33 @@ function clearStoredBioDraft(lang: AppLanguage) {
   window.localStorage.removeItem(getDraftStorageKey(lang));
 }
 
-function parseStoredBioDraft(raw: string | null): StoredBioEditorDraft | null {
+function storeBioDraft(lang: AppLanguage, draft: StoredBioEditorDraft) {
+  window.localStorage.setItem(getDraftStorageKey(lang), JSON.stringify(draft));
+}
+
+function parseStoredBioDraft(raw: string | null): RestoredBioEditorDraft | null {
   if (!raw) return null;
 
   try {
     const candidate = JSON.parse(raw) as Record<string, unknown>;
     const content = normalizeBioPageContent(candidate.content);
     if (!content || typeof candidate.jsonDraft !== 'string') return null;
+
+    let jsonError: string | null = null;
+    try {
+      const parsed = normalizeBioPageContent(lenientParseJsonText(candidate.jsonDraft));
+      if (!parsed) {
+        throw new Error(UI_COPY.nodeEditor.bioJsonTab.invalidJson);
+      }
+    } catch (error) {
+      jsonError = error instanceof Error ? error.message : UI_COPY.nodeEditor.bioJsonTab.invalidJson;
+    }
+
     return {
       version: 1,
       content,
       jsonDraft: candidate.jsonDraft,
+      jsonError,
     };
   } catch {
     return null;
@@ -283,6 +303,12 @@ export default function BioEditorWorkspace() {
   const [resolvedContentLanguage, setResolvedContentLanguage] = useState<AppLanguage>(language);
   const [showJsonContent, setShowJsonContent] = useState(true);
   const [editingSectionIndex, setEditingSectionIndex] = useState<number | null>(null);
+  const bootstrapRequestIdRef = useRef(0);
+  const bioLoadRequestIdRef = useRef(0);
+  const draftStorageLanguageRef = useRef<AppLanguage>(language);
+  const originalContentRef = useRef<BioPageContent | null>(null);
+  const draftContentRef = useRef<BioPageContent | null>(null);
+  const jsonDraftRef = useRef('');
 
   useEffect(() => {
     if (!statusMessage) return;
@@ -295,47 +321,73 @@ export default function BioEditorWorkspace() {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
 
+  originalContentRef.current = originalContent;
+  draftContentRef.current = draftContent;
+  jsonDraftRef.current = jsonDraft;
+
   useEffect(() => {
+    const requestId = ++bootstrapRequestIdRef.current;
+
     fetchEditorBootstrap(language)
       .then((payload) => {
+        if (requestId !== bootstrapRequestIdRef.current) return;
         setBootstrapNodes(payload.nodes);
         setBootstrapError(null);
       })
       .catch((error: unknown) => {
+        if (requestId !== bootstrapRequestIdRef.current) return;
         setBootstrapError(error instanceof Error ? error.message : 'Failed to load editor bootstrap.');
       });
   }, [language]);
 
   useEffect(() => {
-    let cancelled = false;
+    const previousDraftLanguage = draftStorageLanguageRef.current;
+    const snapshotOriginalContent = originalContentRef.current;
+    const snapshotDraftContent = draftContentRef.current;
+    const snapshotJsonDraft = jsonDraftRef.current;
+
+    if (
+      previousDraftLanguage !== language &&
+      snapshotOriginalContent &&
+      snapshotDraftContent &&
+      (
+        prettyJson(snapshotOriginalContent) !== prettyJson(snapshotDraftContent) ||
+        snapshotJsonDraft !== prettyJson(snapshotDraftContent)
+      )
+    ) {
+      storeBioDraft(previousDraftLanguage, {
+        version: 1,
+        content: snapshotDraftContent,
+        jsonDraft: snapshotJsonDraft,
+      });
+    }
+
+    const requestId = ++bioLoadRequestIdRef.current;
     setLoadingBio(true);
 
     fetchEditorBio(language)
       .then((payload) => {
-        if (cancelled) return;
+        if (requestId !== bioLoadRequestIdRef.current) return;
 
         const storedDraft = parseStoredBioDraft(window.localStorage.getItem(getDraftStorageKey(language)));
         const nextContent = storedDraft?.content ?? payload.content;
         setOriginalContent(payload.content);
         setDraftContent(nextContent);
         setJsonDraft(storedDraft?.jsonDraft ?? prettyJson(nextContent));
-        setJsonError(null);
+        setJsonError(storedDraft?.jsonError ?? null);
         setIsFallbackContent(payload.isFallbackContent);
         setResolvedContentLanguage(payload.resolvedLanguage);
         setContentError(null);
+        draftStorageLanguageRef.current = language;
       })
       .catch((error: unknown) => {
-        if (cancelled) return;
+        if (requestId !== bioLoadRequestIdRef.current) return;
         setContentError(error instanceof Error ? error.message : UI_COPY.bioDetailPage.errorLoading);
       })
       .finally(() => {
-        if (cancelled) return;
+        if (requestId !== bioLoadRequestIdRef.current) return;
         setLoadingBio(false);
       });
-
-    return () => {
-      cancelled = true;
-    };
   }, [language]);
 
   const hasUnsavedLocalDraft = useMemo(() => {
@@ -344,24 +396,24 @@ export default function BioEditorWorkspace() {
   }, [draftContent, jsonDraft, originalContent]);
 
   useEffect(() => {
+    const draftStorageLanguage = draftStorageLanguageRef.current;
     if (!draftContent) return;
 
     if (!hasUnsavedLocalDraft) {
-      clearStoredBioDraft(language);
+      clearStoredBioDraft(draftStorageLanguage);
       return;
     }
 
     const timer = window.setTimeout(() => {
-      const payload: StoredBioEditorDraft = {
+      storeBioDraft(draftStorageLanguage, {
         version: 1,
         content: draftContent,
         jsonDraft,
-      };
-      window.localStorage.setItem(getDraftStorageKey(language), JSON.stringify(payload));
+      });
     }, EDITOR_DRAFT_AUTOSAVE_DELAY_MS);
 
     return () => window.clearTimeout(timer);
-  }, [draftContent, hasUnsavedLocalDraft, jsonDraft, language]);
+  }, [draftContent, hasUnsavedLocalDraft, jsonDraft]);
 
   const bioOpenNodeLabel = draftContent?.name?.trim() || UI_COPY.nodeDetailPage.bioEntry.title;
   const bioOpenNodeSubtitle = draftContent?.subtitle?.trim() || UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle;

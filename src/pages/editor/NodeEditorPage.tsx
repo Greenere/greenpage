@@ -176,6 +176,11 @@ type StoredNodeEditorDraft = {
   explicitRelations?: EditorExplicitRelation[];
 };
 
+type DraftStorageOwner = {
+  nodeId: string;
+  language: AppLanguage;
+};
+
 type RestoredNodeEditorDraft = {
   content: GraphNodeContent;
   jsonDraft: string;
@@ -320,6 +325,10 @@ function clearStoredNodeDraft(nodeId: string, lang: AppLanguage) {
   window.localStorage.removeItem(getDraftStorageKey(nodeId, lang));
 }
 
+function storeNodeDraft(owner: DraftStorageOwner, draft: StoredNodeEditorDraft) {
+  window.localStorage.setItem(getDraftStorageKey(owner.nodeId, owner.language), JSON.stringify(draft));
+}
+
 function isSafeSlug(value: string) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
 }
@@ -396,6 +405,16 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   const explicitRelationsRef = useRef<EditorExplicitRelation[]>([]);
   const loadedExplicitRelationsRef = useRef<EditorExplicitRelation[]>([]);
   const loadedNodeRefRef = useRef<GraphNodeRef | null>(null);
+  const bootstrapRequestIdRef = useRef(0);
+  const nodeLoadRequestIdRef = useRef(0);
+  const draftStorageOwnerRef = useRef<DraftStorageOwner | null>(
+    decodedNodeId ? { nodeId: decodedNodeId, language } : null,
+  );
+  const currentNodeStateRef = useRef<GraphNodeRef | null>(null);
+  const originalContentRef = useRef<GraphNodeContent | null>(null);
+  const draftContentRef = useRef<GraphNodeContent | null>(null);
+  const jsonDraftRef = useRef('');
+  const explicitRelationsJsonDraftRef = useRef('[]');
   const availableTabs = (editorCanMutateProject
     ? (['content', 'json', 'new-node', 'new-domain'] as const)
     : (['content', 'json'] as const));
@@ -418,6 +437,12 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     explicitRelationsRef.current = explicitRelations;
   }, [explicitRelations]);
 
+  currentNodeStateRef.current = currentNodeRef;
+  originalContentRef.current = originalContent;
+  draftContentRef.current = draftContent;
+  jsonDraftRef.current = jsonDraft;
+  explicitRelationsJsonDraftRef.current = explicitRelationsJsonDraft;
+
   useEffect(() => {
     applyThemeVars(theme);
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
@@ -431,11 +456,15 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   }, [dispatch, editorCanMutateProject, tab]);
 
   useEffect(() => {
+    const requestId = ++bootstrapRequestIdRef.current;
+
     fetchEditorBootstrap(language)
       .then((payload) => {
+        if (requestId !== bootstrapRequestIdRef.current) return;
         dispatch({ type: 'set_bootstrap_nodes', nodes: payload.nodes });
       })
       .catch((error: unknown) => {
+        if (requestId !== bootstrapRequestIdRef.current) return;
         dispatch({
           type: 'set_bootstrap_error',
           error: error instanceof Error ? error.message : 'Failed to load editor bootstrap.',
@@ -471,11 +500,50 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   }, [decodedNodeId, dispatch]);
 
   useEffect(() => {
+    const previousOwner = draftStorageOwnerRef.current;
+    const snapshotCurrentNode = currentNodeStateRef.current;
+    const snapshotOriginalContent = originalContentRef.current;
+    const snapshotDraftContent = draftContentRef.current;
+    const snapshotJsonDraft = jsonDraftRef.current;
+    const snapshotExplicitRelationsJsonDraft = explicitRelationsJsonDraftRef.current;
+    const snapshotLoadedNode = loadedNodeRefRef.current;
+    const snapshotExplicitRelations = explicitRelationsRef.current;
+
+    if (
+      previousOwner &&
+      snapshotCurrentNode &&
+      snapshotLoadedNode &&
+      snapshotDraftContent &&
+      previousOwner.nodeId === snapshotCurrentNode.id &&
+      (previousOwner.nodeId !== decodedNodeId || previousOwner.language !== language)
+    ) {
+      const hasUnsavedDraftForPreviousOwner =
+        prettyJson(snapshotDraftContent) !== prettyJson(snapshotOriginalContent) ||
+        snapshotCurrentNode.chronology !== snapshotLoadedNode.chronology ||
+        !areExplicitRelationsEquivalent(snapshotExplicitRelations, loadedExplicitRelationsRef.current) ||
+        snapshotJsonDraft !== prettyJson(snapshotDraftContent) ||
+        snapshotExplicitRelationsJsonDraft !== prettyJson(snapshotExplicitRelations);
+
+      if (hasUnsavedDraftForPreviousOwner) {
+        storeNodeDraft(previousOwner, {
+          version: 2,
+          content: snapshotDraftContent,
+          jsonDraft: snapshotJsonDraft,
+          explicitRelationsJsonDraft: snapshotExplicitRelationsJsonDraft,
+          currentNodeRef: snapshotCurrentNode,
+          explicitRelations: snapshotExplicitRelations,
+        });
+      }
+    }
+
+    const requestId = ++nodeLoadRequestIdRef.current;
+
     if (!decodedNodeId) {
       lastLoadedNodeIdRef.current = '';
       explicitRelationsRef.current = [];
       loadedExplicitRelationsRef.current = [];
       loadedNodeRefRef.current = null;
+      draftStorageOwnerRef.current = null;
       dispatch({ type: 'reset_for_empty_node', language });
       return;
     }
@@ -484,6 +552,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     dispatch({ type: 'set_loading_node', value: true });
     fetchEditorNode(decodedNodeId, language)
       .then((payload) => {
+        if (requestId !== nodeLoadRequestIdRef.current) return;
         const storedDraft = parseStoredNodeDraft(
           window.localStorage.getItem(getDraftStorageKey(decodedNodeId, language)),
           decodedNodeId,
@@ -531,14 +600,17 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
         lastLoadedNodeIdRef.current = decodedNodeId;
         loadedNodeRefRef.current = payload.node;
         loadedExplicitRelationsRef.current = anchoredRelations;
+        draftStorageOwnerRef.current = { nodeId: decodedNodeId, language };
       })
       .catch((error: unknown) => {
+        if (requestId !== nodeLoadRequestIdRef.current) return;
         dispatch({
           type: 'set_bootstrap_error',
           error: error instanceof Error ? error.message : 'Failed to load node content.',
         });
       })
       .finally(() => {
+        if (requestId !== nodeLoadRequestIdRef.current) return;
         dispatch({ type: 'set_loading_node', value: false });
       });
   }, [decodedNodeId, dispatch, language]);
@@ -565,28 +637,27 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     );
 
   useEffect(() => {
-    if (!decodedNodeId || !draftContent || !currentNodeRef) return;
+    const draftStorageOwner = draftStorageOwnerRef.current;
+    if (!draftStorageOwner || !draftContent || !currentNodeRef) return;
 
     if (!hasUnsavedLocalDraft) {
-      clearStoredNodeDraft(decodedNodeId, language);
+      clearStoredNodeDraft(draftStorageOwner.nodeId, draftStorageOwner.language);
       return;
     }
 
     const timer = window.setTimeout(() => {
-      const payload: StoredNodeEditorDraft = {
+      storeNodeDraft(draftStorageOwner, {
         version: 2,
         content: draftContent,
         jsonDraft,
         explicitRelationsJsonDraft,
         currentNodeRef,
         explicitRelations,
-      };
-
-      window.localStorage.setItem(getDraftStorageKey(decodedNodeId, language), JSON.stringify(payload));
+      });
     }, EDITOR_DRAFT_AUTOSAVE_DELAY_MS);
 
     return () => window.clearTimeout(timer);
-  }, [currentNodeRef, decodedNodeId, draftContent, explicitRelations, explicitRelationsJsonDraft, hasUnsavedLocalDraft, jsonDraft, language]);
+  }, [currentNodeRef, draftContent, explicitRelations, explicitRelationsJsonDraft, hasUnsavedLocalDraft, jsonDraft]);
 
   const trimmedNewNodeId = newNodeDraft.nodeId.trim();
   const newNodeIdAlreadyExists = trimmedNewNodeId.length > 0 && bootstrapNodes.some((node) => node.id === trimmedNewNodeId);
