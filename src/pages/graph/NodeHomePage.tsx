@@ -19,7 +19,6 @@ import StoryNode from './nodes/StoryNode';
 import BioToggleNode from './nodes/BioToggleNode';
 import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
-import { getChronologySortKey } from '../../shared/chronology';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graph/focus';
 import { GRAPH_LAYOUT } from '../../configs/graph/layout';
 import {
@@ -40,19 +39,25 @@ import {
     type GraphModel,
     getContentNodes,
     getDisplayDomain,
-    getDomainLayout,
     getGraphRelations,
     loadGraphModel,
     readCachedGraphModel,
 } from './content/Nodes';
+import {
+    type BoxState,
+    type Point,
+    half,
+    relaxBoxPositions,
+    enforceAnchorClearance,
+    buildLaneTargetPositions,
+} from './layout/graphLayout';
+import { RELAX_INITIAL_NODES_CONFIG } from './layout/graphLayoutConfig';
 
 const nodeTypes = {
     bioNode: BioNode,
     bioToggleNode: BioToggleNode,
     storyNode: StoryNode
 };
-
-type Point = { x: number; y: number };
 
 type StoryNodeData = {
     nodeRole: 'content';
@@ -93,11 +98,6 @@ const GRAPH_MIN_ZOOM = 0.5;
 const GRAPH_MAX_ZOOM = 2;
 const DRAG_EDGE_SYNC_INTERVAL_MS = 34;
 const DRAG_EDGE_SYNC_DISTANCE = 16;
-const DOMAIN_LAYOUT_INNER_RADIUS_MIN = GRAPH_LAYOUT.ring.innerRadiusMin;
-const DOMAIN_LAYOUT_INNER_RADIUS_MAX = GRAPH_LAYOUT.ring.innerRadiusMax;
-const DOMAIN_LAYOUT_RADIAL_GAP_MIN = GRAPH_LAYOUT.ring.radialGapMin;
-const DOMAIN_LAYOUT_RADIAL_GAP_MAX = GRAPH_LAYOUT.ring.radialGapMax;
-const DOMAIN_LAYOUT_MAX_ANGLE_OFFSET = GRAPH_LAYOUT.maxAngleOffset;
 
 type ProjectedHandle = DynamicHandle & {
     nodeId: string;
@@ -105,15 +105,6 @@ type ProjectedHandle = DynamicHandle & {
 };
 
 const EMPTY_HANDLES: DynamicHandle[] = [];
-const COLLISION_CELL_SIZE = 240;
-
-type BoxState = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    pad: number;
-};
 
 type StoredGraphView = {
     nodes: Array<{ id: string; x: number; y: number }>;
@@ -126,152 +117,6 @@ type PendingGraphRestore = {
     viewport?: Viewport;
     returnFocusNodeId: string | null;
 };
-
-function half(n: number) {
-    return n / 2;
-}
-
-function sign(n: number) {
-    return n < 0 ? -1 : n > 0 ? 1 : 1;
-}
-
-function mtvSeparateAABB(
-    ax: number, ay: number, aw: number, ah: number,
-    bx: number, by: number, bw: number, bh: number
-): [number, number] {
-    const acx = ax + half(aw);
-    const acy = ay + half(ah);
-    const bcx = bx + half(bw);
-    const bcy = by + half(bh);
-
-    const overlapX = half(aw) + half(bw) - Math.abs(acx - bcx);
-    const overlapY = half(ah) + half(bh) - Math.abs(acy - bcy);
-
-    if (overlapX <= 0 || overlapY <= 0) return [0, 0];
-
-    if (overlapX < overlapY) {
-        return [sign(bcx - acx) * overlapX, 0];
-    }
-
-    return [0, sign(bcy - acy) * overlapY];
-}
-
-function getCollisionCellKey(x: number, y: number) {
-    return `${x}:${y}`;
-}
-
-function getExpandedBox(box: BoxState) {
-    return {
-        x: box.x - box.pad,
-        y: box.y - box.pad,
-        w: box.w + box.pad * 2,
-        h: box.h + box.pad * 2,
-    };
-}
-
-function getCollisionCellBounds(box: BoxState, cellSize: number) {
-    const expanded = getExpandedBox(box);
-    return {
-        minX: Math.floor(expanded.x / cellSize),
-        maxX: Math.floor((expanded.x + expanded.w) / cellSize),
-        minY: Math.floor(expanded.y / cellSize),
-        maxY: Math.floor((expanded.y + expanded.h) / cellSize),
-    };
-}
-
-function buildCollisionIndex(pos: Map<string, BoxState>, cellSize: number) {
-    const buckets = new Map<string, string[]>();
-
-    for (const [id, box] of pos) {
-        const bounds = getCollisionCellBounds(box, cellSize);
-
-        for (let x = bounds.minX; x <= bounds.maxX; x++) {
-            for (let y = bounds.minY; y <= bounds.maxY; y++) {
-                const key = getCollisionCellKey(x, y);
-                const existing = buckets.get(key) ?? [];
-                existing.push(id);
-                buckets.set(key, existing);
-            }
-        }
-    }
-
-    return buckets;
-}
-
-function getPotentialCollisionIds(id: string, box: BoxState, index: Map<string, string[]>, cellSize: number) {
-    const bounds = getCollisionCellBounds(box, cellSize);
-    const candidates = new Set<string>();
-
-    for (let x = bounds.minX; x <= bounds.maxX; x++) {
-        for (let y = bounds.minY; y <= bounds.maxY; y++) {
-            for (const candidateId of index.get(getCollisionCellKey(x, y)) ?? []) {
-                if (candidateId !== id) {
-                    candidates.add(candidateId);
-                }
-            }
-        }
-    }
-
-    return candidates;
-}
-
-function relaxBoxPositions(
-    pos: Map<string, BoxState>,
-    {
-        immovableIds,
-        maxIters,
-        damping,
-        maxStep,
-        cellSize = COLLISION_CELL_SIZE,
-    }: {
-        immovableIds?: Set<string>;
-        maxIters: number;
-        damping: number;
-        maxStep: number;
-        cellSize?: number;
-    }
-) {
-    for (let iter = 0; iter < maxIters; iter++) {
-        let movedAny = false;
-        const collisionIndex = buildCollisionIndex(pos, cellSize);
-
-        for (const [bid, bp] of pos) {
-            if (immovableIds?.has(bid)) continue;
-
-            const candidateIds = getPotentialCollisionIds(bid, bp, collisionIndex, cellSize);
-
-            for (const aid of candidateIds) {
-                const ap = pos.get(aid);
-                if (!ap) continue;
-                const expandedA = getExpandedBox(ap);
-                const expandedB = getExpandedBox(bp);
-
-                const [dx, dy] = mtvSeparateAABB(
-                    expandedA.x,
-                    expandedA.y,
-                    expandedA.w,
-                    expandedA.h,
-                    expandedB.x,
-                    expandedB.y,
-                    expandedB.w,
-                    expandedB.h
-                );
-                if (dx === 0 && dy === 0) continue;
-
-                const nextX = bp.x + Math.max(-maxStep, Math.min(maxStep, dx * damping));
-                const nextY = bp.y + Math.max(-maxStep, Math.min(maxStep, dy * damping));
-
-                if (nextX !== bp.x || nextY !== bp.y) {
-                    bp.x = nextX;
-                    bp.y = nextY;
-                    movedAny = true;
-                }
-            }
-        }
-
-        if (!movedAny) break;
-    }
-}
 
 function getNodeDimensions(node: Node) {
     if (typeof node.measured?.width === 'number' && typeof node.measured?.height === 'number') {
@@ -798,234 +643,6 @@ function applyEdgeOpacity(edges: Edge[], previousHighlightedNodeId: string | nul
     return updated ? nextEdges : edges;
 }
 
-function getDomainPairKey(left: DomainId, right: DomainId) {
-    return left < right ? `${left}|${right}` : `${right}|${left}`;
-}
-
-function permuteDomainOrder(domains: DomainId[]) {
-    const results: DomainId[][] = [];
-    const current: DomainId[] = [];
-    const used = new Array(domains.length).fill(false);
-
-    function walk() {
-        if (current.length === domains.length) {
-            results.push([...current]);
-            return;
-        }
-
-        for (let index = 0; index < domains.length; index++) {
-            if (used[index]) continue;
-            used[index] = true;
-            current.push(domains[index]);
-            walk();
-            current.pop();
-            used[index] = false;
-        }
-    }
-
-    walk();
-    return results;
-}
-
-function buildDomainLaneOrder(contentNodes: GraphCardNode[], graphRelations: GraphModel['relations']) {
-    const domains = [...new Set(contentNodes.map((node) => node.domain))] as DomainId[];
-    const fallbackOrder = [...domains].sort((left, right) => getDomainLayout(left).seedAngle - getDomainLayout(right).seedAngle);
-    const fallbackIndex = new Map(fallbackOrder.map((domain, index) => [domain, index]));
-    const nodeById = new Map(contentNodes.map((node) => [node.id, node]));
-    const affinity = new Map<string, number>();
-
-    for (const relation of graphRelations) {
-        const fromNode = nodeById.get(relation.from);
-        const toNode = nodeById.get(relation.to);
-        if (!fromNode || !toNode || fromNode.domain === toNode.domain) continue;
-
-        const key = getDomainPairKey(fromNode.domain, toNode.domain);
-        const relationWeight =
-            relation.kind === 'reason' || relation.kind === 'outcome'
-                ? 1.35
-                : relation.kind === 'topic' || relation.kind === 'tool'
-                    ? 1.2
-                    : relation.kind === 'time'
-                        ? 1.05
-                        : 1;
-        affinity.set(key, (affinity.get(key) ?? 0) + relation.strength * relationWeight);
-    }
-
-    let bestOrder = fallbackOrder;
-    let bestScore = Number.NEGATIVE_INFINITY;
-
-    for (const order of permuteDomainOrder(fallbackOrder)) {
-        let score = 0;
-
-        for (let index = 0; index < order.length - 1; index++) {
-            score += (affinity.get(getDomainPairKey(order[index], order[index + 1])) ?? 0) * 6;
-        }
-
-        for (let index = 0; index < order.length; index++) {
-            score -= Math.abs((fallbackIndex.get(order[index]) ?? index) - index) * 0.85;
-        }
-
-        if (score > bestScore) {
-            bestScore = score;
-            bestOrder = order;
-        }
-    }
-
-    return bestOrder;
-}
-
-function normalizeAngle(angle: number) {
-    let normalized = angle;
-
-    while (normalized <= -Math.PI) normalized += Math.PI * 2;
-    while (normalized > Math.PI) normalized -= Math.PI * 2;
-
-    return normalized;
-}
-
-function getAngularDistance(left: number, right: number) {
-    return Math.abs(normalizeAngle(left - right));
-}
-
-function rotateDomains(domains: DomainId[], offset: number) {
-    return domains.map((_, index) => domains[(index + offset) % domains.length]);
-}
-
-function buildDomainWeights(contentNodes: GraphCardNode[], graphRelations: GraphModel['relations']) {
-    const weights = new Map<DomainId, number>();
-    const nodeById = new Map(contentNodes.map((node) => [node.id, node]));
-
-    for (const node of contentNodes) {
-        weights.set(node.domain, (weights.get(node.domain) ?? 0) + 1.3);
-    }
-
-    for (const relation of graphRelations) {
-        const fromNode = nodeById.get(relation.from);
-        const toNode = nodeById.get(relation.to);
-        if (!fromNode || !toNode || fromNode.domain === toNode.domain) continue;
-
-        const relationWeight =
-            relation.kind === 'reason' || relation.kind === 'outcome'
-                ? 0.55
-                : relation.kind === 'topic' || relation.kind === 'tool'
-                    ? 0.45
-                    : 0.3;
-
-        weights.set(fromNode.domain, (weights.get(fromNode.domain) ?? 1) + relation.strength * relationWeight);
-        weights.set(toNode.domain, (weights.get(toNode.domain) ?? 1) + relation.strength * relationWeight);
-    }
-
-    return weights;
-}
-
-function buildLaneAnglePlan(
-    orderedDomains: DomainId[],
-    domainWeights: Map<DomainId, number>,
-    baseArcStart: number,
-    totalArcSpan: number
-) {
-    const laneGap = Math.min(0.18, totalArcSpan / Math.max(18, orderedDomains.length * 4.5));
-    const usableArcSpan = totalArcSpan - laneGap * Math.max(0, orderedDomains.length - 1);
-    const totalWeight = orderedDomains.reduce((sum, domain) => sum + (domainWeights.get(domain) ?? 1), 0);
-    let cursor = baseArcStart;
-    const plan = new Map<DomainId, { centerAngle: number; span: number }>();
-
-    for (const domain of orderedDomains) {
-        const weight = domainWeights.get(domain) ?? 1;
-        const span = usableArcSpan * (weight / totalWeight);
-        plan.set(domain, {
-            centerAngle: cursor + span / 2,
-            span,
-        });
-        cursor += span + laneGap;
-    }
-
-    return plan;
-}
-
-function chooseBalancedDomainPlan(contentNodes: GraphCardNode[], graphRelations: GraphModel['relations']) {
-    const baseOrder = buildDomainLaneOrder(contentNodes, graphRelations);
-    const domainWeights = buildDomainWeights(contentNodes, graphRelations);
-    const preferredAngles = new Map(
-        baseOrder.map((domain) => [domain, getDomainLayout(domain).seedAngle * (Math.PI / 180)])
-    );
-    const arcStart = -25 * (Math.PI / 180);
-    const arcSpan = 320 * (Math.PI / 180);
-    let bestPlan = buildLaneAnglePlan(baseOrder, domainWeights, arcStart, arcSpan);
-    let bestScore = Number.POSITIVE_INFINITY;
-
-    for (let rotation = 0; rotation < baseOrder.length; rotation++) {
-        const rotatedOrder = rotateDomains(baseOrder, rotation);
-        const plan = buildLaneAnglePlan(rotatedOrder, domainWeights, arcStart, arcSpan);
-        let anchorPenalty = 0;
-        let balanceX = 0;
-        let balanceY = 0;
-
-        for (const domain of rotatedOrder) {
-            const weight = domainWeights.get(domain) ?? 1;
-            const centerAngle = plan.get(domain)?.centerAngle ?? 0;
-            const preferredAngle = preferredAngles.get(domain) ?? centerAngle;
-            anchorPenalty += getAngularDistance(centerAngle, preferredAngle) * weight * 0.95;
-            balanceX += Math.cos(centerAngle) * weight;
-            balanceY += Math.sin(centerAngle) * weight;
-        }
-
-        const balancePenalty = Math.hypot(balanceX, balanceY) * 0.55;
-        const score = anchorPenalty + balancePenalty;
-
-        if (score < bestScore) {
-            bestScore = score;
-            bestPlan = plan;
-        }
-    }
-
-    return bestPlan;
-}
-
-function buildLaneTargetPositions(
-    contentNodes: GraphCardNode[],
-    graphRelations: GraphModel['relations'],
-    centerX: number,
-    centerY: number,
-    viewportWidth: number,
-    viewportHeight: number
-) {
-    const lanePlan = chooseBalancedDomainPlan(contentNodes, graphRelations);
-    const domainOrder = [...lanePlan.keys()];
-    const minViewport = Math.min(viewportWidth, viewportHeight);
-    const innerRadius = Math.max(DOMAIN_LAYOUT_INNER_RADIUS_MIN, Math.min(DOMAIN_LAYOUT_INNER_RADIUS_MAX, minViewport * 0.245));
-    const radialGap = Math.max(DOMAIN_LAYOUT_RADIAL_GAP_MIN, Math.min(DOMAIN_LAYOUT_RADIAL_GAP_MAX, minViewport * 0.128));
-    const targets = new Map<string, Point>();
-
-    for (const domain of domainOrder) {
-        const laneNodes = contentNodes
-            .filter((node) => node.domain === domain)
-            .sort((left, right) => getChronologySortKey(right.chronology) - getChronologySortKey(left.chronology));
-        const lane = lanePlan.get(domain);
-        if (!lane) continue;
-
-        const outerLayerCount = Math.max(1, Math.ceil((laneNodes.length - 1) / 2));
-        const maxAngleOffset = Math.min(DOMAIN_LAYOUT_MAX_ANGLE_OFFSET, lane.span * 0.34);
-        const angleStep = outerLayerCount > 0 ? maxAngleOffset / outerLayerCount : 0;
-
-        laneNodes.forEach((node, index) => {
-            const layer = index === 0 ? 0 : Math.ceil(index / 2);
-            const side = index === 0 ? 0 : index % 2 === 1 ? -1 : 1;
-            const angleOffset = side * angleStep * layer;
-            const angle = lane.centerAngle + angleOffset;
-            const radius = innerRadius + layer * radialGap;
-            const tangentOffset = side === 0 ? 0 : side * radialGap * 0.14;
-
-            targets.set(node.id, {
-                x: centerX + Math.cos(angle) * radius - Math.sin(angle) * tangentOffset,
-                y: centerY + Math.sin(angle) * radius + Math.cos(angle) * tangentOffset,
-            });
-        });
-    }
-
-    return targets;
-}
-
 function buildEdgesForNodes(
     nodes: Node[],
     graphRelations: GraphModel['relations'],
@@ -1135,9 +752,7 @@ function relaxInitialNodes(nodes: Node[]) {
 
     relaxBoxPositions(pos, {
         immovableIds: lockedIds,
-        maxIters: 34,
-        damping: 0.82,
-        maxStep: 44,
+        ...RELAX_INITIAL_NODES_CONFIG,
     });
 
     return nodes.map((node) => {
@@ -1147,58 +762,6 @@ function relaxInitialNodes(nodes: Node[]) {
         const current = pos.get(node.id)!;
         return { ...node, position: { x: current.x, y: current.y } };
     });
-}
-
-function enforceAnchorClearance(
-    pos: Map<string, BoxState>,
-    anchorId: string,
-    extraPadding: number,
-    {
-        maxIters = 8,
-        damping = 0.88,
-        maxStep = 52,
-    }: {
-        maxIters?: number;
-        damping?: number;
-        maxStep?: number;
-    } = {}
-) {
-    const anchor = pos.get(anchorId);
-    if (!anchor) {
-        return;
-    }
-
-    for (let iter = 0; iter < maxIters; iter++) {
-        let movedAny = false;
-
-        for (const [nodeId, node] of pos) {
-            if (nodeId === anchorId) continue;
-
-            const [dx, dy] = mtvSeparateAABB(
-                anchor.x - (anchor.pad + extraPadding),
-                anchor.y - (anchor.pad + extraPadding),
-                anchor.w + (anchor.pad + extraPadding) * 2,
-                anchor.h + (anchor.pad + extraPadding) * 2,
-                node.x - node.pad,
-                node.y - node.pad,
-                node.w + node.pad * 2,
-                node.h + node.pad * 2
-            );
-
-            if (dx === 0 && dy === 0) continue;
-
-            const nextX = node.x + Math.max(-maxStep, Math.min(maxStep, dx * damping));
-            const nextY = node.y + Math.max(-maxStep, Math.min(maxStep, dy * damping));
-
-            if (nextX !== node.x || nextY !== node.y) {
-                node.x = nextX;
-                node.y = nextY;
-                movedAny = true;
-            }
-        }
-
-        if (!movedAny) break;
-    }
 }
 
 function settleNodesAroundAnchor(
@@ -1284,7 +847,14 @@ function buildInitialGraph(
         bioCenter.x,
         bioCenter.y,
         viewportWidth,
-        viewportHeight
+        viewportHeight,
+        {
+            innerRadiusMin: GRAPH_LAYOUT.ring.innerRadiusMin,
+            innerRadiusMax: GRAPH_LAYOUT.ring.innerRadiusMax,
+            radialGapMin: GRAPH_LAYOUT.ring.radialGapMin,
+            radialGapMax: GRAPH_LAYOUT.ring.radialGapMax,
+            maxAngleOffset: GRAPH_LAYOUT.maxAngleOffset,
+        }
     );
     const positionById = new Map(contentNodes.map((node) => [node.id, targetCenters.get(node.id) ?? bioCenter]));
 
