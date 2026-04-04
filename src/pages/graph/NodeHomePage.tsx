@@ -54,6 +54,7 @@ import {
 } from './layout/graphLayout';
 import {
     GRAPH_RETURN_FOCUS_CAMERA_DURATION_MS,
+    LAYOUT_CHRONOLOGY_SPRING,
     RELAX_INITIAL_NODES_CONFIG,
     SETTLE_NODES_AROUND_ANCHOR_CONFIG,
 } from './layout/graphLayoutConfig';
@@ -738,8 +739,44 @@ function buildEdgesForNodes(
     };
 }
 
-function relaxInitialNodes(nodes: Node[], extraLockedIds?: ReadonlySet<string>) {
-    const lockedIds = new Set(['bio', ...(extraLockedIds ?? [])]);
+/**
+ * Phase 1 of the two-phase layout: pulls every node toward its target position
+ * using pure spring forces, with no collision detection.
+ *
+ * Running this before the collision pass means the collision repulsion starts
+ * from a near-ideal baseline (nodes already near their chronological targets)
+ * rather than fighting the spring every iteration.
+ *
+ * With innerLayerSpringK = 0.35 and 20 iterations the error is (1-0.35)^20 ≈ 0.2%
+ * of the initial displacement — effectively zero.
+ */
+function convergeToChrono(
+    pos: Map<string, BoxState>,
+    lockedIds: Set<string>,
+    targets: Map<string, Point>,
+    nodeSpringK: Map<string, number>,
+    iters = 20,
+) {
+    for (let i = 0; i < iters; i++) {
+        for (const [bid, bp] of pos) {
+            if (lockedIds.has(bid)) continue;
+            const target = targets.get(bid);
+            if (!target) continue;
+            const k = nodeSpringK.get(bid) ?? 0;
+            if (k <= 0) continue;
+            bp.x += (target.x - bp.w / 2 - bp.x) * k;
+            bp.y += (target.y - bp.h / 2 - bp.y) * k;
+        }
+    }
+}
+
+function relaxInitialNodes(
+    nodes: Node[],
+    targets?: Map<string, Point>,
+    relations?: GraphModel['relations'],
+    nodeSpringK?: Map<string, number>,
+) {
+    const lockedIds = new Set(['bio']);
     const pos = new Map<string, BoxState>();
 
     for (const node of nodes) {
@@ -755,9 +792,21 @@ function relaxInitialNodes(nodes: Node[], extraLockedIds?: ReadonlySet<string>) 
         });
     }
 
+    // Phase 1: converge to target positions with no collision.
+    if (targets && nodeSpringK) {
+        convergeToChrono(pos, lockedIds, targets, nodeSpringK);
+    }
+
+    // Phase 2: resolve collisions and apply edge springs.
+    // A light global springK (0.04) gently holds nodes near their targets
+    // while collision separation is free to push them apart.
     relaxBoxPositions(pos, {
         immovableIds: lockedIds,
         ...RELAX_INITIAL_NODES_CONFIG,
+        targets,
+        springK: 0.04,
+        relations,
+        edgeSpringK: 0.02,
     });
 
     return nodes.map((node) => {
@@ -776,10 +825,16 @@ function settleNodesAroundAnchor(
         maxIters = SETTLE_NODES_AROUND_ANCHOR_CONFIG.maxIters,
         damping = SETTLE_NODES_AROUND_ANCHOR_CONFIG.damping,
         maxStep = SETTLE_NODES_AROUND_ANCHOR_CONFIG.maxStep,
+        targets,
+        nodeSpringK,
+        relations,
     }: {
         maxIters?: number;
         damping?: number;
         maxStep?: number;
+        targets?: Map<string, Point>;
+        nodeSpringK?: Map<string, number>;
+        relations?: GraphModel['relations'];
     } = {}
 ) {
     const pos = new Map<string, BoxState>();
@@ -800,11 +855,23 @@ function settleNodesAroundAnchor(
         return nodes;
     }
 
+    const lockedIds = new Set([anchorId]);
+
+    // Phase 1: converge to target positions with no collision.
+    if (targets && nodeSpringK) {
+        convergeToChrono(pos, lockedIds, targets, nodeSpringK);
+    }
+
+    // Phase 2: resolve collisions and edge springs with a light target anchor.
     relaxBoxPositions(pos, {
-        immovableIds: new Set([anchorId]),
+        immovableIds: lockedIds,
         maxIters,
         damping,
         maxStep,
+        targets,
+        springK: 0.04,
+        relations,
+        edgeSpringK: relations ? 0.02 : 0,
     });
     enforceAnchorClearance(pos, anchorId, BIO_CLEARANCE_PADDING);
 
@@ -846,7 +913,7 @@ function buildInitialGraph(
         y: bioPosition.y + GRAPH_LAYOUT.styleNodeOffsetFromBio.y,
     };
     const contentNodes = getContentNodes(model);
-    const targetCenters = buildLaneTargetPositions(
+    const { targets: targetCenters, layers: nodeLayers } = buildLaneTargetPositions(
         contentNodes,
         graphRelations,
         bioCenter.x,
@@ -863,11 +930,16 @@ function buildInitialGraph(
     );
     const positionById = new Map(contentNodes.map((node) => [node.id, targetCenters.get(node.id) ?? bioCenter]));
 
-    const bioConnectedIds = new Set<string>();
-    for (const rel of graphRelations) {
-        if (rel.from === 'bio') bioConnectedIds.add(rel.to);
-        if (rel.to === 'bio') bioConnectedIds.add(rel.from);
-    }
+    // Per-node spring strengths: layer 1 (bio-adjacent) gets a strong pull so they
+    // cluster near bio; outer layers get a weaker pull so topology can shift them.
+    const nodeSpringK = new Map(
+        [...nodeLayers.entries()].map(([id, layer]) => [
+            id,
+            layer <= 1
+                ? LAYOUT_CHRONOLOGY_SPRING.innerLayerSpringK
+                : LAYOUT_CHRONOLOGY_SPRING.outerLayerSpringK,
+        ])
+    );
 
     const relaxedNodes = relaxInitialNodes([
         {
@@ -908,9 +980,9 @@ function buildInitialGraph(
                 } satisfies StoryNodeData,
             };
         }),
-    ], bioConnectedIds);
+    ], targetCenters, graphRelations, nodeSpringK);
 
-    return buildEdgesForNodes(relaxedNodes, graphRelations);
+    return { ...buildEdgesForNodes(relaxedNodes, graphRelations), targets: targetCenters, nodeSpringK };
 }
 
 const NodeCanvas: React.FC = () => {
@@ -945,7 +1017,9 @@ const NodeCanvas: React.FC = () => {
         [graphRelations]
     );
     const initialGraph = useMemo(
-        () => graphModel ? buildInitialGraph(graphModel, graphRelations, initialThemeRef.current, setTheme, viewport.width, viewport.height) : { nodes: [], edges: [] },
+        () => graphModel
+            ? buildInitialGraph(graphModel, graphRelations, initialThemeRef.current, setTheme, viewport.width, viewport.height)
+            : { nodes: [], edges: [], targets: new Map<string, Point>(), nodeSpringK: new Map<string, number>() },
         [graphModel, graphRelations, viewport.height, viewport.width]
     );
     const nodesInitialized = useNodesInitialized();
@@ -1036,7 +1110,11 @@ const NodeCanvas: React.FC = () => {
             };
         });
 
-        const settledResetNodes = settleNodesAroundAnchor(resetNodes, 'bio');
+        const settledResetNodes = settleNodesAroundAnchor(resetNodes, 'bio', {
+            targets: initialGraph.targets,
+            nodeSpringK: initialGraph.nodeSpringK,
+            relations: orderedGraphRelations,
+        });
         const resetGraph = buildEdgesForNodes(settledResetNodes, orderedGraphRelations, null);
         setNodes(resetGraph.nodes);
         setEdges(resetGraph.edges);
@@ -1049,7 +1127,7 @@ const NodeCanvas: React.FC = () => {
 
             focusNode(bioNode);
         });
-    }, [focusNode, initialGraph.nodes, orderedGraphRelations, persistCurrentGraphView, setEdges, setNodes, setTheme, theme]);
+    }, [focusNode, initialGraph, orderedGraphRelations, persistCurrentGraphView, setEdges, setNodes, setTheme, theme]);
 
     const applyPendingGraphRestore = useCallback(() => {
         if (!flowReadyRef.current || !pendingGraphRestoreRef.current) {
@@ -1190,7 +1268,11 @@ const NodeCanvas: React.FC = () => {
         if (hasAppliedMeasuredInitialLayoutRef.current) return;
         if (nodes.length === 0) return;
 
-        const relaxedNodes = settleNodesAroundAnchor(nodes, 'bio');
+        const relaxedNodes = settleNodesAroundAnchor(nodes, 'bio', {
+            targets: initialGraph.targets,
+            nodeSpringK: initialGraph.nodeSpringK,
+            relations: orderedGraphRelations,
+        });
         const hasMovedNode = relaxedNodes.some((node, index) => {
             const previous = nodes[index];
             return (

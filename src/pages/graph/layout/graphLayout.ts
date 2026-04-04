@@ -134,6 +134,18 @@ export function getPotentialCollisionIds(id: string, box: BoxState, index: Map<s
 /**
  * Iteratively separates overlapping boxes in-place.
  * Boxes in `immovableIds` act as fixed obstacles.
+ *
+ * Each iteration runs three passes in priority order:
+ *   1. Collision separation (AABB MTV) — hard constraint, always wins.
+ *   2. Edge spring attraction — pulls connected node pairs toward each other,
+ *      scaled by relation strength. Applied as a symmetric simultaneous update
+ *      so result is independent of iteration order.
+ *   3. Target spring — gently pulls each node toward its assigned radial target
+ *      to prevent sector drift.
+ *
+ * Coefficient guide:
+ *   springK    ~0.04  — weak sector anchor, leaves room for edge forces
+ *   edgeSpringK ~0.06 — edge attraction; strength 3 edges pull ~2× harder than strength 1
  */
 export function relaxBoxPositions(
     pos: Map<string, BoxState>,
@@ -143,18 +155,33 @@ export function relaxBoxPositions(
         damping,
         maxStep,
         cellSize = COLLISION_CELL_SIZE,
+        targets,
+        springK = 0,
+        nodeSpringK,
+        relations,
+        edgeSpringK = 0,
     }: {
         immovableIds?: Set<string>;
         maxIters: number;
         damping: number;
         maxStep: number;
         cellSize?: number;
+        targets?: Map<string, Point>;
+        /** Default spring coefficient pulling each node toward its target. 0 = off. */
+        springK?: number;
+        /** Per-node spring overrides — takes precedence over springK when present. */
+        nodeSpringK?: Map<string, number>;
+        /** Graph relations — used to pull connected node pairs toward each other. */
+        relations?: ReadonlyArray<{ from: string; to: string; strength: number }>;
+        /** Spring coefficient for edge attraction. 0 = off. */
+        edgeSpringK?: number;
     }
 ) {
     for (let iter = 0; iter < maxIters; iter++) {
         let movedAny = false;
         const collisionIndex = buildCollisionIndex(pos, cellSize);
 
+        // Pass 1: collision separation
         for (const [bid, bp] of pos) {
             if (immovableIds?.has(bid)) continue;
 
@@ -180,6 +207,45 @@ export function relaxBoxPositions(
                     bp.y = nextY;
                     movedAny = true;
                 }
+            }
+        }
+
+        // Pass 2: edge spring attraction (symmetric — both endpoints move together)
+        if (edgeSpringK > 0 && relations) {
+            for (const rel of relations) {
+                const a = pos.get(rel.from);
+                const b = pos.get(rel.to);
+                if (!a || !b) continue;
+
+                const acx = a.x + a.w / 2;
+                const acy = a.y + a.h / 2;
+                const bcx = b.x + b.w / 2;
+                const bcy = b.y + b.h / 2;
+                const k = edgeSpringK * (rel.strength / 3);
+
+                if (!immovableIds?.has(rel.from)) {
+                    a.x += (bcx - acx) * k;
+                    a.y += (bcy - acy) * k;
+                }
+                if (!immovableIds?.has(rel.to)) {
+                    b.x += (acx - bcx) * k;
+                    b.y += (acy - bcy) * k;
+                }
+            }
+        }
+
+        // Pass 3: target spring — keeps nodes near their assigned radial sector.
+        // Per-node overrides (nodeSpringK) take precedence over the global springK,
+        // allowing inner-ring nodes to be held tightly while outer nodes drift freely.
+        if (targets && (springK > 0 || nodeSpringK)) {
+            for (const [bid, bp] of pos) {
+                if (immovableIds?.has(bid)) continue;
+                const target = targets.get(bid);
+                if (!target) continue;
+                const k = nodeSpringK?.get(bid) ?? springK;
+                if (k <= 0) continue;
+                bp.x += (target.x - bp.w / 2 - bp.x) * k;
+                bp.y += (target.y - bp.h / 2 - bp.y) * k;
             }
         }
 
@@ -501,10 +567,15 @@ export function buildLaneTargetPositions(
         radialGapMax: number;
         maxAngleOffset: number;
     }
-): Map<string, Point> {
+): { targets: Map<string, Point>; layers: Map<string, number> } {
     const lanePlan = chooseBalancedDomainPlan(contentNodes, graphRelations);
     const domainOrder = [...lanePlan.keys()];
     const minViewport = Math.min(viewportWidth, viewportHeight);
+    // Stretch targets horizontally to fill the wide screen.
+    // Nodes are placed on an ellipse whose x-radius = innerRadius * aspectX
+    // and y-radius = innerRadius, so the layout fills the viewport proportionally
+    // rather than expanding as a circle scaled to the shorter (height) dimension.
+    const aspectX = Math.min(viewportWidth / viewportHeight, 2.2);
     const innerRadius = Math.max(innerRadiusMin, Math.min(innerRadiusMax, minViewport * 0.245));
     const radialGap = Math.max(radialGapMin, Math.min(radialGapMax, minViewport * 0.128));
     // Outermost ring must not exceed this distance from center.
@@ -519,6 +590,7 @@ export function buildLaneTargetPositions(
     }
 
     const targets = new Map<string, Point>();
+    const layers = new Map<string, number>();
 
     for (const domain of domainOrder) {
         const laneNodes = contentNodes
@@ -552,13 +624,14 @@ export function buildLaneTargetPositions(
             const tangentOffset = side === 0 ? 0 : side * effectiveRadialGap * 0.14;
 
             targets.set(node.id, {
-                x: centerX + Math.cos(angle) * radius - Math.sin(angle) * tangentOffset,
+                x: centerX + Math.cos(angle) * radius * aspectX - Math.sin(angle) * tangentOffset * aspectX,
                 y: centerY + Math.sin(angle) * radius + Math.cos(angle) * tangentOffset,
             });
+            layers.set(node.id, layer);
         });
     }
 
-    return targets;
+    return { targets, layers };
 }
 
 // ---------------------------------------------------------------------------
@@ -596,7 +669,8 @@ export function settleBoxesAroundAnchor(
 
 /**
  * Relaxes boxes from a default-overlap state (all stacked at target centers),
- * with the anchor fixed.
+ * with the anchor fixed. Pass `targets` (center points) and `springK` to keep
+ * nodes attracted to their assigned radial positions during separation.
  */
 export function relaxBoxesFromTargets(
     pos: Map<string, BoxState>,
@@ -605,10 +679,20 @@ export function relaxBoxesFromTargets(
         maxIters = RELAX_INITIAL_NODES_CONFIG.maxIters,
         damping = RELAX_INITIAL_NODES_CONFIG.damping,
         maxStep = RELAX_INITIAL_NODES_CONFIG.maxStep,
+        targets,
+        springK,
+        nodeSpringK,
+        relations,
+        edgeSpringK,
     }: {
         maxIters?: number;
         damping?: number;
         maxStep?: number;
+        targets?: Map<string, Point>;
+        springK?: number;
+        nodeSpringK?: Map<string, number>;
+        relations?: ReadonlyArray<{ from: string; to: string; strength: number }>;
+        edgeSpringK?: number;
     } = {}
 ) {
     relaxBoxPositions(pos, {
@@ -616,5 +700,10 @@ export function relaxBoxesFromTargets(
         maxIters,
         damping,
         maxStep,
+        targets,
+        springK,
+        nodeSpringK,
+        relations,
+        edgeSpringK,
     });
 }
