@@ -9,7 +9,6 @@ import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { DOMAIN_CONFIG } from '../../../configs/content/domains';
 import {
     getNodeDetailPath,
-    getNodeTransitionName,
     type DomainId,
     type ContentBlock,
     type NodeGalleryImage,
@@ -51,7 +50,6 @@ const StoryNode: React.FC<StoryNodeProps> = ({
     const navigate = useNavigate();
     const updateNodeInternals = useUpdateNodeInternals();
     const showDetailLink = layoutMode !== 'container' && Boolean(data.nodeId);
-    const transitionName = showDetailLink ? getNodeTransitionName(data.nodeId ?? id) : undefined;
 
     useLayoutEffect(() => {
         updateNodeInternals(id);
@@ -158,10 +156,7 @@ const StoryNode: React.FC<StoryNodeProps> = ({
         return null;
     };
     return (<>
-        <NodeContainer style={{
-            ...containerStyle,
-            viewTransitionName: transitionName,
-        }}>
+        <NodeContainer style={containerStyle}>
             <div style={{ marginTop: data.domain ? "1.05rem" : "0.55rem" }}>
                 {data.domain && (
                     <span

@@ -187,9 +187,6 @@ export function getNodeDetailPath(nodeId: string) {
   return `/nodes/${encodeURIComponent(nodeId)}`;
 }
 
-export function getNodeTransitionName(nodeId: string) {
-  return `content-node-${nodeId}`;
-}
 
 function isNodeKind(value: unknown): value is NodeKind {
   return value === 'writing' || isDomainId(value);

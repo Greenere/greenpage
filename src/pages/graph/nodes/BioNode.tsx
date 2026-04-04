@@ -8,7 +8,7 @@ import { type Theme, BIOTHEME } from "../content/BioTheme";
 import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from "../content/BioPage";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
 import { UI_COPY } from '../../../configs/ui/uiCopy';
-import { getNodeDetailPath, getNodeTransitionName, resolveAssetUrl } from "../content/Nodes";
+import { getNodeDetailPath, resolveAssetUrl } from "../content/Nodes";
 import { useAppLanguage } from '../../../i18n/useAppLanguage';
 
 interface BioData {
@@ -110,7 +110,6 @@ const BioNode: React.FC<BioNodeProps> = ({
                 paddingRight: "1rem",
                 paddingBottom: "1.25rem",
                 background: "color-mix(in srgb, var(--color-background) 90%, white 10%)",
-                viewTransitionName: getNodeTransitionName('bio'),
             }}
         >
             <div style={{

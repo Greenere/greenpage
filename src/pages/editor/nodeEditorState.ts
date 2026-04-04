@@ -348,7 +348,11 @@ export function nodeEditorWorkspaceReducer(
         isFallbackContent: action.isFallbackContent,
         resolvedContentLanguage: action.resolvedContentLanguage,
         statusMessage: action.statusMessage,
-        tab: action.nodeChanged ? 'content' : state.tab,
+        tab: action.nodeChanged
+          ? state.tab === 'json'
+            ? 'json'
+            : 'content'
+          : state.tab,
         editingSectionIndex: action.nodeChanged
           ? null
           : clampEditingSectionIndex(state.editingSectionIndex, action.draftContent),

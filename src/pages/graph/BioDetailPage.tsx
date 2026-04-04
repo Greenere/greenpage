@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   DETAIL_PAGE_ACTION_BORDER,
@@ -10,11 +10,7 @@ import { THEME_CONFIG } from '../../configs/ui/themes';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
-import {
-  captureSharedElementTransition,
-  navigateWithViewTransition,
-  playSharedElementEnterTransition,
-} from '../../shared/ui/viewTransitions';
+import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
 import DetailPageLanguageToggle from './DetailPageLanguageToggle';
@@ -23,7 +19,6 @@ import {
   getDisplayDomain,
   getLatestNodesByDomain,
   getNodeDetailPath,
-  getNodeTransitionName,
   loadGraphModel,
   readCachedGraphModel,
   resolveAssetUrl,
@@ -118,13 +113,6 @@ const BioDetailPage: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const portrait = BIOTHEME[theme];
   const themeLabel = THEME_CONFIG[theme].label;
-  const transitionName = getNodeTransitionName('bio');
-  const heroSectionRef = useRef<HTMLElement | null>(null);
-
-  useLayoutEffect(() => {
-    playSharedElementEnterTransition(heroSectionRef.current, transitionName);
-  }, [transitionName]);
-
   const handleThemeChange = (nextTheme: Theme) => {
     setTheme(nextTheme);
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
@@ -284,7 +272,6 @@ const BioDetailPage: React.FC = () => {
         </div>
 
         <section
-          ref={heroSectionRef}
           style={{
             marginTop: '1.15rem',
             maxWidth: DETAIL_SECTION_WIDTH,
@@ -292,7 +279,6 @@ const BioDetailPage: React.FC = () => {
             padding: '2.1rem 2rem 2.2rem',
             borderRadius: '34px',
             background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-            viewTransitionName: transitionName,
           }}
         >
           <div
@@ -481,7 +467,6 @@ const BioDetailPage: React.FC = () => {
                 className="node-detail-related-link"
                 onClick={(event) => {
                   event.preventDefault();
-                  captureSharedElementTransition(event.currentTarget, getNodeTransitionName(entry.id));
                   handleNavigateWithTransition(getNodeDetailPath(entry.id));
                 }}
                 style={{
@@ -493,7 +478,6 @@ const BioDetailPage: React.FC = () => {
                   color: 'var(--color-text)',
                   background: 'color-mix(in srgb, var(--color-background) 84%, white 16%)',
                   textDecoration: 'none',
-                  viewTransitionName: getNodeTransitionName(entry.id),
                 }}
               >
                 <Footnote

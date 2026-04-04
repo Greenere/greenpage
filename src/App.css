@@ -35,6 +35,8 @@ body,
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none !important;
+    opacity: 1 !important;
+    scale: 1 !important;
   }
 }
 
@@ -44,44 +46,36 @@ body,
   margin: 0;
 }
 
-::view-transition-group(root) {
-  animation-duration: 280ms;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+/* Driven by PAGE_TRANSITION_CONFIG — values written by viewTransitions.ts at module load. */
+:root {
+  --page-exit-duration: 100ms;
+  --page-exit-easing: ease-in;
+  --page-enter-duration: 220ms;
+  --page-enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --page-enter-scale-from: 0.97;
 }
 
 ::view-transition-old(root) {
-  animation: greenpage-view-fade-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation: greenpage-page-exit var(--page-exit-duration) var(--page-exit-easing) both;
 }
 
 ::view-transition-new(root) {
-  animation: greenpage-view-fade-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: greenpage-page-enter var(--page-enter-duration) var(--page-enter-easing) both;
 }
 
-@keyframes greenpage-view-fade-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(10px);
-    filter: blur(4px);
-  }
+@keyframes greenpage-page-exit {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
-@keyframes greenpage-view-fade-in {
+@keyframes greenpage-page-enter {
   from {
     opacity: 0;
-    transform: translateY(14px);
-    filter: blur(6px);
+    scale: var(--page-enter-scale-from);
   }
-
   to {
     opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
+    scale: 1;
   }
 }
 
