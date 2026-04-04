@@ -7,7 +7,7 @@ export const PAGE_TRANSITION_CONFIG = {
   exitEasing: 'ease-out',
 
   /** Enter: new page fades in while scaling up from `enterScaleFrom`. */
-  enterDurationMs: 420,
+  enterDurationMs: 600,
   enterEasing: 'cubic-bezier(0.22, 1, 0.36, 1)',
 
   /**
@@ -23,19 +23,19 @@ export const PAGE_TRANSITION_CONFIG = {
  * crossfades in at full scale — the reverse of the forward zoom-in.
  */
 export const PAGE_BACK_TRANSITION_CONFIG = {
-  exitDurationMs: 180,
+  exitDurationMs: 220,
   exitEasing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-  exitScaleTo: 0.97,
-  enterDurationMs: 320,
+  exitScaleTo: 1.03,
+  enterDurationMs: 600,
   enterEasing: 'ease-out',
-  enterScaleFrom: 1,
+  enterScaleFrom: 0.97,
 } as const;
 
 export const LANGUAGE_SWITCH_TRANSITION_CONFIG = {
   /** Slightly softer than route changes because the user is staying on the same page. */
   exitDurationMs: 120,
   exitEasing: 'ease-out',
-  enterDurationMs: 420,
+  enterDurationMs: 800,
   enterEasing: 'cubic-bezier(0.22, 1, 0.36, 1)',
   enterScaleFrom: 1,
 } as const;
