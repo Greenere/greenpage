@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import {
   getInitialLanguage,
@@ -9,14 +9,7 @@ import {
 } from './index';
 import { clearGraphModelCache, clearGraphNodeContentCache } from '../pages/graph/content/Nodes';
 import { clearBioPageContentCache } from '../pages/graph/content/BioPage';
-
-type LanguageContextValue = {
-  language: AppLanguage;
-  setLanguage: (language: AppLanguage) => void;
-  messages: ReturnType<typeof getLocaleMessages>;
-};
-
-const LanguageContext = createContext<LanguageContextValue | null>(null);
+import { LanguageContext } from './appLanguageContext';
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(() => getInitialLanguage());
@@ -51,12 +44,4 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
-}
-
-export function useAppLanguage() {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useAppLanguage must be used within LanguageProvider.');
-  }
-  return context;
 }

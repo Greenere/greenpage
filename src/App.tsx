@@ -4,7 +4,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NodeHomePage from './pages/graph/NodeHomePage'
 import NodeDetailPage from './pages/graph/NodeDetailPage'
 import BioDetailPage from './pages/graph/BioDetailPage'
-import { useAppLanguage } from './i18n/LanguageProvider'
+import { useAppLanguage } from './i18n/useAppLanguage'
 
 const NodeEditorPage = lazy(() => import('./pages/editor/NodeEditorPage'))
 

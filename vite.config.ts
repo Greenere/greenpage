@@ -473,7 +473,7 @@ function createNodeEditorPlugin(): Plugin {
             let nextChronology: ChronologyValue
             try {
               nextChronology = normalizeChronologyValue(nextNode.chronology)
-            } catch (error) {
+            } catch {
               sendJson(response, 400, { error: 'Invalid chronology.' })
               return
             }

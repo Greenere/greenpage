@@ -5,6 +5,16 @@ import { resolveAssetUrl, type NodeGalleryAlignment, type NodeGalleryImage } fro
 const DEFAULT_GALLERY_RATIO = 4 / 3;
 const GALLERY_TRACKS_PER_COLUMN = 6;
 
+function parseGalleryAlignment(align: NodeGalleryAlignment) {
+  if (align === 'natural') {
+    return { mode: 'natural' as const, referenceIndex: 1 };
+  }
+
+  const match = align.match(/^height:(\d+)$/);
+  const referenceIndex = match ? Math.max(1, Number(match[1]) || 1) : 1;
+  return { mode: 'height' as const, referenceIndex };
+}
+
 function chunkGalleryItems<T>(items: T[], size: number) {
   const rows: T[][] = [];
 
@@ -72,6 +82,7 @@ export default function ArticleGallery({
   const [aspectRatios, setAspectRatios] = useState<Record<string, number>>({});
   const galleryRows = chunkGalleryItems(items, columns);
   const totalTracks = columns * GALLERY_TRACKS_PER_COLUMN;
+  const { mode: alignmentMode, referenceIndex } = parseGalleryAlignment(align);
 
   return (
     <div
@@ -86,13 +97,19 @@ export default function ArticleGallery({
           const absoluteIndex = rowIndex * columns + imageIndex;
           const itemKey = `${keyPrefix}-${image.src}-${absoluteIndex}`;
           const measuredRatio = aspectRatios[itemKey] ?? DEFAULT_GALLERY_RATIO;
-          return align === 'height' ? Math.sqrt(measuredRatio) : measuredRatio;
+          return alignmentMode === 'height' ? Math.sqrt(measuredRatio) : measuredRatio;
         });
         const rowSpans = getNormalizedGallerySpans(rowAspectRatios, totalTracks);
+        const referenceRowIndex = Math.min(Math.max(referenceIndex - 1, 0), Math.max(row.length - 1, 0));
+        const referenceAspectRatio = rowAspectRatios[referenceRowIndex] ?? DEFAULT_GALLERY_RATIO;
+        const referenceSpan = rowSpans[referenceRowIndex] ?? GALLERY_TRACKS_PER_COLUMN;
 
         return row.map((image, imageIndex) => {
           const absoluteIndex = rowIndex * columns + imageIndex;
           const itemKey = `${keyPrefix}-${image.src}-${absoluteIndex}`;
+          const currentSpan = rowSpans[imageIndex] ?? GALLERY_TRACKS_PER_COLUMN;
+          const heightAlignedAspectRatio =
+            referenceSpan > 0 ? (referenceAspectRatio * currentSpan) / referenceSpan : referenceAspectRatio;
 
           return (
             <figure
@@ -110,6 +127,7 @@ export default function ArticleGallery({
                   borderRadius: '12px',
                   overflow: 'hidden',
                   flexShrink: 0,
+                  aspectRatio: alignmentMode === 'height' ? `${heightAlignedAspectRatio}` : undefined,
                   background: 'color-mix(in srgb, var(--color-secondary) 10%, transparent)',
                   boxShadow: '0 2px 12px rgba(0,0,0,0.10)',
                 }}
@@ -130,8 +148,8 @@ export default function ArticleGallery({
                   style={{
                     display: 'block',
                     width: '100%',
-                    height: align === 'height' ? '15rem' : 'auto',
-                    objectFit: align === 'height' ? 'cover' : undefined,
+                    height: alignmentMode === 'height' ? '100%' : 'auto',
+                    objectFit: alignmentMode === 'height' ? 'cover' : undefined,
                     objectPosition: 'center',
                     transition: 'transform 0.3s ease, filter 0.3s ease',
                   }}

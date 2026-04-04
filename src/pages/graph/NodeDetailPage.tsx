@@ -17,7 +17,7 @@ import {
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from './content/BioPage';
 import ThemePicker from './ThemePicker';
-import { useAppLanguage } from '../../i18n/LanguageProvider';
+import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {
   getDisplayDomain,
   getGraphRelations,
@@ -638,7 +638,7 @@ const NodeDetailPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [graphModel]);
+  }, [graphModel, language]);
 
   const graphNode = graphModel?.nodes.find((entry) => entry.id === decodedNodeId) ?? null;
 

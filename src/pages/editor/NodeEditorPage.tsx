@@ -10,7 +10,7 @@ import {
 import { EDIT_RELATION_ICON, type ConfigurableIcon } from '../../configs/icons';
 import { UI_COPY } from '../../configs/uiCopy';
 import { LANGUAGE_OPTIONS, getLocaleMessages, type AppLanguage } from '../../i18n';
-import { useAppLanguage } from '../../i18n/LanguageProvider';
+import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {
   CHRONOLOGY_FORMAT_HINT,
   getChronologySortKeySafe,
@@ -1078,6 +1078,7 @@ function SearchableNodePicker({
   }, [selectedOption]);
 
   const filteredOptions = useMemo(() => {
+    void language;
     const normalizedQuery = query.trim().toLowerCase();
 
     return options
@@ -1584,17 +1585,17 @@ const NodeEditorPage: React.FC = () => {
 
         return sortNodeRefs(left, right);
       });
+  }, [bootstrapNodes, currentNodeRef]);
+
+  const timelineConnectionEntries = useMemo(() => {
+    void language;
+    return currentNodeRef ? buildTimelineConnectionEntries(currentNodeRef, bootstrapNodes) : [];
   }, [bootstrapNodes, currentNodeRef, language]);
 
-  const timelineConnectionEntries = useMemo(
-    () => (currentNodeRef ? buildTimelineConnectionEntries(currentNodeRef, bootstrapNodes) : []),
-    [bootstrapNodes, currentNodeRef, language]
-  );
-
-  const bioConnectionEntry = useMemo(
-    () => (currentNodeRef ? buildBioConnectionEntry(currentNodeRef, bootstrapNodes) : null),
-    [bootstrapNodes, currentNodeRef, language]
-  );
+  const bioConnectionEntry = useMemo(() => {
+    void language;
+    return currentNodeRef ? buildBioConnectionEntry(currentNodeRef, bootstrapNodes) : null;
+  }, [bootstrapNodes, currentNodeRef, language]);
 
   const blockedExplicitRelationPeerIds = useMemo(
     () =>
@@ -1604,25 +1605,26 @@ const NodeEditorPage: React.FC = () => {
     [bootstrapNodes, currentNodeRef, explicitRelations, selectedExplicitRelationIndex]
   );
 
-  const explicitConnectionEntries = useMemo(
-    () =>
-      currentNodeRef
-        ? explicitRelations.map((relation, relationIndex) =>
-            buildExplicitConnectionEntry(relation, relationIndex, currentNodeRef.id, editorNodeById)
-          )
-        : [],
-    [currentNodeRef, editorNodeById, explicitRelations, language]
-  );
+  const explicitConnectionEntries = useMemo(() => {
+    void language;
+    return currentNodeRef
+      ? explicitRelations.map((relation, relationIndex) =>
+          buildExplicitConnectionEntry(relation, relationIndex, currentNodeRef.id, editorNodeById)
+        )
+      : [];
+  }, [currentNodeRef, editorNodeById, explicitRelations, language]);
 
   const domainTreemapEntries = useMemo<DomainTreemapEntry[]>(
-    () =>
-      DOMAIN_ORDER.map((domain) => ({
+    () => {
+      void language;
+      return DOMAIN_ORDER.map((domain) => ({
         domain,
         display: getDisplayDomain(domain),
         cardTag: DOMAIN_CONFIG[domain].cardTag,
         count: bootstrapNodes.filter((node) => node.domain === domain).length,
         removable: bootstrapNodes.every((node) => node.domain !== domain),
-      })),
+      }));
+    },
     [bootstrapNodes, language]
   );
 

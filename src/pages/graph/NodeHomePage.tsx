@@ -32,7 +32,7 @@ import {
     getHighlightBorderShadowPrefix,
 } from '../../configs/graphHighlight';
 import { UI_COPY } from '../../configs/uiCopy';
-import { useAppLanguage } from '../../i18n/LanguageProvider';
+import { useAppLanguage } from '../../i18n/useAppLanguage';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
@@ -1593,7 +1593,7 @@ const NodeCanvas: React.FC = () => {
             returnFocusNodeId,
         };
         applyPendingGraphRestore();
-    }, [applyPendingGraphRestore, graphModel, initialGraph, orderedGraphRelations, setEdges, setNodes]);
+    }, [applyPendingGraphRestore, graphModel, graphNodeSetSignature, initialGraph, orderedGraphRelations, setEdges, setNodes]);
 
     useEffect(() => {
         restoredStoredViewRef.current = false;

@@ -4,7 +4,7 @@ import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./
 import { type Theme } from "../content/BioTheme";
 import ThemePicker from "../ThemePicker";
 import { LANGUAGE_OPTIONS } from "../../../i18n";
-import { useAppLanguage } from "../../../i18n/LanguageProvider";
+import { useAppLanguage } from '../../../i18n/useAppLanguage';
 
 interface BioThemeData {
     theme: Theme

@@ -28,7 +28,7 @@ export type NodeGalleryImage = {
   caption?: string;
 };
 
-export type NodeGalleryAlignment = 'height' | 'natural';
+export type NodeGalleryAlignment = 'height' | `height:${number}` | 'natural';
 
 export type NodeArticleLink = {
   label: string;
@@ -331,10 +331,12 @@ function normalizeArticleBlocks(value: unknown): ArticleBlock[] | undefined {
 
     if (block.type === 'gallery') {
       const items = normalizeGalleryImages(block.items);
+      const align =
+        typeof block.align === 'string' ? block.align : undefined;
       return (
         Boolean(items?.length) &&
         (block.columns === undefined || block.columns === 1 || block.columns === 2 || block.columns === 3) &&
-        (block.align === undefined || block.align === 'height' || block.align === 'natural')
+        (align === undefined || align === 'natural' || align === 'height' || /^height:\d+$/.test(align))
       );
     }
 

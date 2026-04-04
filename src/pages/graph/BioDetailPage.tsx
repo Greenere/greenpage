@@ -29,7 +29,7 @@ import {
   type GraphCardNode,
   type GraphModel,
 } from './content/Nodes';
-import { useAppLanguage } from '../../i18n/LanguageProvider';
+import { useAppLanguage } from '../../i18n/useAppLanguage';
 
 const GRAPH_RETURN_FOCUS_NODE_KEY = 'greenpage-graph-return-focus-node';
 const DETAIL_READING_WIDTH = '46rem';

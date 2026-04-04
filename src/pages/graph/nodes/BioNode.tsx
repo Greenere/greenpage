@@ -9,7 +9,7 @@ import { loadBioPageContent, readCachedBioPageContent, type BioPageContent } fro
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
 import { UI_COPY } from "../../../configs/uiCopy";
 import { getNodeDetailPath, getNodeTransitionName, resolveAssetUrl } from "../content/Nodes";
-import { useAppLanguage } from "../../../i18n/LanguageProvider";
+import { useAppLanguage } from '../../../i18n/useAppLanguage';
 
 interface BioData {
     theme: Theme
