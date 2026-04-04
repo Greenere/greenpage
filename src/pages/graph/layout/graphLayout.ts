@@ -249,29 +249,74 @@ function getDomainPairKey(left: DomainId, right: DomainId) {
     return left < right ? `${left}|${right}` : `${right}|${left}`;
 }
 
-export function permuteDomainOrder(domains: DomainId[]) {
-    const results: DomainId[][] = [];
-    const current: DomainId[] = [];
-    const used = new Array(domains.length).fill(false);
+/**
+ * Greedy O(D²) domain ordering that replaces the original O(D!) exhaustive search.
+ *
+ * Builds the sequence incrementally: seed with the fallback-order domain that has
+ * the highest total affinity (most inter-domain connections), then at each step
+ * append the unplaced domain whose insertion at the current tail maximises the
+ * same scoring objective used by the old exhaustive scorer:
+ *
+ *   score = Σ adjacent_affinity × 6  −  Σ |fallback_pos − actual_pos| × 0.85
+ *
+ * Because domain affinity is dominated by direct adjacency, greedy insertion
+ * produces near-optimal results across realistic graph sizes.
+ */
+export function greedyDomainOrder(
+    domains: DomainId[],
+    affinity: Map<string, number>,
+    fallbackIndex: Map<DomainId, number>,
+): DomainId[] {
+    if (domains.length <= 1) return [...domains];
 
-    function walk() {
-        if (current.length === domains.length) {
-            results.push([...current]);
-            return;
+    // Score a complete candidate sequence with the same formula as before.
+    function scoreOrder(order: DomainId[]) {
+        let score = 0;
+        for (let i = 0; i < order.length - 1; i++) {
+            score += (affinity.get(getDomainPairKey(order[i], order[i + 1])) ?? 0) * 6;
         }
-
-        for (let index = 0; index < domains.length; index++) {
-            if (used[index]) continue;
-            used[index] = true;
-            current.push(domains[index]);
-            walk();
-            current.pop();
-            used[index] = false;
+        for (let i = 0; i < order.length; i++) {
+            score -= Math.abs((fallbackIndex.get(order[i]) ?? i) - i) * 0.85;
         }
+        return score;
     }
 
-    walk();
-    return results;
+    const remaining = new Set(domains);
+
+    // Seed: pick the domain with the highest sum of affinity to all others.
+    let seedDomain = domains[0];
+    let bestSeedAffinity = -Infinity;
+    for (const domain of domains) {
+        let total = 0;
+        for (const other of domains) {
+            if (other !== domain) total += affinity.get(getDomainPairKey(domain, other)) ?? 0;
+        }
+        if (total > bestSeedAffinity) { bestSeedAffinity = total; seedDomain = domain; }
+    }
+
+    const result: DomainId[] = [seedDomain];
+    remaining.delete(seedDomain);
+
+    // Greedy insertion: at each step try appending each remaining domain at the
+    // tail and pick the one that produces the best full-sequence score.
+    while (remaining.size > 0) {
+        let bestNext: DomainId | null = null;
+        let bestScore = -Infinity;
+
+        for (const candidate of remaining) {
+            const candidate_score = scoreOrder([...result, candidate]);
+            if (candidate_score > bestScore) {
+                bestScore = candidate_score;
+                bestNext = candidate;
+            }
+        }
+
+        if (bestNext === null) break;
+        result.push(bestNext);
+        remaining.delete(bestNext);
+    }
+
+    return result;
 }
 
 export function buildDomainWeights(contentNodes: GraphCardNode[], graphRelations: GraphModel['relations']) {
@@ -325,27 +370,7 @@ export function buildDomainLaneOrder(contentNodes: GraphCardNode[], graphRelatio
         affinity.set(key, (affinity.get(key) ?? 0) + relation.strength * relationWeight);
     }
 
-    let bestOrder = fallbackOrder;
-    let bestScore = Number.NEGATIVE_INFINITY;
-
-    for (const order of permuteDomainOrder(fallbackOrder)) {
-        let score = 0;
-
-        for (let index = 0; index < order.length - 1; index++) {
-            score += (affinity.get(getDomainPairKey(order[index], order[index + 1])) ?? 0) * 6;
-        }
-
-        for (let index = 0; index < order.length; index++) {
-            score -= Math.abs((fallbackIndex.get(order[index]) ?? index) - index) * 0.85;
-        }
-
-        if (score > bestScore) {
-            bestScore = score;
-            bestOrder = order;
-        }
-    }
-
-    return bestOrder;
+    return greedyDomainOrder(fallbackOrder, affinity, fallbackIndex);
 }
 
 export function normalizeAngle(angle: number) {
