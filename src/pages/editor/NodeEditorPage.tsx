@@ -64,6 +64,7 @@ import { createTemplateContent, getDefaultKindForDomain, getNodeTemplateOptions,
 
 const EDITOR_DRAFT_STORAGE_PREFIX = 'greenpage-node-editor-draft:';
 const EDITOR_PENDING_NEW_DOMAIN_KEY = 'greenpage-node-editor-pending-new-domain';
+const EDITOR_DRAFT_AUTOSAVE_DELAY_MS = 250;
 
 function getTabLabel(tab: EditorTab) {
   if (tab === 'content') return UI_COPY.nodeEditor.tabs.content;
@@ -151,6 +152,159 @@ const RELATION_KIND_OPTIONS: EditorExplicitRelation['kind'][] = [
 
 function getDraftStorageKey(nodeId: string, lang: AppLanguage) {
   return `${EDITOR_DRAFT_STORAGE_PREFIX}${lang}:${nodeId}`;
+}
+
+type StoredNodeEditorDraft = {
+  version: 2;
+  content: GraphNodeContent;
+  jsonDraft: string;
+  explicitRelationsJsonDraft?: string;
+  currentNodeRef?: GraphNodeRef;
+  explicitRelations?: EditorExplicitRelation[];
+};
+
+type RestoredNodeEditorDraft = {
+  content: GraphNodeContent;
+  jsonDraft: string;
+  jsonError: string | null;
+  explicitRelationsJsonDraft: string;
+  explicitRelationsJsonError: string | null;
+  currentNodeRef?: GraphNodeRef;
+  explicitRelations?: EditorExplicitRelation[];
+};
+
+function lenientParseJsonText(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return JSON.parse(text.replace(/,(\s*[}\]])/g, '$1'));
+  }
+}
+
+function normalizeExplicitRelationsInput(raw: unknown, currentNodeId: string): EditorExplicitRelation[] {
+  if (!Array.isArray(raw)) {
+    throw new Error('Explicit connections JSON must be an array.');
+  }
+
+  return raw.map((entry, index) => {
+    if (!entry || typeof entry !== 'object') {
+      throw new Error(`Explicit connection at index ${index} must be an object.`);
+    }
+
+    const candidate = entry as Record<string, unknown>;
+    const kind = candidate.kind;
+    const strength = candidate.strength;
+
+    if (
+      typeof candidate.from !== 'string' ||
+      typeof candidate.to !== 'string' ||
+      typeof candidate.label !== 'string' ||
+      !RELATION_KIND_OPTIONS.includes(kind as EditorExplicitRelation['kind']) ||
+      (strength !== 1 && strength !== 2 && strength !== 3)
+    ) {
+      throw new Error(`Explicit connection at index ${index} is missing required fields.`);
+    }
+
+    return anchorExplicitRelationToNode(
+      {
+        id: typeof candidate.id === 'string' ? candidate.id : undefined,
+        from: candidate.from,
+        to: candidate.to,
+        kind: kind as EditorExplicitRelation['kind'],
+        label: candidate.label,
+        strength: strength as 1 | 2 | 3,
+      },
+      currentNodeId,
+    );
+  });
+}
+
+function isStoredNodeRef(value: unknown): value is GraphNodeRef {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.kind === 'string' &&
+    typeof candidate.domain === 'string' &&
+    typeof candidate.chronology === 'string'
+  );
+}
+
+function isStoredExplicitRelation(value: unknown): value is EditorExplicitRelation {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.from === 'string' &&
+    typeof candidate.to === 'string' &&
+    typeof candidate.kind === 'string' &&
+    typeof candidate.label === 'string' &&
+    (candidate.strength === 1 || candidate.strength === 2 || candidate.strength === 3) &&
+    (candidate.id === undefined || typeof candidate.id === 'string')
+  );
+}
+
+function parseStoredNodeDraft(rawValue: string | null, nodeId: string): RestoredNodeEditorDraft | null {
+  if (!rawValue) return null;
+
+  try {
+    const parsed = JSON.parse(rawValue) as unknown;
+
+    if (parsed && typeof parsed === 'object' && typeof (parsed as Record<string, unknown>).title === 'string') {
+      const content = normalizeNodeContent(parsed, nodeId);
+      return {
+        content,
+        jsonDraft: prettyJson(content),
+        jsonError: null,
+        explicitRelationsJsonDraft: '[]',
+        explicitRelationsJsonError: null,
+      };
+    }
+
+    if (!parsed || typeof parsed !== 'object') {
+      return null;
+    }
+
+    const candidate = parsed as Record<string, unknown>;
+    const content = normalizeNodeContent(candidate.content, nodeId);
+    const jsonDraft = typeof candidate.jsonDraft === 'string' ? candidate.jsonDraft : prettyJson(content);
+    const explicitRelations = Array.isArray(candidate.explicitRelations)
+      ? candidate.explicitRelations.filter(isStoredExplicitRelation)
+      : undefined;
+    const explicitRelationsJsonDraft =
+      typeof candidate.explicitRelationsJsonDraft === 'string'
+        ? candidate.explicitRelationsJsonDraft
+        : prettyJson(explicitRelations ?? []);
+
+    let jsonError: string | null = null;
+    try {
+      normalizeNodeContent(lenientParseJsonText(jsonDraft), nodeId);
+    } catch (error) {
+      jsonError = error instanceof Error ? error.message : 'Invalid JSON.';
+    }
+
+    let explicitRelationsJsonError: string | null = null;
+    try {
+      normalizeExplicitRelationsInput(lenientParseJsonText(explicitRelationsJsonDraft), nodeId);
+    } catch (error) {
+      explicitRelationsJsonError = error instanceof Error ? error.message : 'Invalid explicit connections JSON.';
+    }
+
+    return {
+      content,
+      jsonDraft,
+      jsonError,
+      explicitRelationsJsonDraft,
+      explicitRelationsJsonError,
+      currentNodeRef: isStoredNodeRef(candidate.currentNodeRef) ? candidate.currentNodeRef : undefined,
+      explicitRelations,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function clearStoredNodeDraft(nodeId: string, lang: AppLanguage) {
+  window.localStorage.removeItem(getDraftStorageKey(nodeId, lang));
 }
 
 function isSafeSlug(value: string) {
@@ -1128,6 +1282,8 @@ const NodeEditorPage: React.FC = () => {
     draftContent,
     jsonDraft,
     jsonError,
+    explicitRelationsJsonDraft,
+    explicitRelationsJsonError,
     tagInput,
     explicitRelations,
     validation,
@@ -1138,6 +1294,8 @@ const NodeEditorPage: React.FC = () => {
     editingSectionIndex,
     showHeaderFields,
     showMeta,
+    showJsonContent,
+    showJsonConnections,
     isFallbackContent,
     resolvedContentLanguage,
     newNodeDraft,
@@ -1147,6 +1305,7 @@ const NodeEditorPage: React.FC = () => {
   const previousTemplateDefaultsRef = useRef(templateDefaults);
   const explicitRelationsRef = useRef<EditorExplicitRelation[]>([]);
   const loadedExplicitRelationsRef = useRef<EditorExplicitRelation[]>([]);
+  const loadedNodeRefRef = useRef<GraphNodeRef | null>(null);
 
   // Auto-dismiss status messages after 4 s
   useEffect(() => {
@@ -1209,6 +1368,7 @@ const NodeEditorPage: React.FC = () => {
       lastLoadedNodeIdRef.current = '';
       explicitRelationsRef.current = [];
       loadedExplicitRelationsRef.current = [];
+      loadedNodeRefRef.current = null;
       dispatch({ type: 'reset_for_empty_node', language });
       return;
     }
@@ -1217,12 +1377,25 @@ const NodeEditorPage: React.FC = () => {
     dispatch({ type: 'set_loading_node', value: true });
     fetchEditorNode(decodedNodeId, language)
       .then((payload) => {
-        const storedDraft = window.localStorage.getItem(getDraftStorageKey(decodedNodeId, language));
+        const storedDraft = parseStoredNodeDraft(
+          window.localStorage.getItem(getDraftStorageKey(decodedNodeId, language)),
+          decodedNodeId,
+        );
         const nextContent =
           storedDraft
-            ? normalizeNodeContent(JSON.parse(storedDraft), decodedNodeId)
+            ? storedDraft.content
             : normalizeNodeContent(payload.content, decodedNodeId);
+        const nextNodeRef =
+          storedDraft?.currentNodeRef?.id === payload.node.id
+            ? {
+                ...payload.node,
+                chronology: storedDraft.currentNodeRef.chronology,
+              }
+            : payload.node;
         const anchoredRelations = payload.explicitRelations.map((relation) =>
+          anchorExplicitRelationToNode(relation, payload.node.id)
+        );
+        const storedExplicitRelations = storedDraft?.explicitRelations?.map((relation) =>
           anchorExplicitRelationToNode(relation, payload.node.id)
         );
         const hasUnsavedExplicitRelationChanges =
@@ -1230,21 +1403,26 @@ const NodeEditorPage: React.FC = () => {
           !areExplicitRelationsEquivalent(explicitRelationsRef.current, loadedExplicitRelationsRef.current);
         const nextExplicitRelations = hasUnsavedExplicitRelationChanges
           ? explicitRelationsRef.current
-          : anchoredRelations;
+          : storedExplicitRelations ?? anchoredRelations;
 
         dispatch({
           type: 'load_node_success',
           nodeChanged,
           nodeId: decodedNodeId,
-          node: payload.node,
+          node: nextNodeRef,
           originalContent: payload.content,
           draftContent: nextContent,
+          jsonDraft: storedDraft?.jsonDraft ?? prettyJson(nextContent),
+          jsonError: storedDraft?.jsonError ?? null,
           explicitRelations: nextExplicitRelations,
+          explicitRelationsJsonDraft: storedDraft?.explicitRelationsJsonDraft ?? prettyJson(nextExplicitRelations),
+          explicitRelationsJsonError: storedDraft?.explicitRelationsJsonError ?? null,
           isFallbackContent: payload.isFallbackContent ?? false,
           resolvedContentLanguage: payload.resolvedLanguage ?? language,
-          statusMessage: storedDraft ? UI_COPY.nodeEditor.status.recoveredDraft : null,
+          statusMessage: null,
         });
         lastLoadedNodeIdRef.current = decodedNodeId;
+        loadedNodeRefRef.current = payload.node;
         loadedExplicitRelationsRef.current = anchoredRelations;
       })
       .catch((error: unknown) => {
@@ -1265,6 +1443,43 @@ const NodeEditorPage: React.FC = () => {
     if (normalizedCurrent === normalized) return;
     dispatch({ type: 'set_tag_input', value: normalized });
   }, [dispatch, draftContent?.tags, tagInput]);
+
+  const hasUnsavedLocalDraft =
+    Boolean(decodedNodeId) &&
+    Boolean(draftContent) &&
+    Boolean(currentNodeRef) &&
+    Boolean(loadedNodeRefRef.current) &&
+    (
+      prettyJson(draftContent) !== prettyJson(originalContent) ||
+      currentNodeRef?.chronology !== loadedNodeRefRef.current?.chronology ||
+      !areExplicitRelationsEquivalent(explicitRelations, loadedExplicitRelationsRef.current) ||
+      jsonDraft !== prettyJson(draftContent) ||
+      explicitRelationsJsonDraft !== prettyJson(explicitRelations)
+    );
+
+  useEffect(() => {
+    if (!decodedNodeId || !draftContent || !currentNodeRef) return;
+
+    if (!hasUnsavedLocalDraft) {
+      clearStoredNodeDraft(decodedNodeId, language);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      const payload: StoredNodeEditorDraft = {
+        version: 2,
+        content: draftContent,
+        jsonDraft,
+        explicitRelationsJsonDraft,
+        currentNodeRef,
+        explicitRelations,
+      };
+
+      window.localStorage.setItem(getDraftStorageKey(decodedNodeId, language), JSON.stringify(payload));
+    }, EDITOR_DRAFT_AUTOSAVE_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [currentNodeRef, decodedNodeId, draftContent, explicitRelations, explicitRelationsJsonDraft, hasUnsavedLocalDraft, jsonDraft, language]);
 
   const trimmedNewNodeId = newNodeDraft.nodeId.trim();
   const newNodeIdAlreadyExists = trimmedNewNodeId.length > 0 && bootstrapNodes.some((node) => node.id === trimmedNewNodeId);
@@ -1399,6 +1614,13 @@ const NodeEditorPage: React.FC = () => {
   const duplicateExplicitRelationCount = duplicateExplicitRelationIndexes.size;
   const selectedExplicitRelationIsDuplicate =
     selectedExplicitRelationIndex !== null && duplicateExplicitRelationIndexes.has(selectedExplicitRelationIndex);
+  const jsonWriteDisabled =
+    Boolean(validation.error) ||
+    Boolean(jsonError) ||
+    Boolean(explicitRelationsJsonError) ||
+    Boolean(currentChronologyError) ||
+    actionPending ||
+    duplicateExplicitRelationCount > 0;
   const selectableOtherNodeOptions = useMemo(
     () =>
       otherNodeOptions.filter((node) => {
@@ -1431,6 +1653,26 @@ const NodeEditorPage: React.FC = () => {
       parsedContent: parsedContent ?? undefined,
       error,
     });
+  };
+
+  const handleExplicitRelationsJsonDraftChange = (nextText: string) => {
+    if (!currentNodeRef) return;
+
+    try {
+      const parsed = normalizeExplicitRelationsInput(lenientParseJsonText(nextText), currentNodeRef.id);
+      dispatch({
+        type: 'edit_explicit_relations_json_draft',
+        value: nextText,
+        parsedRelations: parsed,
+        error: null,
+      });
+    } catch (error) {
+      dispatch({
+        type: 'edit_explicit_relations_json_draft',
+        value: nextText,
+        error: error instanceof Error ? error.message : 'Invalid explicit connections JSON.',
+      });
+    }
   };
 
   const updateSelectedExplicitRelation = (
@@ -1476,15 +1718,11 @@ const NodeEditorPage: React.FC = () => {
     navigate(`/editor/nodes/${encodeURIComponent(nextNodeId)}`);
   };
 
-  const handleSaveDraft = () => {
-    if (!decodedNodeId || !draftContent) return;
-    window.localStorage.setItem(getDraftStorageKey(decodedNodeId, language), prettyJson(draftContent));
-    dispatch({ type: 'set_status_message', message: UI_COPY.nodeEditor.status.savedDraft });
-  };
-
   const handleDiscardDraft = () => {
     if (!decodedNodeId || !originalContent) return;
-    window.localStorage.removeItem(getDraftStorageKey(decodedNodeId, language));
+    clearStoredNodeDraft(decodedNodeId, language);
+    dispatch({ type: 'set_current_node_ref', value: loadedNodeRefRef.current });
+    dispatch({ type: 'replace_explicit_relations', relations: loadedExplicitRelationsRef.current });
     dispatch({ type: 'reset_draft_to_original', nodeId: decodedNodeId });
     dispatch({ type: 'set_status_message', message: UI_COPY.nodeEditor.status.discardedDraft });
   };
@@ -1512,6 +1750,9 @@ const NodeEditorPage: React.FC = () => {
         completeRelations,
         language
       );
+      loadedNodeRefRef.current = normalizedCurrentNode;
+      loadedExplicitRelationsRef.current = completeRelations;
+      clearStoredNodeDraft(decodedNodeId, language);
       clearGraphModelCache();
       clearGraphNodeContentCache();
       dispatch({
@@ -1534,8 +1775,6 @@ const NodeEditorPage: React.FC = () => {
           subtitle: draftContent.subtitle,
         },
       });
-      loadedExplicitRelationsRef.current = completeRelations;
-      window.localStorage.removeItem(getDraftStorageKey(decodedNodeId, language));
       return successMessage;
     } catch (error) {
       const message = error instanceof Error ? error.message : UI_COPY.nodeEditor.status.failedWriteNodeFile;
@@ -1606,6 +1845,62 @@ const NodeEditorPage: React.FC = () => {
     });
   };
 
+  const renderConnectedNodesSection = (allowInspect: boolean) => {
+    if (!currentNodeRef) {
+      return null;
+    }
+
+    return (
+      <section
+        style={{
+          marginTop: '0.35rem',
+          maxWidth: DETAIL_SECTION_WIDTH,
+          marginInline: 'auto',
+          paddingBottom: '2rem',
+        }}
+      >
+        {renderSectionHeading(UI_COPY.nodeDetailPage.sections.connectedNodes)}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(12rem, 1fr))',
+            gap: '0.85rem',
+          }}
+        >
+          {bioConnectionEntry && (
+            <ConnectedNodeCard key={bioConnectionEntry.key} entry={bioConnectionEntry} />
+          )}
+          {timelineConnectionEntries.map((entry) => (
+            <ConnectedNodeCard
+              key={entry.key}
+              entry={entry}
+              onNavigate={() => handleOpenNode(entry.relatedNodeId)}
+            />
+          ))}
+          {explicitConnectionEntries.map((entry) => {
+            const relationIndex = entry.explicitRelationIndex;
+            const canNavigate = Boolean(entry.relatedNodeId) && editorNodeById.has(entry.relatedNodeId);
+
+            return (
+              <ConnectedNodeCard
+                key={entry.key}
+                entry={entry}
+                selected={relationIndex === selectedExplicitRelationIndex}
+                onNavigate={canNavigate ? () => handleOpenNode(entry.relatedNodeId) : undefined}
+                onInspect={
+                  allowInspect && relationIndex !== undefined
+                    ? () => handleSelectExplicitRelation(relationIndex)
+                    : undefined
+                }
+              />
+            );
+          })}
+          <AddConnectedNodeCard onClick={handleAddExplicitRelation} />
+        </div>
+      </section>
+    );
+  };
+
   const handleCreateDomain = async () => {
     if (newDomainCreateDisabled) return;
     dispatch({ type: 'set_action_pending', value: true });
@@ -1660,7 +1955,7 @@ const NodeEditorPage: React.FC = () => {
       clearGraphModelCache();
       clearGraphNodeContentCache();
       for (const option of LANGUAGE_OPTIONS) {
-        window.localStorage.removeItem(getDraftStorageKey(decodedNodeId, option.id));
+        clearStoredNodeDraft(decodedNodeId, option.id);
       }
       dispatch({
         type: 'set_bootstrap_nodes',
@@ -2430,14 +2725,6 @@ const NodeEditorPage: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={handleSaveDraft}
-                        disabled={!draftContent}
-                        style={!draftContent ? { ...btnSecondary, ...btnDisabled } : btnSecondary}
-                      >
-                        {UI_COPY.nodeEditor.contentTab.saveDraft}
-                      </button>
-                      <button
-                        type="button"
                         onClick={() =>
                           openDangerDialog({
                             actionDescription: UI_COPY.nodeEditor.confirmations.resetDraft,
@@ -2487,25 +2774,128 @@ const NodeEditorPage: React.FC = () => {
                 {!decodedNodeId || !draftContent ? (
                   <div style={{ opacity: 0.65, fontSize: '0.88rem' }}>{UI_COPY.nodeEditor.jsonTab.emptyState}</div>
                 ) : (
-                  <JsonEditorPanel
-                    text={jsonDraft}
-                    nodeId={decodedNodeId}
-                    jsonError={jsonError}
-                    validationError={validation.error}
-                    actionPending={actionPending}
-                    onChangeText={handleJsonDraftChange}
-                    onWriteToFile={() =>
-                      openDangerDialog({
-                        actionDescription: UI_COPY.nodeEditor.confirmations.writeJsonChanges,
-                        proceedLabel: UI_COPY.nodeEditor.common.proceed,
-                        tone: 'primary',
-                        showResult: true,
-                        pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
-                        onProceed: handleWriteToFile,
-                      })
-                    }
-                    onSaveDraft={handleSaveDraft}
-                  />
+                  <>
+                    <div style={{ marginTop: '0.1rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => dispatch({ type: 'set_show_json_content', value: !showJsonContent })}
+                        className="greenpage-editor-text-toggle"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          fontSize: '0.73rem',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.06em',
+                          opacity: 0.78,
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: 'var(--color-text)',
+                          padding: 0,
+                          fontFamily: 'inherit',
+                          justifyContent: 'flex-start',
+                        }}
+                      >
+                        <span style={{ opacity: 0.55, fontSize: '0.7rem' }}>{showJsonContent ? '▾' : '▸'}</span>
+                        {UI_COPY.nodeEditor.jsonTab.contentJson}
+                      </button>
+                      {showJsonContent && (
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <JsonEditorPanel
+                            hint={UI_COPY.nodeEditor.jsonTab.contentJsonHint}
+                            text={jsonDraft}
+                            nodeId={decodedNodeId}
+                            jsonError={jsonError}
+                            onChangeText={handleJsonDraftChange}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ marginTop: '1rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => dispatch({ type: 'set_show_json_connections', value: !showJsonConnections })}
+                        className="greenpage-editor-text-toggle"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          fontSize: '0.73rem',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.06em',
+                          opacity: 0.78,
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: 'var(--color-text)',
+                          padding: 0,
+                          fontFamily: 'inherit',
+                          justifyContent: 'flex-start',
+                        }}
+                      >
+                        <span style={{ opacity: 0.55, fontSize: '0.7rem' }}>{showJsonConnections ? '▾' : '▸'}</span>
+                        {UI_COPY.nodeEditor.jsonTab.explicitConnectionsJson}
+                      </button>
+                      {showJsonConnections && (
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', opacity: 0.62, lineHeight: 1.55 }}>
+                            {UI_COPY.nodeEditor.jsonTab.explicitConnectionsJsonHint}
+                          </div>
+                          <textarea
+                            value={explicitRelationsJsonDraft}
+                            rows={12}
+                            style={{
+                              width: '100%',
+                              padding: '0.6rem 0.72rem',
+                              borderRadius: '10px',
+                              border: '1px solid color-mix(in srgb, var(--color-secondary) 34%, transparent)',
+                              background: 'transparent',
+                              color: 'var(--color-text)',
+                              fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace',
+                              fontSize: '0.8rem',
+                              lineHeight: 1.6,
+                              resize: 'vertical',
+                            }}
+                            onChange={(event) => handleExplicitRelationsJsonDraftChange(event.target.value)}
+                          />
+                          {explicitRelationsJsonError && (
+                            <div style={{ marginTop: '0.55rem', color: 'crimson', fontSize: '0.82rem' }}>
+                              {explicitRelationsJsonError}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openDangerDialog({
+                            actionDescription: UI_COPY.nodeEditor.confirmations.writeJsonChanges,
+                            proceedLabel: UI_COPY.nodeEditor.common.proceed,
+                            tone: 'primary',
+                            showResult: true,
+                            pendingMessage: UI_COPY.nodeEditor.confirmations.writingToFile,
+                            onProceed: handleWriteToFile,
+                          })
+                        }
+                        disabled={jsonWriteDisabled}
+                        style={jsonWriteDisabled ? { ...btnPrimary, ...btnDisabled } : btnPrimary}
+                      >
+                        {UI_COPY.nodeEditor.jsonTab.writeToFile}
+                      </button>
+                    </div>
+                    {(validation.error || currentChronologyError || duplicateExplicitRelationCount > 0) && (
+                      <div style={{ marginTop: '0.6rem', color: 'crimson', fontSize: '0.82rem', lineHeight: 1.55 }}>
+                        {validation.error ??
+                          currentChronologyError ??
+                          (duplicateExplicitRelationCount > 0 ? UI_COPY.nodeEditor.contentTab.duplicateConnectionsHint : null)}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -2979,52 +3369,13 @@ const NodeEditorPage: React.FC = () => {
                   }}
                 />
 
-                <section
-                  style={{
-                    marginTop: '0.35rem',
-                    maxWidth: DETAIL_SECTION_WIDTH,
-                    marginInline: 'auto',
-                    paddingBottom: '2rem',
-                  }}
-                >
-                  {renderSectionHeading(UI_COPY.nodeDetailPage.sections.connectedNodes)}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(12rem, 1fr))',
-                      gap: '0.85rem',
-                    }}
-                  >
-                    {bioConnectionEntry && (
-                      <ConnectedNodeCard key={bioConnectionEntry.key} entry={bioConnectionEntry} />
-                    )}
-                    {timelineConnectionEntries.map((entry) => (
-                      <ConnectedNodeCard
-                        key={entry.key}
-                        entry={entry}
-                        onNavigate={() => handleOpenNode(entry.relatedNodeId)}
-                      />
-                    ))}
-                    {explicitConnectionEntries.map((entry) => {
-                      const relationIndex = entry.explicitRelationIndex;
-                      const canNavigate = Boolean(entry.relatedNodeId) && editorNodeById.has(entry.relatedNodeId);
-
-                      return (
-                        <ConnectedNodeCard
-                          key={entry.key}
-                          entry={entry}
-                          selected={relationIndex === selectedExplicitRelationIndex}
-                          onNavigate={canNavigate ? () => handleOpenNode(entry.relatedNodeId) : undefined}
-                          onInspect={relationIndex === undefined ? undefined : () => handleSelectExplicitRelation(relationIndex)}
-                        />
-                      );
-                    })}
-                    <AddConnectedNodeCard onClick={handleAddExplicitRelation} />
-                  </div>
-                </section>
+                {renderConnectedNodesSection(true)}
               </div>
             ) : previewNode ? (
-              <NodeArticlePreview node={previewNode} />
+              <div style={{ minHeight: '100%', color: 'var(--color-text)' }}>
+                <NodeArticlePreview node={previewNode} />
+                {tab === 'json' && decodedNodeId ? renderConnectedNodesSection(false) : null}
+              </div>
             ) : (
               <div style={{ padding: '2.5rem 1.5rem', opacity: 0.55, fontSize: '0.9rem' }}>
                 {UI_COPY.nodeEditor.rightPanel.previewEmptyState}

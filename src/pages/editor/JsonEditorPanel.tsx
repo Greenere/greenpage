@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react';
 
-import { UI_COPY } from '../../configs/uiCopy';
 import { normalizeNodeContent, type GraphNodeContent } from '../graph/content/Nodes';
 
 // ── styles ──
@@ -18,32 +17,6 @@ const textareaStyle: CSSProperties = {
   resize: 'vertical',
 };
 
-const btnPrimary: CSSProperties = {
-  padding: '0.48rem 0.9rem',
-  borderRadius: '10px',
-  fontSize: '0.83rem',
-  fontWeight: 600,
-  fontFamily: 'inherit',
-  cursor: 'pointer',
-  border: '1px solid transparent',
-  background: 'var(--color-text)',
-  color: 'var(--color-background)',
-};
-
-const btnSecondary: CSSProperties = {
-  padding: '0.48rem 0.9rem',
-  borderRadius: '10px',
-  fontSize: '0.83rem',
-  fontWeight: 500,
-  fontFamily: 'inherit',
-  cursor: 'pointer',
-  border: '1px solid color-mix(in srgb, var(--color-secondary) 34%, transparent)',
-  background: 'transparent',
-  color: 'var(--color-text)',
-};
-
-const btnDisabled: CSSProperties = { opacity: 0.38, cursor: 'not-allowed' };
-
 // ── helpers ──
 
 /**
@@ -60,25 +33,21 @@ function lenientParse(text: string): unknown {
 // ── component ──
 
 type JsonEditorPanelProps = {
+  label?: string;
+  hint?: string;
   text: string;
   nodeId: string;
   jsonError: string | null;
-  validationError: string | null;
-  actionPending: boolean;
   onChangeText: (value: string, parsedContent: GraphNodeContent | null, error: string | null) => void;
-  onWriteToFile: () => void;
-  onSaveDraft: () => void;
 };
 
 export default function JsonEditorPanel({
+  label,
+  hint,
   text,
   nodeId,
   jsonError,
-  validationError,
-  actionPending,
   onChangeText,
-  onWriteToFile,
-  onSaveDraft,
 }: JsonEditorPanelProps) {
   const handleChange = (value: string) => {
     try {
@@ -90,39 +59,29 @@ export default function JsonEditorPanel({
     }
   };
 
-  const displayError = jsonError ?? validationError;
-  const canWrite = !displayError && !actionPending;
-
   return (
     <>
+      {label && (
+        <div style={{ fontSize: '0.73rem', fontWeight: 600, marginBottom: '0.35rem', opacity: 0.78, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          {label}
+        </div>
+      )}
+      {hint && (
+        <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', opacity: 0.62, lineHeight: 1.55 }}>
+          {hint}
+        </div>
+      )}
       <textarea
         value={text}
         rows={30}
         style={textareaStyle}
         onChange={(event) => handleChange(event.target.value)}
       />
-      {displayError && (
+      {jsonError && (
         <div style={{ marginTop: '0.55rem', color: 'crimson', fontSize: '0.82rem' }}>
-          {displayError}
+          {jsonError}
         </div>
       )}
-      <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          onClick={onWriteToFile}
-          disabled={!canWrite}
-          style={canWrite ? btnPrimary : { ...btnPrimary, ...btnDisabled }}
-        >
-          {UI_COPY.nodeEditor.jsonTab.writeToFile}
-        </button>
-        <button
-          type="button"
-          onClick={onSaveDraft}
-          style={btnSecondary}
-        >
-          {UI_COPY.nodeEditor.jsonTab.saveDraft}
-        </button>
-      </div>
     </>
   );
 }

@@ -121,8 +121,6 @@ export const EN_MESSAGES = {
         deleteSectionTitle: 'Delete section',
       },
       status: {
-        recoveredDraft: 'Recovered browser draft.',
-        savedDraft: 'Saved browser draft.',
         discardedDraft: 'Discarded browser draft.',
         wroteNodeFile: 'Wrote node JSON to file.',
         wroteNodeFileSkipped: (count: number) =>
@@ -215,14 +213,17 @@ export const EN_MESSAGES = {
           'Select an explicit connection card on the right to edit its direction, kind, strength, and label.',
         sidebarHint: 'Edit header, metadata, and hero from this panel. Click any section on the right to edit it.',
         writeToFile: 'Write to file',
-        saveDraft: 'Save draft',
         reset: 'Reset',
         deleteNode: 'Delete node',
       },
       jsonTab: {
         emptyState: 'Choose a node above to edit raw JSON.',
+        contentJson: 'Content JSON',
+        contentJsonHint: 'Edit the node content directly. The live preview updates whenever the JSON is valid.',
+        explicitConnectionsJson: 'Explicit Connections JSON',
+        explicitConnectionsJsonHint:
+          'Edit the saved explicit graph connections for this node. Timeline and bio links are derived automatically and are not included here.',
         writeToFile: 'Write to file',
-        saveDraft: 'Save draft',
       },
       newNodeTab: {
         domain: 'Domain',

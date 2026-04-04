@@ -123,8 +123,6 @@ export const ZH_CN_MESSAGES = {
         deleteSectionTitle: '删除章节',
       },
       status: {
-        recoveredDraft: '已恢复浏览器草稿。',
-        savedDraft: '已保存浏览器草稿。',
         discardedDraft: '已丢弃浏览器草稿。',
         wroteNodeFile: '已将节点 JSON 写入文件。',
         wroteNodeFileSkipped: (count: number) =>
@@ -217,14 +215,17 @@ export const ZH_CN_MESSAGES = {
           '在右侧选择一张显式连接卡片，以编辑其方向、类型、强度和标签。',
         sidebarHint: '在此面板编辑头部、元数据和头图。点击右侧任意章节即可编辑。',
         writeToFile: '写入文件',
-        saveDraft: '保存草稿',
         reset: '重置',
         deleteNode: '删除节点',
       },
       jsonTab: {
         emptyState: '请先在上方选择一个节点来编辑原始 JSON。',
+        contentJson: '内容 JSON',
+        contentJsonHint: '直接编辑节点内容。只要 JSON 有效，右侧预览就会实时更新。',
+        explicitConnectionsJson: '显式连接 JSON',
+        explicitConnectionsJsonHint:
+          '编辑这个节点会写入图谱的显式连接。时间线连接和 bio 连接是自动推导的，不在这里编辑。',
         writeToFile: '写入文件',
-        saveDraft: '保存草稿',
       },
       newNodeTab: {
         domain: '领域',
