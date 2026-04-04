@@ -1,0 +1,32 @@
+.page-loading-fallback {
+  position: fixed;
+  inset: 0;
+  background: var(--color-background, #f5f0e8);
+}
+
+.page-loading-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 60%;
+  background: var(--color-secondary, #888);
+  opacity: 0.5;
+  animation: page-loading-sweep 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: left center;
+}
+
+@keyframes page-loading-sweep {
+  0%   { width: 0%;   opacity: 0;   }
+  20%  { opacity: 0.5; }
+  80%  { opacity: 0.5; }
+  100% { width: 85%;  opacity: 0;   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-loading-bar {
+    animation: none;
+    width: 100%;
+    opacity: 0.3;
+  }
+}

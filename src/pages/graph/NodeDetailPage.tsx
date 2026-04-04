@@ -9,7 +9,7 @@ import { UI_COPY } from '../../configs/ui/uiCopy';
 import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { Footnote, Paragraph } from '../../shared/ui/StyledTextBlocks';
-import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
+import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from './content/BioPage';
@@ -722,6 +722,7 @@ const NodeDetailPage: React.FC = () => {
   }
 
   const articleSections = node.sections;
+  const heroImageTransitionName = getStableImageViewTransitionName(`node-hero-${node.id}`);
   const detailPageStyle = {
     minHeight: '100vh',
     color: 'var(--color-text)',

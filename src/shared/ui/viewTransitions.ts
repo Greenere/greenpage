@@ -1,5 +1,3 @@
-import { flushSync } from 'react-dom';
-
 import { PAGE_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 
 type DocumentWithViewTransition = Document & {
@@ -41,9 +39,7 @@ type RunWithViewTransitionOptions = {
 };
 
 function applyUpdate(update: () => void, options?: RunWithViewTransitionOptions) {
-  flushSync(() => {
-    update();
-  });
+  update();
   if (options?.resetScrollTop) {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }

@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import './App.css'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NodeHomePage from './pages/graph/NodeHomePage'
-import { useAppLanguage } from './i18n/useAppLanguage'
+import PageLoadingFallback from './shared/ui/PageLoadingFallback'
 
 const NodeEditorPage = lazy(() => import('./pages/editor/NodeEditorPage'))
 const NodeDetailPage = lazy(() => import('./pages/graph/NodeDetailPage'))
@@ -10,7 +10,6 @@ const BioDetailPage = lazy(() => import('./pages/graph/BioDetailPage'))
 
 function App() {
   const location = useLocation()
-  const { messages } = useAppLanguage()
   const editorTab = new URLSearchParams(location.search).get('tab')
   const renderEditorWorkspace = editorTab === 'new-node' || editorTab === 'new-domain'
 
@@ -21,7 +20,7 @@ function App() {
         path="/editor"
         element={
           renderEditorWorkspace ? (
-            <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
+            <Suspense fallback={<PageLoadingFallback />}>
               <NodeEditorPage />
             </Suspense>
           ) : (
@@ -32,7 +31,7 @@ function App() {
       <Route
         path="/editor/nodes/:nodeId"
         element={
-          <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
+          <Suspense fallback={<PageLoadingFallback />}>
             <NodeEditorPage />
           </Suspense>
         }
@@ -40,7 +39,7 @@ function App() {
       <Route
         path="/nodes/bio"
         element={
-          <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
+          <Suspense fallback={<PageLoadingFallback />}>
             <BioDetailPage key={location.pathname} />
           </Suspense>
         }
@@ -48,7 +47,7 @@ function App() {
       <Route
         path="/nodes/:nodeId"
         element={
-          <Suspense fallback={<div style={{ padding: '1rem' }}>{messages.appShell.loadingEditor}</div>}>
+          <Suspense fallback={<PageLoadingFallback />}>
             <NodeDetailPage key={location.pathname} />
           </Suspense>
         }
