@@ -7,7 +7,7 @@ The main experience is a graph-based homepage with:
 - a central bio node
 - domain-grouped content nodes such as education, experience, project, research, travel, and writing
 - draggable graph interactions and routed detail pages
-- a dev-only node editor for content, relations, and domains
+- an editor workspace for content, relations, and domains
 - localized UI and localized content files
 
 ## Stack
@@ -55,9 +55,9 @@ npm run generate:node-index
 ## Project structure
 
 - [`src/pages/graph`](./src/pages/graph)
-  The active graph homepage, node detail pages, graph nodes, and graph data loaders.
+  The active graph homepage, lazy-loaded detail pages, graph nodes, and graph data loaders.
 - [`src/pages/editor`](./src/pages/editor)
-  The dev-only node editor, live preview, templates, and section editor.
+  The editor workspace, live preview, templates, browse-node dialog, and section editor.
 - [`src/pages/legacy`](./src/pages/legacy)
   Older homepage implementation kept as reference/archive material.
 - [`src/configs`](./src/configs)
@@ -74,7 +74,10 @@ npm run generate:node-index
 - `/` for the graph homepage
 - `/nodes/:nodeId` for content detail pages
 - `/nodes/bio` for the bio detail page
-- `/editor` for the dev-only node editor during `npm run dev`
+- `/editor` for the editor landing route, which defaults to the bio editor
+- `/editor/nodes/:nodeId` for opening a specific node or the bio workspace directly
+
+The two detail routes are lazy-loaded and now use a shared layout skeleton while the route chunk or localized content is loading.
 
 ## Data model
 
@@ -154,13 +157,14 @@ Fallback order is locale-aware and currently prefers:
 - other supported locale
 - legacy unlocalized file if present
 
-## Node editor
+## Editor
 
-The project includes a dev-only node editor for creating and editing:
+The project includes an editor for creating and editing:
 
 - node content
 - explicit graph relations
 - node metadata
+- the bio page
 - new nodes from templates
 - new domains
 
@@ -178,17 +182,21 @@ Then open:
 
 Important notes:
 
-- the editor uses Vite dev-only endpoints, so it is only available during `npm run dev`
+- `/editor` now opens the bio workspace by default
+- in development, the editor can write back to the repo through Vite dev endpoints
+- in production, the editor is still accessible for preview/local draft editing, but write/create/delete actions are disabled
 - create/delete domain operations still reload the editor because domains are stored in [`src/configs/content/domains.ts`](./src/configs/content/domains.ts)
 
 ### What it can do
 
 - edit localized node content with a live article preview
+- edit localized bio content with the same section editor and markdown subset
 - edit raw JSON
 - create new nodes from templates
 - edit explicit graph relations from the connected-nodes UI
 - create and delete domains
 - switch editor language without changing the current editing context
+- autosave local drafts by default
 
 ### Editor rules
 
@@ -197,6 +205,19 @@ Important notes:
 - incomplete connection drafts stay in the editor but are skipped on save
 - timeline links and latest-bio links are inferred automatically
 - dangerous actions like write, reset, and delete use confirmations
+
+## Detail-page rendering
+
+The graph detail pages share a small rendering layer under [`src/pages/graph`](./src/pages/graph):
+
+- [`DetailContent.tsx`](./src/pages/graph/DetailContent.tsx)
+  Shared content-block rendering, inline markdown handling, and base-aware internal/external link behavior for graph detail pages.
+- [`BioDetailPage.tsx`](./src/pages/graph/BioDetailPage.tsx)
+  Bio detail page with localized content, theme/language controls, and graph-path cards.
+- [`NodeDetailPage.tsx`](./src/pages/graph/NodeDetailPage.tsx)
+  Content-node detail page that lazy-loads full article data and related nodes.
+- [`src/shared/ui/DetailPageSkeleton.tsx`](./src/shared/ui/DetailPageSkeleton.tsx)
+  Shared skeleton used during detail-route lazy loading and localized content fetches.
 
 ## Content format
 
