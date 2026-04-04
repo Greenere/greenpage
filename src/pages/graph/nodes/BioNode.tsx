@@ -34,7 +34,7 @@ const BioNode: React.FC<BioNodeProps> = ({
     const [bioContent, setBioContent] = useState<BioPageContent | null>(() => readCachedBioPageContent(language));
     const updateNodeInternals = useUpdateNodeInternals();
     const portraitTransitionName = getStableImageViewTransitionName(`graph-bio-portrait-${data.theme}`);
-    const portraitHref = getBioPortraitHref(bioContent ?? {}, BIOTHEME[data.theme].url);
+    const portraitHref = getBioPortraitHref(bioContent ?? {});
 
     useLayoutEffect(() => {
         updateNodeInternals(id);
@@ -119,17 +119,29 @@ const BioNode: React.FC<BioNodeProps> = ({
                 paddingTop: "1.1rem"
             }}>
                 <div style={{ position: "relative", display: "inline-block", background: "transparent" }}>
-                    <a
-                        href={portraitHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        onMouseOver={() => {
-                            setFocused(true);
-                        }}
-                        onMouseLeave={() => {
-                            setFocused(false);
-                        }}
-                    >
+                    {portraitHref ? (
+                        <a
+                            href={portraitHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            onMouseOver={() => {
+                                setFocused(true);
+                            }}
+                            onMouseLeave={() => {
+                                setFocused(false);
+                            }}
+                        >
+                            <img src={resolveAssetUrl(BIOTHEME[data.theme].imgSrc)} style={{
+                                width: `96px`,
+                                height: `96px`,
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                                border: `calc(var(--greenpage-bio-portrait-border-width, 1.35) * 1px) solid color-mix(in srgb, var(--color-secondary) calc(var(--greenpage-bio-portrait-border-opacity, 1) * 100%), transparent)`,
+                                filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`,
+                                viewTransitionName: portraitTransitionName,
+                            }} />
+                        </a>
+                    ) : (
                         <img src={resolveAssetUrl(BIOTHEME[data.theme].imgSrc)} style={{
                             width: `96px`,
                             height: `96px`,
@@ -139,7 +151,7 @@ const BioNode: React.FC<BioNodeProps> = ({
                             filter: `saturate(${focused ? 1.08 : 1}) brightness(${focused ? 1.03 : 1})`,
                             viewTransitionName: portraitTransitionName,
                         }} />
-                    </a>
+                    )}
 
                     <GreenHandle
                         type="target"

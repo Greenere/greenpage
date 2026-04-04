@@ -192,7 +192,7 @@ export default function BioPagePreview({ content, theme, hideSections = false, c
   const portrait = BIOTHEME[theme];
   const portraitTransitionName = getStableImageViewTransitionName(`bio-preview-portrait-${theme}`);
   const themeLabel = THEME_CONFIG[theme].label;
-  const portraitHref = getBioPortraitHref(content, portrait.url);
+  const portraitHref = getBioPortraitHref(content);
 
   useEffect(() => {
     setGraphModel(readCachedGraphModel(language));
@@ -323,16 +323,32 @@ export default function BioPagePreview({ content, theme, hideSections = false, c
               width: 'min(100%, 16rem)',
             }}
           >
-            <a
-              href={portraitHref}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                display: 'block',
-                color: 'inherit',
-                textDecoration: 'none',
-              }}
-            >
+            {portraitHref ? (
+              <a
+                href={portraitHref}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: 'block',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+              >
+                <img
+                  src={resolveAssetUrl(portrait.imgSrc)}
+                  alt={UI_COPY.bioDetailPage.portraitAlt(content.name)}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    aspectRatio: '1 / 1',
+                    objectFit: 'cover',
+                    borderRadius: '24px',
+                    border: '2px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
+                    viewTransitionName: portraitTransitionName,
+                  }}
+                />
+              </a>
+            ) : (
               <img
                 src={resolveAssetUrl(portrait.imgSrc)}
                 alt={UI_COPY.bioDetailPage.portraitAlt(content.name)}
@@ -346,7 +362,7 @@ export default function BioPagePreview({ content, theme, hideSections = false, c
                   viewTransitionName: portraitTransitionName,
                 }}
               />
-            </a>
+            )}
             <figcaption
               style={{
                 marginTop: '0.7rem',

@@ -115,7 +115,7 @@ const BioDetailPage: React.FC = () => {
   const portrait = BIOTHEME[theme];
   const portraitTransitionName = getStableImageViewTransitionName(`bio-portrait-${theme}`);
   const themeLabel = THEME_CONFIG[theme].label;
-  const portraitHref = bioContent ? getBioPortraitHref(bioContent, portrait.url) : portrait.url;
+  const portraitHref = bioContent ? getBioPortraitHref(bioContent) : undefined;
   const handleThemeChange = (nextTheme: Theme) => {
     setTheme(nextTheme);
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
@@ -375,16 +375,32 @@ const BioDetailPage: React.FC = () => {
                 width: 'min(100%, 16rem)',
               }}
             >
-              <a
-                href={portraitHref}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  display: 'block',
-                  color: 'inherit',
-                  textDecoration: 'none',
-                }}
-              >
+              {portraitHref ? (
+                <a
+                  href={portraitHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'block',
+                    color: 'inherit',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <img
+                    src={resolveAssetUrl(portrait.imgSrc)}
+                    alt={UI_COPY.bioDetailPage.portraitAlt(bioContent.name)}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      aspectRatio: '1 / 1',
+                      objectFit: 'cover',
+                      borderRadius: '24px',
+                      border: '2px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
+                      viewTransitionName: portraitTransitionName,
+                    }}
+                  />
+                </a>
+              ) : (
                 <img
                   src={resolveAssetUrl(portrait.imgSrc)}
                   alt={UI_COPY.bioDetailPage.portraitAlt(bioContent.name)}
@@ -398,7 +414,7 @@ const BioDetailPage: React.FC = () => {
                     viewTransitionName: portraitTransitionName,
                   }}
                 />
-              </a>
+              )}
               <figcaption
                 style={{
                   marginTop: '0.7rem',

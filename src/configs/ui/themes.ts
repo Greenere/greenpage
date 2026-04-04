@@ -8,7 +8,6 @@ export type ThemePalette = {
 
 type ThemePortraitConfig = {
     imgSrc: string;
-    url: string;
     description: string;
 };
 
@@ -30,7 +29,6 @@ export const THEME_CONFIG = {
         },
         portrait: {
             imgSrc: './assets/portrait_haoyang_nyc.jpg',
-            url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'New York, 2023',
         },
     },
@@ -45,7 +43,6 @@ export const THEME_CONFIG = {
         },
         portrait: {
             imgSrc: './assets/portrait_haoyang_joshua.jpg',
-            url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'Joshua Tree, 2023',
         },
     },
@@ -60,7 +57,6 @@ export const THEME_CONFIG = {
         },
         portrait: {
             imgSrc: './assets/portrait_haoyang_mty.jpg',
-            url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'Monterey, 2023',
         },
     },
@@ -75,7 +71,6 @@ export const THEME_CONFIG = {
         },
         portrait: {
             imgSrc: './assets/portrait_haoyang_atlp.jpg',
-            url: 'https://www.linkedin.com/in/haoyanghowyoung/',
             description: 'Antelope Valley, 2023',
         },
     },

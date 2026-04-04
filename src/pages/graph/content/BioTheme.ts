@@ -8,7 +8,6 @@ const THEME_STORAGE_KEY = 'greenpage-active-theme';
 
 type ThemeInfo = {
     imgSrc: string,
-    url: string,
     description: string
 };
 
