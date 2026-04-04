@@ -33,6 +33,7 @@ import {
 } from '../graph/content/Nodes';
 import JsonEditorPanel from './JsonEditorPanel';
 import NodeArticlePreview from './NodeArticlePreview';
+import BrowseNodesDialog from './BrowseNodesDialog';
 import {
   DETAIL_READING_WIDTH,
   DETAIL_SECTION_WIDTH,
@@ -1061,12 +1062,18 @@ function SearchableNodePicker({
   currentDomain,
   onSelect,
   placeholder = UI_COPY.nodeEditor.contentTab.otherNodePlaceholder,
+  disabled = false,
+  maxResults = 8,
+  menuMaxHeight = '16rem',
 }: {
   options: EditorNodeOption[];
   value: string;
   currentDomain?: DomainId;
   onSelect: (nodeId: string) => void;
   placeholder?: string;
+  disabled?: boolean;
+  maxResults?: number;
+  menuMaxHeight?: string;
 }) {
   const { language } = useAppLanguage();
   const selectedOption = options.find((node) => node.id === value);
@@ -1109,8 +1116,8 @@ function SearchableNodePicker({
 
         return sortNodeRefs(left, right);
       })
-      .slice(0, 8);
-  }, [currentDomain, language, options, query]);
+      .slice(0, maxResults);
+  }, [currentDomain, language, maxResults, options, query]);
 
   const resetQuery = () => {
     setQuery(selectedOption ? formatEditorNodeOptionLabel(selectedOption) : '');
@@ -1124,12 +1131,17 @@ function SearchableNodePicker({
   return (
     <div style={{ position: 'relative' }}>
       <input
+        disabled={disabled}
         value={query}
         onChange={(event) => {
+          if (disabled) return;
           setQuery(event.target.value);
           setOpen(true);
         }}
-        onFocus={() => setOpen(true)}
+        onFocus={() => {
+          if (disabled) return;
+          setOpen(true);
+        }}
         onBlur={() => {
           window.setTimeout(() => {
             setOpen(false);
@@ -1147,9 +1159,9 @@ function SearchableNodePicker({
           }
         }}
         placeholder={placeholder}
-        style={inputStyle()}
+        style={disabled ? { ...inputStyle(), ...btnDisabled } : inputStyle()}
       />
-      {open && (
+      {open && !disabled && (
         <div
           style={{
             position: 'absolute',
@@ -1164,7 +1176,7 @@ function SearchableNodePicker({
             boxShadow: '0 18px 40px rgba(0, 0, 0, 0.08)',
             display: 'grid',
             gap: '0.2rem',
-            maxHeight: '16rem',
+            maxHeight: menuMaxHeight,
             overflowY: 'auto',
           }}
         >
@@ -1278,6 +1290,7 @@ const NodeEditorPage: React.FC = () => {
       }),
   );
   const [dangerDialog, setDangerDialog] = useState<DangerDialogState | null>(null);
+  const [showOpenNodeDialog, setShowOpenNodeDialog] = useState(false);
   const {
     tab,
     bootstrapNodes,
@@ -1569,6 +1582,10 @@ const NodeEditorPage: React.FC = () => {
     () => new Map(bootstrapNodes.map((node) => [node.id, node])),
     [bootstrapNodes]
   );
+  const selectedOpenNodeOption = useMemo(
+    () => bootstrapNodes.find((node) => node.id === decodedNodeId) ?? null,
+    [bootstrapNodes, decodedNodeId],
+  );
 
   const otherNodeOptions = useMemo(() => {
     if (!currentNodeRef) return [];
@@ -1757,6 +1774,12 @@ const NodeEditorPage: React.FC = () => {
     }
     navigate(`/editor/nodes/${encodeURIComponent(nextNodeId)}`);
   };
+
+  useEffect(() => {
+    if (tab === 'new-node') {
+      setShowOpenNodeDialog(false);
+    }
+  }, [tab]);
 
   const handleDiscardDraft = () => {
     if (!decodedNodeId || !originalContent) return;
@@ -2179,22 +2202,59 @@ const NodeEditorPage: React.FC = () => {
             {tab !== 'new-domain' && (
               <FieldShell>
                 <ControlLabel>{UI_COPY.nodeEditor.common.openNode}</ControlLabel>
-                <select
-                  value={tab === 'new-node' ? '' : decodedNodeId}
-                  onChange={(event) => handleOpenNode(event.target.value)}
+                <button
+                  type="button"
+                  onClick={() => setShowOpenNodeDialog(true)}
                   disabled={tab === 'new-node'}
-                  style={tab === 'new-node' ? { ...inputStyle(), ...btnDisabled } : inputStyle()}
+                  style={
+                    tab === 'new-node'
+                      ? { ...inputStyle(), ...btnDisabled, textAlign: 'left' }
+                      : {
+                          ...inputStyle(),
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '0.8rem',
+                        }
+                  }
                 >
-                  <option value="">{UI_COPY.nodeEditor.common.chooseNode}</option>
-                  {bootstrapNodes
-                    .slice()
-                    .sort(sortNodeRefs)
-                    .map((node) => (
-                      <option key={node.id} value={node.id}>
-                        {formatEditorNodeOptionLabel(node)}
-                      </option>
-                    ))}
-                </select>
+                  <span style={{ minWidth: 0 }}>
+                    <span
+                      style={{
+                        display: 'block',
+                        fontSize: '0.88rem',
+                        fontWeight: 600,
+                        lineHeight: 1.35,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {selectedOpenNodeOption
+                        ? getEditorNodeTitle(selectedOpenNodeOption, selectedOpenNodeOption.id)
+                        : UI_COPY.nodeEditor.common.chooseNode}
+                    </span>
+                    <span
+                      style={{
+                        display: 'block',
+                        marginTop: '0.16rem',
+                        fontSize: '0.74rem',
+                        opacity: 0.62,
+                        lineHeight: 1.4,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {selectedOpenNodeOption
+                        ? `${selectedOpenNodeOption.domain} / ${selectedOpenNodeOption.id}${selectedOpenNodeOption.subtitle ? ` · ${selectedOpenNodeOption.subtitle}` : ''}`
+                        : UI_COPY.nodeEditor.common.browseNodes}
+                    </span>
+                  </span>
+                  <span style={{ opacity: 0.45, fontSize: '0.86rem', flexShrink: 0 }}>▾</span>
+                </button>
               </FieldShell>
             )}
 
@@ -3446,6 +3506,14 @@ const NodeEditorPage: React.FC = () => {
           </div>
         </div>
       </div>
+      <BrowseNodesDialog
+        open={showOpenNodeDialog}
+        nodes={bootstrapNodes}
+        currentNodeId={decodedNodeId}
+        currentDomain={currentNodeRef?.domain}
+        onClose={() => setShowOpenNodeDialog(false)}
+        onSelect={handleOpenNode}
+      />
       {dangerDialog && (
         <div
           onClick={closeDangerDialog}
