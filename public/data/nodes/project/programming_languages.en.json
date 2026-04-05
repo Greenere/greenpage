@@ -1,10 +1,10 @@
 {
   "title": "Data Visualizations",
-  "subtitle": "Interactive D3 project",
-  "summary": "A Cornell visualization piece exploring programming-language history, family relationships, and popularity through interactive graphics.",
+  "subtitle": "Interactive D3 projects during Cornell",
+  "summary": "I attended this interesting course INFO 5100 at Cornell, where we were taught the principals of data visualizations and how to use d3.js to realize those ideas. There were three course projects that are very interesting.",
   "tags": [
     "D3",
-    "programming languages"
+    "Data visualization"
   ],
   "sections": [
     {
@@ -12,18 +12,86 @@
       "blocks": [
         {
           "type": "text",
-          "text": "The project combined history, relation maps, and trend views. In hindsight, it feels especially close to the graph-based personal-site idea."
+          "text": "The first project was a static course chart showing the course distributions of three adjacent majors in Cornell over a week, where we can see the temporal and spatial concentrations of courses."
         },
         {
-          "type": "list",
-          "items": [
-            "Language family network",
-            "Popularity and speed views",
-            "Collaborative Cornell course project"
-          ]
+          "type": "text",
+          "text": "The second project was an interactive kitchen board called \"Online Kitchen\", where you can drag your food and see the nutritions of the combined meal."
+        },
+        {
+          "type": "text",
+          "text": "The third project was a composite interactive storyboard showing the history, relationship and popularities of major programming languages."
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "Cornell Fall 2021 Class of ECE, CS & INFO",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "This is a data visualization course project realized with D3.js, check the visualization outcome in web page [here](https://greenere.github.io/visualizations/cornell_class/cornell_class_ece_cs_info_fall2021.html)"
+        },
+        {
+          "type": "text",
+          "text": "It is a course project in collaboration with Han Xia, Yingxin Lin and Yuhao Lu."
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/visualizations/cornell_class/cornell_class_ece_cs_info_fall2021.jpg"
+        }
+      ]
+    },
+    {
+      "label": "Online Kitchen",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "This is a data visualization course project realized with D3.js, check the visualization outcome in web page [here](https://greenere.github.io/visualizations/online_kitchen/online_kitchen.html)."
+        },
+        {
+          "type": "text",
+          "text": "It is a course project in collaboration with Yuhao Lu, Yue Wang and Yue Zhao."
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/online_kitchen.png"
+        }
+      ]
+    },
+    {
+      "label": "Programming Languages",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "This is a data visualization course project realized with D3.js, check the visualization outcome in web page [here](https://greenere.github.io/visualizations/programming_languages/programming_languages.html)."
+        },
+        {
+          "type": "text",
+          "text": "It is a course project in collaboration with Yuhao Lu, Yue Wang and Yue Zhao."
+        },
+        {
+          "type": "text",
+          "text": "The project aims to display some interesting facts about programming languages in terms of their histories and popularities."
+        },
+        {
+          "type": "gallery",
+          "items": [
+            {
+              "alt": "",
+              "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/pl_familynet.png"
+            },
+            {
+              "alt": "",
+              "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/pl_speed.png"
+            }
+          ],
+          "columns": 1,
+          "align": "natural"
+        }
+      ]
     }
   ]
 }

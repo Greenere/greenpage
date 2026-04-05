@@ -322,24 +322,24 @@
   },
   "programming-languages": {
     "title": "Data Visualizations",
-    "subtitle": "Interactive D3 project",
-    "summary": "A Cornell visualization piece exploring programming-language history, family relationships, and popularity through interactive graphics.",
+    "subtitle": "Interactive D3 projects during Cornell",
+    "summary": "I attended this interesting course INFO 5100 at Cornell, where we were taught the principals of data visualizations and how to use d3.js to realize those ideas. There were three course projects that are very interesting.",
     "tags": [
       "D3",
-      "programming languages"
+      "Data visualization"
     ],
     "preview": [
       {
         "type": "text",
-        "text": "The project combined history, relation maps, and trend views. In hindsight, it feels especially close to the graph-based personal-site idea."
+        "text": "The first project was a static course chart showing the course distributions of three adjacent majors in Cornell over a week, where we can see the temporal and spatial concentrations of courses."
       },
       {
-        "type": "list",
-        "items": [
-          "Language family network",
-          "Popularity and speed views",
-          "Collaborative Cornell course project"
-        ]
+        "type": "text",
+        "text": "The second project was an interactive kitchen board called \"Online Kitchen\", where you can drag your food and see the nutritions of the combined meal."
+      },
+      {
+        "type": "text",
+        "text": "The third project was a composite interactive storyboard showing the history, relationship and popularities of major programming languages."
       }
     ]
   },

@@ -149,17 +149,6 @@
       "strength": 2
     },
     {
-      "id": "editor-verily-reason-layoff-journey-verily-1",
-      "from": "layoff-journey",
-      "to": "verily",
-      "kind": "reason",
-      "labels": {
-        "en": "laid-off by Verily",
-        "zh-CN": "被 Verily 裁员"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
       "from": "california-one-2022",
       "to": "cornell",
@@ -215,17 +204,6 @@
       "strength": 2
     },
     {
-      "id": "editor-hust-time-faceswap-hust-7",
-      "from": "faceswap",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "graduation capstone project for bachelors",
-        "zh-CN": "本科毕业设计项目"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-naec-time-hust-naec-1",
       "from": "hust",
       "to": "naec",
@@ -257,39 +235,6 @@
         "zh-CN": "在研究助理阶段逐渐成形"
       },
       "strength": 3
-    },
-    {
-      "id": "editor-adversarial-writing-outcome-noise-modulation-adversarial-writing-1",
-      "from": "noise-modulation",
-      "to": "adversarial-writing",
-      "kind": "outcome",
-      "labels": {
-        "en": "the failed research those notes eventually led to",
-        "zh-CN": "这些笔记促成的失败研究"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-adversarial-writing-reason-adversarial-writing-hust-mclab-3",
-      "from": "adversarial-writing",
-      "to": "hust-mclab",
-      "kind": "reason",
-      "labels": {
-        "en": "research note during this period",
-        "zh-CN": "在这期间的科研笔记"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-programming-languages-time-programming-languages-cornell-1",
-      "from": "programming-languages",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "Data Visualization work at Cornell",
-        "zh-CN": "康奈尔时期的数据可视化项目"
-      },
-      "strength": 2
     },
     {
       "id": "editor-realai-tool-realai-noise-modulation-1",
@@ -324,7 +269,18 @@
       "strength": 2
     },
     {
-      "id": "editor-signature-attack-topic-faceswap-signature-attack-3",
+      "id": "editor-faceswap-time-faceswap-hust-1",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "graduation capstone project for bachelors",
+        "zh-CN": "本科毕业设计项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-faceswap-topic-faceswap-signature-attack-2",
       "from": "faceswap",
       "to": "signature-attack",
       "kind": "topic",
@@ -335,13 +291,57 @@
       "strength": 2
     },
     {
-      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-4",
+      "id": "editor-adversarial-writing-outcome-noise-modulation-adversarial-writing-1",
+      "from": "noise-modulation",
+      "to": "adversarial-writing",
+      "kind": "outcome",
+      "labels": {
+        "en": "reading notes related to adversarial examples",
+        "zh-CN": "与对抗样本相关的阅读笔记"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-adversarial-writing-topic-signature-attack-adversarial-writing-2",
       "from": "signature-attack",
       "to": "adversarial-writing",
       "kind": "topic",
       "labels": {
-        "en": "the original research direction",
-        "zh-CN": "最开始的研究方向"
+        "zh-CN": "这篇论文是之后类似研究的起点",
+        "en": "it leads to further research in adversarial ML"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-adversarial-writing-reason-adversarial-writing-hust-mclab-3",
+      "from": "adversarial-writing",
+      "to": "hust-mclab",
+      "kind": "reason",
+      "labels": {
+        "en": "research notes during this period",
+        "zh-CN": "在这期间的研究笔记"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "labels": {
+        "en": "Laid off by Verily",
+        "zh-CN": "被 Verily 裁员"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-programming-languages-time-programming-languages-cornell-1",
+      "from": "programming-languages",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "Data Visualization work at Cornell",
+        "zh-CN": "康奈尔时期的数据可视化项目"
       },
       "strength": 2
     }
