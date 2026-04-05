@@ -4,7 +4,8 @@ import { Footnote, Paragraph, Subtitle } from "../../../shared/ui/StyledTextBloc
 import { Position, useUpdateNodeInternals } from "@xyflow/react";
 import { NodeContainer } from "../../../shared/ui/NodeContainer";
 import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./Handles";
-import { type Theme, BIOTHEME } from "../content/BioTheme";
+import { THEME_CONFIG } from "../../../configs/ui/themes";
+import { type Theme } from "../content/BioTheme";
 import { getBioPortraitHref, loadBioPageContent, readCachedBioPageContent, type BioPageContent } from "../content/BioPage";
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
 import { UI_COPY } from '../../../configs/ui/uiCopy';
@@ -110,7 +111,7 @@ const BioNode: React.FC<BioNodeProps> = ({
     };
 
     const portraitImage = (
-        <img src={resolveAssetUrl(BIOTHEME[data.theme].imgSrc)} style={{
+        <img src={resolveAssetUrl(THEME_CONFIG[data.theme].portrait.imgSrc)} style={{
             width: `96px`,
             height: `96px`,
             objectFit: "cover",

@@ -74,6 +74,20 @@ export const THEME_CONFIG = {
             description: 'Antelope Valley, 2023',
         },
     },
+    sfhill: {
+        label: 'San Francisco Bay, 2023',
+        colors: {
+            primary: 'rgb(17, 177, 153)',
+            secondary: '#954839ff',
+            background: 'rgb(104, 206, 153)',
+            text: 'rgb(19, 68, 121)',
+            accent: '#43444Dff',
+        },
+        portrait: {
+            imgSrc: './assets/portrait_haoyang_sfhill.jpg',
+            description: 'San Francisco Bay, 2023',
+        },
+    },
 } as const satisfies Record<string, ThemeConfig>;
 
 export type Theme = keyof typeof THEME_CONFIG;

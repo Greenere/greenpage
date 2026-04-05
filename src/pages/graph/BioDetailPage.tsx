@@ -13,7 +13,7 @@ import DetailPageSkeleton from '../../shared/ui/DetailPageSkeleton';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
 import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
-import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
+import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { getBioPortraitHref, loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
 import DetailPageLanguageToggle from './DetailPageLanguageToggle';
 import ThemePicker from './ThemePicker';
@@ -54,7 +54,7 @@ const BioDetailPage: React.FC = () => {
   const [graphModel, setGraphModel] = useState<GraphModel | null>(() => readCachedGraphModel(language));
   const [graphError, setGraphError] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
-  const portrait = BIOTHEME[theme];
+  const portrait = THEME_CONFIG[theme].portrait;
   const themeLabel = THEME_CONFIG[theme].label;
   const portraitHref = bioContent ? getBioPortraitHref(bioContent) : undefined;
   const handleThemeChange = (nextTheme: Theme) => {
