@@ -218,44 +218,12 @@
       "strength": 3
     },
     {
-      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-1",
-      "from": "signature-attack",
-      "to": "adversarial-writing",
-      "kind": "topic",
-      "labels": {
-        "zh-CN": "这篇论文是之后类似研究的起点"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-naec-reason-signature-attack-naec-2",
-      "from": "signature-attack",
-      "to": "naec",
-      "kind": "reason",
-      "labels": {
-        "zh-CN": "在这期间实习完成的工作",
-        "en": "在这期间实习完成的工作"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-hust-time-hust-mclab-hust-1",
       "from": "hust-mclab",
       "to": "hust",
       "kind": "time",
       "labels": {
         "en": "still rooted in the HUST period",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-hust-time-signature-attack-hust-2",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "在华科读书期间完成的科研",
         "zh-CN": ""
       },
       "strength": 2
@@ -304,22 +272,56 @@
       "strength": 1
     },
     {
-      "id": "editor-faceswap-topic-faceswap-signature-attack-1",
-      "from": "faceswap",
-      "to": "signature-attack",
-      "kind": "topic",
-      "labels": {
-        "en": "works also related to AI security"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-faceswap-time-faceswap-hust-2",
       "from": "faceswap",
       "to": "hust",
       "kind": "time",
       "labels": {
         "en": "graduation capstone project for bachelors"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-1",
+      "from": "signature-attack",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "labels": {
+        "zh-CN": "这篇论文是之后类似研究的起点",
+        "en": "it leads to further research in adversarial ML"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-reason-signature-attack-naec-2",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "reason",
+      "labels": {
+        "en": "it was conducted during this internship",
+        "zh-CN": "实习期间的工作"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-signature-attack-time-signature-attack-hust-3",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "在华科读书期间完成的科研",
+        "zh-CN": "大三暑期的科研"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-topic-faceswap-signature-attack-4",
+      "from": "faceswap",
+      "to": "signature-attack",
+      "kind": "topic",
+      "labels": {
+        "en": "works also related to AI security",
+        "zh-CN": "相关的AI安全工作"
       },
       "strength": 2
     }
