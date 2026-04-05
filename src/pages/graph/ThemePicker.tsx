@@ -62,9 +62,10 @@ const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'f
           return (
             <button
               key={key}
+              className="nodrag nopan"
               type="button"
               aria-label={THEME_CONFIG[key].label}
-              title={isInline ? THEME_CONFIG[key].label : undefined}
+              title={THEME_CONFIG[key].label}
               onClick={(event) => {
                 setTheme(key);
                 event.currentTarget.blur();
@@ -76,11 +77,15 @@ const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'f
                 width: '1rem',
                 height: '1rem',
                 margin: 0,
-                border: `1px ${theme === key ? 'solid' : 'dotted'} var(--color-secondary)`,
+                border: 'none',
+                outline: theme === key
+                  ? '1px solid color-mix(in srgb, var(--color-text) 80%, transparent)'
+                  : '1px dotted color-mix(in srgb, var(--color-text) 50%, transparent)',
+                outlineOffset: '0',
                 padding: 0,
                 cursor: 'pointer',
-                outline: 'none',
                 boxShadow: 'none',
+                transition: 'outline-color 140ms ease',
                 appearance: 'none',
                 WebkitAppearance: 'none',
               }}
