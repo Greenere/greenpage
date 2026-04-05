@@ -142,6 +142,7 @@ export const EN_MESSAGES = {
         syntaxHintBlocksLabel: 'Blocks:',
         addSection: '+ Add section',
         addSectionTitle: 'Add section at end',
+        addSectionAfterTitle: 'Add section after this section',
         deleteSectionTitle: 'Delete section',
       },
       status: {

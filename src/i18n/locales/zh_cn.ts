@@ -144,6 +144,7 @@ export const ZH_CN_MESSAGES = {
         syntaxHintBlocksLabel: '块级：',
         addSection: '+ 添加章节',
         addSectionTitle: '在末尾添加章节',
+        addSectionAfterTitle: '在这一章节后添加章节',
         deleteSectionTitle: '删除章节',
       },
       status: {

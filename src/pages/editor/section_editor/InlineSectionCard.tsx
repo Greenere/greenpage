@@ -106,6 +106,7 @@ type InlineSectionCardProps = {
   onStopEditing: () => void;
   onChange: (next: NodeArticleSection) => void;
   onDelete: () => void;
+  onAddAfter: () => void;
 };
 
 export default function InlineSectionCard({
@@ -116,6 +117,7 @@ export default function InlineSectionCard({
   onStopEditing,
   onChange,
   onDelete,
+  onAddAfter,
 }: InlineSectionCardProps) {
   return (
     <section
@@ -230,6 +232,33 @@ export default function InlineSectionCard({
           {section.blocks.map((block, blockIndex) => renderContentBlock(block, blockIndex))}
         </div>
       )}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: isEditing ? '0.85rem' : '1rem',
+        }}
+      >
+        <button
+          type="button"
+          onClick={onAddAfter}
+          style={{
+            padding: '0.3rem 0.85rem',
+            borderRadius: '999px',
+            border: '1px solid color-mix(in srgb, var(--color-secondary) 28%, transparent)',
+            background: 'transparent',
+            color: 'var(--color-text)',
+            cursor: 'pointer',
+            fontSize: '0.77rem',
+            fontFamily: 'inherit',
+            opacity: 0.72,
+          }}
+          title={UI_COPY.nodeEditor.sectionEditor.addSectionAfterTitle}
+        >
+          {UI_COPY.nodeEditor.sectionEditor.addSection}
+        </button>
+      </div>
     </section>
   );
 }

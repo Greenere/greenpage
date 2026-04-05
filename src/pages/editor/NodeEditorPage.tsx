@@ -2608,10 +2608,11 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
                       },
                     })
                   }
-                  onAddSection={() => {
-                    const nextSections = [...(draftContent.sections ?? []), createEmptySection()];
+                  onAddSectionAfter={(sectionIndex) => {
+                    const nextSections = [...(draftContent.sections ?? [])];
+                    nextSections.splice(sectionIndex + 1, 0, createEmptySection());
                     updateDraftContent({ ...draftContent, sections: nextSections });
-                    dispatch({ type: 'set_editing_section_index', index: nextSections.length - 1 });
+                    dispatch({ type: 'set_editing_section_index', index: sectionIndex + 1 });
                   }}
                 />
 

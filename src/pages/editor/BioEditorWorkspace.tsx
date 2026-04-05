@@ -1199,10 +1199,11 @@ export default function BioEditorWorkspace() {
                             },
                           });
                         }}
-                        onAddSection={() => {
-                          const nextSections = [...(draftContent.sections ?? []), createEmptySection()];
+                        onAddSectionAfter={(sectionIndex) => {
+                          const nextSections = [...(draftContent.sections ?? [])];
+                          nextSections.splice(sectionIndex + 1, 0, createEmptySection());
                           updateBioSections(nextSections);
-                          setEditingSectionIndex(nextSections.length - 1);
+                          setEditingSectionIndex(sectionIndex + 1);
                         }}
                       />
                     }
