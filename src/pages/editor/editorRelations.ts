@@ -138,22 +138,25 @@ function getTimelineConnectionPeers(currentNode: GraphNodeRef, nodes: EditorNode
     return [];
   }
 
-  const neighbors = [domainNodes[currentIndex - 1], domainNodes[currentIndex + 1]].filter(
-    (node): node is EditorNodeOption => Boolean(node),
-  );
+  const previousNode = domainNodes[currentIndex - 1];
+  const nextNode = domainNodes[currentIndex + 1];
 
-  return neighbors;
+  return [
+    nextNode ? { node: nextNode, direction: 'next' as const } : null,
+    previousNode ? { node: previousNode, direction: 'previous' as const } : null,
+  ].filter((entry): entry is { node: EditorNodeOption; direction: 'next' | 'previous' } => Boolean(entry));
 }
 
 export function buildTimelineConnectionEntries(currentNode: GraphNodeRef, nodes: EditorNodeOption[]): EditorConnectedNodeEntry[] {
   const neighbors = getTimelineConnectionPeers(currentNode, nodes);
 
-  return neighbors.map((node, index) => ({
-    key: `timeline-${node.id}-${index}`,
+  return neighbors.map(({ node, direction }, index) => ({
+    key: `timeline-${direction}-${node.id}-${index}`,
     relatedNodeId: node.id,
     relatedNodeTitle: getEditorNodeTitle(node, node.id),
-    displayKind: 'sequence',
-    displayLabel: UI_COPY.graphRelations.nextInTimeline,
+    displayKind: direction === 'next' ? UI_COPY.graphRelations.next : UI_COPY.graphRelations.previous,
+    displayLabel:
+      direction === 'next' ? UI_COPY.graphRelations.nextInTimeline : UI_COPY.graphRelations.previousInTimeline,
     removable: false,
   }));
 }
@@ -208,7 +211,7 @@ export function getOccupiedConnectionPeerIds(
 ) {
   const peerIds = new Set<string>();
 
-  getTimelineConnectionPeers(currentNode, nodes).forEach((node) => {
+  getTimelineConnectionPeers(currentNode, nodes).forEach(({ node }) => {
     peerIds.add(node.id);
   });
 

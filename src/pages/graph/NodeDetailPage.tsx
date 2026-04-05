@@ -51,6 +51,7 @@ type RelatedEntry = {
   displayKind: string;
   displayLabel: string;
   isBio: boolean;
+  displayOrder: number;
 };
 
 function getRelatedEntries(
@@ -73,6 +74,7 @@ function getRelatedEntries(
           displayKind: UI_COPY.nodeDetailPage.bioEntry.kind,
           displayLabel: bioIdentity.subtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
           isBio: true,
+          displayOrder: 0,
         };
       }
 
@@ -81,20 +83,33 @@ function getRelatedEntries(
         return null;
       }
 
+      const isTemporalSequence = relation.kind === 'sequence';
+      const isNextNode = isTemporalSequence && relation.from === node.id;
+      const isPreviousNode = isTemporalSequence && relation.to === node.id;
+
       return {
         relation,
         relatedNodeId: relatedNode.id,
         relatedNodeTitle: relatedNode.title,
         relatedNodeSubtitle: relatedNode.subtitle ?? relation.label,
-        displayKind: relation.kind,
-        displayLabel: relation.label,
+        displayKind: isNextNode
+          ? UI_COPY.graphRelations.next
+          : isPreviousNode
+            ? UI_COPY.graphRelations.previous
+            : relation.kind,
+        displayLabel: isNextNode
+          ? UI_COPY.graphRelations.nextInTimeline
+          : isPreviousNode
+            ? UI_COPY.graphRelations.previousInTimeline
+            : relation.label,
         isBio: false,
+        displayOrder: isNextNode ? 1 : isPreviousNode ? 2 : 3,
       };
     })
     .filter((entry): entry is RelatedEntry => entry !== null)
     .sort((left, right) => {
-      if (left.isBio !== right.isBio) {
-        return left.isBio ? -1 : 1;
+      if (left.displayOrder !== right.displayOrder) {
+        return left.displayOrder - right.displayOrder;
       }
 
       return right.relation.strength - left.relation.strength || left.relatedNodeTitle.localeCompare(right.relatedNodeTitle);

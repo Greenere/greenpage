@@ -23,7 +23,10 @@ export const EN_MESSAGES = {
   },
   uiCopy: {
     graphRelations: {
-      nextInTimeline: 'adjacent in timeline',
+      next: 'next',
+      previous: 'previous',
+      nextInTimeline: 'next in timeline',
+      previousInTimeline: 'previous in timeline',
       latestNodeInDomain: 'latest node in domain',
     },
     graphHome: {

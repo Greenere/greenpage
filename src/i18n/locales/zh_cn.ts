@@ -25,8 +25,11 @@ export const ZH_CN_MESSAGES = {
   },
   uiCopy: {
     graphRelations: {
-      nextInTimeline: '时间上相邻',
-      latestNodeInDomain: '该领域中的最新节点',
+      next: '下一个',
+      previous: '上一个',
+      nextInTimeline: '时间线中的下一个节点',
+      previousInTimeline: '时间线中的上一个节点',
+      latestNodeInDomain: '相关方向的最新节点',
     },
     graphHome: {
       loading: '正在加载图谱...',
