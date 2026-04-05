@@ -388,6 +388,17 @@
         "zh-CN": ""
       },
       "strength": 2
+    },
+    {
+      "id": "editor-microwave-notes-2019-reason-microwave-notes-2019-hust-1",
+      "from": "microwave-notes-2019",
+      "to": "hust",
+      "kind": "reason",
+      "labels": {
+        "en": "course study notes",
+        "zh-CN": "课程学习笔记"
+      },
+      "strength": 3
     }
   ]
 }
