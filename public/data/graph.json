@@ -205,59 +205,6 @@
       "strength": 4
     },
     {
-      "id": "editor-hust-time-wellmail-hust-2",
-      "from": "wellmail",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "coursework in sophomore year",
-        "zh-CN": "大二时期的课程项目"
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-signature-attack-hust-3",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "research during the undergraduate study"
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-weibe-hust-5",
-      "from": "weibe",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "big-data systems course project",
-        "zh-CN": ""
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-faceswap-hust-6",
-      "from": "faceswap",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "graduation capstone project for bachelors"
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-hust-naec-7",
-      "from": "hust",
-      "to": "naec",
-      "kind": "time",
-      "labels": {
-        "en": "it was during my junior year",
-        "zh-CN": "大三时期的科研实习"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
       "from": "layoff-journey",
       "to": "verily",
@@ -278,39 +225,6 @@
         "zh-CN": "在这期间的研究笔记"
       },
       "strength": 4
-    },
-    {
-      "id": "editor-hust-mclab-time-hust-mclab-hust-2",
-      "from": "hust-mclab",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "still rooted in the HUST period",
-        "zh-CN": "still rooted in the HUST period"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-1",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "competition project during college",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-microwave-notes-2019-reason-microwave-notes-2019-hust-1",
-      "from": "microwave-notes-2019",
-      "to": "hust",
-      "kind": "reason",
-      "labels": {
-        "en": "course study notes",
-        "zh-CN": "课程学习笔记"
-      },
-      "strength": 3
     },
     {
       "id": "editor-noise-modulation-topic-noise-modulation-adversarial-writing-1",
@@ -406,10 +320,98 @@
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "zh-CN": "trip during the Cornell years",
+        "zh-CN": "康村上学期间的旅行",
         "en": "trip during the Cornell years"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-hust-time-wellmail-hust-1",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "coursework in sophomore year",
+        "zh-CN": "大二时期的课程项目"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-signature-attack-hust-2",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "research during the undergraduate study",
+        "zh-CN": "大三期间的暑期科研项目"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-weibe-hust-3",
+      "from": "weibe",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "big-data systems course project",
+        "zh-CN": "大三期间的课程设计项目"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-faceswap-hust-4",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "graduation capstone project for bachelors",
+        "zh-CN": "本科毕业论文"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-hust-naec-5",
+      "from": "hust",
+      "to": "naec",
+      "kind": "time",
+      "labels": {
+        "en": "it was during my junior year",
+        "zh-CN": "大三时期的科研实习"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-hust-time-hust-mclab-hust-6",
+      "from": "hust-mclab",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "still rooted in the HUST period",
+        "zh-CN": "科研助理"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-hust-time-louvre-evacuation-hust-7",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "competition project during college",
+        "zh-CN": "大三的竞赛项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-reason-microwave-notes-2019-hust-8",
+      "from": "microwave-notes-2019",
+      "to": "hust",
+      "kind": "reason",
+      "labels": {
+        "en": "course study notes",
+        "zh-CN": "课程学习笔记"
+      },
+      "strength": 3
     }
   ]
 }
