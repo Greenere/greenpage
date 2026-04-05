@@ -93,8 +93,6 @@ export const ZH_CN_MESSAGES = {
       fallbackThemeFactLabel: '当前视角',
       fallbackPathsSectionLabel: '点击探索进入图谱的路径',
       fallbackLinksSectionLabel: '其他链接',
-      statisticsLinkLabel: '统计',
-      editorLinkLabel: '编辑器',
       portraitAlt: (name: string) => `${name} 的肖像`,
     },
     contentLoaders: {

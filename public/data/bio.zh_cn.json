@@ -47,7 +47,15 @@
   "linksSectionLabel": "其他",
   "links": [
     {
-      "label": "LinkedIn",
+      "label": "统计数据",
+      "href": "/graph/statistics"
+    },
+    {
+      "label": "编辑器",
+      "href": "/editor/nodes/bio"
+    },
+    {
+      "label": "领英",
       "href": "https://www.linkedin.com/in/haoyanghowyoung/"
     },
     {

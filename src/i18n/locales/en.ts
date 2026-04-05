@@ -91,8 +91,6 @@ export const EN_MESSAGES = {
       fallbackThemeFactLabel: 'Current frame',
       fallbackPathsSectionLabel: 'Click to Explore Paths into the Graph',
       fallbackLinksSectionLabel: 'Elsewhere',
-      statisticsLinkLabel: 'Statistics',
-      editorLinkLabel: 'Editor',
       portraitAlt: (name: string) => `Portrait of ${name}`,
     },
     contentLoaders: {
