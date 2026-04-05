@@ -19,6 +19,7 @@ import {
 import { applyThemeVars } from '../../shared/styles/colors';
 import ThemePicker from '../graph/ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph/content/BioTheme';
+import { loadBioPageContent, readCachedBioPageContent } from '../graph/content/BioPage';
 import {
   getDisplayDomain,
   clearGraphModelCache,
@@ -36,7 +37,7 @@ import BrowseNodesDialog from './BrowseNodesDialog';
 import {
   anchorExplicitRelationToNode,
   areExplicitRelationsEquivalent,
-  buildBioConnectionEntry,
+  buildBioConnectionEntryWithIdentity,
   buildExplicitConnectionEntry,
   buildTimelineConnectionEntries,
   createEmptyExplicitRelation,
@@ -497,6 +498,13 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   );
   const [dangerDialog, setDangerDialog] = useState<DangerDialogState | null>(null);
   const [showOpenNodeDialog, setShowOpenNodeDialog] = useState(false);
+  const [bioIdentity, setBioIdentity] = useState<{ name: string | null; subtitle: string | null }>(() => {
+    const cachedBio = readCachedBioPageContent(language);
+    return {
+      name: cachedBio?.name ?? null,
+      subtitle: cachedBio?.subtitle ?? null,
+    };
+  });
   const {
     tab,
     bootstrapNodes,
@@ -880,9 +888,10 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   }, [bootstrapNodes, currentNodeRef, language]);
 
   const bioConnectionEntry = useMemo(() => {
-    void language;
-    return currentNodeRef ? buildBioConnectionEntry(currentNodeRef, bootstrapNodes) : null;
-  }, [bootstrapNodes, currentNodeRef, language]);
+    return currentNodeRef
+      ? buildBioConnectionEntryWithIdentity(currentNodeRef, bootstrapNodes, bioIdentity)
+      : null;
+  }, [bioIdentity, bootstrapNodes, currentNodeRef]);
 
   const blockedExplicitRelationPeerIds = useMemo(
     () =>
@@ -914,6 +923,40 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     },
     [bootstrapNodes, language]
   );
+
+  useEffect(() => {
+    const cachedBio = readCachedBioPageContent(language);
+    setBioIdentity({
+      name: cachedBio?.name ?? null,
+      subtitle: cachedBio?.subtitle ?? null,
+    });
+  }, [language]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (bioIdentity.name && bioIdentity.subtitle) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    loadBioPageContent(language)
+      .then((content) => {
+        if (cancelled) return;
+        setBioIdentity({
+          name: content.name,
+          subtitle: content.subtitle,
+        });
+      })
+      .catch(() => {
+        if (cancelled) return;
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bioIdentity.name, bioIdentity.subtitle, language]);
 
   const selectedExplicitRelation =
     selectedExplicitRelationIndex === null ? null : explicitRelations[selectedExplicitRelationIndex] ?? null;
@@ -2539,8 +2582,8 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
         currentNodeId={decodedNodeId}
         currentDomain={currentNodeRef?.domain}
         includeBioEntry
-        bioLabel={UI_COPY.nodeDetailPage.bioEntry.title}
-        bioSubtitle={UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle}
+        bioLabel={bioIdentity.name ?? UI_COPY.nodeDetailPage.bioEntry.title}
+        bioSubtitle={bioIdentity.subtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle}
         onClose={() => setShowOpenNodeDialog(false)}
         onSelect={handleOpenNode}
       />

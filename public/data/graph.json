@@ -298,17 +298,6 @@
       "strength": 2
     },
     {
-      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "summer trip in the graduate-school stretch",
-        "zh-CN": "研究生阶段中的那次暑期旅行"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-verily-intern-time-verily-intern-cornell-1",
       "from": "verily-intern",
       "to": "cornell",
@@ -318,17 +307,6 @@
         "zh-CN": "康村读书期间的实习"
       },
       "strength": 2
-    },
-    {
-      "id": "editor-verily-intern-location-california-one-2022-verily-intern-2",
-      "from": "california-one-2022",
-      "to": "verily-intern",
-      "kind": "location",
-      "labels": {
-        "en": "I took the trip during the internship",
-        "zh-CN": "实习期间的旅行"
-      },
-      "strength": 3
     },
     {
       "id": "editor-realai-topic-realai-noise-modulation-1",
@@ -360,6 +338,28 @@
       "labels": {
         "en": "",
         "zh-CN": ""
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "summer trip in the graduate-school stretch",
+        "zh-CN": "研究生阶段中的那次暑期旅行"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
+      "from": "california-one-2022",
+      "to": "verily-intern",
+      "kind": "location",
+      "labels": {
+        "en": "I took the trip during the internship",
+        "zh-CN": "实习期间的旅行"
       },
       "strength": 3
     }

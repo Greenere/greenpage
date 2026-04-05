@@ -145,6 +145,14 @@ function getBioConnectionPeerId(currentNode: GraphNodeRef, nodes: EditorNodeOpti
 }
 
 export function buildBioConnectionEntry(currentNode: GraphNodeRef, nodes: EditorNodeOption[]): EditorConnectedNodeEntry | null {
+  return buildBioConnectionEntryWithIdentity(currentNode, nodes, {});
+}
+
+export function buildBioConnectionEntryWithIdentity(
+  currentNode: GraphNodeRef,
+  nodes: EditorNodeOption[],
+  bioIdentity: { name?: string | null; subtitle?: string | null },
+): EditorConnectedNodeEntry | null {
   const relatedNodeId = getBioConnectionPeerId(currentNode, nodes);
   if (!relatedNodeId) {
     return null;
@@ -153,7 +161,7 @@ export function buildBioConnectionEntry(currentNode: GraphNodeRef, nodes: Editor
   return {
     key: 'bio-derived-connection',
     relatedNodeId,
-    relatedNodeTitle: UI_COPY.nodeDetailPage.bioEntry.title,
+    relatedNodeTitle: bioIdentity.name ?? UI_COPY.nodeDetailPage.bioEntry.title,
     displayKind: UI_COPY.nodeDetailPage.bioEntry.kind,
     displayLabel: UI_COPY.graphRelations.latestNodeInDomain,
     removable: false,
