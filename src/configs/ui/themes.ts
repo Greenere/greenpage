@@ -38,7 +38,7 @@ export const THEME_CONFIG = {
             primary: '#7D8696ff',
             secondary: '#535360ff',
             background: '#A19CA0ff',
-            text: '#45444Bff',
+            text: 'rgb(28, 27, 31)',
             accent: '#28272Bff',
         },
         portrait: {
@@ -52,7 +52,7 @@ export const THEME_CONFIG = {
             primary: '#30648Dff',
             secondary: '#E3E0E6ff',
             background: '#6796BEff',
-            text: '#E3E0E6ff',
+            text: 'rgb(255, 255, 255)',
             accent: '#43444Dff',
         },
         portrait: {
@@ -66,7 +66,7 @@ export const THEME_CONFIG = {
             primary: '#83361Dff',
             secondary: '#954839ff',
             background: '#CE7268ff',
-            text: '#134D8Cff',
+            text: 'rgb(19, 68, 121)',
             accent: '#43444Dff',
         },
         portrait: {
