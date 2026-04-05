@@ -1,7 +1,7 @@
-import { UI_COPY } from '../../../configs/ui/uiCopy';
-import type { DomainId } from '../../../configs/content/domains';
+import { UI_COPY } from '../../configs/ui/uiCopy';
+import type { DomainId } from '../../configs/content/domains';
 
-export type DomainTreemapEntry = {
+export type StatisticsDomainEntry = {
   domain: DomainId;
   display: string;
   cardTag: string;
@@ -9,7 +9,7 @@ export type DomainTreemapEntry = {
   removable: boolean;
 };
 
-type DomainStatisticsSummary = {
+export type StatisticsSummary = {
   timelineByYear: Array<{ year: string; count: number }>;
   connectionDistribution: Array<{ bucket: string; count: number }>;
   topConnectedNodes: Array<{ id: string; label: string; domainTag: string; count: number }>;
@@ -17,18 +17,18 @@ type DomainStatisticsSummary = {
 };
 
 function buildTreemapLayout(
-  entries: DomainTreemapEntry[],
+  entries: StatisticsDomainEntry[],
   x: number,
   y: number,
   width: number,
   height: number,
-): Array<DomainTreemapEntry & { x: number; y: number; width: number; height: number }> {
+): Array<StatisticsDomainEntry & { x: number; y: number; width: number; height: number }> {
   if (entries.length === 0 || width <= 0 || height <= 0) return [];
   if (entries.length === 1) {
     return [{ ...entries[0], x, y, width, height }];
   }
 
-  const getWeight = (entry: DomainTreemapEntry) => Math.max(entry.count, 1);
+  const getWeight = (entry: StatisticsDomainEntry) => Math.max(entry.count, 1);
   const total = entries.reduce((sum, entry) => sum + getWeight(entry), 0);
   let bestIndex = 1;
   let bestDelta = Number.POSITIVE_INFINITY;
@@ -64,14 +64,14 @@ function buildTreemapLayout(
   ];
 }
 
-export function DomainTreemap({
+export function StatisticsPanel({
   entries,
   stats,
   onDeleteDomain,
 }: {
-  entries: DomainTreemapEntry[];
-  stats: DomainStatisticsSummary;
-  onDeleteDomain: (entry: DomainTreemapEntry) => void;
+  entries: StatisticsDomainEntry[];
+  stats: StatisticsSummary;
+  onDeleteDomain?: (entry: StatisticsDomainEntry) => void;
 }) {
   const sortedEntries = [...entries].sort((left, right) => right.count - left.count || left.domain.localeCompare(right.domain));
   const layout = buildTreemapLayout(sortedEntries, 0, 0, 100, 100);
@@ -370,7 +370,7 @@ export function DomainTreemap({
                     <div style={{ fontSize: '0.72rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.72 }}>
                       {entry.cardTag}
                     </div>
-                    {entry.removable ? (
+                    {entry.removable && onDeleteDomain ? (
                       <button
                         type="button"
                         onClick={() => onDeleteDomain(entry)}

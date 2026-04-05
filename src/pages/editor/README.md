@@ -90,8 +90,8 @@ These are reusable editor UI pieces.
 - [`components/AddConnectedNodeCard.tsx`](./components/AddConnectedNodeCard.tsx)
   Add-connection entry card.
 
-- [`components/DomainTreemap.tsx`](./components/DomainTreemap.tsx)
-  Domain creation/browsing UI used in the new-domain flow.
+- [`../shared/ui/StatisticsPanel.tsx`](../shared/ui/StatisticsPanel.tsx)
+  Shared statistics surface used in the new-domain flow today and ready to be reused from graph routes later.
 
 - [`components/ControlLabel.tsx`](./components/ControlLabel.tsx)
   Small shared label component for editor controls.

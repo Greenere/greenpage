@@ -19,6 +19,7 @@ import {
 } from '../../shared/chronology';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { getRelationKindLabel } from '../../shared/relationDisplay';
+import { StatisticsPanel, type StatisticsDomainEntry } from '../../shared/ui/StatisticsPanel';
 import ThemePicker from '../graph/ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph/content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from '../graph/content/BioPage';
@@ -83,7 +84,6 @@ import {
 import { formatEditorNodeOptionLabel, getEditorNodeTitle, sortNodeRefs } from './editorNodeUtils';
 import { AddConnectedNodeCard } from './components/AddConnectedNodeCard';
 import { ConnectedNodeCard } from './components/ConnectedNodeCard';
-import { DomainTreemap, type DomainTreemapEntry } from './components/DomainTreemap';
 import { SearchableNodePicker } from './components/SearchableNodePicker';
 import { ControlLabel, FieldShell } from './components/ControlLabel';
 import { btnPrimary, btnSecondary, btnDanger, btnDisabled, inputStyle } from './components/editorStyles';
@@ -967,7 +967,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
       : [];
   }, [currentNodeRef, editorNodeById, explicitRelations, language]);
 
-  const domainTreemapEntries = useMemo<DomainTreemapEntry[]>(
+  const statisticsDomainEntries = useMemo<StatisticsDomainEntry[]>(
     () => {
       void language;
       return DOMAIN_ORDER.map((domain) => ({
@@ -981,7 +981,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     [bootstrapNodes, language]
   );
 
-  const domainStatisticsSummary = useMemo(() => {
+  const statisticsSummary = useMemo(() => {
     const sortedByChronology = [...bootstrapNodes].sort(
       (left, right) => getChronologySortKey(left.chronology) - getChronologySortKey(right.chronology)
     );
@@ -1415,7 +1415,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     }
   };
 
-  const handleDeleteDomain = async (entry: DomainTreemapEntry) => {
+  const handleDeleteDomain = async (entry: StatisticsDomainEntry) => {
     if (!entry.removable) return;
 
     dispatch({ type: 'set_action_pending', value: true });
@@ -2504,7 +2504,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
                 </div>
                 <div style={{ marginTop: '0.2rem', opacity: 0.6, fontSize: '0.82rem' }}>
                   {tab === 'new-domain'
-                    ? UI_COPY.nodeEditor.domainStats.subtitle(bootstrapNodes.length, domainTreemapEntries.length)
+                    ? UI_COPY.nodeEditor.domainStats.subtitle(bootstrapNodes.length, statisticsDomainEntries.length)
                     : previewNode
                       ? `${previewNode.domain} / ${previewNode.id}`
                       : previewSelectionHint}
@@ -2515,9 +2515,9 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
 
             {/* Content editor (inline editing mode) */}
             {tab === 'new-domain' ? (
-              <DomainTreemap
-                entries={domainTreemapEntries}
-                stats={domainStatisticsSummary}
+              <StatisticsPanel
+                entries={statisticsDomainEntries}
+                stats={statisticsSummary}
                 onDeleteDomain={(entry) =>
                   openDangerDialog({
                     actionDescription: UI_COPY.nodeEditor.confirmations.deleteDomain(entry.domain),
