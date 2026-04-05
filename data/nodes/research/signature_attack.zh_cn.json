@@ -1,14 +1,13 @@
 {
-  "title": "签名验证攻击",
-  "subtitle": "黑盒对抗机器学习研究",
-  "summary": "一条围绕手写签名验证系统的区域限制黑盒攻击展开的研究线索，后来发展成了一篇发表在 Pattern Recognition 上的论文。",
+  "title": "对抗样本攻击",
+  "subtitle": "黑盒对抗攻击机器学习研究，2019",
+  "summary": "大三暑假，我做了一项关于针对手写签名验证的区域限制黑盒攻击的研究，后来这项研究成果发表在了《模式识别》期刊上。我实际上只花了两个星期来调试主要算法，但最终它成功了，并且得以发表。",
   "tags": [
     "对抗机器学习",
     "签名"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
@@ -16,14 +15,16 @@
           "text": "这项工作起点是课程里对对抗样本的兴趣。核心是把扰动限制在笔画区域之内，使它们更不容易被注意到，也能在背景清理之后继续保留下来。"
         },
         {
-          "type": "list",
-          "items": [
-            "2019 年开始于袁伟老师实验室",
-            "2021 年发表于 Pattern Recognition",
-            "通过区域限制扰动获得更干净的攻击效果"
-          ]
+          "type": "text",
+          "text": "论文最终发表在《Pattern Recognition》:"
+        },
+        {
+          "type": "link",
+          "label": "Black-box attack against handwritten signature verification with region-restricted adversarial perturbations",
+          "href": "https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921"
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }

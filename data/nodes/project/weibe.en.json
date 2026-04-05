@@ -8,20 +8,56 @@
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
           "type": "text",
-          "text": "The main contribution was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
+          "text": "This is a course project for the course, Capstone Project in Big Data Processing System. The core idea of this project is to fetch the trending topics of weibo (the Chinese version of Twitter) and analyze corresponding posts for the emotion tendencies concealed in each tweet."
         },
         {
-          "type": "list",
+          "type": "text",
+          "text": "I am responsible for the system rather than the algorithm behind the emotion analysis. The scheme I designed for this system is shown as below."
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-structure.jpg",
+          "caption": "The system architecture of WEIBE"
+        },
+        {
+          "type": "text",
+          "text": "The dark parts are the off-shelf programs utilized by this system and the light parts are our own modules. I write the Web Crawler in Python with the help of Selenium , driving a chrome browser to fetch the web pages of Weibo, collect trending topics and posts and put them into a Mongodb database. The Server is also composed with Python using Flask and Gevent. A very basic static pages server is capable enough for our purpose. The Frontend is coded with the basic web languages, HTML for structure, CSS for style and JavaScript for actions."
+        },
+        {
+          "type": "gallery",
           "items": [
-            "Capstone Project in Big Data Processing System",
-            "Python, Flask, Gevent, MongoDB",
-            "Captured topics during the early COVID-19 moment"
-          ]
+            {
+              "alt": "The word cloud of the covid day",
+              "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-cloud.png",
+              "caption": "The word cloud on the day of covid-19"
+            },
+            {
+              "alt": "The emotion dot chart",
+              "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-scatter.png",
+              "caption": "The emotion dot chart"
+            }
+          ],
+          "columns": 2,
+          "align": "natural"
+        },
+        {
+          "type": "text",
+          "text": "Due to the limited computational resources, we limit the number of posts fetched for each trending topic. It is not a really \"big\" data processing system, but the results are actually very informative. Unexpectedly, we happened to catch the trending topics invoked by an earthquake near Wuhan and the initial of COVID-19 outbreak."
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "Source Code",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
         }
       ]
     }

@@ -1,87 +1,45 @@
 {
-  "history-writing": {
-    "title": "History Writing",
-    "subtitle": "Essays from outside the technical track",
-    "summary": "A parallel writing thread focused on history rather than engineering, with essays on war, territory, and long arcs of political change.",
-    "tags": [
-      "history",
-      "essay"
-    ],
-    "sections": [
-      {
-        "id": "overview",
-        "label": "Overview",
-        "blocks": [
-          {
-            "type": "text",
-            "text": "This node keeps the graph from collapsing into only study and work. The old site also made room for essays driven by curiosity about history, geography, and the movement of states and ideas over time."
-          },
-          {
-            "type": "list",
-            "items": [
-              "The Ripples of War",
-              "A history essay on the territorial changes of China",
-              "A quieter humanities thread alongside technical writing"
-            ]
-          },
-          {
-            "type": "link",
-            "label": "Old blog index",
-            "href": "https://greenere.github.io/blogs.html"
-          }
-        ]
-      }
-    ]
-  },
   "adversarial-writing": {
-    "title": "Adversarial ML Writing Trail",
+    "title": "ML Reading Notes",
     "subtitle": "Zhihu articles, surveys, and dense notes",
     "summary": "A long writing trail on adversarial examples, robustness, and interpretability, spanning public explainers, research maps, and paper notes.",
     "tags": [
       "writing",
       "research"
     ],
-    "meta": {
-      "readingTime": "4 min",
-      "status": "archive",
-      "links": [
-        {
-          "label": "Old blog index",
-          "href": "https://greenere.github.io/blogs.html"
-        }
-      ]
-    },
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "The old site held a large body of writing on adversarial machine learning. Some pieces explained ideas for a broad audience. Others worked more like study notes, mapping papers, concepts, and debates into something I could revisit later."
+            "text": "When I was doing research with Prof. Xinggang Wang, I used to do weekly paper readings and wrote detailed notes over it. It spans across general computer vision, object detection, adversarial attacks and defenses. These notes were part of the research requirement but I also enjoyed it."
           },
           {
             "type": "text",
-            "text": "In retrospect, these pieces were less about publishing polished essays than about building a durable reading trail. Writing was a way to turn dense research into something that felt *navigable*."
+            "text": "The link to the old blog is [here](https://greenere.github.io/blogs.html)"
           }
-        ]
+        ],
+        "id": "overview"
       },
       {
-        "id": "formats",
-        "label": "Formats",
+        "label": "Zhihu Articles",
         "blocks": [
+          {
+            "type": "text",
+            "text": "I wrote a list of zhihu articles with some readings:"
+          },
           {
             "type": "list",
             "items": [
-              "Zhihu explainers on **adversarial examples**, adversarial training, and regularization",
-              "Long-form note collections such as *A Map of Adversarial Example Research*",
-              "Single-paper and dense-paper notes on robustness, defense, and interpretation"
+              "[对抗样本问题——数据的一小步，模型的一大步](https://zhuanlan.zhihu.com/p/268154711)",
+              "[什么是对抗样本？——稳健性和泛化性的交集](https://zhuanlan.zhihu.com/p/269203978)",
+              "[对抗训练——终极数据增强？](https://zhuanlan.zhihu.com/p/296809584)",
+              "[对抗正则化——盲人摸象还是对症下药？](https://zhuanlan.zhihu.com/p/337880063)",
+              "[对抗攻击——优化噪声的艺术](https://zhuanlan.zhihu.com/p/341533105)",
+              "[迁移对抗攻击——假虞灭虢](https://zhuanlan.zhihu.com/p/363793831)",
+              "[Density & Robustness](https://zhuanlan.zhihu.com/p/355959295)"
             ]
-          },
-          {
-            "type": "callout",
-            "title": "Writing function",
-            "text": "A lot of this work sat between reading and research. The pieces were public enough to share, but they were also a way to keep an internal map of a field that could otherwise sprawl too quickly."
           }
         ]
       }
@@ -117,40 +75,32 @@
   },
   "oxford": {
     "title": "Oxford Summer School",
-    "subtitle": "Knowledge Representation, Aug. 2018",
-    "summary": "A short academic branch at Oriel College that widened the undergraduate horizon before the later research-heavy years.",
+    "subtitle": "Knowledge Representation Summer School, Aug. 2018",
+    "summary": "A two week summer school reimbursed and encouraged by my undergraduate college. We were supposed to go to UIUC but they canceled due to some misunderstanding, so we had to all go to Oriel College in Oxford University.",
     "tags": [
       "Oxford",
-      "summer school"
+      "Summer School"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "The old resume lists this as a summer school in knowledge representation at Oriel College, Oxford."
-          },
-          {
-            "type": "list",
-            "items": [
-              "Oriel College",
-              "Knowledge representation",
-              "A brief international academic detour"
-            ]
+            "text": "It was my first time ever been abroad. We spent two weeks in England. The courses were a good introduction, but what really impressed me was how tranquil the countryside of England feels like. We visited London and Brighton in weekends, and I also got a chance to take a guided tour to the BMW Mini factory."
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "hust": {
-    "title": "HUST Electronic and Information Engineering",
-    "subtitle": "Bachelor's degree, 2016-2020",
-    "summary": "The undergraduate base where software, computer vision, modeling, and student-organization work first started to braid together.",
+    "title": "Huazhong University of Science and Technology",
+    "subtitle": "Bachelor's degree in Electronic and Information Engineering, 2016-2020",
+    "summary": "I spent four years for my undergraduate study in Wuhan, China. Originally I was in the School of Environment but later transferred to the School of Electronic Information and Communications. We have a huge campus with lush trees, making the summer feels pleasant rather than tortuous like other places in Wuhan. ",
     "tags": [
       "HUST",
-      "undergraduate"
+      "Undergraduate"
     ],
     "sections": [
       {
@@ -158,15 +108,23 @@
         "blocks": [
           {
             "type": "text",
-            "text": "I graduated in the top 10 with a 3.91/4.0 GPA. Research, contests, design work, and course projects gradually pulled the path toward machine learning and software."
+            "text": "I graduated in the top 10 with a 3.91/4.0 GPA, toped the class in the end but never got to top any single semester, so it was funny."
           },
           {
-            "type": "list",
-            "items": [
-              "Electronic and Information Engineering",
-              "Research and capstone project work",
-              "Student associations and design work"
-            ]
+            "type": "text",
+            "text": "The first two years were occupied by trying to have fun while keeping up with the courses. I did tour most places in Wuhan that I found interesting and actively participated in Poestry Association and SICA (Student International Communication Association), and tried to found a Spanish club but failed."
+          },
+          {
+            "type": "text",
+            "text": "The thrid year came with the burden to lay bedrock for the future, as I tried to get admitted to a pre-graduate program summer school, I did not find myself lucky when other students were talking about research and projects, yet the only thing I could talk was reading."
+          },
+          {
+            "type": "text",
+            "text": "So I came back to the school in the summer of 2019 to do some research, when I picked the adversarial machine learning as the domain by accident and nurtured a published paper eventually (but it won't be officially published until 2021)."
+          },
+          {
+            "type": "text",
+            "text": "In the first month of 2020, the world gets paused and I had to postpone my plan to study abroad. We did not even get a graduation ceremony because of it."
           }
         ],
         "id": "overview"
@@ -268,16 +226,15 @@
     ]
   },
   "naec": {
-    "title": "Research Engineer Intern at NAEC",
+    "title": "Research at NAEC",
     "subtitle": "National Anti-counterfeit Engineering Research Center",
-    "summary": "A part-time research internship where a course interest in adversarial examples became sustained work on handwritten signature verification and, later, a journal publication.",
+    "summary": "A part-time non-paid research internship where a course interest in adversarial examples became sustained work on handwritten signature verification and, later, a journal publication.",
     "tags": [
       "research",
       "security"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
@@ -285,25 +242,17 @@
             "text": "This was the period when adversarial machine learning stopped being just a course topic and became a real research track. Working with Prof. Wei Yuan's group, I focused on attacking signature verification systems under realistic black-box constraints."
           },
           {
-            "type": "list",
-            "items": [
-              "Part-time internship during the HUST years",
-              "Worked on handwritten signature verification attacks",
-              "Fed directly into the RSAEG / region-restricted signature paper"
-            ]
-          },
-          {
-            "type": "link",
-            "label": "Pattern Recognition paper",
-            "href": "http://www.sciencedirect.com/science/article/pii/S0031320320304921"
+            "type": "text",
+            "text": "It was a part-time non-paid research internship during the HUST years. I primarily worked on adversarial attacks against handwritten signature verification system starting from the summer of 2019 and later worked on a face-swap system for my graduation capstone project."
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "hust-mclab": {
-    "title": "Research Assistant at HUST Media and Communication Lab",
-    "subtitle": "Adversarial ML with Prof. Xinggang Wang",
+    "title": "Research with Prof. Xinggang Wang",
+    "subtitle": "Adversarial ML research with Prof. Xinggang Wang",
     "summary": "A research-assistant period focused on adversarial robustness, interpretability, and what adversarial training changes inside a model.",
     "tags": [
       "robustness",
@@ -321,15 +270,8 @@
           {
             "type": "list",
             "items": [
-              "Studied adversarial training and robustness literature in depth",
-              "Developed the noise modulation idea around interpretable input gradients",
-              "Balanced paper-writing ambitions with unresolved accuracy tradeoffs"
+              "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
             ]
-          },
-          {
-            "type": "link",
-            "label": "Noise Modulation preprint",
-            "href": "https://arxiv.org/abs/2103.10603"
           }
         ],
         "id": "overview"
@@ -337,89 +279,97 @@
     ]
   },
   "realai": {
-    "title": "Software Algorithm Engineer Intern at RealAI",
-    "subtitle": "AI security internship in Beijing",
-    "summary": "A short industry chapter in AI security that sat between academic robustness research and later product engineering work.",
+    "title": "RealAI Internship",
+    "subtitle": "AI security internship in Beijing, 2021",
+    "summary": "During my research into adversarial examples, I found this interesting company trying to put AI security into industry. So I applied and did an internship there, where I got to know many renowned researcher in this field.",
     "tags": [
-      "industry",
-      "ai security"
+      "AI",
+      "security",
+      "face recognition"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "RealAI felt like a bridge. The same adversarial-ML interests appeared in a more applied setting, shaped by industry pace and product constraints. It sharpened the sense that robustness ideas had to survive outside the paper world."
+            "text": "To be honest, I do not really understand what RealAI is trying to do. During my internship, the mentor asked me to think of ways to make adversarial examples for face recognition system physically viable."
           },
           {
-            "type": "list",
-            "items": [
-              "Worked as a software algorithm engineer intern",
-              "Stayed close to AI security and robustness themes",
-              "Helped mark the transition from research-heavy work toward engineering roles"
-            ]
+            "type": "text",
+            "text": "The main challenge was that normally we use flat digital images for training and adversarial attacks, while in the physical world, human face is not flat. So I was exploring ways to reliably mapping the unflat face to a flat space."
+          },
+          {
+            "type": "text",
+            "text": "Overall, I did not accomplish anything meaningful despite got to know the authors of many papers I read and admire."
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "verily-intern": {
-    "title": "Verily Summer Intern",
-    "subtitle": "Summer 2022, from Cornell to California",
-    "summary": "The internship that turned graduate school into a clearer engineering path, connecting Cornell coursework with California life and later full-time work.",
+    "title": "Verily Internship",
+    "subtitle": "Software Engineering Intern working on a retinal camera",
+    "summary": "I found this internship at late March when I almost lost hope in job searching, and it started in May, so everything felt lucky. It was my first time ever been to California and my first time ever do a \"real\" summer internship.",
     "tags": [
-      "internship",
-      "engineering"
+      "verily",
+      "internship"
     ],
+    "hero": {
+      "image": {
+        "src": "https://picx.zhimg.com/v2-deb4ae1afdf6456e137502b4ca1b787a_1440w.jpg?source=d16d100b",
+        "alt": "I happened to visit Google's Bayview campus when it first opened"
+      }
+    },
     "meta": {
       "dateLabel": "Summer 2022",
       "location": "South San Francisco"
     },
     "sections": [
       {
-        "label": "Shift",
+        "label": "overview",
         "blocks": [
           {
             "type": "text",
-            "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
+            "text": "Back then, Verily Life Sciences was still a subsidiary of Alphabet and we still had access to Google buildings. So the internship feels both like working in a large company in Google and working in a startup where everything is shifty."
           },
           {
             "type": "text",
-            "text": "It also changed how the summer itself felt. Workdays at Verily and weekend drives like [California State Route 1](/nodes/california-one-2022) started to belong to the same chapter rather than separate categories."
+            "text": "It was my first time in California, but I did not know how to drive. So I did not get a lot chances to explore the bay area but still managed to check out the Golden Gate Bridge, the California Coast and even made several short trips to visit my friends in Boston and Seattle."
+          },
+          {
+            "type": "text",
+            "text": "Our team was working on a retinal camera project, which was not launched back then but were to be canceled in 2025. I worked on building a visualization tool to help the development of the retinal imaging algorithms. But work was the least thing I can remember now when I think of this summer."
           }
         ],
         "id": "shift"
       },
       {
-        "label": "What changed",
+        "label": "zhihu",
         "blocks": [
+          {
+            "type": "text",
+            "text": "Many internship experiences are talked here:"
+          },
           {
             "type": "list",
             "items": [
-              "Software engineering became a concrete path rather than an abstract possibility",
-              "The distance between coursework and real product work became much smaller",
-              "The internship later connected forward into the full-time role that follows in the graph"
+              "[找实习和找工作——Cornell ECE MENG 就读体验 - 3](https://zhuanlan.zhihu.com/p/673614414)"
             ]
-          },
-          {
-            "type": "callout",
-            "title": "Practical effect",
-            "text": "The important part was not just learning new tools. It was seeing how engineering decisions accumulate in a team setting and how much clarity can come from shipping something that other people actually depend on."
           }
-        ],
-        "id": "what-changed"
+        ]
       }
     ]
   },
   "verily": {
     "title": "Verily",
-    "subtitle": "Full-time chapter beginning in 2023",
-    "summary": "The once long-running chapter: product engineering, system ownership, and the part of the graph that connects most directly back to the present-day bio node.",
+    "subtitle": "My first full-time job  in the U.S. spanning from 2023 to 2025",
+    "summary": "I got my return offer to the same team after the summer internship, so in Jan, 2023, I joined Verily as a full-time Software Engineer, working on the same retinal camera project.",
     "tags": [
-      "current",
-      "software"
+      "verily",
+      "full-time",
+      "software engineer"
     ],
     "sections": [
       {
@@ -427,15 +377,19 @@
         "blocks": [
           {
             "type": "text",
-            "text": "Compared with the earlier nodes, this one reflects a steadier and less school-shaped rhythm. It is about longer projects, production responsibility, and a deeper engineering identity that can later branch into writing, side projects, or future moves."
+            "text": "The job searching in 2022 was brutal and I did not get any other offer except for this return offer from Verily, so I did not have any choice. Besides, it was a fine place to work on and I really like my teammates back then."
           },
           {
-            "type": "list",
-            "items": [
-              "Continuation of the Verily internship into a full-time role",
-              "Represents the most up-to-date experience thread in the graph",
-              "A natural bridge back to the central bio node and present tense"
-            ]
+            "type": "text",
+            "text": "Our team was handling the entire software stack of a hardware project, spanning from the embedded software all the way to frontend, and I touched a little bit with a focus on frontend."
+          },
+          {
+            "type": "text",
+            "text": "When I returned as a full-time, the project had just launched and the sales had just begun. But it did not take a salesman to tell if a project is successfully or not in the market, and I could tell it was not since the end of 2023."
+          },
+          {
+            "type": "text",
+            "text": "The company was also at a crisis back then and we had to waste two years to do the technical separation, only to be canceled and laid off in 2025."
           }
         ],
         "id": "overview"
@@ -462,7 +416,7 @@
   "wellmail": {
     "title": "WELLMAIL",
     "subtitle": "An e-mail client with GUI written in Python",
-    "summary": "My first serious software project. It was a course project finished with a group of three. We built a Python e-mail client with a GUI, and spent a lot of time figuring out how to make SMTP and QT work.",
+    "summary": " It was a course project finished with a group of three. We built a Python e-mail client with a GUI, and spent a lot of time figuring out how to make SMTP and QT work.",
     "tags": [
       "Python",
       "GUI",
@@ -474,14 +428,52 @@
         "blocks": [
           {
             "type": "text",
-            "text": "It's a tiny project, almost useless in that sense, but I really enjoyed it. We spent most of the time trying to get the UI work, which seems dumb to try to use QT to write a UI in Python rather than just pull up a localhost and write a web frontend."
+            "text": "This is the very first project I ever participated that could be referred as a project. For the course, Software Project, an e-mail client is required to be designed and implemented."
           },
           {
             "type": "text",
-            "text": "Check it out here: [WELLMAIL](https://github.com/Greenere/wellmail)"
+            "text": "We were splitted into groups of three, and we had literally zero experience about how to begin. Most of the other groups chose Java to programmed it, while we chose Python after a few consideration. Python is light, new and all three members wanted to proceed into relevant areas that requires Python's help."
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail_structure.jpg",
+            "caption": "The architecture for a GUI client"
+          },
+          {
+            "type": "text",
+            "text": "It took one week for us to familiarize with Python. I first divided the whole project into three parts: network module, management module and graphic user interface module. Each of us was then in charge of one of the modules. But later we discovered that most of our work would be related to graphic interface, which was quite different from those programs with consoles we coded before."
+          },
+          {
+            "type": "text",
+            "text": "Therefore, I redivided the project according to the lagical relationship of graphic user interfaces. The logical relationship is shown below. I was in charge of the Recieve Box Module and the Main Module."
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail0.png",
+            "caption": "The GUI of WELLMAIL"
+          },
+          {
+            "type": "text",
+            "text": "A user first logs in through the Log Module, and then the Main Module communicates with the email service, fetching the information. Then it is the Recieve Box Module that appears in front of the user. Switches for the Writing Module, Setting Module, Contact Module, etc. are designed as buttons on the left of the Main Module. A search bar is placed above, with which the user can fetch the relevant e-mails with key words."
+          },
+          {
+            "type": "text",
+            "text": "We named this client as \"WELLMAIL\", \"W\" stands for Yun Wang, \"L\" and \"L\" stand for Xin Liu and Haoyang Li, and \"E\" stands for e-mail. This project was designated as one of the best among our peers, although there were many unsolved problems as a maiden work. Anyway, the most important skill I got from this experience was the use of Python and the basic ability to develop a software with graphic user interface."
           }
         ],
         "id": "overview"
+      },
+      {
+        "label": "Source Code",
+        "blocks": [
+          {
+            "type": "link",
+            "label": "WELLMAIL",
+            "href": "https://github.com/Greenere/wellmail"
+          }
+        ]
       }
     ]
   },
@@ -495,22 +487,53 @@
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "Instead of modeling each person as a cell, the system modeled representative exhibition halls. It then simulated how congestion-aware routing could accelerate evacuation."
+            "text": "In Janurary. 2019, I led a group of three competed in the Interdisciplinary Contest in Modeling (ICM). We chose the problem designated as \"D\" that required us to build a model for the Louvre Museum and design an evacuation strategy for it."
           },
           {
-            "type": "list",
+            "type": "text",
+            "text": "It took us one day to discuss and decide an appropriate model and finally I proposed a cellular automata model for the Louvre. You may think that we represented each person to be evacuated as a cell, but actually we chose several representative exhibition halls to be the cells in our model."
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/louvre.png",
+            "caption": "The Louvre"
+          },
+          {
+            "type": "text",
+            "text": "This model of Louvre is presented above. For each cell, there was a state that represented the number of people stuck inside when the evacuation began. The neighbors were linked according to the structure of the building. For each iteration, the people in each cell would be evacuated to the neighbors following the strategy. The baseline strategy we considered was \"random wandering\", which meant that no instructions were given and people just walked randomly. The evacuation process of the five levels of the Louvre is presented below on the left. Our solution was called \"dynamic plan \""
+          },
+          {
+            "type": "gallery",
             "items": [
-              "Interdisciplinary Contest in Modeling, 2019",
-              "Dynamic congestion-control plan",
-              "Honorable Mention"
-            ]
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/blob/master/subpages/imgs/randomwandering.png?raw=true",
+                "caption": "evacutaion process under random wandering"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/dynamicplan.png",
+                "caption": "evacutaion process under dynamic plan"
+              }
+            ],
+            "columns": 2,
+            "align": "natural"
+          },
+          {
+            "type": "text",
+            "text": "It is very clear that under our simulation, our strategy reduces the overall evacuation time from 3000s to 600s. This so called \"dynamic plan\" was very simple. The core idea of it was to make sure that no congestion occur during the whole process, i.e. people would be welcomed by relatively empty exhibition halls and rejected by nearly filled ones. Our simulation results showed that no matter what the original strategy was, all people would be evacuated quickly with a dynamic control of congestion."
+          },
+          {
+            "type": "text",
+            "text": "This model was implemented by MATLAB. We drafted the paper in a rash, and I think an \"Honorable Mention\" is appropriate and satisfactory."
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
@@ -524,27 +547,63 @@
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "The main contribution was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
+            "text": "This is a course project for the course, Capstone Project in Big Data Processing System. The core idea of this project is to fetch the trending topics of weibo (the Chinese version of Twitter) and analyze corresponding posts for the emotion tendencies concealed in each tweet."
           },
           {
-            "type": "list",
+            "type": "text",
+            "text": "I am responsible for the system rather than the algorithm behind the emotion analysis. The scheme I designed for this system is shown as below."
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-structure.jpg",
+            "caption": "The system architecture of WEIBE"
+          },
+          {
+            "type": "text",
+            "text": "The dark parts are the off-shelf programs utilized by this system and the light parts are our own modules. I write the Web Crawler in Python with the help of Selenium , driving a chrome browser to fetch the web pages of Weibo, collect trending topics and posts and put them into a Mongodb database. The Server is also composed with Python using Flask and Gevent. A very basic static pages server is capable enough for our purpose. The Frontend is coded with the basic web languages, HTML for structure, CSS for style and JavaScript for actions."
+          },
+          {
+            "type": "gallery",
             "items": [
-              "Capstone Project in Big Data Processing System",
-              "Python, Flask, Gevent, MongoDB",
-              "Captured topics during the early COVID-19 moment"
-            ]
+              {
+                "alt": "The word cloud of the covid day",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-cloud.png",
+                "caption": "The word cloud on the day of covid-19"
+              },
+              {
+                "alt": "The emotion dot chart",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-scatter.png",
+                "caption": "The emotion dot chart"
+              }
+            ],
+            "columns": 2,
+            "align": "natural"
+          },
+          {
+            "type": "text",
+            "text": "Due to the limited computational resources, we limit the number of posts fetched for each trending topic. It is not a really \"big\" data processing system, but the results are actually very informative. Unexpectedly, we happened to catch the trending topics invoked by an earthquake near Wuhan and the initial of COVID-19 outbreak."
+          }
+        ],
+        "id": "overview"
+      },
+      {
+        "label": "Source Code",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
           }
         ]
       }
     ]
   },
   "faceswap": {
-    "title": "FaceSwap Deepfake System",
+    "title": "FaceSwap",
     "subtitle": "Undergraduate capstone project",
     "summary": "A bachelor's graduation project focused on generating face-swapped short videos, with attention to the full pipeline rather than only the core model.",
     "tags": [
@@ -553,32 +612,131 @@
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "The core work centered on the intracoder and color-correction modules. The broader challenge was stitching detection, alignment, fusion, and post-processing into one pipeline."
+            "text": "This is my graduate design for my bachelor's degree. The major focus is the generation of deepfakes, more specificly, face swapped videos. I adjust the existing method with some minor improvements for generation part. The detection of deepfakes appears as a survey in the final paper."
           },
           {
-            "type": "list",
+            "type": "text",
+            "text": "You can find it here on my github: [faceswap](https://github.com/Greenere/faceswap/tree/master)"
+          }
+        ],
+        "id": "overview"
+      },
+      {
+        "label": "Scheme",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "It takes a lot of work for auxiliary modules to construct an end-to-end pipeline as shown below:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_skeleton.png",
+            "caption": "The Overall Architecture"
+          },
+          {
+            "type": "text",
+            "text": "Each video is first digested into frames, ceating two small datasets of faces after Face Detection and Face Alignment. These two datasets are then used to train Intracoder and Color Correction modules. At inference, these two modules together swap the original faces but maintain the original color, creating a new datasets of swapped faces. These swapped faces are then fused with corresponding original face and de-aligned to the original posture. Merging the original background with de-aligned swapped face creates a frame of final deepfake. Assemble these frames, there comes the final deepfake."
+          },
+          {
+            "type": "text",
+            "text": "I adopt a public MTCNN for Face Detection, warp affine for Face Alignment and Posture Reduction, Poisson image blending for Image Fusion. The major works are Intracoder and Color Correction."
+          }
+        ]
+      },
+      {
+        "label": "Intracoder",
+        "blocks": [
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_intracoder.png"
+          },
+          {
+            "type": "text",
+            "text": "Just like the initial scheme of deepfakes, two auto-encoders share the same encoder that force the encoder to map two types of faces into the same latent space. The decoders are owned distinctly by each type of face. After sufficient training, we can then map the origin face into the domain of target face. The synthesized face has the posture of original face and the identity of target face. The posture information is more abstract and the identity information is more concrete. To maintain the more abstract posture, I use a more deeper encoder compared with decoder."
+          }
+        ]
+      },
+      {
+        "label": "Color Correction",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Most of other implementations use a classical method to correct the color:"
+          },
+          {
+            "type": "text",
+            "text": "Reinhard E, Adhikhmin M, Gooch B, et al. Color transfer between images[J]. IEEE Computer graphics and applications, 2001."
+          },
+          {
+            "type": "text",
+            "text": "In my case, I also want the color correction module to super-resolute the swapped face and correct artifacts brought by Intracoder. So I use another pair of auto-encoders as shown below:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_colorcorrection.png"
+          },
+          {
+            "type": "text",
+            "text": "Color information is rather shallow, so the decoder is actually only one layer deep."
+          }
+        ]
+      },
+      {
+        "label": "Results",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Static images:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_faceswaps.png"
+          },
+          {
+            "type": "text",
+            "text": "Video example:"
+          },
+          {
+            "type": "gallery",
             "items": [
-              "Generation-focused deepfake pipeline",
-              "Identity swap plus color correction modules",
-              "Detection treated as a survey in the final paper"
-            ]
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id1-4.gif",
+                "caption": "Gesture Donor"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id19-1.gif",
+                "caption": "Identity Donor"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id1-id19-4-1.gif",
+                "caption": "Deepfake generated"
+              }
+            ],
+            "columns": 3,
+            "align": "height:2"
           }
         ]
       }
     ]
   },
-  "programming-languages": {
-    "title": "Visualizations",
-    "subtitle": "Interactive D3 project",
-    "summary": "A Cornell visualization piece exploring programming-language history, family relationships, and popularity through interactive graphics.",
+  "data-visualizations-2021": {
+    "title": "Data Visualizations",
+    "subtitle": "Interactive D3 projects during Cornell period",
+    "summary": "I attended this interesting course INFO 5100 at Cornell, where we were taught the principals of data visualizations and how to use d3.js to realize those ideas. There were three course projects that are very interesting.",
     "tags": [
       "D3",
-      "programming languages"
+      "Data visualization"
     ],
     "sections": [
       {
@@ -586,32 +744,109 @@
         "blocks": [
           {
             "type": "text",
-            "text": "The project combined history, relation maps, and trend views. In hindsight, it feels especially close to the graph-based personal-site idea."
+            "text": "The first project was a static course chart showing the course distributions of three adjacent majors in Cornell over a week, where we can see the temporal and spatial concentrations of courses."
           },
           {
-            "type": "list",
-            "items": [
-              "Language family network",
-              "Popularity and speed views",
-              "Collaborative Cornell course project"
-            ]
+            "type": "text",
+            "text": "The second project was an interactive kitchen board called \"Online Kitchen\", where you can drag your food and see the nutritions of the combined meal."
+          },
+          {
+            "type": "text",
+            "text": "The third project was a composite interactive storyboard showing the history, relationship and popularities of major programming languages."
           }
         ],
         "id": "overview"
+      },
+      {
+        "label": "Cornell Fall 2021 Class of ECE, CS & INFO",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "This is a data visualization course project realized with D3.js, check the visualization outcome in web page [here](https://greenere.github.io/visualizations/cornell_class/cornell_class_ece_cs_info_fall2021.html)"
+          },
+          {
+            "type": "text",
+            "text": "It is a course project in collaboration with Han Xia, Yingxin Lin and Yuhao Lu."
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/visualizations/cornell_class/cornell_class_ece_cs_info_fall2021.jpg"
+          }
+        ]
+      },
+      {
+        "label": "Online Kitchen",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "This is a data visualization course project realized with D3.js, check the visualization outcome in web page [here](https://greenere.github.io/visualizations/online_kitchen/online_kitchen.html)."
+          },
+          {
+            "type": "text",
+            "text": "It is a course project in collaboration with Yuhao Lu, Yue Wang and Yue Zhao."
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/online_kitchen.png"
+          }
+        ]
+      },
+      {
+        "label": "Programming Languages",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "This is a data visualization course project realized with D3.js, check the visualization outcome in web page [here](https://greenere.github.io/visualizations/programming_languages/programming_languages.html)."
+          },
+          {
+            "type": "text",
+            "text": "It is a course project in collaboration with Yuhao Lu, Yue Wang and Yue Zhao."
+          },
+          {
+            "type": "text",
+            "text": "The project aims to display some interesting facts about programming languages in terms of their histories and popularities."
+          },
+          {
+            "type": "gallery",
+            "items": [
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/pl_familynet.png"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/pl_speed.png"
+              }
+            ],
+            "columns": 1,
+            "align": "natural"
+          }
+        ]
+      },
+      {
+        "label": "zhihu articles",
+        "blocks": [
+          {
+            "type": "link",
+            "label": "d3.js与三则数据可视化",
+            "href": "https://zhuanlan.zhihu.com/p/446008683"
+          }
+        ]
       }
     ]
   },
   "signature-attack": {
-    "title": "Signature Verification Attack",
-    "subtitle": "Black-box adversarial ML research",
-    "summary": "A research thread on region-restricted black-box attacks against handwritten signature verification that later became a Pattern Recognition paper.",
+    "title": "Adversarial Attack",
+    "subtitle": "Black-box adversarial ML research, 2019",
+    "summary": "A summer research on region-restricted black-box attacks against handwritten signature verification that later became a Pattern Recognition paper. I really only spent two weeks on foestering the major algorithms, but it worked and eventually got published.",
     "tags": [
       "adversarial ML",
       "signature"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
@@ -619,14 +854,16 @@
             "text": "The work started from a course interest in adversarial examples. It focused on keeping perturbations inside the stroke region, so they stayed hard to notice and survived background cleaning."
           },
           {
-            "type": "list",
-            "items": [
-              "Started in 2019 in Wei Yuan's lab",
-              "Published in Pattern Recognition, 2021",
-              "Region-restricted perturbations for cleaner attacks"
-            ]
+            "type": "text",
+            "text": "You can find the paper here:"
+          },
+          {
+            "type": "link",
+            "label": "Black-box attack against handwritten signature verification with region-restricted adversarial perturbations",
+            "href": "https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921"
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
@@ -640,7 +877,6 @@
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
@@ -648,198 +884,85 @@
             "text": "The idea was to multiply images with learned noise during training. That pushed the model to rely on the truly critical components, cleaning up the gradient signal at the cost of some accuracy."
           },
           {
-            "type": "list",
-            "items": [
-              "Worked on with Xinggang Wang",
-              "Cheap alternative to one aspect of adversarial training",
-              "Interesting result, but not publishable in its current form"
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  "northeast-2022": {
-    "title": "Northeast Corridor Trips",
-    "subtitle": "Cornell-year loops through NYC, Philly, Boston, and upstate",
-    "summary": "A cluster of 2022 trips radiating out from Ithaca during the Cornell period, mixing museums, city walks, nearby escapes, and the feeling of learning the U.S. Northeast through movement.",
-    "tags": [
-      "travel",
-      "east coast"
-    ],
-    "sections": [
-      {
-        "id": "overview",
-        "label": "Overview",
-        "blocks": [
-          {
             "type": "text",
-            "text": "The old tripline files suggest this was less a single trip than a travel season: New York City in January, Philadelphia in February, Boston in June, and repeated returns to Ithaca and upstate New York through the rest of the year."
+            "text": "The paper will never be published, it's archived here:"
           },
           {
             "type": "list",
             "items": [
-              "New York City, Jan. 21-23, 2022",
-              "Philadelphia, Feb. 25-28, 2022",
-              "Boston and whale watching, Jun. 24-28, 2022",
-              "Ithaca and New York upstate loops across 2022"
+              "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
             ]
           }
-        ]
-      },
-      {
-        "id": "photographs",
-        "label": "Photographs",
-        "blocks": [
-          {
-            "type": "gallery",
-            "align": "natural",
-            "columns": 1,
-            "items": [
-              {
-                "src": "assets/portrait_haoyang_nyc.jpg",
-                "alt": "Haoyang in New York City during the Cornell period",
-                "caption": "New York became one of the recurring anchors in that travel season."
-              }
-            ]
-          }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "california-one-2022": {
-    "title": "California State Route 1",
-    "subtitle": "A coastal drive during the Verily summer",
-    "summary": "A Pacific coast travel node tied to the California internship period, with a scenic route through places like Half Moon Bay, Santa Cruz, Monterey, and 17-Mile Drive.",
+    "title": "First California Coast Drive",
+    "subtitle": "My first coastal roadtrip during the Verily summer",
+    "summary": "Ever since, I have been to the California coast in countless times, but the first time is always the most memorizable. I did not even know how to drive back then, it was a friend who organized this short trip and we just drove from San Francisco to Monterey along the coast.",
     "tags": [
       "travel",
       "coast"
     ],
-    "hero": {
-      "image": {
-        "src": "assets/portrait_haoyang_mty.jpg",
-        "alt": "Haoyang in Monterey during the Route 1 trip",
-        "caption": "Monterey became the clearest visual memory in a day that started in the Bay and slowly tilted south."
-      }
-    },
-    "meta": {
-      "dateLabel": "May 29, 2022",
-      "location": "California coast",
-      "readingTime": "3 min",
-      "status": "archive"
-    },
     "sections": [
       {
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "Among the old travel artifacts, this one is especially visual. It reads more like a route sketch than a diary entry: coastlines, viewpoints, and a day-long line from the Bay toward Monterey during the [Verily internship](/nodes/verily-intern)."
-          },
-          {
-            "type": "text",
-            "text": "What stayed with me was not a single stop, but the feeling of the whole drive unfolding in sequence, almost like stepping through a living `storyboard` of California."
+            "text": "Everything was amazing from a fresh eye. I still remember the crushing waves beneath the Whale cove, the hanging road above the San Gregorio cliffs and the natural bridge on the beach of Santa Cruz. When we arrived Monterey, we visited the famouse Aquarium and the Lovers point."
           }
         ],
         "id": "overview"
       },
       {
-        "label": "Route",
-        "blocks": [
-          {
-            "type": "list",
-            "items": [
-              "**Half Moon Bay** as the first clear transition out of the Bay rhythm",
-              "*Santa Cruz* as the midpoint where the coast started to feel more leisurely than logistical",
-              "**Monterey** as the emotional center of the trip",
-              "*17-Mile Drive* as the part that made the route feel intentionally scenic rather than merely efficient"
-            ]
-          },
-          {
-            "type": "callout",
-            "title": "Why it stayed",
-            "tone": "highlight",
-            "text": "This was the first trip in California that felt fully inhabited rather than borrowed. It made the summer read less like a temporary relocation and more like a chapter."
-          }
-        ],
-        "id": "route"
-      },
-      {
-        "label": "Photographs",
-        "blocks": [
-          {
-            "type": "gallery",
-            "items": [
-              {
-                "alt": "Haoyang in the Bay Area during summer 2022",
-                "src": "assets/portrait_haoyang_sfbay.jpg",
-                "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
-              },
-              {
-                "alt": "Haoyang in Monterey during the Route 1 trip",
-                "src": "assets/portrait_haoyang_mty.jpg",
-                "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
-              },
-              {
-                "alt": "Haoyang in the Bay Area during summer 2022",
-                "src": "assets/sf_fog.jpg",
-                "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
-              }
-            ],
-            "columns": 3,
-            "align": "height:3"
-          }
-        ],
-        "id": "photographs"
-      }
-    ]
-  },
-  "california-santa-barbara-2022": {
-    "title": "Santa Barbara Trip",
-    "subtitle": "My first time going to California, yet on a rainy day",
-    "summary": "I was in my tedious searching for my first job out of Cornell, yet the return offer from the summer internship was pending. It was a trip reimbursed by a company onsite, and Santa Babara was truly a beautiful city.",
-    "meta": {
-      "dateLabel": "Oct, 2022",
-      "location": "Santa Barbara, CA"
-    },
-    "sections": [
-      {
-        "label": "Overview",
+        "label": "Tripline",
         "blocks": [
           {
             "type": "text",
-            "text": "It was an interesting company based in this touristy town outside of Los Angeles area. The city was all in Spanish colonial style, said to be enforced by the local law. I remember that the court was very picturistic, the mission was an interesting history classroom, where I first learned that California is a state of missions."
+            "text": "This is the route we took:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://greenere.github.io/tripline2022/californiaone_2022.svg"
           }
-        ],
-        "id": "overview"
+        ]
       }
     ]
   },
   "puerto-rico-2022": {
     "title": "Puerto Rico",
     "subtitle": "December 2022 island trip",
-    "summary": "A late-2022 trip that feels like a marker between the Cornell chapter and what came next, with beaches, coastal stops, and a very different atmosphere from Ithaca.",
+    "summary": "I wanted to visit Puerto Rico ever since we saw this island in the 2019 ICM contest. It was basically the Hawaii for the Eastern America with lower price and richer history. I really enjoyed the sunset we saw in San Juan.",
     "tags": [
       "travel",
       "island"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "The old tripline artwork turns this into a vivid node: Old San Juan, Punta Higuero Lighthouse, beaches, airport thresholds, and a compact trip at the end of 2022 that feels transitional in the larger story."
+            "text": "I was planning a trip with some Cornellian friends initially, but they had their private plan and ditched me before I knew. Nevertheless, I still find some old college friends who were also graduating and interested in visiting this Carribean island."
+          }
+        ],
+        "id": "overview"
+      },
+      {
+        "label": "Tripline",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "This is the route we took:"
           },
           {
-            "type": "list",
-            "items": [
-              "Old San Juan",
-              "Punta Higuero Lighthouse",
-              "Playa Escondida and other coastal stops",
-              "Dec. 21-25, 2022"
-            ]
+            "type": "image",
+            "alt": "",
+            "src": "https://greenere.github.io//tripline2022/puertorico_2022.svg"
           }
         ]
       }

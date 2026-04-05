@@ -1,27 +1,126 @@
 {
-  "title": "FaceSwap 换脸系统",
+  "title": "深度伪造",
   "subtitle": "本科毕业设计项目",
-  "summary": "一个聚焦短视频换脸生成的本科毕业设计，关注点不只是核心模型，也包括完整生成流程如何被搭起来。",
+  "summary": "我的本科毕业设计项目是做一个短视频换脸系统，核心模型和原理其实很简单，所以最后项目的关注不是核心模型，而是搭建整条完整的视频生成流程。",
   "tags": [
     "deepfake",
     "计算机视觉"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
           "type": "text",
-          "text": "核心工作主要围绕 intracoder 和颜色校正模块展开。更大的挑战其实是如何把检测、对齐、融合与后处理缝合成一条完整的流水线。"
+          "text": "这是我本科阶段的毕业设计。核心主题是深度伪造生成，更具体地说，是人脸替换视频的生成。我在已有方法的基础上，对生成部分做了一些小改动和改进。深度伪造检测则以综述的形式出现在最终论文里。"
         },
         {
-          "type": "list",
+          "type": "text",
+          "text": "项目代码可以在我的 GitHub 上找到：[faceswap](https://github.com/Greenere/faceswap/tree/master)"
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "方案",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "要把这件事真正做成一个端到端系统，需要很多辅助模块共同配合，整体流程如下图所示："
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_skeleton.png",
+          "caption": "整体架构"
+        },
+        {
+          "type": "text",
+          "text": "每段视频首先会被拆成逐帧图像，再经过人脸检测与人脸对齐，分别形成两个较小的人脸数据集。随后，这两个数据集被用于训练 Intracoder 和 Color Correction 模块。在推理阶段，这两个模块协同工作，用目标身份替换原始人脸，同时尽量保留原视频中的色彩信息，从而得到一组已经完成换脸的人脸图像。之后再把这些换脸结果与原始人脸对应融合，并逆向还原到原始姿态。将去对齐后的换脸结果与原始背景重新合成，就得到了最终深度伪造视频中的每一帧。最后把这些帧重新拼接起来，就形成了完整的视频。"
+        },
+        {
+          "type": "text",
+          "text": "人脸检测我采用了公开实现的 MTCNN；人脸对齐与姿态还原使用的是仿射变换；图像融合部分则使用泊松融合。真正的核心工作主要集中在 Intracoder 和 Color Correction 两个模块。"
+        }
+      ]
+    },
+    {
+      "label": "Intracoder",
+      "blocks": [
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_intracoder.png"
+        },
+        {
+          "type": "text",
+          "text": "这部分基本沿用了早期 deepfakes 的经典方案：两组自编码器共享同一个编码器，通过共享编码器，迫使两类人脸都被映射到同一个潜在空间中；而解码器则分别对应不同的人脸域。训练充分之后，我们就可以把原始人脸映射到目标人脸所在的域中。生成出来的人脸会保留原始人脸的姿态，同时拥有目标人脸的身份特征。姿态信息更偏抽象，身份信息则更偏具体。为了更好地保留这种更抽象的姿态信息，我让编码器的深度比解码器更深。"
+        }
+      ]
+    },
+    {
+      "label": "颜色校正",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "很多其他实现会使用一种经典方法来做颜色校正："
+        },
+        {
+          "type": "text",
+          "text": "Reinhard E, Adhikhmin M, Gooch B, et al. Color transfer between images[J]. IEEE Computer graphics and applications, 2001."
+        },
+        {
+          "type": "text",
+          "text": "但在我的系统里，我还希望颜色校正模块同时承担换脸结果的超分辨率重建，以及修复 Intracoder 带来的伪影问题。所以我又设计了另一组自编码器，如下图所示："
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_colorcorrection.png"
+        },
+        {
+          "type": "text",
+          "text": "颜色信息本身相对更浅层，因此这里的解码器实际上只做了一层。"
+        }
+      ]
+    },
+    {
+      "label": "结果",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "静态图像示例："
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/fw_faceswaps.png"
+        },
+        {
+          "type": "text",
+          "text": "视频示例："
+        },
+        {
+          "type": "gallery",
           "items": [
-            "以生成为中心的 deepfake 流水线",
-            "身份替换加颜色校正模块",
-            "最终论文里把检测部分作为综述处理"
-          ]
+            {
+              "alt": "",
+              "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id1-4.gif",
+              "caption": "动作提供者"
+            },
+            {
+              "alt": "",
+              "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id19-1.gif",
+              "caption": "身份提供者"
+            },
+            {
+              "alt": "",
+              "src": "https://github.com/Greenere/faceswap/raw/master/imgs/id1-id19-4-1.gif",
+              "caption": "生成出的深度伪造结果"
+            }
+          ],
+          "columns": 3,
+          "align": "height:2"
         }
       ]
     }

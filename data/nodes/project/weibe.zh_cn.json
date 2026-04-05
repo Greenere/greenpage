@@ -1,27 +1,45 @@
 {
   "title": "WEIBE",
   "subtitle": "微博情感分析系统",
-  "summary": "一个课程项目：抓取微博热搜、存储帖子，并对这些讨论中的情绪倾向进行可视化展示。",
+  "summary": "课程项目：抓取微博热搜、存储帖子，并对这些讨论中的情绪倾向进行可视化展示。",
   "tags": [
     "爬虫",
     "可视化"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
           "type": "text",
-          "text": "这个项目最主要的价值在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。"
+          "text": "这个项目最主要的工作在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。其实现在看起来很简陋，但是对于一个课程项目来说足够了，并且比较有趣的是后来抓取到了疫情爆发的舆情。"
         },
         {
-          "type": "list",
+          "type": "gallery",
           "items": [
-            "《大数据处理系统》课程毕业设计",
-            "Python、Flask、Gevent、MongoDB",
-            "记录了新冠疫情早期的一批热门话题"
-          ]
+            {
+              "alt": "疫情爆发当天的微博",
+              "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-cloud.png",
+              "caption": "疫情爆发当天的微博"
+            },
+            {
+              "alt": "情绪散点图",
+              "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-scatter.png",
+              "caption": "情绪散点图"
+            }
+          ],
+          "columns": 2,
+          "align": "natural"
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "代码",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "项目存档在我的 Github 上: [WEIBE](https://github.com/Greenere/weibe)"
         }
       ]
     }

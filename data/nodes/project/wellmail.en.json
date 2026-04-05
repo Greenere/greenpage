@@ -1,7 +1,7 @@
 {
   "title": "WELLMAIL",
   "subtitle": "An e-mail client with GUI written in Python",
-  "summary": "My first serious software project. It was a course project finished with a group of three. We built a Python e-mail client with a GUI, and spent a lot of time figuring out how to make SMTP and QT work.",
+  "summary": " It was a course project finished with a group of three. We built a Python e-mail client with a GUI, and spent a lot of time figuring out how to make SMTP and QT work.",
   "tags": [
     "Python",
     "GUI",
@@ -13,14 +13,52 @@
       "blocks": [
         {
           "type": "text",
-          "text": "It's a tiny project, almost useless in that sense, but I really enjoyed it. We spent most of the time trying to get the UI work, which seems dumb to try to use QT to write a UI in Python rather than just pull up a localhost and write a web frontend."
+          "text": "This is the very first project I ever participated that could be referred as a project. For the course, Software Project, an e-mail client is required to be designed and implemented."
         },
         {
           "type": "text",
-          "text": "Check it out here: [WELLMAIL](https://github.com/Greenere/wellmail)"
+          "text": "We were splitted into groups of three, and we had literally zero experience about how to begin. Most of the other groups chose Java to programmed it, while we chose Python after a few consideration. Python is light, new and all three members wanted to proceed into relevant areas that requires Python's help."
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail_structure.jpg",
+          "caption": "The architecture for a GUI client"
+        },
+        {
+          "type": "text",
+          "text": "It took one week for us to familiarize with Python. I first divided the whole project into three parts: network module, management module and graphic user interface module. Each of us was then in charge of one of the modules. But later we discovered that most of our work would be related to graphic interface, which was quite different from those programs with consoles we coded before."
+        },
+        {
+          "type": "text",
+          "text": "Therefore, I redivided the project according to the lagical relationship of graphic user interfaces. The logical relationship is shown below. I was in charge of the Recieve Box Module and the Main Module."
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail0.png",
+          "caption": "The GUI of WELLMAIL"
+        },
+        {
+          "type": "text",
+          "text": "A user first logs in through the Log Module, and then the Main Module communicates with the email service, fetching the information. Then it is the Recieve Box Module that appears in front of the user. Switches for the Writing Module, Setting Module, Contact Module, etc. are designed as buttons on the left of the Main Module. A search bar is placed above, with which the user can fetch the relevant e-mails with key words."
+        },
+        {
+          "type": "text",
+          "text": "We named this client as \"WELLMAIL\", \"W\" stands for Yun Wang, \"L\" and \"L\" stand for Xin Liu and Haoyang Li, and \"E\" stands for e-mail. This project was designated as one of the best among our peers, although there were many unsolved problems as a maiden work. Anyway, the most important skill I got from this experience was the use of Python and the basic ability to develop a software with graphic user interface."
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "Source Code",
+      "blocks": [
+        {
+          "type": "link",
+          "label": "WELLMAIL",
+          "href": "https://github.com/Greenere/wellmail"
+        }
+      ]
     }
   ]
 }

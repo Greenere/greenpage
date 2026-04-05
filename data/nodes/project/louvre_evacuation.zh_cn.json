@@ -1,6 +1,6 @@
 {
   "title": "卢浮宫疏散模型",
-  "subtitle": "2019 ICM 建模项目",
+  "subtitle": "2019 ICM 建模比赛",
   "summary": "一个竞赛建模项目，用类似元胞自动机的方式抽象卢浮宫，并据此设计动态疏散策略。",
   "tags": [
     "建模",
@@ -8,22 +8,53 @@
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
           "type": "text",
-          "text": "项目没有把每个人都当成一个单元来模拟，而是把有代表性的展厅作为系统状态节点，进一步模拟基于拥堵感知的路线调整如何加快整体疏散。"
+          "text": "2019年1月，我带领一个三人小组参加了跨学科建模竞赛（ICM）。我们选择了编号为“D”的题目，要求我们为卢浮宫博物馆构建一个模型并设计一个疏散方案。我们花了一天时间讨论并确定合适的模型，最终我提出了一个卢浮宫的元胞自动机模型。"
         },
         {
-          "type": "list",
+          "type": "text",
+          "text": "你可能会认为我们把每个需要疏散的人都代表为一个“单元格”，但实际上，我们选择了几个具有代表性的展厅作为模型中的“单元格”。"
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/louvre.png",
+          "caption": "卢浮宫模型"
+        },
+        {
+          "type": "text",
+          "text": "上图展示了卢浮宫的模型。每个单元格都代表一个状态，表示疏散开始时被困在里面的人数。相邻单元格根据建筑结构连接。每次迭代中，每个单元格中的人员都会按照既定策略疏散到相邻单元格。我们考虑的基准策略是“随机游荡”，这意味着没有给出任何指令，人们只是随机行走。卢浮宫五层的疏散过程如下图左侧所示。我们的解决方案被称为“动态方案”。"
+        },
+        {
+          "type": "gallery",
           "items": [
-            "2019 年美国大学生数学建模竞赛",
-            "动态拥堵控制方案",
-            "Honorable Mention"
-          ]
+            {
+              "alt": "",
+              "src": "https://github.com/Greenere/Greenere.github.io/blob/master/subpages/imgs/randomwandering.png?raw=true",
+              "caption": "随机游荡的疏散过程"
+            },
+            {
+              "alt": "",
+              "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/dynamicplan.png",
+              "caption": "动态方案下的疏散过程"
+            }
+          ],
+          "columns": 2,
+          "align": "natural"
+        },
+        {
+          "type": "text",
+          "text": "很明显，在我们的模拟中，我们的策略将整体疏散时间从3000秒缩短到了600秒。这个所谓的“动态方案”非常简单。其核心思想是确保整个过程中不会出现拥堵，也就是说，人们会被相对空旷的展厅迎接，而被几乎满员的展厅拒之门外。我们的模拟结果表明，无论最初的策略是什么，通过对拥堵情况进行动态控制，所有人都能快速疏散。"
+        },
+        {
+          "type": "text",
+          "text": "该模型是用MATLAB实现的。我们仓促地完成了论文，我认为获得“荣誉提名”是恰当且令人满意的。"
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }

@@ -1,54 +1,47 @@
 {
-  "title": "对抗机器学习写作轨迹",
+  "title": "论文阅读笔记",
   "subtitle": "知乎文章、综述与密集笔记",
   "summary": "一条持续多年的写作线索，围绕对抗样本、鲁棒性与可解释性展开，横跨面向公众的解释文章、研究地图与论文笔记。",
   "tags": [
     "写作",
     "研究"
   ],
-  "meta": {
-    "readingTime": "4 分钟",
-    "status": "archive",
-    "links": [
-      {
-        "label": "旧博客索引",
-        "href": "https://greenere.github.io/blogs.html"
-      }
-    ]
-  },
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
           "type": "text",
-          "text": "旧站点里保存着一大批关于对抗机器学习的文字。有些文章试图向更广泛的读者解释概念；另一些则更像学习笔记，把论文、概念与争论整理成自己日后还能重新进入的地图。"
+          "text": "在王兴刚教授的指导下做研究时，我每周都要阅读论文并做详细的笔记。内容涵盖计算机视觉、目标检测、对抗性攻击和防御等各个方面。这些笔记是研究工作的一部分，但我也乐在其中。"
         },
         {
           "type": "text",
-          "text": "回头看，这些内容与其说是在发表打磨完成的文章，不如说是在为自己铺设一条耐久的阅读路径。写作是一种把高密度研究转化为更*可导航*结构的方法。"
+          "text": "旧博客的索引[在这里](https://greenere.github.io/blogs.html)"
         }
-      ]
+      ],
+      "id": "overview"
     },
     {
-      "id": "formats",
-      "label": "形式",
+      "label": "知乎",
       "blocks": [
+        {
+          "type": "text",
+          "text": "我写了不少这个领域的知乎文章，可能带了一些人入坑："
+        },
         {
           "type": "list",
           "items": [
-            "关于**对抗样本**、对抗训练与正则化的知乎解释文章",
-            "像《A Map of Adversarial Example Research》这样的长篇笔记整理",
-            "围绕鲁棒性、防御与解释的一篇论文或密集论文阅读笔记"
+            "[对抗样本问题——数据的一小步，模型的一大步](https://zhuanlan.zhihu.com/p/268154711)",
+            "[什么是对抗样本？——稳健性和泛化性的交集](https://zhuanlan.zhihu.com/p/269203978)",
+            "[对抗训练——终极数据增强？](https://zhuanlan.zhihu.com/p/296809584)",
+            "[对抗正则化——盲人摸象还是对症下药？](https://zhuanlan.zhihu.com/p/337880063)",
+            "[对抗攻击——优化噪声的艺术](https://zhuanlan.zhihu.com/p/341533105)",
+            "[迁移对抗攻击——假虞灭虢](https://zhuanlan.zhihu.com/p/363793831)",
+            "[Density & Robustness](https://zhuanlan.zhihu.com/p/355959295)"
           ]
-        },
-        {
-          "type": "callout",
-          "title": "写作的功能",
-          "text": "这部分工作常常介于阅读与研究之间。它们足够公开，可以分享给别人；但同时也是我为一个很容易迅速蔓延的领域维持内部地图的方式。"
         }
-      ]
+      ],
+      "id": "formats"
     }
   ]
 }

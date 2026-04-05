@@ -1,5 +1,5 @@
 {
-  "title": "华科媒传实验室科研助理",
+  "title": "王兴刚教授实验室",
   "subtitle": "与王兴刚教授合作的对抗机器学习研究",
   "summary": "一段聚焦对抗鲁棒性、可解释性，以及对抗训练到底改变了模型内部什么的科研助理时期。",
   "tags": [
@@ -13,20 +13,13 @@
       "blocks": [
         {
           "type": "text",
-          "text": "这段实验室时期把从签名项目开始的对抗机器学习线索继续深化。围绕 noise modulation 的大量阅读、实验与写作，大多也是在这里汇聚起来的。"
+          "text": "那个时候觉得深度学习模型犯下这么显而易见的错误简直不可思议，让人难以理解。我认为是数据和模型训练方式的原因，因此疯狂寻找对抗样本的解药，但是显然失败了"
         },
         {
           "type": "list",
           "items": [
-            "深入研究对抗训练与鲁棒性文献",
-            "围绕更可解释的输入梯度发展出 noise modulation 的想法",
-            "在论文写作愿望与尚未解决的精度权衡之间反复拉扯"
+            "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
           ]
-        },
-        {
-          "type": "link",
-          "label": "Noise Modulation 预印本",
-          "href": "https://arxiv.org/abs/2103.10603"
         }
       ],
       "id": "overview"
