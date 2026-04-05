@@ -94,7 +94,7 @@ export const THEME_CONFIG = {
             primary: '#355B80',
             secondary: '#8E2F28',
             background: '#D5E4F1',
-            text: '#16212B',
+            text: '#1A2840',
             accent: '#F4F7FA',
         },
         portrait: {
@@ -108,7 +108,7 @@ export const THEME_CONFIG = {
             primary: '#29465C',
             secondary: '#526774',
             background: '#A8C0D2',
-            text: '#172029',
+            text: '#1B2B34',
             accent: '#D2CBC3',
         },
         portrait: {
@@ -122,7 +122,7 @@ export const THEME_CONFIG = {
             primary: '#28477F',
             secondary: '#6F8FA3',
             background: '#B7D0E2',
-            text: '#16202A',
+            text: '#1E3150',
             accent: '#C9B36A',
         },
         portrait: {
@@ -136,7 +136,7 @@ export const THEME_CONFIG = {
             primary: '#586351',
             secondary: '#8A7A72',
             background: '#D7D7DD',
-            text: '#1E1D1B',
+            text: '#2C2925',
             accent: '#B7A79E',
         },
         portrait: {
@@ -144,10 +144,35 @@ export const THEME_CONFIG = {
             description: 'Machu Picchu, 2024',
         },
     },
+    whitesands: {
+        label: 'White Sands, 2025',
+        colors: {
+            primary: '#3A4451',
+            secondary: '#9D938B',
+            background: '#E5D8CC',
+            text: '#332D2A',
+            accent: '#8D4F42',
+        },
+        portrait: {
+            imgSrc: './assets/portraits/portrait_haoyang_whitesands.jpg',
+            description: 'White Sands, 2025',
+        },
+    },
 } as const satisfies Record<string, ThemeConfig>;
 
 export type Theme = keyof typeof THEME_CONFIG;
 
 // Controls the initial style when there is no saved preference in localStorage yet.
-export const DEFAULT_THEME: Theme = 'nyc';
-export const THEME_ORDER = Object.keys(THEME_CONFIG) as Theme[];
+export const DEFAULT_THEME: Theme = 'machupicchu';
+export const THEME_ORDER: Theme[] = [
+    'cornellsailing',
+    'sfhill',
+    'nyc',
+    'mty',
+    'atlp',
+    'joshua',
+    'squamish',
+    'mtfuji',
+    'machupicchu',
+    'whitesands',
+];

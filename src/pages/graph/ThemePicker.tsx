@@ -18,8 +18,8 @@ const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'f
       style={{
         width: isInline ? 'auto' : 'fit-content',
         paddingTop: isInline ? 0 : '0.28rem',
-        paddingLeft: isInline ? 0 : '0.34rem',
-        paddingRight: isInline ? 0 : '0.34rem',
+        paddingLeft: isInline ? 0 : '0.80rem',
+        paddingRight: isInline ? 0 : '0.80rem',
         border: '1px solid transparent',
         borderRadius: isInline ? 0 : '13px',
         textAlign: 'center',
