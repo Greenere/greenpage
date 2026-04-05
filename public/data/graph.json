@@ -259,59 +259,15 @@
       "strength": 3
     },
     {
-      "id": "editor-signature-attack-reason-signature-attack-naec-2",
-      "from": "signature-attack",
-      "to": "naec",
-      "kind": "reason",
-      "labels": {
-        "en": "research direction developed during the NAEC internship",
-        "zh-CN": "在 NAEC 实习期间逐渐形成的研究方向"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-signature-attack-time-signature-attack-hust-3",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "summer research during the HUST years",
-        "zh-CN": "HUST 时期的一段暑期研究"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-signature-attack-topic-faceswap-signature-attack-4",
-      "from": "faceswap",
-      "to": "signature-attack",
-      "kind": "topic",
-      "labels": {
-        "en": "shared interest in adversarial and synthetic-image systems",
-        "zh-CN": "都围绕对抗样本与合成图像系统的兴趣展开"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-adversarial-writing-outcome-noise-modulation-adversarial-writing-1",
       "from": "noise-modulation",
       "to": "adversarial-writing",
       "kind": "outcome",
       "labels": {
-        "en": "",
+        "en": "the failed research those notes eventually led to",
         "zh-CN": "这些笔记促成的失败研究"
       },
       "strength": 3
-    },
-    {
-      "id": "editor-adversarial-writing-topic-signature-attack-adversarial-writing-2",
-      "from": "signature-attack",
-      "to": "adversarial-writing",
-      "kind": "topic",
-      "labels": {
-        "en": "",
-        "zh-CN": "最开始的研究方向"
-      },
-      "strength": 2
     },
     {
       "id": "editor-adversarial-writing-reason-adversarial-writing-hust-mclab-3",
@@ -342,6 +298,50 @@
       "kind": "tool",
       "labels": {
         "en": "AI security internship echoed robustness research"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-reason-signature-attack-naec-1",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "reason",
+      "labels": {
+        "en": "research direction developed during the NAEC internship",
+        "zh-CN": "在 NAEC 实习期间逐渐形成的研究方向"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-signature-attack-time-signature-attack-hust-2",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "summer research during the HUST years",
+        "zh-CN": "HUST 时期的一段暑期研究"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-topic-faceswap-signature-attack-3",
+      "from": "faceswap",
+      "to": "signature-attack",
+      "kind": "topic",
+      "labels": {
+        "en": "shared interest in adversarial and synthetic-image systems",
+        "zh-CN": "都围绕对抗样本与合成图像系统的兴趣展开"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-4",
+      "from": "signature-attack",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "labels": {
+        "en": "the original research direction",
+        "zh-CN": "最开始的研究方向"
       },
       "strength": 2
     }
