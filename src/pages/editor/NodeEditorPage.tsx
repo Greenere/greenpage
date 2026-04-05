@@ -12,6 +12,7 @@ import { LANGUAGE_OPTIONS, getLocaleMessages, type AppLanguage } from '../../i18
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {
   CHRONOLOGY_FORMAT_HINT,
+  getChronologySortKey,
   getChronologyValidationError,
   getCurrentMonthChronologyValue,
   normalizeChronologyValue,
@@ -65,6 +66,7 @@ import {
   deleteEditorDomain,
   createEditorNode,
   EDITOR_CAN_MUTATE_PROJECT,
+  type EditorBootstrapRelation,
   type EditorExplicitRelation,
   fetchEditorBootstrap,
   fetchEditorNode,
@@ -540,6 +542,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   );
   const [dangerDialog, setDangerDialog] = useState<DangerDialogState | null>(null);
   const [showOpenNodeDialog, setShowOpenNodeDialog] = useState(false);
+  const [bootstrapRelations, setBootstrapRelations] = useState<EditorBootstrapRelation[]>([]);
   const [bioIdentity, setBioIdentity] = useState<{ name: string | null; subtitle: string | null }>(() => {
     const cachedBio = readCachedBioPageContent(language);
     return {
@@ -637,9 +640,11 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
       .then((payload) => {
         if (requestId !== bootstrapRequestIdRef.current) return;
         dispatch({ type: 'set_bootstrap_nodes', nodes: payload.nodes });
+        setBootstrapRelations(payload.relations);
       })
       .catch((error: unknown) => {
         if (requestId !== bootstrapRequestIdRef.current) return;
+        setBootstrapRelations([]);
         dispatch({
           type: 'set_bootstrap_error',
           error: error instanceof Error ? error.message : 'Failed to load editor bootstrap.',
@@ -975,6 +980,59 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     },
     [bootstrapNodes, language]
   );
+
+  const domainStatisticsSummary = useMemo(() => {
+    const sortedByChronology = [...bootstrapNodes].sort(
+      (left, right) => getChronologySortKey(left.chronology) - getChronologySortKey(right.chronology)
+    );
+    const nodesByYear = new Map<string, number>();
+    for (const node of sortedByChronology) {
+      const year = node.chronology.slice(0, 4);
+      nodesByYear.set(year, (nodesByYear.get(year) ?? 0) + 1);
+    }
+
+    const degreeByNode = new Map<string, number>();
+    for (const node of bootstrapNodes) {
+      degreeByNode.set(node.id, 0);
+    }
+    const strengthCounts: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const relation of bootstrapRelations) {
+      degreeByNode.set(relation.from, (degreeByNode.get(relation.from) ?? 0) + 1);
+      degreeByNode.set(relation.to, (degreeByNode.get(relation.to) ?? 0) + 1);
+      strengthCounts[relation.strength] += 1;
+    }
+    const degreeBuckets = new Map<string, number>([
+      ['0', 0],
+      ['1', 0],
+      ['2', 0],
+      ['3', 0],
+      ['4', 0],
+      ['5+', 0],
+    ]);
+    for (const degree of degreeByNode.values()) {
+      const key = degree >= 5 ? '5+' : String(degree);
+      degreeBuckets.set(key, (degreeBuckets.get(key) ?? 0) + 1);
+    }
+    const topConnectedNodes = [...bootstrapNodes]
+      .map((node) => ({
+        id: node.id,
+        label: node.title?.trim() ? node.title : node.id,
+        domainTag: DOMAIN_CONFIG[node.domain].cardTag,
+        count: degreeByNode.get(node.id) ?? 0,
+      }))
+      .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label))
+      .slice(0, 12);
+
+    return {
+      timelineByYear: [...nodesByYear.entries()].map(([year, count]) => ({ year, count })),
+      connectionDistribution: [...degreeBuckets.entries()].map(([bucket, count]) => ({ bucket, count })),
+      topConnectedNodes,
+      strengthDistribution: (Object.keys(strengthCounts) as Array<'1' | '2' | '3' | '4' | '5'>).map((strength) => ({
+        strength: Number(strength) as 1 | 2 | 3 | 4 | 5,
+        count: strengthCounts[Number(strength) as 1 | 2 | 3 | 4 | 5],
+      })),
+    };
+  }, [bootstrapNodes, bootstrapRelations]);
 
   useEffect(() => {
     const cachedBio = readCachedBioPageContent(language);
@@ -2459,6 +2517,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
             {tab === 'new-domain' ? (
               <DomainTreemap
                 entries={domainTreemapEntries}
+                stats={domainStatisticsSummary}
                 onDeleteDomain={(entry) =>
                   openDangerDialog({
                     actionDescription: UI_COPY.nodeEditor.confirmations.deleteDomain(entry.domain),

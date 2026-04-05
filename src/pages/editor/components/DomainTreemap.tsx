@@ -9,6 +9,13 @@ export type DomainTreemapEntry = {
   removable: boolean;
 };
 
+type DomainStatisticsSummary = {
+  timelineByYear: Array<{ year: string; count: number }>;
+  connectionDistribution: Array<{ bucket: string; count: number }>;
+  topConnectedNodes: Array<{ id: string; label: string; domainTag: string; count: number }>;
+  strengthDistribution: Array<{ strength: 1 | 2 | 3 | 4 | 5; count: number }>;
+};
+
 function buildTreemapLayout(
   entries: DomainTreemapEntry[],
   x: number,
@@ -59,15 +66,21 @@ function buildTreemapLayout(
 
 export function DomainTreemap({
   entries,
+  stats,
   onDeleteDomain,
 }: {
   entries: DomainTreemapEntry[];
+  stats: DomainStatisticsSummary;
   onDeleteDomain: (entry: DomainTreemapEntry) => void;
 }) {
   const sortedEntries = [...entries].sort((left, right) => right.count - left.count || left.domain.localeCompare(right.domain));
   const layout = buildTreemapLayout(sortedEntries, 0, 0, 100, 100);
   const maxCount = Math.max(...entries.map((entry) => entry.count), 1);
   const totalNodes = entries.reduce((sum, entry) => sum + entry.count, 0);
+  const maxTimelineCount = Math.max(...stats.timelineByYear.map((entry) => entry.count), 1);
+  const maxConnectionBucketCount = Math.max(...stats.connectionDistribution.map((entry) => entry.count), 1);
+  const maxTopConnectedCount = Math.max(...stats.topConnectedNodes.map((entry) => entry.count), 1);
+  const maxStrengthCount = Math.max(...stats.strengthDistribution.map((entry) => entry.count), 1);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -85,74 +98,311 @@ export function DomainTreemap({
       </div>
       <div
         style={{
-          position: 'relative',
           marginTop: '0.9rem',
-          width: '100%',
-          flex: 1,
-          minHeight: '20rem',
-          borderRadius: '22px',
-          overflow: 'hidden',
-          background:
-            'linear-gradient(135deg, color-mix(in srgb, var(--color-background) 92%, white 8%), color-mix(in srgb, var(--color-background) 84%, white 16%))',
-          border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(18rem, 2fr)',
+          gap: '0.9rem',
+          alignItems: 'stretch',
         }}
       >
-        {layout.map((entry) => {
-          const intensity = 0.18 + (entry.count / maxCount) * 0.34;
-          return (
-            <div
-              key={entry.domain}
-              style={{
-                position: 'absolute',
-                left: `${entry.x}%`,
-                top: `${entry.y}%`,
-                width: `${entry.width}%`,
-                height: `${entry.height}%`,
-                padding: '0.9rem',
-                border: '1px solid color-mix(in srgb, var(--color-secondary) 18%, transparent)',
-                background: `color-mix(in srgb, var(--color-text) ${Math.round(intensity * 100)}%, var(--color-background))`,
-                color: intensity > 0.34 ? 'var(--color-background)' : 'var(--color-text)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '0.5rem',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
-                <div style={{ fontSize: '0.72rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.72 }}>
-                  {entry.cardTag}
-                </div>
-                {entry.removable ? (
-                  <button
-                    type="button"
-                    onClick={() => onDeleteDomain(entry)}
+        <div style={{ display: 'grid', gap: '0.9rem' }}>
+          <div
+            style={{
+              padding: '1rem 1.05rem',
+              borderRadius: '18px',
+              background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
+              border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+              boxShadow:
+                'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
+              {UI_COPY.nodeEditor.domainStats.timelineTitle}
+            </div>
+            <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
+              {UI_COPY.nodeEditor.domainStats.timelineDetail}
+            </div>
+            <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'flex-end', gap: '0.42rem', minHeight: '8.5rem', flex: 1 }}>
+              {stats.timelineByYear.map((entry) => (
+                <div key={entry.year} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.42rem' }}>
+                  <div style={{ fontSize: '0.74rem', opacity: 0.66 }}>{entry.count}</div>
+                  <div
                     style={{
-                      padding: '0.22rem 0.55rem',
+                      width: '100%',
+                      minHeight: '0.45rem',
+                      height: `${Math.max(8, (entry.count / maxTimelineCount) * 110)}px`,
                       borderRadius: '999px',
-                      border: '1px solid color-mix(in srgb, crimson 22%, transparent)',
-                      background: 'transparent',
-                      color: 'inherit',
-                      cursor: 'pointer',
-                      fontSize: '0.72rem',
-                      fontFamily: 'inherit',
-                      opacity: 0.88,
+                      background: 'color-mix(in srgb, var(--color-secondary) 70%, var(--color-text))',
+                    }}
+                  />
+                  <div style={{ fontSize: '0.72rem', opacity: 0.74 }}>{entry.year}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: '1rem 1.05rem',
+              borderRadius: '18px',
+              background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
+              border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+              boxShadow:
+                'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
+              {UI_COPY.nodeEditor.domainStats.connectionDistributionTitle}
+            </div>
+            <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
+              {UI_COPY.nodeEditor.domainStats.connectionDistributionDetail}
+            </div>
+            <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.55rem', flex: 1, justifyContent: 'center' }}>
+              {stats.connectionDistribution.map((entry) => (
+                <div
+                  key={entry.bucket}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '3rem 1fr auto',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                  }}
+                >
+                  <div style={{ fontSize: '0.78rem', opacity: 0.82 }}>{entry.bucket}</div>
+                  <div
+                    style={{
+                      height: '0.64rem',
+                      borderRadius: '999px',
+                      background: 'color-mix(in srgb, var(--color-background) 80%, white 20%)',
+                      overflow: 'hidden',
                     }}
                   >
-                    {UI_COPY.nodeEditor.domainStats.delete}
-                  </button>
-                ) : null}
-              </div>
-              <div>
-                <div style={{ fontSize: entry.width < 22 || entry.height < 18 ? '0.95rem' : '1.18rem', fontWeight: 700, lineHeight: 1.05 }}>
-                  {entry.display}
+                    <div
+                      style={{
+                        width: `${(entry.count / maxConnectionBucketCount) * 100}%`,
+                        minWidth: entry.count > 0 ? '0.24rem' : 0,
+                        height: '100%',
+                        borderRadius: '999px',
+                        background: 'color-mix(in srgb, var(--color-secondary) 70%, var(--color-text))',
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '0.77rem', opacity: 0.72 }}>{entry.count}</div>
                 </div>
-                <div style={{ marginTop: '0.3rem', fontSize: '0.8rem', opacity: 0.78 }}>
-                  {UI_COPY.nodeEditor.domainStats.nodeCount(entry.count)}
-                </div>
-              </div>
+              ))}
             </div>
-          );
-        })}
+          </div>
+
+          <div
+            style={{
+              padding: '1rem 1.05rem',
+              borderRadius: '18px',
+              background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
+              border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+              boxShadow:
+                'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
+              {UI_COPY.nodeEditor.domainStats.strengthDistributionTitle}
+            </div>
+            <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
+              {UI_COPY.nodeEditor.domainStats.strengthDistributionDetail}
+            </div>
+            <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'flex-end', gap: '0.48rem', minHeight: '8.5rem', flex: 1 }}>
+              {stats.strengthDistribution.map((entry) => (
+                <div key={entry.strength} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.42rem' }}>
+                  <div style={{ fontSize: '0.74rem', opacity: 0.66 }}>{entry.count}</div>
+                  <div
+                    style={{
+                      width: '100%',
+                      minHeight: '0.45rem',
+                      height: `${Math.max(8, (entry.count / maxStrengthCount) * 110)}px`,
+                      borderRadius: '999px',
+                      background: 'color-mix(in srgb, var(--color-text) 28%, var(--color-background))',
+                    }}
+                  />
+                  <div style={{ fontSize: '0.72rem', opacity: 0.74 }}>{entry.strength}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: '1rem 1.05rem',
+            borderRadius: '18px',
+            background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
+            border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+            boxShadow:
+              'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
+            {UI_COPY.nodeEditor.domainStats.topConnectedNodesTitle}
+          </div>
+          <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
+            {UI_COPY.nodeEditor.domainStats.topConnectedNodesDetail}
+          </div>
+          <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.62rem', flex: 1, justifyContent: 'center' }}>
+            {stats.topConnectedNodes.map((entry) => (
+              <div
+                key={entry.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr auto',
+                  gap: '0.55rem',
+                  alignItems: 'center',
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {entry.label}
+                  </div>
+                  <div style={{ marginTop: '0.18rem', fontSize: '0.72rem', opacity: 0.68 }}>
+                    {entry.domainTag}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: '0.35rem',
+                      height: '0.45rem',
+                      borderRadius: '999px',
+                      background: 'color-mix(in srgb, var(--color-background) 80%, white 20%)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${(entry.count / maxTopConnectedCount) * 100}%`,
+                        minWidth: entry.count > 0 ? '0.24rem' : 0,
+                        height: '100%',
+                        borderRadius: '999px',
+                        background: 'color-mix(in srgb, var(--color-secondary) 70%, var(--color-text))',
+                      }}
+                    />
+                  </div>
+                </div>
+                <div style={{ fontSize: '0.78rem', opacity: 0.74 }}>{entry.count}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          marginTop: '0.9rem',
+          width: '100%',
+          flex: 1.15,
+          minHeight: '25rem',
+          padding: '1rem 1.05rem',
+          borderRadius: '22px',
+          background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
+          border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+          boxShadow:
+            'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
+          {UI_COPY.nodeEditor.domainStats.treemapTitle}
+        </div>
+        <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
+          {UI_COPY.nodeEditor.domainStats.treemapDetail}
+        </div>
+        <div
+          style={{
+            position: 'relative',
+            marginTop: '0.9rem',
+            flex: 1,
+            minHeight: '21rem',
+            borderRadius: '18px',
+            overflow: 'hidden',
+            background:
+              'linear-gradient(135deg, color-mix(in srgb, var(--color-background) 92%, white 8%), color-mix(in srgb, var(--color-background) 84%, white 16%))',
+            border: '1px solid color-mix(in srgb, var(--color-secondary) 22%, transparent)',
+          }}
+        >
+          {layout.map((entry) => {
+            const intensity = 0.18 + (entry.count / maxCount) * 0.34;
+            const compact = entry.width < 22 || entry.height < 18;
+            return (
+              <div
+                key={entry.domain}
+                style={{
+                  position: 'absolute',
+                  left: `${entry.x}%`,
+                  top: `${entry.y}%`,
+                  width: `${entry.width}%`,
+                  height: `${entry.height}%`,
+                  padding: compact ? '0.3rem' : '0.42rem',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    padding: compact ? '0.7rem 0.72rem' : '0.9rem',
+                    borderRadius: compact ? '16px' : '18px',
+                    border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
+                    background: `color-mix(in srgb, var(--color-background) ${Math.round(82 - intensity * 12)}%, white ${Math.round(18 + intensity * 12)}%)`,
+                    boxShadow:
+                      'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 22%, transparent), 0 10px 24px color-mix(in srgb, black 7%, transparent)',
+                    color: 'var(--color-text)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '0.5rem',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '0.72rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.72 }}>
+                      {entry.cardTag}
+                    </div>
+                    {entry.removable ? (
+                      <button
+                        type="button"
+                        onClick={() => onDeleteDomain(entry)}
+                        style={{
+                          padding: '0.22rem 0.55rem',
+                          borderRadius: '999px',
+                          border: '1px solid color-mix(in srgb, crimson 22%, transparent)',
+                          background: 'transparent',
+                          color: 'inherit',
+                          cursor: 'pointer',
+                          fontSize: '0.72rem',
+                          fontFamily: 'inherit',
+                          opacity: 0.88,
+                        }}
+                      >
+                        {UI_COPY.nodeEditor.domainStats.delete}
+                      </button>
+                    ) : null}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: compact ? '0.95rem' : '1.18rem', fontWeight: 700, lineHeight: 1.05 }}>
+                      {entry.display}
+                    </div>
+                    <div style={{ marginTop: '0.3rem', fontSize: '0.8rem', opacity: 0.78 }}>
+                      {UI_COPY.nodeEditor.domainStats.nodeCount(entry.count)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

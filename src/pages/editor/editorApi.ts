@@ -20,8 +20,16 @@ export type EditorNodeOption = GraphNodeRef & {
   subtitle?: string;
 };
 
+export type EditorBootstrapRelation = {
+  from: string;
+  to: string;
+  kind: RelationKind;
+  strength: RelationStrength;
+};
+
 export type EditorBootstrapResponse = {
   nodes: EditorNodeOption[];
+  relations: EditorBootstrapRelation[];
 };
 
 export type EditorRelationLabels = Partial<Record<AppLanguage, string>>;
@@ -102,6 +110,12 @@ export async function fetchEditorBootstrap(lang: AppLanguage) {
         contentPath: node.contentPath,
         title: node.title,
         subtitle: node.subtitle,
+      })),
+      relations: model.relations.map((relation) => ({
+        from: relation.from,
+        to: relation.to,
+        kind: relation.kind,
+        strength: relation.strength,
       })),
     } satisfies EditorBootstrapResponse;
   }

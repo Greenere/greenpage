@@ -523,7 +523,18 @@ function createNodeEditorPlugin(): Plugin {
             const lang = requestUrl.searchParams.get('lang') ?? 'en'
             const graph = await readGraphModel()
             const nodes = await Promise.all(graph.nodes.map((node) => readNodeSummary(node, lang)))
-            sendJson(response, 200, { nodes })
+            sendJson(response, 200, {
+              nodes,
+              relations: graph.relations.map((relation) => ({
+                from: typeof relation.from === 'string' ? relation.from : '',
+                to: typeof relation.to === 'string' ? relation.to : '',
+                kind: typeof relation.kind === 'string' ? relation.kind : 'topic',
+                strength:
+                  relation.strength === 1 || relation.strength === 2 || relation.strength === 3 || relation.strength === 4 || relation.strength === 5
+                    ? relation.strength
+                    : 3,
+              })),
+            })
             return
           }
 
