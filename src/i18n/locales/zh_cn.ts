@@ -25,8 +25,17 @@ export const ZH_CN_MESSAGES = {
   },
   uiCopy: {
     graphRelations: {
-      next: 'NEXT',
-      previous: 'PREVIOUS',
+      kindLabels: {
+        time: '时间',
+        location: '地点',
+        topic: '主题',
+        reason: '原因',
+        outcome: '结果',
+        tool: '工具',
+        sequence: '顺序',
+      },
+      next: '后续',
+      previous: '前序',
       nextInTimeline: '时间线中的下一个节点',
       previousInTimeline: '时间线中的上一个节点',
       latestNodeInDomain: '相关方向的最新节点',

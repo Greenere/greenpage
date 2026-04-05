@@ -17,6 +17,7 @@ import {
   normalizeChronologyValue,
 } from '../../shared/chronology';
 import { applyThemeVars } from '../../shared/styles/colors';
+import { getRelationKindLabel } from '../../shared/relationDisplay';
 import ThemePicker from '../graph/ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph/content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from '../graph/content/BioPage';
@@ -2077,7 +2078,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
                               >
                                 {RELATION_KIND_OPTIONS.map((kind) => (
                                   <option key={kind} value={kind}>
-                                    {kind}
+                                    {getRelationKindLabel(kind)}
                                   </option>
                                 ))}
                               </select>

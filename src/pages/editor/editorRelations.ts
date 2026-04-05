@@ -1,5 +1,6 @@
 import type { AppLanguage } from '../../i18n';
 import { UI_COPY } from '../../configs/ui/uiCopy';
+import { getDirectionalRelationKindLabel, getDirectionalTimelineLabel, getRelationKindLabel } from '../../shared/relationDisplay';
 import type { GraphNodeRef } from '../graph/content/Nodes';
 import type { EditorExplicitRelation, EditorNodeOption } from './editorApi';
 import { getEditorNodeTitle, sortNodeRefs } from './editorNodeUtils';
@@ -154,9 +155,8 @@ export function buildTimelineConnectionEntries(currentNode: GraphNodeRef, nodes:
     key: `timeline-${direction}-${node.id}-${index}`,
     relatedNodeId: node.id,
     relatedNodeTitle: getEditorNodeTitle(node, node.id),
-    displayKind: direction === 'next' ? UI_COPY.graphRelations.next : UI_COPY.graphRelations.previous,
-    displayLabel:
-      direction === 'next' ? UI_COPY.graphRelations.nextInTimeline : UI_COPY.graphRelations.previousInTimeline,
+    displayKind: getDirectionalRelationKindLabel(direction),
+    displayLabel: getDirectionalTimelineLabel(direction),
     removable: false,
   }));
 }
@@ -302,7 +302,7 @@ export function buildExplicitConnectionEntry(
     key: `explicit-${relationIndex}-${relation.from}-${relation.to}-${relation.kind}`,
     relatedNodeId,
     relatedNodeTitle: hasChosenPeer ? getEditorNodeTitle(relatedNode, relatedNodeId) : UI_COPY.nodeEditor.common.chooseNodeFallback,
-    displayKind: relation.kind,
+    displayKind: getRelationKindLabel(relation.kind),
     displayLabel:
       relationLabel.trim() ||
       (hasChosenPeer

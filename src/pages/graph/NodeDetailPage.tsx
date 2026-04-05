@@ -10,6 +10,7 @@ import ArticleGalleryBlock from '../../shared/ui/ArticleGalleryBlock';
 import { applyThemeVars } from '../../shared/styles/colors';
 import DetailPageSkeleton from '../../shared/ui/DetailPageSkeleton';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
+import { getDirectionalRelationKindLabel, getDirectionalTimelineLabel, getRelationKindLabel } from '../../shared/relationDisplay';
 import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
@@ -93,14 +94,14 @@ function getRelatedEntries(
         relatedNodeTitle: relatedNode.title,
         relatedNodeSubtitle: relatedNode.subtitle ?? relation.label,
         displayKind: isNextNode
-          ? UI_COPY.graphRelations.next
+          ? getDirectionalRelationKindLabel('next')
           : isPreviousNode
-            ? UI_COPY.graphRelations.previous
-            : relation.kind,
+            ? getDirectionalRelationKindLabel('previous')
+            : getRelationKindLabel(relation.kind),
         displayLabel: isNextNode
-          ? UI_COPY.graphRelations.nextInTimeline
+          ? getDirectionalTimelineLabel('next')
           : isPreviousNode
-            ? UI_COPY.graphRelations.previousInTimeline
+            ? getDirectionalTimelineLabel('previous')
             : relation.label,
         isBio: false,
         displayOrder: isNextNode ? 1 : isPreviousNode ? 2 : 3,
