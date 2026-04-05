@@ -53,6 +53,10 @@
     {
       "label": "Email",
       "href": "mailto:lihaoyangjingzhou@outlook.com"
+    },
+    {
+      "label": "Github",
+      "href": "https://github.com/Greenere"
     }
   ]
 }
