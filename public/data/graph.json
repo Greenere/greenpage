@@ -139,28 +139,6 @@
   ],
   "relations": [
     {
-      "id": "editor-verily-intern-time-verily-intern-cornell-1",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "it was during the Cornell period",
-        "zh-CN": "康村读书期间的实习"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "summer trip in the graduate-school stretch",
-        "zh-CN": "研究生阶段中的那次暑期旅行"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
       "from": "california-one-2022",
       "to": "verily-intern",
@@ -181,17 +159,6 @@
         "zh-CN": "工作之余的个人项目"
       },
       "strength": 1
-    },
-    {
-      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
-      "from": "cornell",
-      "to": "data-visualizations-2021",
-      "kind": "time",
-      "labels": {
-        "en": "coursework during Cornell period",
-        "zh-CN": "康村上学期间的课程作业"
-      },
-      "strength": 4
     },
     {
       "id": "editor-data-visualizations-2021-topic-data-visualizations-2021-weibe-2",
@@ -324,28 +291,6 @@
       "strength": 3
     },
     {
-      "id": "editor-oxford-reason-oxford-cornell-1",
-      "from": "oxford",
-      "to": "cornell",
-      "kind": "reason",
-      "labels": {
-        "en": "it makes me want to attend a school in countryside",
-        "zh-CN": "让我想要去“世外桃源”读书"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-puerto-rico-2022-time-puerto-rico-2022-cornell-1",
-      "from": "puerto-rico-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "zh-CN": "trip during the Cornell years",
-        "en": "trip during the Cornell years"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-1",
       "from": "louvre-evacuation",
       "to": "hust",
@@ -379,7 +324,18 @@
       "strength": 3
     },
     {
-      "id": "editor-noise-modulation-topic-realai-noise-modulation-2",
+      "id": "editor-noise-modulation-outcome-noise-modulation-hust-mclab-3",
+      "from": "noise-modulation",
+      "to": "hust-mclab",
+      "kind": "outcome",
+      "labels": {
+        "en": "took shape during the research assistant period",
+        "zh-CN": "在研究助理阶段逐渐成形"
+      },
+      "strength": 5
+    },
+    {
+      "id": "editor-realai-topic-realai-noise-modulation-1",
       "from": "realai",
       "to": "noise-modulation",
       "kind": "topic",
@@ -390,15 +346,70 @@
       "strength": 1
     },
     {
-      "id": "editor-noise-modulation-outcome-noise-modulation-hust-mclab-3",
-      "from": "noise-modulation",
-      "to": "hust-mclab",
-      "kind": "outcome",
+      "id": "editor-realai-topic-realai-signature-attack-2",
+      "from": "realai",
+      "to": "signature-attack",
+      "kind": "topic",
       "labels": {
-        "en": "took shape during the research assistant period",
-        "zh-CN": "在研究助理阶段逐渐成形"
+        "en": "same research domain",
+        "zh-CN": "相同的研究方向"
       },
-      "strength": 5
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-verily-intern-cornell-1",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "it was during the Cornell period",
+        "zh-CN": "康村读书期间的实习"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-cornell-time-california-one-2022-cornell-2",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "summer trip in the graduate-school stretch",
+        "zh-CN": "研究生阶段中的那次暑期旅行"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-cornell-time-cornell-data-visualizations-2021-3",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "coursework during Cornell period",
+        "zh-CN": "康村上学期间的课程作业"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-cornell-reason-oxford-cornell-4",
+      "from": "oxford",
+      "to": "cornell",
+      "kind": "reason",
+      "labels": {
+        "en": "it makes me want to attend a school in countryside",
+        "zh-CN": "让我想要去“世外桃源”读书"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-cornell-time-puerto-rico-2022-cornell-5",
+      "from": "puerto-rico-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "trip during the Cornell years",
+        "en": "trip during the Cornell years"
+      },
+      "strength": 2
     }
   ]
 }
