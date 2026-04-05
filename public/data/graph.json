@@ -292,28 +292,6 @@
       "strength": 3
     },
     {
-      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "summer trip in the graduate-school stretch",
-        "zh-CN": "研究生阶段中的那次暑期旅行"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
-      "from": "california-one-2022",
-      "to": "verily-intern",
-      "kind": "location",
-      "labels": {
-        "en": "",
-        "zh-CN": ""
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-wellmail-time-wellmail-hust-1",
       "from": "wellmail",
       "to": "hust",
@@ -345,6 +323,28 @@
         "en": "trip during the Cornell years"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "summer trip in the graduate-school stretch",
+        "zh-CN": "研究生阶段中的那次暑期旅行"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
+      "from": "california-one-2022",
+      "to": "verily-intern",
+      "kind": "location",
+      "labels": {
+        "en": "",
+        "zh-CN": "发生在实习期间"
+      },
+      "strength": 3
     }
   ]
 }

@@ -393,9 +393,9 @@
     ]
   },
   "california-one-2022": {
-    "title": "加州一号公路",
-    "subtitle": "Verily 那个夏天的一次海岸自驾",
-    "summary": "一个和加州实习阶段紧密相连的太平洋海岸旅行节点，路线串起了 Half Moon Bay、Santa Cruz、Monterey 和 17-Mile Drive 等地方。",
+    "title": "第一次加州海岸自驾",
+    "subtitle": "Verily 那个夏天的一次海岸公路旅行",
+    "summary": "后来我见过无数次加州的海，但第一次永远是印象最深刻的。那时候我甚至还不会开车，是朋友组织了这趟短途旅行，我们沿着海岸线从旧金山一路开到蒙特雷（Monterey）。",
     "tags": [
       "旅行",
       "海岸"
@@ -403,27 +403,23 @@
     "preview": [
       {
         "type": "text",
-        "text": "在旧旅行材料里，这个节点尤其偏视觉化。它读起来更像一张路线草图，而不是日记：海岸线、观景点，以及在[Verily 实习](/nodes/verily-intern)期间，从湾区一路向 Monterey 延展的一整天。"
+        "text": "第一次看到这些景色时，一切都新鲜得不可思议。我到现在还记得 Whale Cove 下方拍碎的海浪、San Gregorio 悬崖上方高悬的公路，以及 Santa Cruz 海滩上的天然桥。到了 Monterey 之后，我们还去了著名的 Aquarium 和 Lovers Point。"
       },
       {
         "type": "text",
-        "text": "真正留下来的不是某一个停靠点，而是整段路程按顺序展开的感觉，几乎像在走过一幅活着的加州`分镜板`。"
+        "text": "这是我们当时走的路线："
       },
       {
-        "type": "list",
-        "items": [
-          "**Half Moon Bay** 像是离开湾区节奏后的第一个明显过渡",
-          "*Santa Cruz* 像是中点，让海岸线开始显得更悠闲而不是功能性",
-          "**Monterey** 成了这趟旅行的情绪中心",
-          "*17-Mile Drive* 则让整条路线显得是刻意追求风景，而不是单纯效率"
-        ]
+        "type": "image",
+        "src": "https://greenere.github.io/tripline2022/californiaone_2022.svg",
+        "alt": ""
       }
     ]
   },
   "puerto-rico-2022": {
     "title": "波多黎各",
-    "subtitle": "2022 年 12 月的海岛之旅",
-    "summary": "2022 年末的一次旅行，像是康奈尔章节与下一段生活之间的一个标记：海滩、海岸停靠点，以及一种与伊萨卡完全不同的空气。",
+    "subtitle": "2022 年 12 月的海岛旅行",
+    "summary": "自从我们在 2019 年 ICM 比赛里看到这座岛之后，我就一直想去波多黎各看看。对美国东海岸来说，它几乎像是一个更便宜、历史也更丰富的“夏威夷”。我尤其喜欢我们在圣胡安看到的日落。",
     "tags": [
       "旅行",
       "海岛"
@@ -431,16 +427,16 @@
     "preview": [
       {
         "type": "text",
-        "text": "旧 tripline 作品把它变成了一个很鲜明的节点：老圣胡安、Punta Higuero Lighthouse、海滩、机场门槛，以及 2022 年末那次短而紧凑、却很有过渡感的旅行。"
+        "text": "一开始我是打算和几个康奈尔朋友一起去的，但他们后来自己有了别的计划，在我反应过来之前就把我丢下了。不过最后我还是找到了几个大学老朋友，他们也正好快毕业了，也对去这座加勒比海岛玩一趟很感兴趣。"
       },
       {
-        "type": "list",
-        "items": [
-          "老圣胡安",
-          "Punta Higuero Lighthouse",
-          "Playa Escondida 等海岸停靠点",
-          "2022 年 12 月 21–25 日"
-        ]
+        "type": "text",
+        "text": "这是我们当时走的路线："
+      },
+      {
+        "type": "image",
+        "src": "https://greenere.github.io//tripline2022/puertorico_2022.svg",
+        "alt": ""
       }
     ]
   }

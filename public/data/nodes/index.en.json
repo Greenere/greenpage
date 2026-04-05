@@ -899,24 +899,37 @@
     ]
   },
   "california-one-2022": {
-    "title": "California State Route 1",
-    "subtitle": "A coastal drive during the Verily summer",
-    "summary": "A Pacific coast travel node tied to the California internship period, with a scenic route through places like Half Moon Bay, Santa Cruz, Monterey, and 17-Mile Drive.",
+    "title": "First California Coast Drive",
+    "subtitle": "My first coastal roadtrip during the Verily summer",
+    "summary": "Ever since, I have been to the California coast in countless times, but the first time is always the most memorizable. I did not even know how to drive back then, it was a friend who organized this short trip and we just drove from San Francisco to Monterey along the coast.",
     "tags": [
       "travel",
       "coast"
     ],
-    "meta": {},
     "sections": [
       {
         "label": "Overview",
         "blocks": [
           {
             "type": "text",
-            "text": "Start writing here."
+            "text": "Everything was amazing from a fresh eye. I still remember the crushing waves beneath the Whale cove, the hanging road above the San Gregorio cliffs and the natural bridge on the beach of Santa Cruz. When we arrived Monterey, we visited the famouse Aquarium and the Lovers point."
           }
         ],
         "id": "overview"
+      },
+      {
+        "label": "Tripline",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "This is the route we took:"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://greenere.github.io/tripline2022/californiaone_2022.svg"
+          }
+        ]
       }
     ]
   },
