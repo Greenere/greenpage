@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { DOMAIN_CONFIG, DOMAIN_ORDER, isDomainId, type DomainId } from '../../configs/content/domains';
 import {
@@ -7,6 +7,7 @@ import {
   DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
   getHighlightBorderShadowPrefix,
 } from '../../configs/graph/highlight';
+import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { LANGUAGE_OPTIONS, getLocaleMessages, type AppLanguage } from '../../i18n';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
@@ -24,6 +25,7 @@ import {
 import { applyThemeVars } from '../../shared/styles/colors';
 import { getRelationKindLabel } from '../../shared/relationDisplay';
 import { StatisticsPanel } from '../../shared/ui/StatisticsPanel';
+import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import ThemePicker from '../graph/ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph/content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from '../graph/content/BioPage';
@@ -525,6 +527,14 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   const nodeTemplateOptions = getNodeTemplateOptions();
   const templateDefaults = getLocaleMessages().nodeTemplates.defaults;
   const editorCanMutateProject = EDITOR_CAN_MUTATE_PROJECT;
+  const handleBackToGraph = () => {
+    navigateWithViewTransition(
+      () => {
+        navigate('/');
+      },
+      { transitionConfig: PAGE_BACK_TRANSITION_CONFIG }
+    );
+  };
   const navigate = useNavigate();
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const [editorState, dispatch] = useReducer(
@@ -1520,7 +1530,17 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
               {editorSubtitle}
             </div>
           </div>
-          <ThemePicker theme={theme} setTheme={setTheme} variant="inline" />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '0.4rem',
+            }}
+          >
+            <PreviewPanelLanguageToggle />
+            <ThemePicker theme={theme} setTheme={setTheme} variant="inline" />
+          </div>
         </div>
 
         {/* Main two-column layout */}
@@ -2464,7 +2484,16 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
                       : previewSelectionHint}
                 </div>
               </div>
-              <PreviewPanelLanguageToggle />
+              <Link
+                to="/"
+                className="node-card-detail-link node-page-back-link"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleBackToGraph();
+                }}
+              >
+                <span>{UI_COPY.nodeDetailPage.backToGraph}</span>
+              </Link>
             </div>
 
             {/* Content editor (inline editing mode) */}

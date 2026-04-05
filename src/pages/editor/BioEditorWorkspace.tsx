@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import {
   DETAIL_PAGE_ACTION_BORDER,
   DETAIL_PAGE_ACTION_BORDER_GROWTH_DIRECTION,
   getHighlightBorderShadowPrefix,
 } from '../../configs/graph/highlight';
+import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { LANGUAGE_OPTIONS, type AppLanguage } from '../../i18n';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import { applyThemeVars } from '../../shared/styles/colors';
+import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import ThemePicker from '../graph/ThemePicker';
 import { clearBioPageContentCache, normalizeBioPageContent, type BioPageContent, type BioPageSection } from '../graph/content/BioPage';
 import { clearGraphNodeContentCache } from '../graph/content/Nodes';
@@ -285,6 +287,14 @@ export default function BioEditorWorkspace() {
   const navigate = useNavigate();
   const { language, messages } = useAppLanguage();
   const editorCanMutateProject = EDITOR_CAN_MUTATE_PROJECT;
+  const handleBackToGraph = () => {
+    navigateWithViewTransition(
+      () => {
+        navigate('/');
+      },
+      { transitionConfig: PAGE_BACK_TRANSITION_CONFIG }
+    );
+  };
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const [tab, setTab] = useState<'content' | 'json'>('content');
   const [bootstrapNodes, setBootstrapNodes] = useState<EditorNodeOption[]>([]);
@@ -594,7 +604,17 @@ export default function BioEditorWorkspace() {
             <div style={{ fontSize: '1.35rem', fontWeight: 700, letterSpacing: '-0.02em' }}>{UI_COPY.nodeEditor.title}</div>
             <div style={{ marginTop: '0.3rem', opacity: 0.62, fontSize: '0.88rem' }}>{editorSubtitle}</div>
           </div>
-          <ThemePicker theme={theme} setTheme={setTheme} variant="inline" />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '0.4rem',
+            }}
+          >
+            <PreviewPanelLanguageToggle />
+            <ThemePicker theme={theme} setTheme={setTheme} variant="inline" />
+          </div>
         </div>
 
         <div
@@ -1161,7 +1181,16 @@ export default function BioEditorWorkspace() {
                   {draftContent ? `${UI_COPY.nodeDetailPage.bioEntry.kind} / bio` : UI_COPY.nodeEditor.rightPanel.previewSelectionHintExistingOnly}
                 </div>
               </div>
-              <PreviewPanelLanguageToggle />
+              <Link
+                to="/"
+                className="node-card-detail-link node-page-back-link"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleBackToGraph();
+                }}
+              >
+                <span>{UI_COPY.nodeDetailPage.backToGraph}</span>
+              </Link>
             </div>
 
             {draftContent ? (
