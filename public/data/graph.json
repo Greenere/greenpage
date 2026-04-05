@@ -5,6 +5,12 @@
   },
   "nodes": [
     {
+      "id": "microwave-notes-2019",
+      "domain": "blog",
+      "kind": "writing",
+      "chronology": "201907"
+    },
+    {
       "id": "adversarial-writing",
       "kind": "writing",
       "domain": "blog",
@@ -248,28 +254,6 @@
       "strength": 3
     },
     {
-      "id": "editor-verily-intern-time-verily-intern-cornell-1",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "it was during the Cornell period",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-realai-tool-realai-noise-modulation-1",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "tool",
-      "labels": {
-        "en": "AI security internship echoed robustness research",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-verily-reason-layoff-journey-verily-1",
       "from": "layoff-journey",
       "to": "verily",
@@ -336,15 +320,48 @@
       "strength": 1
     },
     {
-      "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
+      "id": "editor-verily-intern-time-verily-intern-cornell-1",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "it was during the Cornell period",
+        "zh-CN": "康村读书期间的实习"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-verily-intern-location-california-one-2022-verily-intern-2",
       "from": "california-one-2022",
       "to": "verily-intern",
       "kind": "location",
       "labels": {
-        "en": "trip during this summer",
-        "zh-CN": "发生在实习期间"
+        "en": "I took the trip during the internship",
+        "zh-CN": "实习期间的旅行"
       },
       "strength": 3
+    },
+    {
+      "id": "editor-realai-topic-realai-noise-modulation-1",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "topic",
+      "labels": {
+        "en": "similar research",
+        "zh-CN": "相关的研究"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-microwave-notes-2019-time-microwave-notes-2019-hust-1",
+      "from": "microwave-notes-2019",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "during my junior year",
+        "zh-CN": "大三时期的课程"
+      },
+      "strength": 2
     }
   ]
 }

@@ -1,4 +1,33 @@
 {
+  "microwave-notes-2019": {
+    "title": " Microwave Technology Notes",
+    "subtitle": "study notes for the course of Fundamentals of Microwave Technology",
+    "summary": "A series of study notes when I was preparing for the finals for the course of Fundamentals of Microwave Technology during my junior year. There were no such notes for this topic online since it was very niche, so my notes were widely read.",
+    "tags": [
+      "study",
+      "notes",
+      "microwave technology"
+    ],
+    "preview": [
+      {
+        "type": "text",
+        "text": "It was purely for passing the finals and I did not continue to do any further research or study over the microwave technology. I had to admit that it was interesting to me, but I did not feel like diving into too hardware heavy stuff."
+      },
+      {
+        "type": "text",
+        "text": "These are the four notes:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "[传输线理论-微波技术基础复习笔记(一)](https://zhuanlan.zhihu.com/p/67811969)",
+          "[波导方程-微波技术基础复习笔记(二)](https://zhuanlan.zhihu.com/p/69641659)",
+          "[史密斯圆图-微波技术基础复习笔记(三)](https://zhuanlan.zhihu.com/p/69685072)",
+          "[矩形波导-微波技术基础复习笔记(四)](https://zhuanlan.zhihu.com/p/81556773)"
+        ]
+      }
+    ]
+  },
   "adversarial-writing": {
     "title": "ML Reading Notes",
     "subtitle": "Zhihu articles, surveys, and dense notes",

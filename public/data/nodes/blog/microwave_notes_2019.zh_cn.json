@@ -1,0 +1,47 @@
+{
+  "title": "微波技术基础笔记",
+  "subtitle": "《微波技术基础》课程的学习笔记",
+  "summary": "这是我大三备考微波技术基础课程期末考试时做的一系列学习笔记。这个课程非常小众，网上几乎没有类似的笔记，所以我的笔记阅读量相对这个主题来说还挺大的。",
+  "tags": [
+    "study",
+    "notes",
+    "microwave technology"
+  ],
+  "hero": {
+    "image": {
+      "src": "https://picx.zhimg.com/70/v2-7d2ac37e5afcc0349a5fe2017f1182c1_1440w.avis?source=172ae18b&biz_tag=Post",
+      "alt": "Describe the image"
+    }
+  },
+  "sections": [
+    {
+      "label": "概述",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "我当时只是为了通过期末考试才选修这门课，并没有继续深入研究微波技术。我得承认，我对它确实挺感兴趣的，但我并不想钻研那些过于复杂的硬件。"
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "知乎",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "知乎上的四篇笔记："
+        },
+        {
+          "type": "list",
+          "items": [
+            "[传输线理论-微波技术基础复习笔记(一)](https://zhuanlan.zhihu.com/p/67811969)",
+            "[波导方程-微波技术基础复习笔记(二)](https://zhuanlan.zhihu.com/p/69641659)",
+            "[史密斯圆图-微波技术基础复习笔记(三)](https://zhuanlan.zhihu.com/p/69685072)",
+            "[矩形波导-微波技术基础复习笔记(四)](https://zhuanlan.zhihu.com/p/81556773)"
+          ]
+        }
+      ],
+      "id": "links"
+    }
+  ]
+}
