@@ -98,8 +98,7 @@
       "id": "data-visualizations-2021",
       "kind": "project",
       "domain": "project",
-      "chronology": "20211215",
-      "contentPath": "/data/nodes/project/data_visualizations_2021.json"
+      "chronology": "20211215"
     },
     {
       "id": "signature-attack",
@@ -127,39 +126,6 @@
     }
   ],
   "relations": [
-    {
-      "id": "editor-cornell-time-puerto-rico-2022-cornell-4",
-      "from": "puerto-rico-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "zh-CN": "trip during the Cornell years",
-        "en": "trip during the Cornell years"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-verily-intern-outcome-verily-intern-cornell-2",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "outcome",
-      "labels": {
-        "en": "internship emerged from the Cornell period",
-        "zh-CN": "康奈尔阶段延伸出的实习经历"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "summer trip in the graduate-school stretch",
-        "zh-CN": "研究生阶段中的那次暑期旅行"
-      },
-      "strength": 1
-    },
     {
       "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
       "from": "california-one-2022",
@@ -336,13 +302,45 @@
       "strength": 3
     },
     {
-      "id": "editor-data-visualizations-2021-time-data-visualizations-2021-cornell-1",
-      "from": "data-visualizations-2021",
+      "id": "editor-cornell-time-puerto-rico-2022-cornell-1",
+      "from": "puerto-rico-2022",
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "en": "Data Visualization work at Cornell",
-        "zh-CN": "康奈尔时期的数据可视化项目"
+        "zh-CN": "trip during the Cornell years",
+        "en": "trip during the Cornell years"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-outcome-verily-intern-cornell-2",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "outcome",
+      "labels": {
+        "en": "internship emerged from the Cornell period",
+        "zh-CN": "康奈尔阶段延伸出的实习经历"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-california-one-2022-cornell-3",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "summer trip in the graduate-school stretch",
+        "zh-CN": "研究生阶段中的那次暑期旅行"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-cornell-time-cornell-data-visualizations-2021-4",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "course project during Cornell period"
       },
       "strength": 2
     }
