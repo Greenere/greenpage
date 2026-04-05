@@ -139,17 +139,6 @@
   ],
   "relations": [
     {
-      "id": "editor-puerto-rico-2022-time-puerto-rico-2022-cornell-1",
-      "from": "puerto-rico-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "zh-CN": "trip during the Cornell years",
-        "en": "trip during the Cornell years"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-verily-intern-time-verily-intern-cornell-1",
       "from": "verily-intern",
       "to": "cornell",
@@ -190,17 +179,6 @@
       "labels": {
         "en": "during my spare time ",
         "zh-CN": "工作之余的个人项目"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-louvre-evacuation-reason-louvre-evacuation-puerto-rico-2022-2",
-      "from": "louvre-evacuation",
-      "to": "puerto-rico-2022",
-      "kind": "reason",
-      "labels": {
-        "en": "first time ever heard of Puerto Rico was in the ICM contest",
-        "zh-CN": "第一次听说波多黎各是在ICM的比赛中"
       },
       "strength": 1
     },
@@ -279,17 +257,6 @@
         "en": "research during the undergraduate study"
       },
       "strength": 4
-    },
-    {
-      "id": "editor-hust-time-louvre-evacuation-hust-4",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "competition project during college",
-        "zh-CN": ""
-      },
-      "strength": 2
     },
     {
       "id": "editor-hust-time-weibe-hust-5",
@@ -388,6 +355,39 @@
         "zh-CN": "在研究助理阶段逐渐成形"
       },
       "strength": 5
+    },
+    {
+      "id": "editor-oxford-reason-oxford-cornell-1",
+      "from": "oxford",
+      "to": "cornell",
+      "kind": "reason",
+      "labels": {
+        "en": "it makes me want to attend a school in countryside",
+        "zh-CN": "让我想要去“世外桃源”读书"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-puerto-rico-2022-time-puerto-rico-2022-cornell-1",
+      "from": "puerto-rico-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "trip during the Cornell years",
+        "en": "trip during the Cornell years"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-1",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "competition project during college",
+        "zh-CN": ""
+      },
+      "strength": 2
     }
   ]
 }

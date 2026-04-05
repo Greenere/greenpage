@@ -33,11 +33,11 @@ export const GRAPH_LAYOUT = {
         2: 1.55,
         3: 2.45,
         4: 3.4,
-        5: 7.5,
+        5: 8,
     },
     derivedRelationStrengths: {
-        temporalSequence: 4,
-        latestNodeToBio: 5,
+        temporalSequence: 15,
+        latestNodeToBio: 30,
     },
     styleNodeOffsetFromBio: {
         x: 128 + Math.round(lerp(36, 14, GRAPH_LAYOUT_TIGHTNESS)),
