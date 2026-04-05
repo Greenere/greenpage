@@ -23,6 +23,15 @@ export const EN_MESSAGES = {
   },
   uiCopy: {
     graphRelations: {
+      kindLabels: {
+        time: 'time',
+        location: 'location',
+        topic: 'topic',
+        reason: 'reason',
+        outcome: 'outcome',
+        tool: 'tool',
+        sequence: 'sequence',
+      },
       next: 'next',
       previous: 'previous',
       nextInTimeline: 'next in timeline',
