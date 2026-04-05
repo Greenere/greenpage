@@ -41,7 +41,7 @@ type EditorExplicitRelation = {
   to: string
   kind: string
   labels: Partial<Record<AppLanguage, string>>
-  strength: 1 | 2 | 3
+  strength: 1 | 2 | 3 | 4 | 5
 }
 
 type EditorBioFact = {
@@ -645,7 +645,11 @@ function createNodeEditorPlugin(): Plugin {
                 !relation.labels ||
                 typeof relation.labels !== 'object' ||
                 Array.isArray(relation.labels) ||
-                (relation.strength !== 1 && relation.strength !== 2 && relation.strength !== 3)
+                (relation.strength !== 1 &&
+                  relation.strength !== 2 &&
+                  relation.strength !== 3 &&
+                  relation.strength !== 4 &&
+                  relation.strength !== 5)
               ) {
                 throw new Error(`Invalid relation at index ${index}.`)
               }

@@ -1,4 +1,5 @@
 import { DOMAIN_CONFIG, isDomainId, type DomainId } from '../../../configs/content/domains';
+import { GRAPH_LAYOUT } from '../../../configs/graph/layout';
 import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { getActiveLanguage, getLocaleMessages, type AppLanguage } from '../../../i18n';
 import { getLocaleFallbackOrder, localeToFileSuffix } from '../../../i18n/localeFiles';
@@ -21,6 +22,10 @@ export type RelationKind =
   | 'outcome'
   | 'tool'
   | 'sequence';
+
+export type RelationStrength = 1 | 2 | 3 | 4 | 5;
+
+export const RELATION_STRENGTH_VALUES = [1, 2, 3, 4, 5] as const;
 
 export type NodeGalleryImage = {
   src: string;
@@ -114,7 +119,7 @@ export type GraphRelation = {
   to: string;
   kind: RelationKind;
   label: string;
-  strength: 1 | 2 | 3;
+  strength: RelationStrength;
 };
 
 export type GraphModelSettings = {
@@ -187,6 +192,10 @@ function isNodeKind(value: unknown): value is NodeKind {
 
 function isRelationKind(value: unknown): value is RelationKind {
   return value === 'time' || value === 'location' || value === 'topic' || value === 'reason' || value === 'outcome' || value === 'tool' || value === 'sequence';
+}
+
+function isRelationStrength(value: unknown): value is RelationStrength {
+  return value === 1 || value === 2 || value === 3 || value === 4 || value === 5;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -455,7 +464,7 @@ export function normalizeGraphStructure(raw: unknown, locale: AppLanguage = getA
         typeof item.from !== 'string' ||
         typeof item.to !== 'string' ||
         !isRelationKind(item.kind) ||
-        (item.strength !== 1 && item.strength !== 2 && item.strength !== 3)
+        !isRelationStrength(item.strength)
       ) {
         throw new Error(`Relation "${String(item.id ?? index)}" is missing required fields.`);
       }
@@ -739,7 +748,7 @@ export function getTemporalDomainRelations(model: GraphModel) {
       to: node.id,
       kind: 'sequence' as const,
       label: UI_COPY.graphRelations.nextInTimeline,
-      strength: 2 as const,
+      strength: GRAPH_LAYOUT.derivedRelationStrengths.temporalSequence,
     }));
   });
 }
@@ -751,7 +760,7 @@ export function getLatestBioRelations(model: GraphModel) {
     to: 'bio',
     kind: 'sequence' as const,
     label: UI_COPY.graphRelations.latestNodeInDomain,
-    strength: 2 as const,
+    strength: GRAPH_LAYOUT.derivedRelationStrengths.latestNodeToBio,
   }));
 }
 

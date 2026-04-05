@@ -8,6 +8,7 @@
  */
 
 import { getChronologySortKey } from '../../../shared/chronology';
+import { GRAPH_LAYOUT } from '../../../configs/graph/layout';
 import { type DomainId, type GraphCardNode, type GraphModel, getDomainLayout } from '../content/Nodes';
 import {
     COLLISION_CELL_SIZE,
@@ -41,6 +42,10 @@ export function half(n: number) {
 
 function sign(n: number) {
     return n < 0 ? -1 : n > 0 ? 1 : 1;
+}
+
+function getRelationStrengthWeight(strength: number) {
+    return GRAPH_LAYOUT.relationStrengthWeights[strength as keyof typeof GRAPH_LAYOUT.relationStrengthWeights] ?? strength;
 }
 
 // ---------------------------------------------------------------------------
@@ -145,7 +150,7 @@ export function getPotentialCollisionIds(id: string, box: BoxState, index: Map<s
  *
  * Coefficient guide:
  *   springK    ~0.04  — weak sector anchor, leaves room for edge forces
- *   edgeSpringK ~0.06 — edge attraction; strength 3 edges pull ~2× harder than strength 1
+ *   edgeSpringK ~0.06 — edge attraction; nonlinear relation weights keep 5 steps useful
  */
 export function relaxBoxPositions(
     pos: Map<string, BoxState>,
@@ -221,7 +226,7 @@ export function relaxBoxPositions(
                 const acy = a.y + a.h / 2;
                 const bcx = b.x + b.w / 2;
                 const bcy = b.y + b.h / 2;
-                const k = edgeSpringK * (rel.strength / 3);
+                const k = edgeSpringK * (getRelationStrengthWeight(rel.strength) / getRelationStrengthWeight(5));
 
                 if (!immovableIds?.has(rel.from)) {
                     a.x += (bcx - acx) * k;
@@ -420,8 +425,9 @@ export function buildDomainWeights(contentNodes: GraphCardNode[], graphRelations
                     ? 0.45
                     : 0.3;
 
-        weights.set(fromNode.domain, (weights.get(fromNode.domain) ?? 1) + relation.strength * relationWeight);
-        weights.set(toNode.domain, (weights.get(toNode.domain) ?? 1) + relation.strength * relationWeight);
+        const strengthWeight = getRelationStrengthWeight(relation.strength);
+        weights.set(fromNode.domain, (weights.get(fromNode.domain) ?? 1) + strengthWeight * relationWeight);
+        weights.set(toNode.domain, (weights.get(toNode.domain) ?? 1) + strengthWeight * relationWeight);
     }
 
     return weights;
@@ -448,7 +454,7 @@ export function buildDomainLaneOrder(contentNodes: GraphCardNode[], graphRelatio
                     : relation.kind === 'time'
                         ? 1.05
                         : 1;
-        affinity.set(key, (affinity.get(key) ?? 0) + relation.strength * relationWeight);
+        affinity.set(key, (affinity.get(key) ?? 0) + getRelationStrengthWeight(relation.strength) * relationWeight);
     }
 
     return greedyDomainOrder(fallbackOrder, affinity, fallbackIndex);

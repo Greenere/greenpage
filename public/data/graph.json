@@ -139,94 +139,6 @@
   ],
   "relations": [
     {
-      "id": "editor-hust-mclab-time-hust-mclab-hust-1",
-      "from": "hust-mclab",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "still rooted in the HUST period",
-        "zh-CN": "still rooted in the HUST period"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-noise-modulation-reason-noise-modulation-hust-mclab-3",
-      "from": "noise-modulation",
-      "to": "hust-mclab",
-      "kind": "reason",
-      "labels": {
-        "en": "took shape during the research assistant period",
-        "zh-CN": "在研究助理阶段逐渐成形"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-faceswap-time-faceswap-hust-1",
-      "from": "faceswap",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "graduation capstone project for bachelors",
-        "zh-CN": "本科毕业设计项目"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-adversarial-writing-outcome-noise-modulation-adversarial-writing-1",
-      "from": "noise-modulation",
-      "to": "adversarial-writing",
-      "kind": "outcome",
-      "labels": {
-        "en": "reading notes related to adversarial examples",
-        "zh-CN": "与对抗样本相关的阅读笔记"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-adversarial-writing-reason-adversarial-writing-hust-mclab-3",
-      "from": "adversarial-writing",
-      "to": "hust-mclab",
-      "kind": "reason",
-      "labels": {
-        "en": "research notes during this period",
-        "zh-CN": "在这期间的研究笔记"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-naec-time-hust-naec-1",
-      "from": "hust",
-      "to": "naec",
-      "kind": "time",
-      "labels": {
-        "en": "it was during my junior year",
-        "zh-CN": "大三时期的科研实习"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-wellmail-time-wellmail-hust-1",
-      "from": "wellmail",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "coursework in sophomore year",
-        "zh-CN": "大二时期的课程项目"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-weibe-time-weibe-hust-1",
-      "from": "weibe",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "big-data systems course project",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-puerto-rico-2022-time-puerto-rico-2022-cornell-1",
       "from": "puerto-rico-2022",
       "to": "cornell",
@@ -235,7 +147,7 @@
         "zh-CN": "trip during the Cornell years",
         "en": "trip during the Cornell years"
       },
-      "strength": 2
+      "strength": 3
     },
     {
       "id": "editor-verily-intern-time-verily-intern-cornell-1",
@@ -246,29 +158,7 @@
         "en": "it was during the Cornell period",
         "zh-CN": "康村读书期间的实习"
       },
-      "strength": 2
-    },
-    {
-      "id": "editor-realai-topic-realai-noise-modulation-1",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "topic",
-      "labels": {
-        "en": "similar research",
-        "zh-CN": "相关的研究"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-microwave-notes-2019-time-microwave-notes-2019-hust-1",
-      "from": "microwave-notes-2019",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "during my junior year",
-        "zh-CN": "大三时期的课程"
-      },
-      "strength": 2
+      "strength": 3
     },
     {
       "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
@@ -290,51 +180,7 @@
         "en": "I took the trip during the internship",
         "zh-CN": "实习期间的旅行"
       },
-      "strength": 3
-    },
-    {
-      "id": "editor-signature-attack-time-signature-attack-hust-1",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "summer research during the HUST years",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-signature-attack-topic-faceswap-signature-attack-2",
-      "from": "faceswap",
-      "to": "signature-attack",
-      "kind": "topic",
-      "labels": {
-        "en": "shared interest in adversarial and synthetic-image systems",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-3",
-      "from": "signature-attack",
-      "to": "adversarial-writing",
-      "kind": "topic",
-      "labels": {
-        "zh-CN": "",
-        "en": "it leads to further research in adversarial ML"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-signature-attack-reason-signature-attack-naec-4",
-      "from": "signature-attack",
-      "to": "naec",
-      "kind": "reason",
-      "labels": {
-        "en": "research direction developed during the NAEC internship",
-        "zh-CN": ""
-      },
-      "strength": 3
+      "strength": 4
     },
     {
       "id": "editor-howlang-time-howlang-waymo-1",
@@ -344,39 +190,6 @@
       "labels": {
         "en": "during my spare time ",
         "zh-CN": "工作之余的个人项目"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
-      "from": "cornell",
-      "to": "data-visualizations-2021",
-      "kind": "time",
-      "labels": {
-        "en": "coursework during Cornell period",
-        "zh-CN": "康村上学期间的课程作业"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-data-visualizations-2021-topic-data-visualizations-2021-weibe-2",
-      "from": "data-visualizations-2021",
-      "to": "weibe",
-      "kind": "topic",
-      "labels": {
-        "en": "both are visualization heavy projects",
-        "zh-CN": "都是可视化项目"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-1",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "",
-        "zh-CN": ""
       },
       "strength": 1
     },
@@ -392,6 +205,125 @@
       "strength": 1
     },
     {
+      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "coursework during Cornell period",
+        "zh-CN": "康村上学期间的课程作业"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-data-visualizations-2021-topic-data-visualizations-2021-weibe-2",
+      "from": "data-visualizations-2021",
+      "to": "weibe",
+      "kind": "topic",
+      "labels": {
+        "en": "both are visualization heavy projects",
+        "zh-CN": "都是可视化项目"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-2",
+      "from": "signature-attack",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "labels": {
+        "zh-CN": "相关论文阅读笔记",
+        "en": "related reading notes"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-outcome-signature-attack-naec-3",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "outcome",
+      "labels": {
+        "en": "key research outcome",
+        "zh-CN": "实习期间的主要研究成果"
+      },
+      "strength": 5
+    },
+    {
+      "id": "editor-signature-attack-topic-faceswap-signature-attack-4",
+      "from": "faceswap",
+      "to": "signature-attack",
+      "kind": "topic",
+      "labels": {
+        "en": "both about AI security",
+        "zh-CN": "都关于 AI 安全"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-wellmail-hust-2",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "coursework in sophomore year",
+        "zh-CN": "大二时期的课程项目"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-signature-attack-hust-3",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "research during the undergraduate study"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-louvre-evacuation-hust-4",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "competition project during college",
+        "zh-CN": ""
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-weibe-hust-5",
+      "from": "weibe",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "big-data systems course project",
+        "zh-CN": ""
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-faceswap-hust-6",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "graduation capstone project for bachelors"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-hust-naec-7",
+      "from": "hust",
+      "to": "naec",
+      "kind": "time",
+      "labels": {
+        "en": "it was during my junior year",
+        "zh-CN": "大三时期的科研实习"
+      },
+      "strength": 3
+    },
+    {
       "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
       "from": "layoff-journey",
       "to": "verily",
@@ -400,7 +332,62 @@
         "en": "laid off by Verily",
         "zh-CN": "被Verily裁员了"
       },
+      "strength": 5
+    },
+    {
+      "id": "editor-noise-modulation-topic-noise-modulation-adversarial-writing-1",
+      "from": "noise-modulation",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "labels": {
+        "en": "reading notes related to adversarial examples",
+        "zh-CN": "与对抗样本相关的阅读笔记"
+      },
       "strength": 3
+    },
+    {
+      "id": "editor-noise-modulation-topic-realai-noise-modulation-2",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "topic",
+      "labels": {
+        "zh-CN": "与对抗样本相关的实习",
+        "en": "internship also related to adversarial examples"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-mclab-reason-adversarial-writing-hust-mclab-1",
+      "from": "adversarial-writing",
+      "to": "hust-mclab",
+      "kind": "reason",
+      "labels": {
+        "en": "research notes during this period",
+        "zh-CN": "在这期间的研究笔记"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-mclab-time-hust-mclab-hust-2",
+      "from": "hust-mclab",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "still rooted in the HUST period",
+        "zh-CN": "still rooted in the HUST period"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-hust-mclab-outcome-noise-modulation-hust-mclab-3",
+      "from": "noise-modulation",
+      "to": "hust-mclab",
+      "kind": "outcome",
+      "labels": {
+        "en": "took shape during the research assistant period",
+        "zh-CN": "在研究助理阶段逐渐成形"
+      },
+      "strength": 5
     }
   ]
 }

@@ -28,6 +28,17 @@ export const GRAPH_LAYOUT = {
         radialGapMin: Math.round(lerp(122, 93, GRAPH_LAYOUT_TIGHTNESS)),
         radialGapMax: Math.round(lerp(158, 134, GRAPH_LAYOUT_TIGHTNESS)),
     },
+    relationStrengthWeights: {
+        1: 1,
+        2: 1.55,
+        3: 2.45,
+        4: 3.4,
+        5: 7.5,
+    },
+    derivedRelationStrengths: {
+        temporalSequence: 4,
+        latestNodeToBio: 5,
+    },
     styleNodeOffsetFromBio: {
         x: 128 + Math.round(lerp(36, 14, GRAPH_LAYOUT_TIGHTNESS)),
         y: -68 - Math.round(48 * lerp(0.42, 0.58, GRAPH_LAYOUT_TIGHTNESS)),

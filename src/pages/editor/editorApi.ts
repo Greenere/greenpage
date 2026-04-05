@@ -10,6 +10,7 @@ import {
   type GraphNodeRef,
   type NodeKind,
   type RelationKind,
+  type RelationStrength,
 } from '../graph/content/Nodes';
 
 export const EDITOR_CAN_MUTATE_PROJECT = import.meta.env.DEV;
@@ -31,7 +32,7 @@ export type EditorExplicitRelation = {
   to: string;
   kind: RelationKind;
   labels: EditorRelationLabels;
-  strength: 1 | 2 | 3;
+  strength: RelationStrength;
 };
 
 export type EditorNodeResponse = {

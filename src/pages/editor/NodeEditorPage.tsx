@@ -27,9 +27,11 @@ import {
   clearGraphNodeContentCache,
   normalizeNodeContent,
   resolveAssetUrl,
+  RELATION_STRENGTH_VALUES,
   type GraphContentNode,
   type GraphNodeContent,
   type GraphNodeRef,
+  type RelationStrength,
 } from '../graph/content/Nodes';
 import JsonEditorPanel from './JsonEditorPanel';
 import NodeArticlePreview from './NodeArticlePreview';
@@ -168,13 +170,14 @@ const RELATION_KIND_OPTIONS: EditorExplicitRelation['kind'][] = [
   'outcome',
   'tool',
 ];
+const NODE_EDITOR_DRAFT_SCHEMA_VERSION = 3;
 
 function getDraftStorageKey(nodeId: string, lang: AppLanguage) {
   return `${EDITOR_DRAFT_STORAGE_PREFIX}${lang}:${nodeId}`;
 }
 
 type StoredNodeEditorDraft = {
-  version: 2;
+  version: 3;
   content: GraphNodeContent;
   jsonDraft: string;
   explicitRelationsJsonDraft?: string;
@@ -225,6 +228,18 @@ function normalizeRelationLabels(
   return null;
 }
 
+function remapLegacyRelationStrength(strength: unknown, draftVersion: number): RelationStrength | null {
+  if (draftVersion >= NODE_EDITOR_DRAFT_SCHEMA_VERSION) {
+    return RELATION_STRENGTH_VALUES.includes(strength as RelationStrength) ? (strength as RelationStrength) : null;
+  }
+
+  if (strength === 1) return 1;
+  if (strength === 2) return 3;
+  if (strength === 3) return 4;
+  if (strength === 4 || strength === 5) return strength;
+  return null;
+}
+
 function normalizeExplicitRelationsInput(
   raw: unknown,
   currentNodeId: string,
@@ -248,7 +263,7 @@ function normalizeExplicitRelationsInput(
       typeof candidate.from !== 'string' ||
       typeof candidate.to !== 'string' ||
       !RELATION_KIND_OPTIONS.includes(kind as EditorExplicitRelation['kind']) ||
-      (strength !== 1 && strength !== 2 && strength !== 3)
+      !RELATION_STRENGTH_VALUES.includes(strength as RelationStrength)
     ) {
       throw new Error(`Explicit connection at index ${index} is missing required fields.`);
     }
@@ -268,7 +283,7 @@ function normalizeExplicitRelationsInput(
         to: candidate.to,
         kind: kind as EditorExplicitRelation['kind'],
         labels,
-        strength: strength as 1 | 2 | 3,
+        strength: strength as RelationStrength,
       },
       currentNodeId,
     );
@@ -297,7 +312,7 @@ function isStoredExplicitRelation(value: unknown): value is EditorExplicitRelati
       allowLegacyLabel: true,
       legacyLabelValue: candidate.label,
     }) !== null) &&
-    (candidate.strength === 1 || candidate.strength === 2 || candidate.strength === 3) &&
+    RELATION_STRENGTH_VALUES.includes(candidate.strength as RelationStrength) &&
     (candidate.id === undefined || typeof candidate.id === 'string')
   );
 }
@@ -324,6 +339,10 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string, language:
     }
 
     const candidate = parsed as Record<string, unknown>;
+    const draftVersion =
+      typeof candidate.version === 'number' && Number.isFinite(candidate.version)
+        ? candidate.version
+        : 1;
     const content = normalizeNodeContent(candidate.content, nodeId);
     const jsonDraft = typeof candidate.jsonDraft === 'string' ? candidate.jsonDraft : prettyJson(content);
     const explicitRelations = Array.isArray(candidate.explicitRelations)
@@ -335,6 +354,7 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string, language:
               allowLegacyLabel: true,
               legacyLabelValue: relationCandidate.label,
             }) ?? {};
+            const strength = remapLegacyRelationStrength(relationCandidate.strength, draftVersion) ?? 3;
 
             return {
               id: typeof relationCandidate.id === 'string' ? relationCandidate.id : undefined,
@@ -342,7 +362,7 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string, language:
               to: relationCandidate.to as string,
               kind: relationCandidate.kind as EditorExplicitRelation['kind'],
               labels,
-              strength: relationCandidate.strength as 1 | 2 | 3,
+              strength,
             } satisfies EditorExplicitRelation;
           })
       : undefined;
@@ -360,7 +380,15 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string, language:
 
     let explicitRelationsJsonError: string | null = null;
     try {
-      normalizeExplicitRelationsInput(lenientParseJsonText(explicitRelationsJsonDraft), nodeId, language);
+      const parsedRelations = normalizeExplicitRelationsInput(lenientParseJsonText(explicitRelationsJsonDraft), nodeId, language);
+      if (draftVersion < NODE_EDITOR_DRAFT_SCHEMA_VERSION) {
+        explicitRelationsJsonDraft = prettyJson(
+          parsedRelations.map((relation) => ({
+            ...relation,
+            strength: remapLegacyRelationStrength(relation.strength, draftVersion) ?? relation.strength,
+          })),
+        );
+      }
     } catch {
       try {
         const migratedRelations = normalizeExplicitRelationsInput(
@@ -369,7 +397,12 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string, language:
           language,
           { allowLegacyLabel: true },
         );
-        explicitRelationsJsonDraft = prettyJson(migratedRelations);
+        explicitRelationsJsonDraft = prettyJson(
+          migratedRelations.map((relation) => ({
+            ...relation,
+            strength: remapLegacyRelationStrength(relation.strength, draftVersion) ?? relation.strength,
+          })),
+        );
       } catch (legacyError) {
         explicitRelationsJsonError = legacyError instanceof Error ? legacyError.message : 'Invalid explicit connections JSON.';
       }
@@ -668,7 +701,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
 
       if (hasUnsavedDraftForPreviousOwner) {
         storeNodeDraft(previousOwner, {
-          version: 2,
+          version: NODE_EDITOR_DRAFT_SCHEMA_VERSION,
           content: snapshotDraftContent,
           jsonDraft: snapshotJsonDraft,
           explicitRelationsJsonDraft: snapshotExplicitRelationsJsonDraft,
@@ -818,7 +851,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
 
     const timer = window.setTimeout(() => {
       storeNodeDraft(draftStorageOwner, {
-        version: 2,
+        version: NODE_EDITOR_DRAFT_SCHEMA_VERSION,
         content: draftContent,
         jsonDraft,
         explicitRelationsJsonDraft,
@@ -2090,14 +2123,16 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
                                 onChange={(event) =>
                                   updateSelectedExplicitRelation((entry) => ({
                                     ...entry,
-                                    strength: Number(event.target.value) as 1 | 2 | 3,
+                                    strength: Number(event.target.value) as RelationStrength,
                                   }))
                                 }
                                 style={inputStyle()}
                               >
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
+                                {RELATION_STRENGTH_VALUES.map((strength) => (
+                                  <option key={strength} value={strength}>
+                                    {strength}
+                                  </option>
+                                ))}
                               </select>
                             </div>
                           </div>
