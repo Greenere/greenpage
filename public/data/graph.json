@@ -254,17 +254,6 @@
       "strength": 3
     },
     {
-      "id": "editor-verily-reason-layoff-journey-verily-1",
-      "from": "layoff-journey",
-      "to": "verily",
-      "kind": "reason",
-      "labels": {
-        "en": "",
-        "zh-CN": "被 Verily 裁员"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-wellmail-time-wellmail-hust-1",
       "from": "wellmail",
       "to": "hust",
@@ -362,6 +351,17 @@
         "zh-CN": "大三时期的课程"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "labels": {
+        "en": "",
+        "zh-CN": ""
+      },
+      "strength": 3
     }
   ]
 }
