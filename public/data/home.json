@@ -4,7 +4,7 @@
     "name":"Haoyang Li",
     "email": "lihaoyangjingzhou@outlook.com",
     "portrait": {
-        "imgSrc":"./assets/portrait_haoyang.jpg",
+        "imgSrc":"./assets/portraits/portrait_haoyang.jpg",
         "url": "https://www.linkedin.com/in/haoyanghowyoung/"
     },
     "sections": [

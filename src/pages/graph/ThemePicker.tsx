@@ -11,14 +11,15 @@ type ThemePickerProps = {
 
 const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'floating', children }) => {
   const isInline = variant === 'inline';
+  const floatingColumnCount = Math.min(5, THEME_ORDER.length);
 
   return (
     <div
       style={{
-        width: isInline ? 'auto' : '10rem',
-        paddingTop: isInline ? 0 : '0.2rem',
-        paddingLeft: isInline ? 0 : '0.2rem',
-        paddingRight: isInline ? 0 : '0.2rem',
+        width: isInline ? 'auto' : 'fit-content',
+        paddingTop: isInline ? 0 : '0.28rem',
+        paddingLeft: isInline ? 0 : '0.34rem',
+        paddingRight: isInline ? 0 : '0.34rem',
         border: '1px solid transparent',
         borderRadius: isInline ? 0 : '13px',
         textAlign: 'center',
@@ -43,35 +44,50 @@ const ThemePicker: React.FC<ThemePickerProps> = ({ theme, setTheme, variant = 'f
           {THEME_CONFIG[theme].label}
         </div>
       )}
-      {THEME_ORDER.map((key) => {
-        return (
-          <button
-            key={key}
-            type="button"
-            aria-label={THEME_CONFIG[key].label}
-            title={isInline ? THEME_CONFIG[key].label : undefined}
-            onClick={(event) => {
-              setTheme(key);
-              event.currentTarget.blur();
-            }}
-            style={{
-              background: THEME_CONFIG[key].colors.primary,
-              display: 'inline-block',
-              borderRadius: '50%',
-              width: '1rem',
-              height: '1rem',
-              margin: isInline ? 0 : '0.1rem',
-              border: `1px ${theme === key ? 'solid' : 'dotted'} var(--color-secondary)`,
-              padding: 0,
-              cursor: 'pointer',
-              outline: 'none',
-              boxShadow: 'none',
-              appearance: 'none',
-              WebkitAppearance: 'none',
-            }}
-          />
-        );
-      })}
+      <div
+        style={{
+          display: isInline ? 'flex' : 'grid',
+          gridTemplateColumns: isInline ? undefined : `repeat(${floatingColumnCount}, 1rem)`,
+          gridAutoRows: isInline ? undefined : '1rem',
+          gridAutoFlow: isInline ? undefined : 'row',
+          justifyContent: isInline ? undefined : 'center',
+          alignItems: isInline ? 'center' : undefined,
+          flexWrap: isInline ? 'nowrap' : undefined,
+          gap: isInline ? '0.18rem' : '0.24rem',
+          marginTop: isInline ? 0 : '0.14rem',
+          marginBottom: isInline ? 0 : '0.08rem',
+        }}
+      >
+        {THEME_ORDER.map((key) => {
+          return (
+            <button
+              key={key}
+              type="button"
+              aria-label={THEME_CONFIG[key].label}
+              title={isInline ? THEME_CONFIG[key].label : undefined}
+              onClick={(event) => {
+                setTheme(key);
+                event.currentTarget.blur();
+              }}
+              style={{
+                background: THEME_CONFIG[key].colors.primary,
+                display: 'inline-block',
+                borderRadius: '50%',
+                width: '1rem',
+                height: '1rem',
+                margin: 0,
+                border: `1px ${theme === key ? 'solid' : 'dotted'} var(--color-secondary)`,
+                padding: 0,
+                cursor: 'pointer',
+                outline: 'none',
+                boxShadow: 'none',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+              }}
+            />
+          );
+        })}
+      </div>
       {!isInline && children ? (
         <div
           style={{

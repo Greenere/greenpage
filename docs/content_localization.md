@@ -94,7 +94,7 @@ Example:
   "tags": ["internship", "engineering"],
   "hero": {
     "image": {
-      "src": "assets/portrait_haoyang_sfbay.jpg",
+      "src": "assets/portraits/portrait_haoyang_sfbay.jpg",
       "alt": "Haoyang in the Bay Area during the Verily internship summer",
       "caption": "Work, relocation, and weekend travel started to blur into one California chapter."
     }

@@ -28,7 +28,7 @@ export const THEME_CONFIG = {
             accent: '#B4B9BD',
         },
         portrait: {
-            imgSrc: './assets/portrait_haoyang_nyc.jpg',
+            imgSrc: './assets/portraits/portrait_haoyang_nyc.jpg',
             description: 'New York, 2023',
         },
     },
@@ -42,7 +42,7 @@ export const THEME_CONFIG = {
             accent: '#28272Bff',
         },
         portrait: {
-            imgSrc: './assets/portrait_haoyang_joshua.jpg',
+            imgSrc: './assets/portraits/portrait_haoyang_joshua.jpg',
             description: 'Joshua Tree, 2023',
         },
     },
@@ -56,7 +56,7 @@ export const THEME_CONFIG = {
             accent: '#43444Dff',
         },
         portrait: {
-            imgSrc: './assets/portrait_haoyang_mty.jpg',
+            imgSrc: './assets/portraits/portrait_haoyang_mty.jpg',
             description: 'Monterey, 2023',
         },
     },
@@ -70,7 +70,7 @@ export const THEME_CONFIG = {
             accent: '#43444Dff',
         },
         portrait: {
-            imgSrc: './assets/portrait_haoyang_atlp.jpg',
+            imgSrc: './assets/portraits/portrait_haoyang_atlp.jpg',
             description: 'Antelope Valley, 2023',
         },
     },
@@ -84,8 +84,64 @@ export const THEME_CONFIG = {
             accent: '#BCA793',
         },
         portrait: {
-            imgSrc: './assets/portrait_haoyang_sfhill.jpg',
+            imgSrc: './assets/portraits/portrait_haoyang_sfhill.jpg',
             description: 'San Francisco Bay, 2023',
+        },
+    },
+    mtfuji: {
+        label: 'Mount Fuji, 2024',
+        colors: {
+            primary: '#355B80',
+            secondary: '#8E2F28',
+            background: '#D5E4F1',
+            text: '#16212B',
+            accent: '#F4F7FA',
+        },
+        portrait: {
+            imgSrc: './assets/portraits/portrait_haoyang_mtfuji.jpg',
+            description: 'Mount Fuji, 2024',
+        },
+    },
+    squamish: {
+        label: 'Squamish, 2024',
+        colors: {
+            primary: '#29465C',
+            secondary: '#526774',
+            background: '#A8C0D2',
+            text: '#172029',
+            accent: '#D2CBC3',
+        },
+        portrait: {
+            imgSrc: './assets/portraits/portrait_haoyang_squamish.jpg',
+            description: 'Squamish, 2024',
+        },
+    },
+    cornellsailing: {
+        label: 'Cornell Sailing, 2021',
+        colors: {
+            primary: '#28477F',
+            secondary: '#6F8FA3',
+            background: '#B7D0E2',
+            text: '#16202A',
+            accent: '#C9B36A',
+        },
+        portrait: {
+            imgSrc: './assets/portraits/portrait_haoyang_cornellsailing.jpg',
+            description: 'Cornell Sailing, 2021',
+        },
+    },
+    machupicchu: {
+        label: 'Machu Picchu, 2024',
+        colors: {
+            primary: '#586351',
+            secondary: '#8A7A72',
+            background: '#D7D7DD',
+            text: '#1E1D1B',
+            accent: '#B7A79E',
+        },
+        portrait: {
+            imgSrc: './assets/portraits/portrait_haoyang_machupicchu.jpg',
+            description: 'Machu Picchu, 2024',
         },
     },
 } as const satisfies Record<string, ThemeConfig>;
