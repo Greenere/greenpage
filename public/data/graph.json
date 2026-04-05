@@ -204,16 +204,6 @@
       "strength": 3
     },
     {
-      "id": "editor-realai-tool-realai-noise-modulation-1",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "tool",
-      "labels": {
-        "en": "AI security internship echoed robustness research"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-signature-attack-reason-signature-attack-naec-1",
       "from": "signature-attack",
       "to": "naec",
@@ -335,12 +325,24 @@
       "strength": 1
     },
     {
-      "id": "editor-cornell-time-cornell-data-visualizations-2021-4",
+      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
       "from": "cornell",
       "to": "data-visualizations-2021",
       "kind": "time",
       "labels": {
-        "en": "course project during Cornell period"
+        "en": "",
+        "zh-CN": ""
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-realai-tool-realai-noise-modulation-1",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "tool",
+      "labels": {
+        "en": "AI security internship echoed robustness research",
+        "zh-CN": ""
       },
       "strength": 2
     }

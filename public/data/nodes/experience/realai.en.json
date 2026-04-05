@@ -1,10 +1,11 @@
 {
   "title": "Algorithm Intern at RealAI",
-  "subtitle": "AI security internship in Beijing",
-  "summary": "A short industry chapter in AI security that sat between academic robustness research and later product engineering work.",
+  "subtitle": "AI security internship in Beijing, 2021",
+  "summary": "During my research into adversarial examples, I found this interesting company trying to put AI security into industry. So I applied and did an internship there, where I got to know many renowned researcher in this field.",
   "tags": [
-    "industry",
-    "ai security"
+    "AI",
+    "security",
+    "face recognition"
   ],
   "sections": [
     {
@@ -12,15 +13,15 @@
       "blocks": [
         {
           "type": "text",
-          "text": "RealAI felt like a bridge. The same adversarial-ML interests appeared in a more applied setting, shaped by industry pace and product constraints. It sharpened the sense that robustness ideas had to survive outside the paper world."
+          "text": "To be honest, I do not really understand what RealAI is trying to do. During my internship, the mentor asked me to think of ways to make adversarial examples for face recognition system physically viable."
         },
         {
-          "type": "list",
-          "items": [
-            "Worked as a software algorithm engineer intern",
-            "Stayed close to AI security and robustness themes",
-            "Helped mark the transition from research-heavy work toward engineering roles"
-          ]
+          "type": "text",
+          "text": "The main challenge was that normally we use flat digital images for training and adversarial attacks, while in the physical world, human face is not flat. So I was exploring ways to reliably mapping the unflat face to a flat space."
+        },
+        {
+          "type": "text",
+          "text": "Overall, I did not accomplish anything meaningful despite got to know the authors of many papers I read and admire."
         }
       ],
       "id": "overview"

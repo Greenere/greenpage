@@ -1,6 +1,6 @@
 {
   "title": "Data Visualizations",
-  "subtitle": "Interactive D3 projects during Cornell",
+  "subtitle": "Interactive D3 projects during Cornell period",
   "summary": "I attended this interesting course INFO 5100 at Cornell, where we were taught the principals of data visualizations and how to use d3.js to realize those ideas. There were three course projects that are very interesting.",
   "tags": [
     "D3",
@@ -90,6 +90,16 @@
           ],
           "columns": 1,
           "align": "natural"
+        }
+      ]
+    },
+    {
+      "label": "zhihu articles",
+      "blocks": [
+        {
+          "type": "link",
+          "label": "d3.js与三则数据可视化",
+          "href": "https://zhuanlan.zhihu.com/p/446008683"
         }
       ]
     }

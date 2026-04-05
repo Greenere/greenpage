@@ -1077,12 +1077,12 @@
     ]
   },
   "data-visualizations-2021": {
-    "title": "编程语言可视化",
-    "subtitle": "交互式 D3 项目",
-    "summary": "一件康奈尔的可视化作品，通过交互图形探索编程语言的历史、家族关系与流行度。",
+    "title": "数据可视化",
+    "subtitle": "康奈尔期间的交互式 D3 项目",
+    "summary": "我在康奈尔上过一门很有意思的课程 INFO 5100，课上学习了数据可视化的基本原则，以及如何用 d3.js 把这些想法真正做出来。课程里有三个我觉得都很有意思的项目。",
     "tags": [
       "D3",
-      "编程语言"
+      "数据可视化"
     ],
     "sections": [
       {
@@ -1090,18 +1090,96 @@
         "blocks": [
           {
             "type": "text",
-            "text": "这个项目把历史、关系图谱与趋势视图组合在一起。回头看，它和后来这个图谱式个人网站的想法其实有一种特别贴近的亲缘关系。"
+            "text": "第一个项目是一张静态课程图表，展示康奈尔三个相邻专业在一周内的课程分布，可以看出课程在时间和空间上的集中情况。"
           },
           {
-            "type": "list",
-            "items": [
-              "语言家族网络",
-              "流行度与速度视图",
-              "康奈尔课程协作项目"
-            ]
+            "type": "text",
+            "text": "第二个项目是一个交互式厨房面板，叫做“Online Kitchen”，你可以拖动不同食物组合，查看整顿餐食的营养构成。"
+          },
+          {
+            "type": "text",
+            "text": "第三个项目则是一个复合型交互故事板，用来展示主要编程语言的历史、关系与流行度。"
           }
         ],
         "id": "overview"
+      },
+      {
+        "label": "2021 年秋季康奈尔 ECE、CS 与 INFO 课程分布",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "这是一个使用 D3.js 实现的数据可视化课程项目，项目网页可以在[这里](https://greenere.github.io/visualizations/cornell_class/cornell_class_ece_cs_info_fall2021.html)查看。"
+          },
+          {
+            "type": "text",
+            "text": "这是我与 Han Xia、Yingxin Lin 和 Yuhao Lu 合作完成的课程项目。"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/visualizations/cornell_class/cornell_class_ece_cs_info_fall2021.jpg"
+          }
+        ]
+      },
+      {
+        "label": "Online Kitchen",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "这是一个使用 D3.js 实现的数据可视化课程项目，项目网页可以在[这里](https://greenere.github.io/visualizations/online_kitchen/online_kitchen.html)查看。"
+          },
+          {
+            "type": "text",
+            "text": "这是我与 Yuhao Lu、Yue Wang 和 Yue Zhao 合作完成的课程项目。"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/online_kitchen.png"
+          }
+        ]
+      },
+      {
+        "label": "编程语言",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "这是一个使用 D3.js 实现的数据可视化课程项目，项目网页可以在[这里](https://greenere.github.io/visualizations/programming_languages/programming_languages.html)查看。"
+          },
+          {
+            "type": "text",
+            "text": "这是我与 Yuhao Lu、Yue Wang 和 Yue Zhao 合作完成的课程项目。"
+          },
+          {
+            "type": "text",
+            "text": "这个项目希望从历史和流行度两个角度，展示一些关于编程语言的有趣事实。"
+          },
+          {
+            "type": "gallery",
+            "items": [
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/pl_familynet.png"
+              },
+              {
+                "alt": "",
+                "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/pl_speed.png"
+              }
+            ],
+            "columns": 1,
+            "align": "natural"
+          }
+        ]
+      },
+      {
+        "label": "知乎",
+        "blocks": [
+          {
+            "type": "link",
+            "label": "d3.js与三则数据可视化",
+            "href": "https://zhuanlan.zhihu.com/p/446008683"
+          }
+        ]
       }
     ]
   },
