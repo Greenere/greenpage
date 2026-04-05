@@ -249,17 +249,6 @@
       "strength": 2
     },
     {
-      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
-      "from": "cornell",
-      "to": "data-visualizations-2021",
-      "kind": "time",
-      "labels": {
-        "en": "coursework during Cornell period",
-        "zh-CN": "康村上学期间的课程作业"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-verily-intern-time-verily-intern-cornell-1",
       "from": "verily-intern",
       "to": "cornell",
@@ -377,6 +366,28 @@
       "labels": {
         "en": "during my spare time ",
         "zh-CN": "工作之余的个人项目"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "coursework during Cornell period",
+        "zh-CN": "康村上学期间的课程作业"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-data-visualizations-2021-topic-data-visualizations-2021-weibe-2",
+      "from": "data-visualizations-2021",
+      "to": "weibe",
+      "kind": "topic",
+      "labels": {
+        "en": "both are visualization heavy projects",
+        "zh-CN": "都是可视化项目"
       },
       "strength": 1
     }
