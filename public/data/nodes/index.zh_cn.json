@@ -1,55 +1,48 @@
 {
   "adversarial-writing": {
-    "title": "对抗机器学习写作轨迹",
+    "title": "论文阅读笔记",
     "subtitle": "知乎文章、综述与密集笔记",
     "summary": "一条持续多年的写作线索，围绕对抗样本、鲁棒性与可解释性展开，横跨面向公众的解释文章、研究地图与论文笔记。",
     "tags": [
       "写作",
       "研究"
     ],
-    "meta": {
-      "readingTime": "4 分钟",
-      "status": "archive",
-      "links": [
-        {
-          "label": "旧博客索引",
-          "href": "https://greenere.github.io/blogs.html"
-        }
-      ]
-    },
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
             "type": "text",
-            "text": "旧站点里保存着一大批关于对抗机器学习的文字。有些文章试图向更广泛的读者解释概念；另一些则更像学习笔记，把论文、概念与争论整理成自己日后还能重新进入的地图。"
+            "text": "在王兴刚教授的指导下做研究时，我每周都要阅读论文并做详细的笔记。内容涵盖计算机视觉、目标检测、对抗性攻击和防御等各个方面。这些笔记是研究工作的一部分，但我也乐在其中。"
           },
           {
             "type": "text",
-            "text": "回头看，这些内容与其说是在发表打磨完成的文章，不如说是在为自己铺设一条耐久的阅读路径。写作是一种把高密度研究转化为更*可导航*结构的方法。"
+            "text": "旧博客的索引[在这里](https://greenere.github.io/blogs.html)"
           }
-        ]
+        ],
+        "id": "overview"
       },
       {
-        "id": "formats",
-        "label": "形式",
+        "label": "知乎",
         "blocks": [
+          {
+            "type": "text",
+            "text": "我写了不少这个领域的知乎文章，可能带了一些人入坑："
+          },
           {
             "type": "list",
             "items": [
-              "关于**对抗样本**、对抗训练与正则化的知乎解释文章",
-              "像《A Map of Adversarial Example Research》这样的长篇笔记整理",
-              "围绕鲁棒性、防御与解释的一篇论文或密集论文阅读笔记"
+              "[对抗样本问题——数据的一小步，模型的一大步](https://zhuanlan.zhihu.com/p/268154711)",
+              "[什么是对抗样本？——稳健性和泛化性的交集](https://zhuanlan.zhihu.com/p/269203978)",
+              "[对抗训练——终极数据增强？](https://zhuanlan.zhihu.com/p/296809584)",
+              "[对抗正则化——盲人摸象还是对症下药？](https://zhuanlan.zhihu.com/p/337880063)",
+              "[对抗攻击——优化噪声的艺术](https://zhuanlan.zhihu.com/p/341533105)",
+              "[迁移对抗攻击——假虞灭虢](https://zhuanlan.zhihu.com/p/363793831)",
+              "[Density & Robustness](https://zhuanlan.zhihu.com/p/355959295)"
             ]
-          },
-          {
-            "type": "callout",
-            "title": "写作的功能",
-            "text": "这部分工作常常介于阅读与研究之间。它们足够公开，可以分享给别人；但同时也是我为一个很容易迅速蔓延的领域维持内部地图的方式。"
           }
-        ]
+        ],
+        "id": "formats"
       }
     ]
   },
@@ -259,7 +252,7 @@
     ]
   },
   "hust-mclab": {
-    "title": "华科媒传实验室科研助理",
+    "title": "王兴刚教授实验室",
     "subtitle": "与王兴刚教授合作的对抗机器学习研究",
     "summary": "一段聚焦对抗鲁棒性、可解释性，以及对抗训练到底改变了模型内部什么的科研助理时期。",
     "tags": [
@@ -273,20 +266,13 @@
         "blocks": [
           {
             "type": "text",
-            "text": "这段实验室时期把从签名项目开始的对抗机器学习线索继续深化。围绕 noise modulation 的大量阅读、实验与写作，大多也是在这里汇聚起来的。"
+            "text": "那个时候觉得深度学习模型犯下这么显而易见的错误简直不可思议，让人难以理解。我认为是数据和模型训练方式的原因，因此疯狂寻找对抗样本的解药，但是显然失败了"
           },
           {
             "type": "list",
             "items": [
-              "深入研究对抗训练与鲁棒性文献",
-              "围绕更可解释的输入梯度发展出 noise modulation 的想法",
-              "在论文写作愿望与尚未解决的精度权衡之间反复拉扯"
+              "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
             ]
-          },
-          {
-            "type": "link",
-            "label": "Noise Modulation 预印本",
-            "href": "https://arxiv.org/abs/2103.10603"
           }
         ],
         "id": "overview"
@@ -556,15 +542,37 @@
         "blocks": [
           {
             "type": "text",
-            "text": "这个项目最主要的工作在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。其实现在看起来很简陋，但是对于一个课程项目来说足够了，并且比较有趣的是后来抓取到了疫情爆发的舆情。"
+            "text": "项目公开存档在这里：[WEIBE](https://github.com/Greenere/weibe)"
+          },
+          {
+            "type": "text",
+            "text": "这是课程 Big Data Processing System 的一个课程项目。这个项目的核心思路是抓取微博（可以理解为中文版 Twitter）的热搜话题，并分析对应帖子中隐含的情绪倾向。"
+          },
+          {
+            "type": "text",
+            "text": "我主要负责的是整个系统，而不是情绪分析背后的算法本身。这个系统的整体方案如下图所示。"
+          },
+          {
+            "type": "image",
+            "alt": "",
+            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-structure.jpg",
+            "caption": "WEIBE 的系统架构"
+          },
+          {
+            "type": "text",
+            "text": "深色部分是系统所依赖的现成程序，浅色部分则是我们自己实现的模块。我用 Python 编写了 Web Crawler，并借助 Selenium 驱动 Chrome 浏览器抓取微博网页，收集热搜话题和帖子，再把它们写入 MongoDB 数据库。服务端同样使用 Python，基于 Flask 和 Gevent 搭建。对于我们的需求来说，一个非常基础的静态页面服务器就已经足够。前端则使用最基础的网页语言编写：HTML 负责结构，CSS 负责样式，JavaScript 负责交互。"
+          },
+          {
+            "type": "text",
+            "text": "下面是系统的一些结果展示："
           },
           {
             "type": "gallery",
             "items": [
               {
-                "alt": "疫情爆发当天的微博",
+                "alt": "新冠疫情当天的词云图",
                 "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-cloud.png",
-                "caption": "疫情爆发当天的微博"
+                "caption": "COVID-19 当天的词云图"
               },
               {
                 "alt": "情绪散点图",
@@ -577,7 +585,7 @@
           },
           {
             "type": "text",
-            "text": "项目存档在我的 Github 上: [WEIBE](https://github.com/Greenere/weibe)"
+            "text": "由于计算资源有限，我们对每个热搜话题抓取的帖子数量做了限制。它并不是一个真正意义上“超大规模”的数据处理系统，但最后得到的结果其实很有信息量。比较意外的是，我们正好抓到了武汉附近地震引发的话题，以及 COVID-19 爆发初期的微博讨论。"
           }
         ],
         "id": "overview"
@@ -742,7 +750,7 @@
     ]
   },
   "signature-attack": {
-    "title": "针对签证验证系统的对抗攻击",
+    "title": "对抗样本攻击",
     "subtitle": "黑盒对抗攻击机器学习研究，2019",
     "summary": "大三暑假，我做了一项关于针对手写签名验证的区域限制黑盒攻击的研究，后来这项研究成果发表在了《模式识别》期刊上。我实际上只花了两个星期来调试主要算法，但最终它成功了，并且得以发表。",
     "tags": [
@@ -772,7 +780,7 @@
     ]
   },
   "noise-modulation": {
-    "title": "Noise Modulation",
+    "title": "噪声调制",
     "subtitle": "可解释性与鲁棒性研究",
     "summary": "一篇未发表的论文工作，提出了一种轻量方法，在不做完整对抗训练的前提下恢复更干净、更可解释的输入梯度。",
     "tags": [
@@ -781,7 +789,6 @@
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
@@ -789,14 +796,17 @@
             "text": "这个想法是训练时将图像与学习得到的噪声相乘，迫使模型依赖真正关键的成分，从而让梯度信号变得更干净，但也要付出一些准确率代价。"
           },
           {
+            "type": "text",
+            "text": "这篇论文永远不会发表："
+          },
+          {
             "type": "list",
             "items": [
-              "与王兴刚合作完成",
-              "是对抗训练某一侧面的低成本替代方案",
-              "结果很有意思，但以当时的形式还不足以发表"
+              "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
             ]
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },

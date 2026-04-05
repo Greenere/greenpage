@@ -12,11 +12,25 @@
       "blocks": [
         {
           "type": "text",
-          "text": "The main workload was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
+          "text": "It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
         },
         {
           "type": "text",
-          "text": "I would say it was decent enough for a course project, and it was interesting enough for capturing the outbreaks of Covid 19. It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
+          "text": "This is a course project for the course, Capstone Project in Big Data Processing System. The core idea of this project is to fetch the trending topics of weibo (the Chinese version of Twitter) and analyze corresponding posts for the emotion tendencies concealed in each tweet."
+        },
+        {
+          "type": "text",
+          "text": "I am responsible for the system rather than the algorithm behind the emotion analysis. The scheme I designed for this system is shown as below."
+        },
+        {
+          "type": "image",
+          "alt": "",
+          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-structure.jpg",
+          "caption": "The system architecture of WEIBE"
+        },
+        {
+          "type": "text",
+          "text": "The dark parts are the off-shelf programs utilized by this system and the light parts are our own modules. I write the Web Crawler in Python with the help of Selenium , driving a chrome browser to fetch the web pages of Weibo, collect trending topics and posts and put them into a Mongodb database. The Server is also composed with Python using Flask and Gevent. A very basic static pages server is capable enough for our purpose. The Frontend is coded with the basic web languages, HTML for structure, CSS for style and JavaScript for actions."
         },
         {
           "type": "gallery",
@@ -34,6 +48,10 @@
           ],
           "columns": 2,
           "align": "natural"
+        },
+        {
+          "type": "text",
+          "text": "Due to the limited computational resources, we limit the number of posts fetched for each trending topic. It is not a really \"big\" data processing system, but the results are actually very informative. Unexpectedly, we happened to catch the trending topics invoked by an earthquake near Wuhan and the initial of COVID-19 outbreak."
         }
       ],
       "id": "overview"

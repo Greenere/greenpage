@@ -1,5 +1,5 @@
 {
-  "title": "FaceSwap Deepfake System",
+  "title": "FaceSwap",
   "subtitle": "Undergraduate capstone project",
   "summary": "A bachelor's graduation project focused on generating face-swapped short videos, with attention to the full pipeline rather than only the core model.",
   "tags": [

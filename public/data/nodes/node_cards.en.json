@@ -1,6 +1,6 @@
 {
   "adversarial-writing": {
-    "title": "Adversarial ML Writing Trail",
+    "title": "ML Reading Notes",
     "subtitle": "Zhihu articles, surveys, and dense notes",
     "summary": "A long writing trail on adversarial examples, robustness, and interpretability, spanning public explainers, research maps, and paper notes.",
     "tags": [
@@ -10,19 +10,15 @@
     "preview": [
       {
         "type": "text",
-        "text": "The old site held a large body of writing on adversarial machine learning. Some pieces explained ideas for a broad audience. Others worked more like study notes, mapping papers, concepts, and debates into something I could revisit later."
+        "text": "When I was doing research with Prof. Xinggang Wang, I used to do weekly paper readings and wrote detailed notes over it. It spans across general computer vision, object detection, adversarial attacks and defenses. These notes were part of the research requirement but I also enjoyed it."
       },
       {
         "type": "text",
-        "text": "In retrospect, these pieces were less about publishing polished essays than about building a durable reading trail. Writing was a way to turn dense research into something that felt *navigable*."
+        "text": "The link to the old blog is [here](https://greenere.github.io/blogs.html)"
       },
       {
-        "type": "list",
-        "items": [
-          "Zhihu explainers on **adversarial examples**, adversarial training, and regularization",
-          "Long-form note collections such as *A Map of Adversarial Example Research*",
-          "Single-paper and dense-paper notes on robustness, defense, and interpretation"
-        ]
+        "type": "text",
+        "text": "I wrote a list of zhihu articles with some readings:"
       }
     ]
   },
@@ -105,7 +101,7 @@
     ]
   },
   "naec": {
-    "title": "Research Engineer Intern at NAEC",
+    "title": "Research at NAEC",
     "subtitle": "National Anti-counterfeit Engineering Research Center",
     "summary": "A part-time non-paid research internship where a course interest in adversarial examples became sustained work on handwritten signature verification and, later, a journal publication.",
     "tags": [
@@ -124,8 +120,8 @@
     ]
   },
   "hust-mclab": {
-    "title": "Research Assistant at HUST Media and Communication Lab",
-    "subtitle": "Adversarial ML with Prof. Xinggang Wang",
+    "title": "Research with Prof. Xinggang Wang",
+    "subtitle": "Adversarial ML research with Prof. Xinggang Wang",
     "summary": "A research-assistant period focused on adversarial robustness, interpretability, and what adversarial training changes inside a model.",
     "tags": [
       "robustness",
@@ -140,15 +136,8 @@
       {
         "type": "list",
         "items": [
-          "Studied adversarial training and robustness literature in depth",
-          "Developed the noise modulation idea around interpretable input gradients",
-          "Balanced paper-writing ambitions with unresolved accuracy tradeoffs"
+          "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
         ]
-      },
-      {
-        "type": "link",
-        "label": "Noise Modulation preprint",
-        "href": "https://arxiv.org/abs/2103.10603"
       }
     ]
   },
@@ -296,16 +285,20 @@
     "preview": [
       {
         "type": "text",
-        "text": "The main workload was system design: a Selenium crawler, MongoDB-backed storage, Python server work, and a simple frontend for exploring the results."
+        "text": "It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
       },
       {
         "type": "text",
-        "text": "I would say it was decent enough for a course project, and it was interesting enough for capturing the outbreaks of Covid 19. It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
+        "text": "This is a course project for the course, Capstone Project in Big Data Processing System. The core idea of this project is to fetch the trending topics of weibo (the Chinese version of Twitter) and analyze corresponding posts for the emotion tendencies concealed in each tweet."
+      },
+      {
+        "type": "text",
+        "text": "I am responsible for the system rather than the algorithm behind the emotion analysis. The scheme I designed for this system is shown as below."
       }
     ]
   },
   "faceswap": {
-    "title": "FaceSwap Deepfake System",
+    "title": "FaceSwap",
     "subtitle": "Undergraduate capstone project",
     "summary": "A bachelor's graduation project focused on generating face-swapped short videos, with attention to the full pipeline rather than only the core model.",
     "tags": [
@@ -351,7 +344,7 @@
     ]
   },
   "signature-attack": {
-    "title": "Adversarial  Examples against Signature Verification",
+    "title": "Adversarial  Example Attack",
     "subtitle": "Black-box adversarial ML research, 2019",
     "summary": "A summer research on region-restricted black-box attacks against handwritten signature verification that later became a Pattern Recognition paper. I really only spent two weeks on foestering the major algorithms, but it worked and eventually got published.",
     "tags": [
@@ -388,11 +381,13 @@
         "text": "The idea was to multiply images with learned noise during training. That pushed the model to rely on the truly critical components, cleaning up the gradient signal at the cost of some accuracy."
       },
       {
+        "type": "text",
+        "text": "The paper will never be published, it's archived here:"
+      },
+      {
         "type": "list",
         "items": [
-          "Worked on with Xinggang Wang",
-          "Cheap alternative to one aspect of adversarial training",
-          "Interesting result, but not publishable in its current form"
+          "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
         ]
       }
     ]

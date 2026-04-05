@@ -8,7 +8,6 @@
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
@@ -16,14 +15,17 @@
           "text": "The idea was to multiply images with learned noise during training. That pushed the model to rely on the truly critical components, cleaning up the gradient signal at the cost of some accuracy."
         },
         {
+          "type": "text",
+          "text": "The paper will never be published, it's archived here:"
+        },
+        {
           "type": "list",
           "items": [
-            "Worked on with Xinggang Wang",
-            "Cheap alternative to one aspect of adversarial training",
-            "Interesting result, but not publishable in its current form"
+            "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
           ]
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "title": "Noise Modulation",
+  "title": "噪声调制",
   "subtitle": "可解释性与鲁棒性研究",
   "summary": "一篇未发表的论文工作，提出了一种轻量方法，在不做完整对抗训练的前提下恢复更干净、更可解释的输入梯度。",
   "tags": [
@@ -8,7 +8,6 @@
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
@@ -16,14 +15,17 @@
           "text": "这个想法是训练时将图像与学习得到的噪声相乘，迫使模型依赖真正关键的成分，从而让梯度信号变得更干净，但也要付出一些准确率代价。"
         },
         {
+          "type": "text",
+          "text": "这篇论文永远不会发表："
+        },
+        {
           "type": "list",
           "items": [
-            "与王兴刚合作完成",
-            "是对抗训练某一侧面的低成本替代方案",
-            "结果很有意思，但以当时的形式还不足以发表"
+            "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
           ]
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }

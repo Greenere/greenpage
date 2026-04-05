@@ -1,6 +1,6 @@
 {
-  "title": "Research Assistant at HUST Media and Communication Lab",
-  "subtitle": "Adversarial ML with Prof. Xinggang Wang",
+  "title": "Research with Prof. Xinggang Wang",
+  "subtitle": "Adversarial ML research with Prof. Xinggang Wang",
   "summary": "A research-assistant period focused on adversarial robustness, interpretability, and what adversarial training changes inside a model.",
   "tags": [
     "robustness",
@@ -18,15 +18,8 @@
         {
           "type": "list",
           "items": [
-            "Studied adversarial training and robustness literature in depth",
-            "Developed the noise modulation idea around interpretable input gradients",
-            "Balanced paper-writing ambitions with unresolved accuracy tradeoffs"
+            "[Noise Modulation: Let your model interpret itself](https://arxiv.org/abs/2103.10603)"
           ]
-        },
-        {
-          "type": "link",
-          "label": "Noise Modulation preprint",
-          "href": "https://arxiv.org/abs/2103.10603"
         }
       ],
       "id": "overview"

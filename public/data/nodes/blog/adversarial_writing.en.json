@@ -1,52 +1,44 @@
 {
-  "title": "Adversarial ML Writing Trail",
+  "title": "ML Reading Notes",
   "subtitle": "Zhihu articles, surveys, and dense notes",
   "summary": "A long writing trail on adversarial examples, robustness, and interpretability, spanning public explainers, research maps, and paper notes.",
   "tags": [
     "writing",
     "research"
   ],
-  "meta": {
-    "readingTime": "4 min",
-    "status": "archive",
-    "links": [
-      {
-        "label": "Old blog index",
-        "href": "https://greenere.github.io/blogs.html"
-      }
-    ]
-  },
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
           "type": "text",
-          "text": "The old site held a large body of writing on adversarial machine learning. Some pieces explained ideas for a broad audience. Others worked more like study notes, mapping papers, concepts, and debates into something I could revisit later."
+          "text": "When I was doing research with Prof. Xinggang Wang, I used to do weekly paper readings and wrote detailed notes over it. It spans across general computer vision, object detection, adversarial attacks and defenses. These notes were part of the research requirement but I also enjoyed it."
         },
         {
           "type": "text",
-          "text": "In retrospect, these pieces were less about publishing polished essays than about building a durable reading trail. Writing was a way to turn dense research into something that felt *navigable*."
+          "text": "The link to the old blog is [here](https://greenere.github.io/blogs.html)"
         }
-      ]
+      ],
+      "id": "overview"
     },
     {
-      "id": "formats",
-      "label": "Formats",
+      "label": "Zhihu Articles",
       "blocks": [
+        {
+          "type": "text",
+          "text": "I wrote a list of zhihu articles with some readings:"
+        },
         {
           "type": "list",
           "items": [
-            "Zhihu explainers on **adversarial examples**, adversarial training, and regularization",
-            "Long-form note collections such as *A Map of Adversarial Example Research*",
-            "Single-paper and dense-paper notes on robustness, defense, and interpretation"
+            "[对抗样本问题——数据的一小步，模型的一大步](https://zhuanlan.zhihu.com/p/268154711)",
+            "[什么是对抗样本？——稳健性和泛化性的交集](https://zhuanlan.zhihu.com/p/269203978)",
+            "[对抗训练——终极数据增强？](https://zhuanlan.zhihu.com/p/296809584)",
+            "[对抗正则化——盲人摸象还是对症下药？](https://zhuanlan.zhihu.com/p/337880063)",
+            "[对抗攻击——优化噪声的艺术](https://zhuanlan.zhihu.com/p/341533105)",
+            "[迁移对抗攻击——假虞灭虢](https://zhuanlan.zhihu.com/p/363793831)",
+            "[Density & Robustness](https://zhuanlan.zhihu.com/p/355959295)"
           ]
-        },
-        {
-          "type": "callout",
-          "title": "Writing function",
-          "text": "A lot of this work sat between reading and research. The pieces were public enough to share, but they were also a way to keep an internal map of a field that could otherwise sprawl too quickly."
         }
       ]
     }

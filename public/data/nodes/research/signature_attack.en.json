@@ -1,5 +1,5 @@
 {
-  "title": "Adversarial  Examples against Signature Verification",
+  "title": "Adversarial  Example Attack",
   "subtitle": "Black-box adversarial ML research, 2019",
   "summary": "A summer research on region-restricted black-box attacks against handwritten signature verification that later became a Pattern Recognition paper. I really only spent two weeks on foestering the major algorithms, but it worked and eventually got published.",
   "tags": [
