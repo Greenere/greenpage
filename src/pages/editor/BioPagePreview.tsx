@@ -6,7 +6,6 @@ import { THEME_CONFIG } from '../../configs/ui/themes';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
-import { getStableImageViewTransitionName } from '../../shared/ui/viewTransitions';
 import { BIOTHEME, type Theme } from '../graph/content/BioTheme';
 import { getBioPortraitHref, type BioPageContent } from '../graph/content/BioPage';
 import {
@@ -190,7 +189,6 @@ export default function BioPagePreview({ content, theme, hideSections = false, c
   const { language } = useAppLanguage();
   const [graphModel, setGraphModel] = useState<GraphModel | null>(() => readCachedGraphModel(language));
   const portrait = BIOTHEME[theme];
-  const portraitTransitionName = getStableImageViewTransitionName(`bio-preview-portrait-${theme}`);
   const themeLabel = THEME_CONFIG[theme].label;
   const portraitHref = getBioPortraitHref(content);
 
@@ -344,7 +342,6 @@ export default function BioPagePreview({ content, theme, hideSections = false, c
                     objectFit: 'cover',
                     borderRadius: '24px',
                     border: '2px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
-                    viewTransitionName: portraitTransitionName,
                   }}
                 />
               </a>
@@ -359,7 +356,6 @@ export default function BioPagePreview({ content, theme, hideSections = false, c
                   objectFit: 'cover',
                   borderRadius: '24px',
                   border: '2px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
-                  viewTransitionName: portraitTransitionName,
                 }}
               />
             )}

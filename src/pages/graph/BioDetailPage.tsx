@@ -11,7 +11,7 @@ import { UI_COPY } from '../../configs/ui/uiCopy';
 import { applyThemeVars } from '../../shared/styles/colors';
 import DetailPageSkeleton from '../../shared/ui/DetailPageSkeleton';
 import { Footnote } from '../../shared/ui/StyledTextBlocks';
-import { getStableImageViewTransitionName, navigateWithViewTransition } from '../../shared/ui/viewTransitions';
+import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
 import { BIOTHEME, readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { getBioPortraitHref, loadBioPageContent, readCachedBioPageContent, type BioPageContent } from './content/BioPage';
@@ -55,7 +55,6 @@ const BioDetailPage: React.FC = () => {
   const [graphError, setGraphError] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const portrait = BIOTHEME[theme];
-  const portraitTransitionName = getStableImageViewTransitionName(`bio-portrait-${theme}`);
   const themeLabel = THEME_CONFIG[theme].label;
   const portraitHref = bioContent ? getBioPortraitHref(bioContent) : undefined;
   const handleThemeChange = (nextTheme: Theme) => {
@@ -343,7 +342,6 @@ const BioDetailPage: React.FC = () => {
                       objectFit: 'cover',
                       borderRadius: '24px',
                       border: '2px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
-                      viewTransitionName: portraitTransitionName,
                     }}
                   />
                 </DetailTextLink>
@@ -358,7 +356,6 @@ const BioDetailPage: React.FC = () => {
                     objectFit: 'cover',
                     borderRadius: '24px',
                     border: '2px solid color-mix(in srgb, var(--color-secondary) 42%, transparent)',
-                    viewTransitionName: portraitTransitionName,
                   }}
                 />
               )}
