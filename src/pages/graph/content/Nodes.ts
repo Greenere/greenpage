@@ -208,7 +208,7 @@ function isJsonResponse(response: Response): boolean {
   return ct !== null && ct.includes('application/json');
 }
 
-// Resolves a relation label from the `labels` map (Phase 4 shape) or legacy `label` field.
+// Resolves a relation label from the locale-aware `labels` map.
 // Returns null if no label is resolvable — the caller should skip the relation with a warning.
 function resolveRelationLabel(item: Record<string, unknown>, locale: AppLanguage): string | null {
   if (isRecord(item.labels)) {
@@ -217,7 +217,6 @@ function resolveRelationLabel(item: Record<string, unknown>, locale: AppLanguage
       if (typeof localizedLabel === 'string') return localizedLabel;
     }
   }
-  if (typeof item.label === 'string') return item.label;
   return null;
 }
 

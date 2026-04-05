@@ -271,17 +271,17 @@
     "preview": [
       {
         "type": "text",
-        "text": "In Janurary. 2019, I led a group of three competed in the Interdisciplinary Contest in Modeling (ICM). We chose the problem designated as \"D\" that required us to build a model for the Louvre Museum and design an evacuation strategy for it. It took us one day to discuss and decide an appropriate model and finally I proposed a cellular automata model for the Louvre. You may think that we represented each person to be evacuated as a cell, but actually we chose several representative exhibition halls to be the cells in our model."
+        "text": "In Janurary. 2019, I led a group of three competed in the Interdisciplinary Contest in Modeling (ICM). We chose the problem designated as \"D\" that required us to build a model for the Louvre Museum and design an evacuation strategy for it."
+      },
+      {
+        "type": "text",
+        "text": "It took us one day to discuss and decide an appropriate model and finally I proposed a cellular automata model for the Louvre. You may think that we represented each person to be evacuated as a cell, but actually we chose several representative exhibition halls to be the cells in our model."
       },
       {
         "type": "image",
         "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/louvre.png",
         "alt": "",
         "caption": "The Louvre"
-      },
-      {
-        "type": "text",
-        "text": "This model of Louvre is presented above. For each cell, there was a state that represented the number of people stuck inside when the evacuation began. The neighbors were linked according to the structure of the building. For each iteration, the people in each cell would be evacuated to the neighbors following the strategy. The baseline strategy we considered was \"random wandering\", which meant that no instructions were given and people just walked randomly. The evacuation process of the five levels of the Louvre is presented below on the left. Our solution was called \"dynamic plan \""
       }
     ]
   },

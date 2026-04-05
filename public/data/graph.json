@@ -137,7 +137,9 @@
       "from": "noise-modulation",
       "to": "hust-mclab",
       "kind": "reason",
-      "label": "took shape during the research assistant period",
+      "labels": {
+        "en": "took shape during the research assistant period"
+      },
       "strength": 3
     },
     {
@@ -145,7 +147,9 @@
       "from": "noise-modulation",
       "to": "adversarial-writing",
       "kind": "outcome",
-      "label": "became part of the later robustness writing trail",
+      "labels": {
+        "en": "became part of the later robustness writing trail"
+      },
       "strength": 3
     },
     {
@@ -153,7 +157,9 @@
       "from": "realai",
       "to": "noise-modulation",
       "kind": "tool",
-      "label": "AI security internship echoed robustness research",
+      "labels": {
+        "en": "AI security internship echoed robustness research"
+      },
       "strength": 2
     },
     {
@@ -261,17 +267,6 @@
       "strength": 2
     },
     {
-      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-2",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "zh-CN": "大学期间的比赛项目",
-        "en": "competition project during college"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-faceswap-time-faceswap-hust-2",
       "from": "faceswap",
       "to": "hust",
@@ -324,6 +319,17 @@
         "zh-CN": "相关的AI安全工作"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-1",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "competition project during college",
+        "zh-CN": "大三期间的竞赛项目"
+      },
+      "strength": 1
     }
   ]
 }

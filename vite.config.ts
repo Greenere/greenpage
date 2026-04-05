@@ -373,7 +373,7 @@ async function readBioContentWithFallback(
   throw new Error('No bio content file found.')
 }
 
-// Resolves a relation label for the given lang from the `labels` map or legacy `label` field.
+// Resolves a relation label for the given lang from the locale-aware `labels` map.
 function resolveRelationLabel(relation: Record<string, unknown>, lang: string): string {
   const labels = relation.labels
   if (labels && typeof labels === 'object' && !Array.isArray(labels)) {
@@ -382,17 +382,14 @@ function resolveRelationLabel(relation: Record<string, unknown>, lang: string): 
       if (typeof labelsObj[fallbackLanguage] === 'string') return labelsObj[fallbackLanguage] as string
     }
   }
-  return typeof relation.label === 'string' ? relation.label : ''
+  return ''
 }
 
-// Returns the existing locale labels for a relation, normalising legacy `label` as English.
+// Returns the existing locale labels for a relation.
 function getExistingRelationLabels(existing: Record<string, unknown> | undefined): Record<string, string> {
   if (!existing) return {}
   if (existing.labels && typeof existing.labels === 'object' && !Array.isArray(existing.labels)) {
     return existing.labels as Record<string, string>
-  }
-  if (typeof existing.label === 'string') {
-    return { en: existing.label }
   }
   return {}
 }
