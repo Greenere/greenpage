@@ -141,9 +141,6 @@ export type DomainLayout = {
 export const GRAPH_MODEL_URL = `${import.meta.env.BASE_URL}data/graph.json`;
 export const GRAPH_NODE_CONTENT_DIR = 'data/nodes/';
 
-// Legacy index URL — used as a fallback during migration before locale-specific indexes exist.
-const LEGACY_NODE_CONTENT_INDEX_URL = `${import.meta.env.BASE_URL}data/nodes/index.json`;
-
 function getNodeCardIndexUrl(locale: AppLanguage): string {
   return withBaseUrl(`${GRAPH_NODE_CONTENT_DIR}node_cards.${localeToFileSuffix(locale)}.json`);
 }
@@ -156,10 +153,6 @@ function withBaseUrl(path: string) {
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
   const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
   return `${base}${path.replace(/^\.\//, '').replace(/^\//, '')}`;
-}
-
-function getNodeContentIndexUrl(locale: AppLanguage): string {
-  return withBaseUrl(`${GRAPH_NODE_CONTENT_DIR}index.${localeToFileSuffix(locale)}.json`);
 }
 
 function localizeContentPath(contentPath: string, locale: AppLanguage): string {
@@ -582,26 +575,14 @@ function normalizeNodeCardIndex(raw: unknown): GraphNodeCardIndex {
 }
 
 async function loadNodeCardIndex(locale: AppLanguage): Promise<GraphNodeCardIndex | null> {
-  const indexUrls = getLocaleFallbackOrder(locale).flatMap((fallbackLocale) => [
-    getNodeCardIndexUrl(fallbackLocale),
-    getNodeContentIndexUrl(fallbackLocale),
-  ]);
-
-  for (const url of [...new Set(indexUrls)]) {
+  for (const url of getLocaleFallbackOrder(locale).map((fallbackLocale) => getNodeCardIndexUrl(fallbackLocale))) {
     const response = await fetch(url);
     if (response.ok && isJsonResponse(response)) {
       const raw = await response.json();
       return normalizeNodeCardIndex(raw);
     }
   }
-
-  const legacyResponse = await fetch(LEGACY_NODE_CONTENT_INDEX_URL);
-  if (!legacyResponse.ok || !isJsonResponse(legacyResponse)) {
-    return null;
-  }
-
-  const raw = await legacyResponse.json();
-  return normalizeNodeCardIndex(raw);
+  return null;
 }
 
 async function loadGraphModelUncached(url: string, locale: AppLanguage): Promise<GraphModel> {
@@ -707,6 +688,13 @@ export async function loadGraphNodeContent(
 
   graphNodeContentPromiseMap.set(cacheKey, promise);
   return promise;
+}
+
+export function preloadGraphNodeContent(
+  node: GraphNodeRef | GraphCardNode,
+  locale: AppLanguage = getActiveLanguage(),
+) {
+  void loadGraphNodeContent(node, locale);
 }
 
 export function getContentNodes(model: GraphModel) {

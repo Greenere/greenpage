@@ -122,8 +122,6 @@ The generator produces two locale-specific indexes per language:
 
 Current generated files include:
 
-- [`public/data/nodes/index.en.json`](./public/data/nodes/index.en.json)
-- [`public/data/nodes/index.zh_cn.json`](./public/data/nodes/index.zh_cn.json)
 - [`public/data/nodes/node_cards.en.json`](./public/data/nodes/node_cards.en.json)
 - [`public/data/nodes/node_cards.zh_cn.json`](./public/data/nodes/node_cards.zh_cn.json)
 

@@ -33,6 +33,7 @@ import {
 } from '../../configs/graph/highlight';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import { useAppLanguage } from '../../i18n/useAppLanguage';
+import type { ChronologyValue } from '../../shared/chronology';
 import { persistTheme, readStoredTheme, type Theme } from './content/BioTheme';
 import {
     type DomainId,
@@ -69,6 +70,8 @@ type StoryNodeData = {
     nodeRole: 'content';
     nodeId: string;
     domain: DomainId;
+    chronology: ChronologyValue;
+    contentPath?: string;
     domainTag: string;
     handles?: DynamicHandle[];
     title: string;
@@ -971,6 +974,8 @@ function buildInitialGraph(
                     nodeRole: 'content',
                     nodeId: node.id,
                     domain: node.domain,
+                    chronology: node.chronology,
+                    contentPath: node.contentPath,
                     domainTag: getDisplayDomain(node.domain),
                     title: node.title,
                     subtitle: node.subtitle,

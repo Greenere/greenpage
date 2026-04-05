@@ -6,6 +6,12 @@
     "Oxford",
     "Summer School"
   ],
+  "hero": {
+    "image": {
+      "src": "https://picx.zhimg.com/70/v2-ecb77b248ab86301824a8a08d0b805d9_1440w.avis?source=172ae18b&biz_tag=Post",
+      "alt": "Describe the image"
+    }
+  },
   "sections": [
     {
       "label": "Overview",
@@ -16,6 +22,16 @@
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "zhihu",
+      "blocks": [
+        {
+          "type": "link",
+          "label": "一点牛津",
+          "href": "https://zhuanlan.zhihu.com/p/43307468"
+        }
+      ]
     }
   ]
 }

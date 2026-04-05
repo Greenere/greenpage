@@ -50,6 +50,11 @@
       {
         "type": "text",
         "text": "It was my first time ever been abroad. We spent two weeks in England. The courses were a good introduction, but what really impressed me was how tranquil the countryside of England feels like. We visited London and Brighton in weekends, and I also got a chance to take a guided tour to the BMW Mini factory."
+      },
+      {
+        "type": "link",
+        "label": "一点牛津",
+        "href": "https://zhuanlan.zhihu.com/p/43307468"
       }
     ]
   },

@@ -7,8 +7,11 @@ import { GreenHandle, sideToPosition, sideToStyle, type DynamicHandle } from "./
 import { navigateWithViewTransition } from "../../../shared/ui/viewTransitions";
 import { UI_COPY } from '../../../configs/ui/uiCopy';
 import { DOMAIN_CONFIG } from '../../../configs/content/domains';
+import { useAppLanguage } from '../../../i18n/useAppLanguage';
+import type { ChronologyValue } from "../../../shared/chronology";
 import {
     getNodeDetailPath,
+    preloadGraphNodeContent,
     type DomainId,
     type ContentBlock,
     type NodeGalleryImage,
@@ -17,6 +20,8 @@ import {
 interface StoryData {
     nodeId?: string,
     domain?: DomainId,
+    chronology?: ChronologyValue,
+    contentPath?: string,
     title: string,
     subtitle?: string,
     summary?: string,
@@ -48,6 +53,7 @@ const StoryNode: React.FC<StoryNodeProps> = ({
     const variant = data.variant ?? 'entry';
     const layoutMode = data.layoutMode ?? 'card';
     const navigate = useNavigate();
+    const { language } = useAppLanguage();
     const updateNodeInternals = useUpdateNodeInternals();
     const showDetailLink = layoutMode !== 'container' && Boolean(data.nodeId);
 
@@ -122,6 +128,20 @@ const StoryNode: React.FC<StoryNodeProps> = ({
         navigateWithViewTransition(() => {
             navigate(getNodeDetailPath(data.nodeId ?? id));
         }, { resetScrollTop: true });
+    };
+
+    const preloadDetailContent = () => {
+        if (!data.nodeId || !data.domain || !data.chronology) {
+            return;
+        }
+
+        preloadGraphNodeContent({
+            id: data.nodeId,
+            kind: data.domain,
+            domain: data.domain,
+            chronology: data.chronology,
+            contentPath: data.contentPath,
+        }, language);
     };
 
     const renderBlock = (block: ContentBlock, idx: number) => {
@@ -221,6 +241,8 @@ const StoryNode: React.FC<StoryNodeProps> = ({
                         className="node-card-detail-link nodrag nopan"
                         onPointerDown={handleDetailPointerDown}
                         onClick={handleOpenDetail}
+                        onMouseEnter={preloadDetailContent}
+                        onFocus={preloadDetailContent}
                         aria-label={UI_COPY.storyNode.openDetailPageAriaLabel(data.title)}
                     >
                         <span>{UI_COPY.storyNode.moreDetails}</span>

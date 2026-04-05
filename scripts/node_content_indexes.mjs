@@ -207,7 +207,6 @@ export async function generateNodeContentIndexes({
   await fs.mkdir(nodesDir, { recursive: true });
 
   for (const locale of LOCALES) {
-    const fullIndex = {};
     const cardIndex = {};
 
     for (const nodeRef of nodeRefs) {
@@ -216,17 +215,13 @@ export async function generateNodeContentIndexes({
       }
 
       const content = await readContentWithFallback(rootDir, nodeRef, locale.suffix);
-      fullIndex[nodeRef.id] = content;
       cardIndex[nodeRef.id] = toNodeCardContent(content, nodeRef.id);
     }
 
-    const fullIndexPath = path.join(nodesDir, `index.${locale.suffix}.json`);
     const cardIndexPath = path.join(nodesDir, `node_cards.${locale.suffix}.json`);
-    await fs.writeFile(fullIndexPath, `${JSON.stringify(fullIndex, null, 2)}\n`);
     await fs.writeFile(cardIndexPath, `${JSON.stringify(cardIndex, null, 2)}\n`);
 
     if (typeof log === 'function') {
-      log(`Generated ${path.relative(rootDir, fullIndexPath)} with ${Object.keys(fullIndex).length} node entries.`);
       log(`Generated ${path.relative(rootDir, cardIndexPath)} with ${Object.keys(cardIndex).length} node entries.`);
     }
   }

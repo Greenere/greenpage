@@ -67,8 +67,8 @@ Examples:
 
 Generate one index per locale:
 
-- `public/data/nodes/index.en.json`
-- `public/data/nodes/index.zh_cn.json`
+- `public/data/nodes/node_cards.en.json`
+- `public/data/nodes/node_cards.zh_cn.json`
 
 ### Graph structure
 
@@ -227,8 +227,8 @@ Each generated locale index should already include fallback-resolved content.
 
 Example:
 
-- `index.zh_cn.json` should contain Chinese content where available
-- if a node does not yet have `*.zh_cn.json`, its entry in `index.zh_cn.json` should fall back to the English payload
+- `node_cards.zh_cn.json` should contain Chinese card content where available
+- if a node does not yet have `*.zh_cn.json`, its entry in `node_cards.zh_cn.json` should fall back to the English payload
 
 This keeps the frontend fast and simple because it still fetches one index per locale.
 
@@ -325,9 +325,9 @@ That makes missing translations visible without blocking editing.
 
 ### Phase 2: locale indexes and cache
 
-- update `scripts/generate_node_index.mjs` to output `index.en.json` and `index.zh_cn.json`
+- update `scripts/generate_node_index.mjs` to output `node_cards.en.json` and `node_cards.zh_cn.json`
 - each locale index should fall back to English when a localized node file is missing
-- update `GRAPH_NODE_CONTENT_INDEX_URL` in `src/pages/graph/content/Nodes.ts` to be locale-aware (currently hardcoded to `data/nodes/index.json`)
+- update the graph loader to use localized node card indexes
 - clear `graphModelCache` and `graphModelPromise` when locale changes so the correct index is loaded
 
 ### Phase 3: editor API
