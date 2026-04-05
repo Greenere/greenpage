@@ -399,7 +399,7 @@
   "waymo": {
     "title": "Waymo",
     "subtitle": "Full-time job since Dec 15th, 2025, still enjoying it",
-    "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
+    "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
     "sections": [
       {
         "label": "Overview",
