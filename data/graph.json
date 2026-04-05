@@ -139,28 +139,6 @@
   ],
   "relations": [
     {
-      "id": "editor-verily-intern-time-verily-intern-cornell-1",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "it was during the Cornell period",
-        "zh-CN": "康村读书期间的实习"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "summer trip in the graduate-school stretch",
-        "zh-CN": "研究生阶段中的那次暑期旅行"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
       "from": "california-one-2022",
       "to": "verily-intern",
@@ -181,17 +159,6 @@
         "zh-CN": "工作之余的个人项目"
       },
       "strength": 1
-    },
-    {
-      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
-      "from": "cornell",
-      "to": "data-visualizations-2021",
-      "kind": "time",
-      "labels": {
-        "en": "coursework during Cornell period",
-        "zh-CN": "康村上学期间的课程作业"
-      },
-      "strength": 4
     },
     {
       "id": "editor-data-visualizations-2021-topic-data-visualizations-2021-weibe-2",
@@ -238,59 +205,6 @@
       "strength": 4
     },
     {
-      "id": "editor-hust-time-wellmail-hust-2",
-      "from": "wellmail",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "coursework in sophomore year",
-        "zh-CN": "大二时期的课程项目"
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-signature-attack-hust-3",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "research during the undergraduate study"
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-weibe-hust-5",
-      "from": "weibe",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "big-data systems course project",
-        "zh-CN": ""
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-faceswap-hust-6",
-      "from": "faceswap",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "graduation capstone project for bachelors"
-      },
-      "strength": 4
-    },
-    {
-      "id": "editor-hust-time-hust-naec-7",
-      "from": "hust",
-      "to": "naec",
-      "kind": "time",
-      "labels": {
-        "en": "it was during my junior year",
-        "zh-CN": "大三时期的科研实习"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
       "from": "layoff-journey",
       "to": "verily",
@@ -313,61 +227,6 @@
       "strength": 4
     },
     {
-      "id": "editor-hust-mclab-time-hust-mclab-hust-2",
-      "from": "hust-mclab",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "still rooted in the HUST period",
-        "zh-CN": "still rooted in the HUST period"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-oxford-reason-oxford-cornell-1",
-      "from": "oxford",
-      "to": "cornell",
-      "kind": "reason",
-      "labels": {
-        "en": "it makes me want to attend a school in countryside",
-        "zh-CN": "让我想要去“世外桃源”读书"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-puerto-rico-2022-time-puerto-rico-2022-cornell-1",
-      "from": "puerto-rico-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "zh-CN": "trip during the Cornell years",
-        "en": "trip during the Cornell years"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-1",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "competition project during college",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-microwave-notes-2019-reason-microwave-notes-2019-hust-1",
-      "from": "microwave-notes-2019",
-      "to": "hust",
-      "kind": "reason",
-      "labels": {
-        "en": "course study notes",
-        "zh-CN": "课程学习笔记"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-noise-modulation-topic-noise-modulation-adversarial-writing-1",
       "from": "noise-modulation",
       "to": "adversarial-writing",
@@ -379,7 +238,18 @@
       "strength": 3
     },
     {
-      "id": "editor-noise-modulation-topic-realai-noise-modulation-2",
+      "id": "editor-noise-modulation-outcome-noise-modulation-hust-mclab-3",
+      "from": "noise-modulation",
+      "to": "hust-mclab",
+      "kind": "outcome",
+      "labels": {
+        "en": "took shape during the research assistant period",
+        "zh-CN": "在研究助理阶段逐渐成形"
+      },
+      "strength": 5
+    },
+    {
+      "id": "editor-realai-topic-realai-noise-modulation-1",
       "from": "realai",
       "to": "noise-modulation",
       "kind": "topic",
@@ -390,15 +260,158 @@
       "strength": 1
     },
     {
-      "id": "editor-noise-modulation-outcome-noise-modulation-hust-mclab-3",
-      "from": "noise-modulation",
-      "to": "hust-mclab",
-      "kind": "outcome",
+      "id": "editor-realai-topic-realai-signature-attack-2",
+      "from": "realai",
+      "to": "signature-attack",
+      "kind": "topic",
       "labels": {
-        "en": "took shape during the research assistant period",
-        "zh-CN": "在研究助理阶段逐渐成形"
+        "en": "same research domain",
+        "zh-CN": "相同的研究方向"
       },
-      "strength": 5
+      "strength": 2
+    },
+    {
+      "id": "editor-cornell-time-verily-intern-cornell-1",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "it was during the Cornell period",
+        "zh-CN": "康村读书期间的实习"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-cornell-time-california-one-2022-cornell-2",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "summer trip in the graduate-school stretch",
+        "zh-CN": "研究生阶段中的那次暑期旅行"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-cornell-time-cornell-data-visualizations-2021-3",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "coursework during Cornell period",
+        "zh-CN": "康村上学期间的课程作业"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-cornell-reason-oxford-cornell-4",
+      "from": "oxford",
+      "to": "cornell",
+      "kind": "reason",
+      "labels": {
+        "en": "it makes me want to attend a school in countryside",
+        "zh-CN": "让我想要去“世外桃源”读书"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-cornell-time-puerto-rico-2022-cornell-5",
+      "from": "puerto-rico-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "康村上学期间的旅行",
+        "en": "trip during the Cornell years"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-time-wellmail-hust-1",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "coursework in sophomore year",
+        "zh-CN": "大二时期的课程项目"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-signature-attack-hust-2",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "research during the undergraduate study",
+        "zh-CN": "大三期间的暑期科研项目"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-weibe-hust-3",
+      "from": "weibe",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "big-data systems course project",
+        "zh-CN": "大三期间的课程设计项目"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-faceswap-hust-4",
+      "from": "faceswap",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "graduation capstone project for bachelors",
+        "zh-CN": "本科毕业论文"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-hust-time-hust-naec-5",
+      "from": "hust",
+      "to": "naec",
+      "kind": "time",
+      "labels": {
+        "en": "it was during my junior year",
+        "zh-CN": "大三时期的科研实习"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-hust-time-hust-mclab-hust-6",
+      "from": "hust-mclab",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "still rooted in the HUST period",
+        "zh-CN": "科研助理"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-hust-time-louvre-evacuation-hust-7",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "competition project during college",
+        "zh-CN": "大三的竞赛项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-hust-reason-microwave-notes-2019-hust-8",
+      "from": "microwave-notes-2019",
+      "to": "hust",
+      "kind": "reason",
+      "labels": {
+        "en": "course study notes",
+        "zh-CN": "课程学习笔记"
+      },
+      "strength": 3
     }
   ]
 }

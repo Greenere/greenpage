@@ -47,6 +47,14 @@
   "linksSectionLabel": "Elsewhere",
   "links": [
     {
+      "label": "Statistics",
+      "href": "/graph/statistics"
+    },
+    {
+      "label": "Editor",
+      "href": "/editor/nodes/bio"
+    },
+    {
       "label": "LinkedIn",
       "href": "https://www.linkedin.com/in/haoyanghowyoung/"
     },
