@@ -335,8 +335,7 @@ export function StatisticsPanel({
             minHeight: detailLayout ? '24rem' : '21rem',
             borderRadius: '18px',
             overflow: 'hidden',
-            background:
-              'linear-gradient(135deg, color-mix(in srgb, var(--color-background) 92%, white 8%), color-mix(in srgb, var(--color-background) 84%, white 16%))',
+            background: 'color-mix(in srgb, var(--color-background) 84%, white 16%)',
             border: '1px solid color-mix(in srgb, var(--color-secondary) 22%, transparent)',
           }}
         >
@@ -363,9 +362,9 @@ export function StatisticsPanel({
                     padding: compact ? '0.7rem 0.72rem' : '0.9rem',
                     borderRadius: compact ? '16px' : '18px',
                     border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
-                    background: `color-mix(in srgb, var(--color-background) ${Math.round(82 - intensity * 12)}%, white ${Math.round(18 + intensity * 12)}%)`,
+                    background: `color-mix(in srgb, var(--color-background) ${Math.round(86 - intensity * 10)}%, white ${Math.round(14 + intensity * 10)}%)`,
                     boxShadow:
-                      'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 22%, transparent), 0 10px 24px color-mix(in srgb, black 7%, transparent)',
+                      'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
                     color: 'var(--color-text)',
                     display: 'flex',
                     flexDirection: 'column',
