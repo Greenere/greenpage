@@ -53,7 +53,11 @@ type RelatedEntry = {
   isBio: boolean;
 };
 
-function getRelatedEntries(model: GraphModel, node: Pick<GraphCardNode, 'id'>, bioSubtitle: string | null) {
+function getRelatedEntries(
+  model: GraphModel,
+  node: Pick<GraphCardNode, 'id'>,
+  bioIdentity: { name: string | null; subtitle: string | null },
+) {
   const nodeById = new Map(model.nodes.map((entry) => [entry.id, entry]));
 
   return getGraphRelations(model)
@@ -64,10 +68,10 @@ function getRelatedEntries(model: GraphModel, node: Pick<GraphCardNode, 'id'>, b
         return {
           relation,
           relatedNodeId: 'bio',
-          relatedNodeTitle: UI_COPY.nodeDetailPage.bioEntry.title,
-          relatedNodeSubtitle: bioSubtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
+          relatedNodeTitle: bioIdentity.name ?? UI_COPY.nodeDetailPage.bioEntry.title,
+          relatedNodeSubtitle: bioIdentity.subtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
           displayKind: UI_COPY.nodeDetailPage.bioEntry.kind,
-          displayLabel: bioSubtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
+          displayLabel: bioIdentity.subtitle ?? UI_COPY.nodeDetailPage.bioEntry.fallbackSubtitle,
           isBio: true,
         };
       }
@@ -114,7 +118,13 @@ const NodeDetailPage: React.FC = () => {
     return cachedContent ? { nodeId: decodedNodeId, content: cachedContent } : null;
   });
   const [nodeError, setNodeError] = useState<string | null>(null);
-  const [bioSubtitle, setBioSubtitle] = useState<string | null>(() => readCachedBioPageContent(language)?.subtitle ?? null);
+  const [bioIdentity, setBioIdentity] = useState<{ name: string | null; subtitle: string | null }>(() => {
+    const cachedBio = readCachedBioPageContent(language);
+    return {
+      name: cachedBio?.name ?? null,
+      subtitle: cachedBio?.subtitle ?? null,
+    };
+  });
   const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
   const handleThemeChange = (nextTheme: Theme) => {
     setTheme(nextTheme);
@@ -159,7 +169,11 @@ const NodeDetailPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setBioSubtitle(readCachedBioPageContent(language)?.subtitle ?? null);
+    const cachedBio = readCachedBioPageContent(language);
+    setBioIdentity({
+      name: cachedBio?.name ?? null,
+      subtitle: cachedBio?.subtitle ?? null,
+    });
     setGraphModel(readCachedGraphModel(language));
     setGraphError(null);
     if (!decodedNodeId) {
@@ -174,7 +188,7 @@ const NodeDetailPage: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
 
-    if (bioSubtitle) {
+    if (bioIdentity.name && bioIdentity.subtitle) {
       return () => {
         cancelled = true;
       };
@@ -183,7 +197,10 @@ const NodeDetailPage: React.FC = () => {
     loadBioPageContent(language)
       .then((content) => {
         if (cancelled) return;
-        setBioSubtitle(content.subtitle);
+        setBioIdentity({
+          name: content.name,
+          subtitle: content.subtitle,
+        });
       })
       .catch(() => {
         if (cancelled) return;
@@ -192,7 +209,7 @@ const NodeDetailPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [bioSubtitle, language]);
+  }, [bioIdentity.name, bioIdentity.subtitle, language]);
 
   useEffect(() => {
     let cancelled = false;
@@ -259,7 +276,7 @@ const NodeDetailPage: React.FC = () => {
         ...nodeContentState.content,
       } satisfies GraphContentNode)
     : null;
-  const relatedEntries = graphModel && graphNode ? getRelatedEntries(graphModel, graphNode, bioSubtitle) : [];
+  const relatedEntries = graphModel && graphNode ? getRelatedEntries(graphModel, graphNode, bioIdentity) : [];
 
   if (graphError || nodeError) {
     return (
