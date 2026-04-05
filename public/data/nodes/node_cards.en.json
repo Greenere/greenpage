@@ -390,15 +390,15 @@
     "preview": [
       {
         "type": "text",
-        "text": "Howlang is an experimental programming language and interpreter designed to explore a minimalist, function-centric programming model where everything is treated as composable transformations. The project implements a lightweight interpreter that emphasizes simplicity, expressiveness, and extensibility, serving both as a playground for language design ideas and a foundation for future compiler development."
+        "text": "Howlang is an experimental programming language and interpreter designed to explore a minimalist, function-centric programming model where everything is treated as composable transformations."
+      },
+      {
+        "type": "text",
+        "text": "The project implements a lightweight interpreter that emphasizes simplicity, expressiveness, and extensibility, serving both as a playground for language design ideas and a foundation for future compiler development."
       },
       {
         "type": "text",
         "text": "It includes parsing, execution, and basic runtime features, along with test programs that demonstrate its capability to model complex logic through a concise syntax. Overall, the project aims to investigate alternative abstractions for computation and provide a base for building more advanced language tooling."
-      },
-      {
-        "type": "text",
-        "text": "It's public here: [howlang](https://github.com/Greenere/howlang)"
       }
     ]
   },

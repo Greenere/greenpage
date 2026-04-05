@@ -410,15 +410,34 @@ function mergeExplicitRelationsForLanguageSwitch(
       };
     }
 
+    const mergedLabels: Partial<Record<AppLanguage, string>> = {};
+    for (const locale of ['en', 'zh-CN'] as const) {
+      const currentValue = relation.labels[locale];
+      const incomingValue = nextLanguageRelation.labels[locale];
+
+      if (typeof incomingValue === 'string' && incomingValue.trim()) {
+        mergedLabels[locale] = incomingValue;
+        continue;
+      }
+
+      if (typeof currentValue === 'string' && currentValue.trim()) {
+        mergedLabels[locale] = currentValue;
+        continue;
+      }
+
+      if (typeof incomingValue === 'string') {
+        mergedLabels[locale] = incomingValue;
+        continue;
+      }
+
+      if (typeof currentValue === 'string') {
+        mergedLabels[locale] = currentValue;
+      }
+    }
+
     return {
       ...relation,
-      labels: {
-        ...nextLanguageRelation.labels,
-        ...relation.labels,
-        ...(targetLanguage in nextLanguageRelation.labels
-          ? { [targetLanguage]: nextLanguageRelation.labels[targetLanguage] }
-          : {}),
-      },
+      labels: mergedLabels,
     };
   });
 }

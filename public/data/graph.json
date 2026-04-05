@@ -375,8 +375,8 @@
       "to": "waymo",
       "kind": "time",
       "labels": {
-        "en": "during my spare time",
-        "zh-CN": "工作之余的业余项目"
+        "en": "during my spare time ",
+        "zh-CN": "工作之余的个人项目"
       },
       "strength": 1
     }
