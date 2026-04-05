@@ -43,8 +43,8 @@
       ]
     }
   ],
-  "pathsSectionLabel": "探索路径",
-  "linksSectionLabel": "其他地方找到我",
+  "pathsSectionLabel": "点击探索各个方向的节点",
+  "linksSectionLabel": "其他",
   "links": [
     {
       "label": "LinkedIn",

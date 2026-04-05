@@ -271,17 +271,6 @@
       "strength": 2
     },
     {
-      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
-      "from": "layoff-journey",
-      "to": "verily",
-      "kind": "reason",
-      "labels": {
-        "en": "",
-        "zh-CN": ""
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
       "from": "california-one-2022",
       "to": "cornell",
@@ -401,6 +390,17 @@
         "zh-CN": "第一次听说波多黎各是在ICM的比赛中"
       },
       "strength": 1
+    },
+    {
+      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "labels": {
+        "en": "laid off by Verily",
+        "zh-CN": "被Verily裁员了"
+      },
+      "strength": 3
     }
   ]
 }
