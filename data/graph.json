@@ -302,28 +302,6 @@
       "strength": 5
     },
     {
-      "id": "editor-noise-modulation-topic-noise-modulation-adversarial-writing-1",
-      "from": "noise-modulation",
-      "to": "adversarial-writing",
-      "kind": "topic",
-      "labels": {
-        "en": "reading notes related to adversarial examples",
-        "zh-CN": "与对抗样本相关的阅读笔记"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-noise-modulation-topic-realai-noise-modulation-2",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "topic",
-      "labels": {
-        "zh-CN": "与对抗样本相关的实习",
-        "en": "internship also related to adversarial examples"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-hust-mclab-reason-adversarial-writing-hust-mclab-1",
       "from": "adversarial-writing",
       "to": "hust-mclab",
@@ -344,17 +322,6 @@
         "zh-CN": "still rooted in the HUST period"
       },
       "strength": 3
-    },
-    {
-      "id": "editor-hust-mclab-outcome-noise-modulation-hust-mclab-3",
-      "from": "noise-modulation",
-      "to": "hust-mclab",
-      "kind": "outcome",
-      "labels": {
-        "en": "took shape during the research assistant period",
-        "zh-CN": "在研究助理阶段逐渐成形"
-      },
-      "strength": 5
     },
     {
       "id": "editor-oxford-reason-oxford-cornell-1",
@@ -399,6 +366,39 @@
         "zh-CN": "课程学习笔记"
       },
       "strength": 3
+    },
+    {
+      "id": "editor-noise-modulation-topic-noise-modulation-adversarial-writing-1",
+      "from": "noise-modulation",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "labels": {
+        "en": "reading notes related to adversarial examples",
+        "zh-CN": "与对抗样本相关的阅读笔记"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-noise-modulation-topic-realai-noise-modulation-2",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "topic",
+      "labels": {
+        "zh-CN": "与对抗样本相关的实习",
+        "en": "internship also related to adversarial examples"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-noise-modulation-outcome-noise-modulation-hust-mclab-3",
+      "from": "noise-modulation",
+      "to": "hust-mclab",
+      "kind": "outcome",
+      "labels": {
+        "en": "took shape during the research assistant period",
+        "zh-CN": "在研究助理阶段逐渐成形"
+      },
+      "strength": 5
     }
   ]
 }
