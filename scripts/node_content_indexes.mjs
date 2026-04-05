@@ -152,7 +152,10 @@ function getLocaleContentPath(rootDir, nodeRef, suffix) {
   const nodesDir = path.join(publicDir, 'data', 'nodes');
 
   if (typeof nodeRef.contentPath === 'string' && nodeRef.contentPath.length > 0) {
-    return path.join(publicDir, nodeRef.contentPath.replace(/^\//, ''));
+    return path.join(
+      publicDir,
+      nodeRef.contentPath.replace(/\.json$/i, `.${suffix}.json`).replace(/^\//, ''),
+    );
   }
 
   if (typeof nodeRef.domain !== 'string' || nodeRef.domain.length === 0) {

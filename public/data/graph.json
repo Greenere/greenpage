@@ -95,10 +95,11 @@
       "chronology": "202005"
     },
     {
-      "id": "programming-languages",
+      "id": "data-visualizations-2021",
       "kind": "project",
       "domain": "project",
-      "chronology": "20211215"
+      "chronology": "20211215",
+      "contentPath": "/data/nodes/project/data_visualizations_2021.json"
     },
     {
       "id": "signature-attack",
@@ -335,8 +336,8 @@
       "strength": 3
     },
     {
-      "id": "editor-programming-languages-time-programming-languages-cornell-1",
-      "from": "programming-languages",
+      "id": "editor-data-visualizations-2021-time-data-visualizations-2021-cornell-1",
+      "from": "data-visualizations-2021",
       "to": "cornell",
       "kind": "time",
       "labels": {

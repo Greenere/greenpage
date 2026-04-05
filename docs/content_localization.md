@@ -55,8 +55,8 @@ Examples:
 
 - `public/data/nodes/experience/verily_intern.en.json`
 - `public/data/nodes/experience/verily_intern.zh_cn.json`
-- `public/data/nodes/project/programming_languages.en.json`
-- `public/data/nodes/project/programming_languages.zh_cn.json`
+- `public/data/nodes/project/data_visualizations_2021.en.json`
+- `public/data/nodes/project/data_visualizations_2021.zh_cn.json`
 
 ### Bio
 

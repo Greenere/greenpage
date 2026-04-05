@@ -1076,7 +1076,7 @@
       }
     ]
   },
-  "programming-languages": {
+  "data-visualizations-2021": {
     "title": "编程语言可视化",
     "subtitle": "交互式 D3 项目",
     "summary": "一件康奈尔的可视化作品，通过交互图形探索编程语言的历史、家族关系与流行度。",

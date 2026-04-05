@@ -109,7 +109,7 @@ Examples:
 
 - `public/data/nodes/education/cornell.en.json`
 - `public/data/nodes/education/cornell.zh_cn.json`
-- `public/data/nodes/project/programming_languages.en.json`
+- `public/data/nodes/project/data_visualizations_2021.en.json`
 
 ### Generated indexes
 

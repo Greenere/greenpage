@@ -241,7 +241,7 @@ async function readDomainIds() {
 // Returns the absolute path to a node's content file, locale-specific.
 function getLocaleNodeContentPath(node: EditorGraphNode, suffix: string): string {
   if (node.contentPath) {
-    const normalized = node.contentPath.replace(/^\/+/, '')
+    const normalized = node.contentPath.replace(/\.json$/i, `.${suffix}.json`).replace(/^\/+/, '')
     return path.resolve(ROOT_DIR, 'public', normalized)
   }
   const baseName = node.id.replace(/-/g, '_')
