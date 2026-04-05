@@ -6,82 +6,17 @@
     "travel",
     "coast"
   ],
-  "hero": {
-    "image": {
-      "src": "assets/portrait_haoyang_mty.jpg",
-      "alt": "Haoyang in Monterey during the Route 1 trip",
-      "caption": "Monterey became the clearest visual memory in a day that started in the Bay and slowly tilted south."
-    }
-  },
-  "meta": {
-    "dateLabel": "May 29, 2022",
-    "location": "California coast",
-    "readingTime": "3 min",
-    "status": "archive"
-  },
+  "meta": {},
   "sections": [
     {
       "label": "Overview",
       "blocks": [
         {
           "type": "text",
-          "text": "Among the old travel artifacts, this one is especially visual. It reads more like a route sketch than a diary entry: coastlines, viewpoints, and a day-long line from the Bay toward Monterey during the [Verily internship](/nodes/verily-intern)."
-        },
-        {
-          "type": "text",
-          "text": "What stayed with me was not a single stop, but the feeling of the whole drive unfolding in sequence, almost like stepping through a living `storyboard` of California."
+          "text": "Start writing here."
         }
       ],
       "id": "overview"
-    },
-    {
-      "label": "Route",
-      "blocks": [
-        {
-          "type": "list",
-          "items": [
-            "**Half Moon Bay** as the first clear transition out of the Bay rhythm",
-            "*Santa Cruz* as the midpoint where the coast started to feel more leisurely than logistical",
-            "**Monterey** as the emotional center of the trip",
-            "*17-Mile Drive* as the part that made the route feel intentionally scenic rather than merely efficient"
-          ]
-        },
-        {
-          "type": "callout",
-          "title": "Why it stayed",
-          "tone": "highlight",
-          "text": "This was the first trip in California that felt fully inhabited rather than borrowed. It made the summer read less like a temporary relocation and more like a chapter."
-        }
-      ],
-      "id": "route"
-    },
-    {
-      "label": "Photographs",
-      "blocks": [
-        {
-          "type": "gallery",
-          "items": [
-            {
-              "alt": "Haoyang in the Bay Area during summer 2022",
-              "src": "assets/portrait_haoyang_sfbay.jpg",
-              "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
-            },
-            {
-              "alt": "Haoyang in Monterey during the Route 1 trip",
-              "src": "assets/portrait_haoyang_mty.jpg",
-              "caption": "By Monterey the trip had slowed down enough to feel memorable rather than fast."
-            },
-            {
-              "alt": "Haoyang in the Bay Area during summer 2022",
-              "src": "assets/sf_fog.jpg",
-              "caption": "The Bay was the starting point before the drive stretched into a longer coastal day."
-            }
-          ],
-          "columns": 3,
-          "align": "height:3"
-        }
-      ],
-      "id": "photographs"
     }
   ]
 }

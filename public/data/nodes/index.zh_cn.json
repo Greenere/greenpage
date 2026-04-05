@@ -720,36 +720,41 @@
     ]
   },
   "verily": {
-    "title": "Verily 软件工程师",
-    "subtitle": "2023年起的全职章节",
-    "summary": "目前最长的一段经历：产品工程、系统职责，以及图谱中与当下个人节点联系最直接的部分。",
+    "title": "Verily",
+    "subtitle": "我在美国的第一份全职工作，从 2023 到 2025",
+    "summary": "拿到暑期实习回聘之后，我在 2023 年 1 月回到同一个团队，以全职软件工程师的身份加入 Verily，继续做同一个视网膜相机项目。",
     "tags": [
-      "当前",
-      "软件"
+      "verily",
+      "全职",
+      "软件工程师"
     ],
     "sections": [
       {
-        "id": "overview",
         "label": "概览",
         "blocks": [
           {
             "type": "text",
-            "text": "与更早的节点相比，这一章节的节奏更为稳定，也不再以学校为框架。它关于更长周期的项目、生产环境的责任感，以及一种更深层的工程师身份——这种身份此后可以延伸至写作、个人项目或未来的新方向。"
+            "text": "2022 年找工作非常残酷，除了 Verily 的回聘之外我没有拿到别的 offer，所以其实也没有太多选择。不过这里本身也是个不错的工作地方，而且我当时真的很喜欢团队里的同事。"
           },
           {
-            "type": "list",
-            "items": [
-              "从 Verily 实习延续至全职岗位",
-              "代表图谱中最新的工作经历线索",
-              "自然地连接回中心的个人节点与当下"
-            ]
+            "type": "text",
+            "text": "我们团队负责的是一个硬件项目的整套软件栈，从嵌入式软件一路做到前端，我也都稍微接触了一些，不过主要还是偏前端。"
+          },
+          {
+            "type": "text",
+            "text": "我以全职身份回去的时候，这个项目刚刚上线，销售也才刚开始。但其实并不需要销售来告诉你一个项目在市场上是不是成功，到 2023 年底我自己就已经能感觉到它并不成功。"
+          },
+          {
+            "type": "text",
+            "text": "公司那时本身也处在危机里，我们不得不花两年时间做技术拆分，最后却还是在 2025 年被取消并遭遇裁员。"
           }
-        ]
+        ],
+        "id": "overview"
       }
     ]
   },
   "waymo": {
-    "title": "Waymo 软件工程师",
+    "title": "Waymo",
     "subtitle": "自 2025 年 12 月 15 日开始的全职工作，目前依然很喜欢",
     "summary": "在我之前的项目被取消、整个团队又在 Verily 被裁之后，一位前同事问我是否有兴趣去 Waymo。显然我说了愿意，于是现在我在做支撑 Waymo 机器学习模型的数据标注平台。",
     "sections": [
@@ -758,7 +763,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "我所在的团队横跨数据、模型与运营，有很多新东西要学，也有很多新机会。Waymo 正在取得的进展很令人兴奋，我也希望自己能一路待到它未来可能 IPO 的那一天。"
+            "text": "我所在的团队横跨数据、模型与运营，有很多新东西要学，也有很多新机会。Waymo正在取得的进展很令人兴奋，我也希望自己能一路待到它未来IPO的那一天。"
           }
         ],
         "id": "overview"
@@ -777,10 +782,6 @@
       {
         "label": "概览",
         "blocks": [
-          {
-            "type": "text",
-            "text": "源代码公开存档在我的Github上： [WELLMAIL](https://github.com/Greenere/wellmail)"
-          },
           {
             "type": "text",
             "text": "这是我参与的第一个真正意义上的项目。这门课叫“软件项目”，要求设计并实现一个电子邮件客户端。"
@@ -819,6 +820,16 @@
           }
         ],
         "id": "overview"
+      },
+      {
+        "label": "代码",
+        "blocks": [
+          {
+            "type": "link",
+            "label": "WELLMAIL",
+            "href": "https://github.com/Greenere/wellmail"
+          }
+        ]
       }
     ]
   },
@@ -896,37 +907,15 @@
         "blocks": [
           {
             "type": "text",
-            "text": "项目公开存档在这里：[WEIBE](https://github.com/Greenere/weibe)"
-          },
-          {
-            "type": "text",
-            "text": "这是课程 Big Data Processing System 的一个课程项目。这个项目的核心思路是抓取微博（可以理解为中文版 Twitter）的热搜话题，并分析对应帖子中隐含的情绪倾向。"
-          },
-          {
-            "type": "text",
-            "text": "我主要负责的是整个系统，而不是情绪分析背后的算法本身。这个系统的整体方案如下图所示。"
-          },
-          {
-            "type": "image",
-            "alt": "",
-            "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-structure.jpg",
-            "caption": "WEIBE 的系统架构"
-          },
-          {
-            "type": "text",
-            "text": "深色部分是系统所依赖的现成程序，浅色部分则是我们自己实现的模块。我用 Python 编写了 Web Crawler，并借助 Selenium 驱动 Chrome 浏览器抓取微博网页，收集热搜话题和帖子，再把它们写入 MongoDB 数据库。服务端同样使用 Python，基于 Flask 和 Gevent 搭建。对于我们的需求来说，一个非常基础的静态页面服务器就已经足够。前端则使用最基础的网页语言编写：HTML 负责结构，CSS 负责样式，JavaScript 负责交互。"
-          },
-          {
-            "type": "text",
-            "text": "下面是系统的一些结果展示："
+            "text": "这个项目最主要的工作在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。其实现在看起来很简陋，但是对于一个课程项目来说足够了，并且比较有趣的是后来抓取到了疫情爆发的舆情。"
           },
           {
             "type": "gallery",
             "items": [
               {
-                "alt": "新冠疫情当天的词云图",
+                "alt": "疫情爆发当天的微博",
                 "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-cloud.png",
-                "caption": "COVID-19 当天的词云图"
+                "caption": "疫情爆发当天的微博"
               },
               {
                 "alt": "情绪散点图",
@@ -936,13 +925,18 @@
             ],
             "columns": 2,
             "align": "natural"
-          },
-          {
-            "type": "text",
-            "text": "由于计算资源有限，我们对每个热搜话题抓取的帖子数量做了限制。它并不是一个真正意义上“超大规模”的数据处理系统，但最后得到的结果其实很有信息量。比较意外的是，我们正好抓到了武汉附近地震引发的话题，以及 COVID-19 爆发初期的微博讨论。"
           }
         ],
         "id": "overview"
+      },
+      {
+        "label": "代码",
+        "blocks": [
+          {
+            "type": "text",
+            "text": "项目存档在我的 Github 上: [WEIBE](https://github.com/Greenere/weibe)"
+          }
+        ]
       }
     ]
   },

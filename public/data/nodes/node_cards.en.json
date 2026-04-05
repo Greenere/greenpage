@@ -235,15 +235,17 @@
     "preview": [
       {
         "type": "text",
-        "text": "Check it out here: [WELLMAIL](https://github.com/Greenere/wellmail)"
-      },
-      {
-        "type": "text",
         "text": "This is the very first project I ever participated that could be referred as a project. For the course, Software Project, an e-mail client is required to be designed and implemented."
       },
       {
         "type": "text",
         "text": "We were splitted into groups of three, and we had literally zero experience about how to begin. Most of the other groups chose Java to programmed it, while we chose Python after a few consideration. Python is light, new and all three members wanted to proceed into relevant areas that requires Python's help."
+      },
+      {
+        "type": "image",
+        "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/wellmail_structure.jpg",
+        "alt": "",
+        "caption": "The architecture for a GUI client"
       }
     ]
   },
@@ -283,15 +285,17 @@
     "preview": [
       {
         "type": "text",
-        "text": "It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
-      },
-      {
-        "type": "text",
         "text": "This is a course project for the course, Capstone Project in Big Data Processing System. The core idea of this project is to fetch the trending topics of weibo (the Chinese version of Twitter) and analyze corresponding posts for the emotion tendencies concealed in each tweet."
       },
       {
         "type": "text",
         "text": "I am responsible for the system rather than the algorithm behind the emotion analysis. The scheme I designed for this system is shown as below."
+      },
+      {
+        "type": "image",
+        "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-structure.jpg",
+        "alt": "",
+        "caption": "The system architecture of WEIBE"
       }
     ]
   },
@@ -401,27 +405,14 @@
     "preview": [
       {
         "type": "text",
-        "text": "Among the old travel artifacts, this one is especially visual. It reads more like a route sketch than a diary entry: coastlines, viewpoints, and a day-long line from the Bay toward Monterey during the [Verily internship](/nodes/verily-intern)."
-      },
-      {
-        "type": "text",
-        "text": "What stayed with me was not a single stop, but the feeling of the whole drive unfolding in sequence, almost like stepping through a living `storyboard` of California."
-      },
-      {
-        "type": "list",
-        "items": [
-          "**Half Moon Bay** as the first clear transition out of the Bay rhythm",
-          "*Santa Cruz* as the midpoint where the coast started to feel more leisurely than logistical",
-          "**Monterey** as the emotional center of the trip",
-          "*17-Mile Drive* as the part that made the route feel intentionally scenic rather than merely efficient"
-        ]
+        "text": "Start writing here."
       }
     ]
   },
   "puerto-rico-2022": {
     "title": "Puerto Rico",
     "subtitle": "December 2022 island trip",
-    "summary": "A late-2022 trip that feels like a marker between the Cornell chapter and what came next, with beaches, coastal stops, and a very different atmosphere from Ithaca.",
+    "summary": "I wanted to visit Puerto Rico ever since we saw this island in the 2019 ICM contest. It was basically the Hawaii for the Eastern America with lower price and richer history. I really enjoyed the sunset we saw in San Juan.",
     "tags": [
       "travel",
       "island"
@@ -429,16 +420,16 @@
     "preview": [
       {
         "type": "text",
-        "text": "The old tripline artwork turns this into a vivid node: Old San Juan, Punta Higuero Lighthouse, beaches, airport thresholds, and a compact trip at the end of 2022 that feels transitional in the larger story."
+        "text": "I was planning a trip with some Cornellian friends initially, but they had their private plan and ditched me before I knew. Nevertheless, I still find some old college friends who were also graduating and interested in visiting this Carribean island."
       },
       {
-        "type": "list",
-        "items": [
-          "Old San Juan",
-          "Punta Higuero Lighthouse",
-          "Playa Escondida and other coastal stops",
-          "Dec. 21-25, 2022"
-        ]
+        "type": "text",
+        "text": "This is the route we took:"
+      },
+      {
+        "type": "image",
+        "src": "https://greenere.github.io//tripline2022/puertorico_2022.svg",
+        "alt": ""
       }
     ]
   }

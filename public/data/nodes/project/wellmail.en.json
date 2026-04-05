@@ -13,10 +13,6 @@
       "blocks": [
         {
           "type": "text",
-          "text": "Check it out here: [WELLMAIL](https://github.com/Greenere/wellmail)"
-        },
-        {
-          "type": "text",
           "text": "This is the very first project I ever participated that could be referred as a project. For the course, Software Project, an e-mail client is required to be designed and implemented."
         },
         {
@@ -53,6 +49,16 @@
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "Source Code",
+      "blocks": [
+        {
+          "type": "link",
+          "label": "WELLMAIL",
+          "href": "https://github.com/Greenere/wellmail"
+        }
+      ]
     }
   ]
 }

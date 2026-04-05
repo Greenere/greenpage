@@ -12,10 +12,6 @@
       "blocks": [
         {
           "type": "text",
-          "text": "It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
-        },
-        {
-          "type": "text",
           "text": "This is a course project for the course, Capstone Project in Big Data Processing System. The core idea of this project is to fetch the trending topics of weibo (the Chinese version of Twitter) and analyze corresponding posts for the emotion tendencies concealed in each tweet."
         },
         {
@@ -55,6 +51,15 @@
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "Source Code",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "It's publicly archived here: [WEIBE](https://github.com/Greenere/weibe)"
+        }
+      ]
     }
   ]
 }

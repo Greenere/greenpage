@@ -12,10 +12,6 @@
       "blocks": [
         {
           "type": "text",
-          "text": "源代码公开存档在我的Github上： [WELLMAIL](https://github.com/Greenere/wellmail)"
-        },
-        {
-          "type": "text",
           "text": "这是我参与的第一个真正意义上的项目。这门课叫“软件项目”，要求设计并实现一个电子邮件客户端。"
         },
         {
@@ -52,6 +48,16 @@
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "代码",
+      "blocks": [
+        {
+          "type": "link",
+          "label": "WELLMAIL",
+          "href": "https://github.com/Greenere/wellmail"
+        }
+      ]
     }
   ]
 }

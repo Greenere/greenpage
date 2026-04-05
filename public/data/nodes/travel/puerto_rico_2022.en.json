@@ -1,28 +1,33 @@
 {
   "title": "Puerto Rico",
   "subtitle": "December 2022 island trip",
-  "summary": "A late-2022 trip that feels like a marker between the Cornell chapter and what came next, with beaches, coastal stops, and a very different atmosphere from Ithaca.",
+  "summary": "I wanted to visit Puerto Rico ever since we saw this island in the 2019 ICM contest. It was basically the Hawaii for the Eastern America with lower price and richer history. I really enjoyed the sunset we saw in San Juan.",
   "tags": [
     "travel",
     "island"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
           "type": "text",
-          "text": "The old tripline artwork turns this into a vivid node: Old San Juan, Punta Higuero Lighthouse, beaches, airport thresholds, and a compact trip at the end of 2022 that feels transitional in the larger story."
+          "text": "I was planning a trip with some Cornellian friends initially, but they had their private plan and ditched me before I knew. Nevertheless, I still find some old college friends who were also graduating and interested in visiting this Carribean island."
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "Tripline",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "This is the route we took:"
         },
         {
-          "type": "list",
-          "items": [
-            "Old San Juan",
-            "Punta Higuero Lighthouse",
-            "Playa Escondida and other coastal stops",
-            "Dec. 21-25, 2022"
-          ]
+          "type": "image",
+          "alt": "",
+          "src": "https://greenere.github.io//tripline2022/puertorico_2022.svg"
         }
       ]
     }

@@ -127,17 +127,6 @@
   ],
   "relations": [
     {
-      "id": "editor-hust-time-wellmail-hust-3",
-      "from": "wellmail",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "coursework in sophomore year",
-        "zh-CN": "大二时期的课程项目"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-hust-time-louvre-evacuation-hust-5",
       "from": "louvre-evacuation",
       "to": "hust",
@@ -147,17 +136,6 @@
         "zh-CN": "大学期间的竞赛项目"
       },
       "strength": 1
-    },
-    {
-      "id": "editor-hust-time-weibe-hust-6",
-      "from": "weibe",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "big-data systems course project",
-        "zh-CN": "大数据系统课程项目"
-      },
-      "strength": 2
     },
     {
       "id": "editor-hust-mclab-time-hust-mclab-hust-1",
@@ -248,28 +226,6 @@
       "strength": 3
     },
     {
-      "id": "editor-cornell-time-puerto-rico-2022-cornell-1",
-      "from": "puerto-rico-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "zh-CN": "trip during the Cornell years",
-        "en": "trip during the Cornell years"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-cornell-time-california-one-2022-cornell-3",
-      "from": "california-one-2022",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "summer trip in the graduate-school stretch",
-        "zh-CN": "研究生阶段中的那次暑期旅行"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
       "from": "cornell",
       "to": "data-visualizations-2021",
@@ -314,17 +270,6 @@
       "strength": 2
     },
     {
-      "id": "editor-verily-intern-location-california-one-2022-verily-intern-2",
-      "from": "california-one-2022",
-      "to": "verily-intern",
-      "kind": "location",
-      "labels": {
-        "en": "",
-        "zh-CN": ""
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-realai-tool-realai-noise-modulation-1",
       "from": "realai",
       "to": "noise-modulation",
@@ -345,6 +290,61 @@
         "zh-CN": "被 Verily 裁员"
       },
       "strength": 3
+    },
+    {
+      "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
+      "from": "california-one-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "summer trip in the graduate-school stretch",
+        "zh-CN": "研究生阶段中的那次暑期旅行"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
+      "from": "california-one-2022",
+      "to": "verily-intern",
+      "kind": "location",
+      "labels": {
+        "en": "",
+        "zh-CN": ""
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-wellmail-time-wellmail-hust-1",
+      "from": "wellmail",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "coursework in sophomore year",
+        "zh-CN": "大二时期的课程项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-weibe-time-weibe-hust-1",
+      "from": "weibe",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "big-data systems course project",
+        "zh-CN": ""
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-puerto-rico-2022-time-puerto-rico-2022-cornell-1",
+      "from": "puerto-rico-2022",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "zh-CN": "trip during the Cornell years",
+        "en": "trip during the Cornell years"
+      },
+      "strength": 2
     }
   ]
 }

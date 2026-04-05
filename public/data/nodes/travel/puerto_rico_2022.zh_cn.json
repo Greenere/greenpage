@@ -1,28 +1,33 @@
 {
   "title": "波多黎各",
-  "subtitle": "2022 年 12 月的海岛之旅",
-  "summary": "2022 年末的一次旅行，像是康奈尔章节与下一段生活之间的一个标记：海滩、海岸停靠点，以及一种与伊萨卡完全不同的空气。",
+  "subtitle": "2022 年 12 月的海岛旅行",
+  "summary": "自从我们在 2019 年 ICM 比赛里看到这座岛之后，我就一直想去波多黎各看看。对美国东海岸来说，它几乎像是一个更便宜、历史也更丰富的“夏威夷”。我尤其喜欢我们在圣胡安看到的日落。",
   "tags": [
     "旅行",
     "海岛"
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "概览",
       "blocks": [
         {
           "type": "text",
-          "text": "旧 tripline 作品把它变成了一个很鲜明的节点：老圣胡安、Punta Higuero Lighthouse、海滩、机场门槛，以及 2022 年末那次短而紧凑、却很有过渡感的旅行。"
+          "text": "一开始我是打算和几个康奈尔朋友一起去的，但他们后来自己有了别的计划，在我反应过来之前就把我丢下了。不过最后我还是找到了几个大学老朋友，他们也正好快毕业了，也对去这座加勒比海岛玩一趟很感兴趣。"
+        }
+      ],
+      "id": "overview"
+    },
+    {
+      "label": "行程路线",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "这是我们当时走的路线："
         },
         {
-          "type": "list",
-          "items": [
-            "老圣胡安",
-            "Punta Higuero Lighthouse",
-            "Playa Escondida 等海岸停靠点",
-            "2022 年 12 月 21–25 日"
-          ]
+          "type": "image",
+          "alt": "",
+          "src": "https://greenere.github.io//tripline2022/puertorico_2022.svg"
         }
       ]
     }

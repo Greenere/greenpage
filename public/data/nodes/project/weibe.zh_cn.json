@@ -12,37 +12,15 @@
       "blocks": [
         {
           "type": "text",
-          "text": "项目公开存档在这里：[WEIBE](https://github.com/Greenere/weibe)"
-        },
-        {
-          "type": "text",
-          "text": "这是课程 Big Data Processing System 的一个课程项目。这个项目的核心思路是抓取微博（可以理解为中文版 Twitter）的热搜话题，并分析对应帖子中隐含的情绪倾向。"
-        },
-        {
-          "type": "text",
-          "text": "我主要负责的是整个系统，而不是情绪分析背后的算法本身。这个系统的整体方案如下图所示。"
-        },
-        {
-          "type": "image",
-          "alt": "",
-          "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-structure.jpg",
-          "caption": "WEIBE 的系统架构"
-        },
-        {
-          "type": "text",
-          "text": "深色部分是系统所依赖的现成程序，浅色部分则是我们自己实现的模块。我用 Python 编写了 Web Crawler，并借助 Selenium 驱动 Chrome 浏览器抓取微博网页，收集热搜话题和帖子，再把它们写入 MongoDB 数据库。服务端同样使用 Python，基于 Flask 和 Gevent 搭建。对于我们的需求来说，一个非常基础的静态页面服务器就已经足够。前端则使用最基础的网页语言编写：HTML 负责结构，CSS 负责样式，JavaScript 负责交互。"
-        },
-        {
-          "type": "text",
-          "text": "下面是系统的一些结果展示："
+          "text": "这个项目最主要的工作在于系统设计：Selenium 爬虫、MongoDB 存储、Python 服务端，以及一个用来浏览结果的简易前端。其实现在看起来很简陋，但是对于一个课程项目来说足够了，并且比较有趣的是后来抓取到了疫情爆发的舆情。"
         },
         {
           "type": "gallery",
           "items": [
             {
-              "alt": "新冠疫情当天的词云图",
+              "alt": "疫情爆发当天的微博",
               "src": "https://github.com/Greenere/Greenere.github.io/raw/master/subpages/imgs/weibe-cloud.png",
-              "caption": "COVID-19 当天的词云图"
+              "caption": "疫情爆发当天的微博"
             },
             {
               "alt": "情绪散点图",
@@ -52,13 +30,18 @@
           ],
           "columns": 2,
           "align": "natural"
-        },
-        {
-          "type": "text",
-          "text": "由于计算资源有限，我们对每个热搜话题抓取的帖子数量做了限制。它并不是一个真正意义上“超大规模”的数据处理系统，但最后得到的结果其实很有信息量。比较意外的是，我们正好抓到了武汉附近地震引发的话题，以及 COVID-19 爆发初期的微博讨论。"
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "代码",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "项目存档在我的 Github 上: [WEIBE](https://github.com/Greenere/weibe)"
+        }
+      ]
     }
   ]
 }
