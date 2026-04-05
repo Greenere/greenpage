@@ -226,17 +226,6 @@
       "strength": 3
     },
     {
-      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
-      "from": "cornell",
-      "to": "data-visualizations-2021",
-      "kind": "time",
-      "labels": {
-        "en": "",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-naec-time-hust-naec-1",
       "from": "hust",
       "to": "naec",
@@ -345,6 +334,17 @@
         "zh-CN": "发生在实习期间"
       },
       "strength": 3
+    },
+    {
+      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "coursework during Cornell period",
+        "zh-CN": "康村上学期间的课程作业"
+      },
+      "strength": 2
     }
   ]
 }
