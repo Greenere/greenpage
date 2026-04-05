@@ -2,7 +2,7 @@
   "eyebrow": "Biography",
   "name": "Haoyang Li",
   "subtitle": "I am currently a Software Engineer in San Francisco Bay Area",
-  "summary": "This page is the narrative front door to the graph: a short profile, the current portrait frame, and a few strong paths into the archive.",
+  "summary": "This page is an attempt to re-organize my life into entangled nodes connected by common traits. So we can explore my life not in a rigid categorical way, instead, we can explore it by connections.",
   "themeFactLabel": "Current frame",
   "facts": [
     {
@@ -17,7 +17,7 @@
   ],
   "sections": [
     {
-      "label": "About",
+      "label": "About ME",
       "blocks": [
         {
           "type": "text",
