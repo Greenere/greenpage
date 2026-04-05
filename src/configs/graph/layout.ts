@@ -36,7 +36,7 @@ export const GRAPH_LAYOUT = {
         5: 7.5,
     },
     derivedRelationStrengths: {
-        temporalSequence: 4,
+        temporalSequence: 3,
         latestNodeToBio: 5,
     },
     styleNodeOffsetFromBio: {
