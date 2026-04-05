@@ -1257,7 +1257,6 @@ const NodeCanvas: React.FC = () => {
     }, [applyPendingGraphRestore, graphModel, graphNodeSetSignature, initialGraph, orderedGraphRelations, setEdges, setNodes]);
 
     useEffect(() => {
-        restoredStoredViewRef.current = false;
         hasAppliedMeasuredInitialLayoutRef.current = false;
     }, [graphNodeSetSignature]);
 
@@ -1642,9 +1641,12 @@ const NodeCanvas: React.FC = () => {
 
     useEffect(() => {
         return () => {
+            if (graphModel && nodesRef.current.length > 0) {
+                persistGraphView(nodesRef.current, getViewport());
+            }
             if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
         };
-    }, []);
+    }, [getViewport, graphModel]);
 
     if (graphError) {
         return (
