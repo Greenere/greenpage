@@ -314,6 +314,17 @@
       "strength": 2
     },
     {
+      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "coursework during Cornell period",
+        "zh-CN": "康村上学期间的课程作业"
+      },
+      "strength": 2
+    },
+    {
       "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
       "from": "california-one-2022",
       "to": "cornell",
@@ -330,21 +341,10 @@
       "to": "verily-intern",
       "kind": "location",
       "labels": {
-        "en": "",
+        "en": "trip during this summer",
         "zh-CN": "发生在实习期间"
       },
       "strength": 3
-    },
-    {
-      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
-      "from": "cornell",
-      "to": "data-visualizations-2021",
-      "kind": "time",
-      "labels": {
-        "en": "coursework during Cornell period",
-        "zh-CN": "康村上学期间的课程作业"
-      },
-      "strength": 2
     }
   ]
 }
