@@ -25,6 +25,15 @@
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "源代码",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "存档在：[rap_attack](https://github.com/Greenere/rap_attack)"
+        }
+      ]
     }
   ]
 }
