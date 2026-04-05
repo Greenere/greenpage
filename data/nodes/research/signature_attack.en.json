@@ -25,6 +25,15 @@
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "Source code",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "It's open sourced under an alias at: [rap_attack](https://github.com/Greenere/rap_attack)"
+        }
+      ]
     }
   ]
 }

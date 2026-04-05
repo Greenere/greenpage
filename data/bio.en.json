@@ -1,7 +1,7 @@
 {
   "eyebrow": "Biography",
   "name": "Haoyang Li",
-  "subtitle": "I am currently a Software Engineer in San Francisco Bay Area",
+  "subtitle": "Software Engineer in San Francisco Bay Area",
   "summary": "This page is an attempt to re-organize my life into entangled nodes connected by common traits. So we can explore my life not in a rigid categorical way, instead, we can explore it by connections.",
   "themeFactLabel": "Current frame",
   "facts": [
@@ -53,6 +53,10 @@
     {
       "label": "Email",
       "href": "mailto:lihaoyangjingzhou@outlook.com"
+    },
+    {
+      "label": "Github",
+      "href": "https://github.com/Greenere"
     }
   ]
 }

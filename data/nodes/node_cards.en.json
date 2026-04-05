@@ -1,4 +1,33 @@
 {
+  "microwave-notes-2019": {
+    "title": " Microwave Technology Notes",
+    "subtitle": "study notes for the course of Fundamentals of Microwave Technology",
+    "summary": "A series of study notes when I was preparing for the finals for the course of Fundamentals of Microwave Technology during my junior year. There were no such notes for this topic online since it was very niche, so my notes were widely read.",
+    "tags": [
+      "study",
+      "notes",
+      "microwave technology"
+    ],
+    "preview": [
+      {
+        "type": "text",
+        "text": "It was purely for passing the finals and I did not continue to do any further research or study over the microwave technology. I had to admit that it was interesting to me, but I did not feel like diving into too hardware heavy stuff."
+      },
+      {
+        "type": "text",
+        "text": "These are the four notes:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "[传输线理论-微波技术基础复习笔记(一)](https://zhuanlan.zhihu.com/p/67811969)",
+          "[波导方程-微波技术基础复习笔记(二)](https://zhuanlan.zhihu.com/p/69641659)",
+          "[史密斯圆图-微波技术基础复习笔记(三)](https://zhuanlan.zhihu.com/p/69685072)",
+          "[矩形波导-微波技术基础复习笔记(四)](https://zhuanlan.zhihu.com/p/81556773)"
+        ]
+      }
+    ]
+  },
   "adversarial-writing": {
     "title": "ML Reading Notes",
     "subtitle": "Zhihu articles, surveys, and dense notes",
@@ -50,6 +79,11 @@
       {
         "type": "text",
         "text": "It was my first time ever been abroad. We spent two weeks in England. The courses were a good introduction, but what really impressed me was how tranquil the countryside of England feels like. We visited London and Brighton in weekends, and I also got a chance to take a guided tour to the BMW Mini factory."
+      },
+      {
+        "type": "link",
+        "label": "一点牛津",
+        "href": "https://zhuanlan.zhihu.com/p/43307468"
       }
     ]
   },
@@ -215,7 +249,7 @@
   "waymo": {
     "title": "Waymo",
     "subtitle": "Full-time job since Dec 15th, 2025, still enjoying it",
-    "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled and the entire team was laid off by Verily. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
+    "summary": "A former colleague asked me if I am interested in Waymo after my previous project was cancelled. Apparently I said yes and now I am working on building the labeling platform that powers the ML models in Waymo.",
     "preview": [
       {
         "type": "text",
@@ -342,6 +376,29 @@
       {
         "type": "text",
         "text": "The third project was a composite interactive storyboard showing the history, relationship and popularities of major programming languages."
+      }
+    ]
+  },
+  "howlang": {
+    "title": "Howlang",
+    "subtitle": "A toy programming language with unified mental model",
+    "summary": "A simple programming language for fun :) Built on the gist of a unified mental model, everything is primitive or callable. I had this idea in 2023 but only realized it with the help of coding agent in 2026.",
+    "tags": [
+      "programming language",
+      "interpreter"
+    ],
+    "preview": [
+      {
+        "type": "text",
+        "text": "Howlang is an experimental programming language and interpreter designed to explore a minimalist, function-centric programming model where everything is treated as composable transformations."
+      },
+      {
+        "type": "text",
+        "text": "The project implements a lightweight interpreter that emphasizes simplicity, expressiveness, and extensibility, serving both as a playground for language design ideas and a foundation for future compiler development."
+      },
+      {
+        "type": "text",
+        "text": "It includes parsing, execution, and basic runtime features, along with test programs that demonstrate its capability to model complex logic through a concise syntax. Overall, the project aims to investigate alternative abstractions for computation and provide a base for building more advanced language tooling."
       }
     ]
   },

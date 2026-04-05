@@ -2,6 +2,13 @@
   "title": "Layoff Journey",
   "subtitle": "An article about my first layoff experience happening in Aug 25th, 2025",
   "summary": "I was laid off in August 2025.To be honest, it didn’t come completely out of nowhere. The industry had already been going through waves of layoffs, and deep down I knew it was possible. Still, when it actually happened, it felt abrupt and strangely disorienting. ",
+  "hero": {
+    "image": {
+      "src": "https://picx.zhimg.com/v2-3d90cc58acb966a6c1c8ec0ccf345260_1440w.jpg?source=d16d100b",
+      "alt": "Describe the image",
+      "caption": "the job searching journey"
+    }
+  },
   "sections": [
     {
       "label": "Overview",

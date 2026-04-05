@@ -5,6 +5,12 @@
   },
   "nodes": [
     {
+      "id": "microwave-notes-2019",
+      "domain": "blog",
+      "kind": "writing",
+      "chronology": "201907"
+    },
+    {
       "id": "adversarial-writing",
       "kind": "writing",
       "domain": "blog",
@@ -101,6 +107,12 @@
       "chronology": "20211215"
     },
     {
+      "id": "howlang",
+      "domain": "project",
+      "kind": "project",
+      "chronology": "202603"
+    },
+    {
       "id": "signature-attack",
       "kind": "research",
       "domain": "research",
@@ -160,17 +172,6 @@
       "strength": 3
     },
     {
-      "id": "editor-signature-attack-time-signature-attack-hust-2",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "summer research during the HUST years",
-        "zh-CN": "HUST 时期的一段暑期研究"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-faceswap-time-faceswap-hust-1",
       "from": "faceswap",
       "to": "hust",
@@ -178,17 +179,6 @@
       "labels": {
         "en": "graduation capstone project for bachelors",
         "zh-CN": "本科毕业设计项目"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-faceswap-topic-faceswap-signature-attack-2",
-      "from": "faceswap",
-      "to": "signature-attack",
-      "kind": "topic",
-      "labels": {
-        "en": "shared interest in adversarial and synthetic-image systems",
-        "zh-CN": "都围绕对抗样本与合成图像系统的兴趣展开"
       },
       "strength": 2
     },
@@ -202,17 +192,6 @@
         "zh-CN": "与对抗样本相关的阅读笔记"
       },
       "strength": 3
-    },
-    {
-      "id": "editor-adversarial-writing-topic-signature-attack-adversarial-writing-2",
-      "from": "signature-attack",
-      "to": "adversarial-writing",
-      "kind": "topic",
-      "labels": {
-        "zh-CN": "这篇论文是之后类似研究的起点",
-        "en": "it leads to further research in adversarial ML"
-      },
-      "strength": 2
     },
     {
       "id": "editor-adversarial-writing-reason-adversarial-writing-hust-mclab-3",
@@ -235,50 +214,6 @@
         "zh-CN": "大三时期的科研实习"
       },
       "strength": 2
-    },
-    {
-      "id": "editor-naec-reason-signature-attack-naec-2",
-      "from": "signature-attack",
-      "to": "naec",
-      "kind": "reason",
-      "labels": {
-        "en": "research direction developed during the NAEC internship",
-        "zh-CN": "在 NAEC 实习期间逐渐形成的研究方向"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-verily-intern-time-verily-intern-cornell-1",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "it was during the Cornell period",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-realai-tool-realai-noise-modulation-1",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "tool",
-      "labels": {
-        "en": "AI security internship echoed robustness research",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-verily-reason-layoff-journey-verily-1",
-      "from": "layoff-journey",
-      "to": "verily",
-      "kind": "reason",
-      "labels": {
-        "en": "",
-        "zh-CN": "被 Verily 裁员"
-      },
-      "strength": 3
     },
     {
       "id": "editor-wellmail-time-wellmail-hust-1",
@@ -314,15 +249,48 @@
       "strength": 2
     },
     {
-      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
-      "from": "cornell",
-      "to": "data-visualizations-2021",
+      "id": "editor-verily-intern-time-verily-intern-cornell-1",
+      "from": "verily-intern",
+      "to": "cornell",
       "kind": "time",
       "labels": {
-        "en": "coursework during Cornell period",
-        "zh-CN": "康村上学期间的课程作业"
+        "en": "it was during the Cornell period",
+        "zh-CN": "康村读书期间的实习"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-realai-topic-realai-noise-modulation-1",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "topic",
+      "labels": {
+        "en": "similar research",
+        "zh-CN": "相关的研究"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-microwave-notes-2019-time-microwave-notes-2019-hust-1",
+      "from": "microwave-notes-2019",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "during my junior year",
+        "zh-CN": "大三时期的课程"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "labels": {
+        "en": "",
+        "zh-CN": ""
+      },
+      "strength": 3
     },
     {
       "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
@@ -341,10 +309,87 @@
       "to": "verily-intern",
       "kind": "location",
       "labels": {
-        "en": "trip during this summer",
-        "zh-CN": "发生在实习期间"
+        "en": "I took the trip during the internship",
+        "zh-CN": "实习期间的旅行"
       },
       "strength": 3
+    },
+    {
+      "id": "editor-signature-attack-time-signature-attack-hust-1",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "summer research during the HUST years",
+        "zh-CN": ""
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-topic-faceswap-signature-attack-2",
+      "from": "faceswap",
+      "to": "signature-attack",
+      "kind": "topic",
+      "labels": {
+        "en": "shared interest in adversarial and synthetic-image systems",
+        "zh-CN": ""
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-3",
+      "from": "signature-attack",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "labels": {
+        "zh-CN": "",
+        "en": "it leads to further research in adversarial ML"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-reason-signature-attack-naec-4",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "reason",
+      "labels": {
+        "en": "research direction developed during the NAEC internship",
+        "zh-CN": ""
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-howlang-time-howlang-waymo-1",
+      "from": "howlang",
+      "to": "waymo",
+      "kind": "time",
+      "labels": {
+        "en": "during my spare time ",
+        "zh-CN": "工作之余的个人项目"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-data-visualizations-2021-time-cornell-data-visualizations-2021-1",
+      "from": "cornell",
+      "to": "data-visualizations-2021",
+      "kind": "time",
+      "labels": {
+        "en": "coursework during Cornell period",
+        "zh-CN": "康村上学期间的课程作业"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-data-visualizations-2021-topic-data-visualizations-2021-weibe-2",
+      "from": "data-visualizations-2021",
+      "to": "weibe",
+      "kind": "topic",
+      "labels": {
+        "en": "both are visualization heavy projects",
+        "zh-CN": "都是可视化项目"
+      },
+      "strength": 1
     }
   ]
 }

@@ -6,6 +6,12 @@
     "牛津",
     "暑校"
   ],
+  "hero": {
+    "image": {
+      "src": "https://picx.zhimg.com/70/v2-ecb77b248ab86301824a8a08d0b805d9_1440w.avis?source=172ae18b&biz_tag=Post",
+      "alt": "描述这张图片"
+    }
+  },
   "sections": [
     {
       "label": "概览",
@@ -16,6 +22,16 @@
         }
       ],
       "id": "overview"
+    },
+    {
+      "label": "知乎",
+      "blocks": [
+        {
+          "type": "link",
+          "label": "一点牛津",
+          "href": "https://zhuanlan.zhihu.com/p/43307468"
+        }
+      ]
     }
   ]
 }
