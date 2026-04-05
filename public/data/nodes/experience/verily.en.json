@@ -1,10 +1,11 @@
 {
   "title": "Verily",
-  "subtitle": "Full-time chapter beginning in 2023",
-  "summary": "The once long-running chapter: product engineering, system ownership, and the part of the graph that connects most directly back to the present-day bio node.",
+  "subtitle": "My first full-time job  in the U.S. spanning from 2023 to 2025",
+  "summary": "I got my return offer to the same team after the summer internship, so in Jan, 2023, I joined Verily as a full-time Software Engineer, working on the same retinal camera project.",
   "tags": [
-    "current",
-    "software"
+    "verily",
+    "full-time",
+    "software engineer"
   ],
   "sections": [
     {
@@ -12,15 +13,19 @@
       "blocks": [
         {
           "type": "text",
-          "text": "Compared with the earlier nodes, this one reflects a steadier and less school-shaped rhythm. It is about longer projects, production responsibility, and a deeper engineering identity that can later branch into writing, side projects, or future moves."
+          "text": "The job searching in 2022 was brutal and I did not get any other offer except for this return offer from Verily, so I did not have any choice. Besides, it was a fine place to work on and I really like my teammates back then."
         },
         {
-          "type": "list",
-          "items": [
-            "Continuation of the Verily internship into a full-time role",
-            "Represents the most up-to-date experience thread in the graph",
-            "A natural bridge back to the central bio node and present tense"
-          ]
+          "type": "text",
+          "text": "Our team was handling the entire software stack of a hardware project, spanning from the embedded software all the way to frontend, and I touched a little bit with a focus on frontend."
+        },
+        {
+          "type": "text",
+          "text": "When I returned as a full-time, the project had just launched and the sales had just begun. But it did not take a salesman to tell if a project is successfully or not in the market, and I could tell it was not since the end of 2023."
+        },
+        {
+          "type": "text",
+          "text": "The company was also at a crisis back then and we had to waste two years to do the technical separation, only to be canceled and laid off in 2025."
         }
       ],
       "id": "overview"

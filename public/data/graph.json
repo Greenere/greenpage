@@ -248,17 +248,6 @@
       "strength": 3
     },
     {
-      "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
-      "from": "layoff-journey",
-      "to": "verily",
-      "kind": "reason",
-      "labels": {
-        "en": "Laid off by Verily",
-        "zh-CN": "被 Verily 裁员"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-cornell-time-puerto-rico-2022-cornell-1",
       "from": "puerto-rico-2022",
       "to": "cornell",
@@ -292,17 +281,6 @@
       "strength": 2
     },
     {
-      "id": "editor-realai-tool-realai-noise-modulation-1",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "tool",
-      "labels": {
-        "en": "AI security internship echoed robustness research",
-        "zh-CN": ""
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-naec-time-hust-naec-1",
       "from": "hust",
       "to": "naec",
@@ -330,7 +308,8 @@
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "en": ""
+        "en": "it was during the Cornell period",
+        "zh-CN": ""
       },
       "strength": 2
     },
@@ -341,7 +320,29 @@
       "kind": "location",
       "labels": {
         "en": "",
-        "zh-CN": "与实习发生在同一个加州夏天"
+        "zh-CN": ""
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-realai-tool-realai-noise-modulation-1",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "tool",
+      "labels": {
+        "en": "AI security internship echoed robustness research",
+        "zh-CN": ""
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-verily-reason-layoff-journey-verily-1",
+      "from": "layoff-journey",
+      "to": "verily",
+      "kind": "reason",
+      "labels": {
+        "en": "",
+        "zh-CN": "被 Verily 裁员"
       },
       "strength": 3
     }
