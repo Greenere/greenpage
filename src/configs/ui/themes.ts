@@ -77,11 +77,11 @@ export const THEME_CONFIG = {
     sfhill: {
         label: 'San Francisco Bay, 2023',
         colors: {
-            primary: 'rgb(17, 177, 153)',
-            secondary: '#954839ff',
-            background: 'rgb(104, 206, 153)',
-            text: 'rgb(19, 68, 121)',
-            accent: '#43444Dff',
+            primary: '#46513A',
+            secondary: '#8E9565',
+            background: '#CEDA8D',
+            text: '#1F2619',
+            accent: '#BCA793',
         },
         portrait: {
             imgSrc: './assets/portrait_haoyang_sfhill.jpg',
