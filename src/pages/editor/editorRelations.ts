@@ -24,8 +24,40 @@ export function createEmptyExplicitRelation(nodeId: string): EditorExplicitRelat
   };
 }
 
+export function getExplicitRelationStructuralKey(relation: EditorExplicitRelation) {
+  return `${relation.from}::${relation.to}::${relation.kind}::${relation.strength}`;
+}
+
 export function getExplicitRelationIdentityKey(relation: EditorExplicitRelation) {
-  return relation.id ?? `${relation.from}::${relation.to}::${relation.kind}::${relation.strength}`;
+  return relation.id ?? getExplicitRelationStructuralKey(relation);
+}
+
+export function buildExplicitRelationLookup(relations: EditorExplicitRelation[]) {
+  const relationLookup = new Map<string, EditorExplicitRelation>();
+
+  relations.forEach((relation) => {
+    if (relation.id) {
+      relationLookup.set(`id:${relation.id}`, relation);
+    }
+
+    relationLookup.set(`struct:${getExplicitRelationStructuralKey(relation)}`, relation);
+  });
+
+  return relationLookup;
+}
+
+export function findMatchingExplicitRelation(
+  relationLookup: Map<string, EditorExplicitRelation>,
+  relation: EditorExplicitRelation,
+) {
+  if (relation.id) {
+    const byId = relationLookup.get(`id:${relation.id}`);
+    if (byId) {
+      return byId;
+    }
+  }
+
+  return relationLookup.get(`struct:${getExplicitRelationStructuralKey(relation)}`);
 }
 
 export function getExplicitRelationLabel(relation: EditorExplicitRelation, language: AppLanguage) {

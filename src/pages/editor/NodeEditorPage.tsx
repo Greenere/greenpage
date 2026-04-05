@@ -37,12 +37,13 @@ import BrowseNodesDialog from './BrowseNodesDialog';
 import {
   anchorExplicitRelationToNode,
   areExplicitRelationsEquivalent,
+  buildExplicitRelationLookup,
   buildBioConnectionEntryWithIdentity,
   buildExplicitConnectionEntry,
   buildTimelineConnectionEntries,
   createEmptyExplicitRelation,
+  findMatchingExplicitRelation,
   findDuplicateExplicitRelationIndexes,
-  getExplicitRelationIdentityKey,
   getExplicitRelationLabel,
   getOccupiedConnectionPeerIds,
   isCompleteExplicitRelation,
@@ -389,25 +390,15 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string, language:
 
 function mergeExplicitRelationsForLanguageSwitch(
   currentRelations: EditorExplicitRelation[],
-  targetLanguage: AppLanguage,
   nextLanguageRelations: EditorExplicitRelation[],
 ) {
-  const nextLanguageByIdentity = new Map(
-    nextLanguageRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
-  );
+  const nextLanguageLookup = buildExplicitRelationLookup(nextLanguageRelations);
 
   return currentRelations.map((relation) => {
-    const identity = getExplicitRelationIdentityKey(relation);
-    const nextLanguageRelation = nextLanguageByIdentity.get(identity);
+    const nextLanguageRelation = findMatchingExplicitRelation(nextLanguageLookup, relation);
 
     if (!nextLanguageRelation) {
-      return {
-        ...relation,
-        labels: {
-          ...relation.labels,
-          [targetLanguage]: '',
-        },
-      };
+      return relation;
     }
 
     const mergedLabels: Partial<Record<AppLanguage, string>> = {};
@@ -447,16 +438,14 @@ function hydrateEmptyExplicitRelationLabels(
   loadedRelations: EditorExplicitRelation[],
   language: AppLanguage,
 ) {
-  const loadedByIdentity = new Map(
-    loadedRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
-  );
+  const loadedRelationLookup = buildExplicitRelationLookup(loadedRelations);
 
   return relations.map((relation) => {
     if (getExplicitRelationLabel(relation, language).trim()) {
       return relation;
     }
 
-    const loadedRelation = loadedByIdentity.get(getExplicitRelationIdentityKey(relation));
+    const loadedRelation = findMatchingExplicitRelation(loadedRelationLookup, relation);
     const loadedLabel = loadedRelation ? getExplicitRelationLabel(loadedRelation, language) : '';
     if (!loadedLabel.trim()) {
       return relation;
@@ -731,19 +720,29 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
         const storedExplicitRelations = storedDraft?.explicitRelations?.map((relation) =>
           anchorExplicitRelationToNode(relation, payload.node.id)
         );
+        const nextLanguageSeedRelations = storedExplicitRelations
+          ? hydrateEmptyExplicitRelationLabels(
+              mergeExplicitRelationsForLanguageSwitch(storedExplicitRelations, anchoredRelations),
+              anchoredRelations,
+              language,
+            )
+          : anchoredRelations;
         const hasUnsavedExplicitRelationChanges =
           !nodeChanged &&
           !areExplicitRelationsEquivalent(explicitRelationsRef.current, loadedExplicitRelationsRef.current);
         const nextExplicitRelationsBase = languageChangedForSameNode
           ? mergeExplicitRelationsForLanguageSwitch(
               explicitRelationsRef.current,
-              language,
-              storedExplicitRelations ?? anchoredRelations,
+              nextLanguageSeedRelations,
             )
           : hasUnsavedExplicitRelationChanges
             ? explicitRelationsRef.current
-            : storedExplicitRelations ?? anchoredRelations;
-        const nextExplicitRelations = hydrateEmptyExplicitRelationLabels(nextExplicitRelationsBase, anchoredRelations, language);
+            : nextLanguageSeedRelations;
+        const nextExplicitRelations = hydrateEmptyExplicitRelationLabels(
+          nextExplicitRelationsBase,
+          nextLanguageSeedRelations,
+          language,
+        );
         const shouldRefreshStoredExplicitRelationsJsonDraft =
           Boolean(storedDraft) &&
           !storedDraft?.explicitRelationsJsonError &&
