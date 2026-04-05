@@ -1,20 +1,5 @@
 import { UI_COPY } from '../../configs/ui/uiCopy';
-import type { DomainId } from '../../configs/content/domains';
-
-export type StatisticsDomainEntry = {
-  domain: DomainId;
-  display: string;
-  cardTag: string;
-  count: number;
-  removable: boolean;
-};
-
-export type StatisticsSummary = {
-  timelineByYear: Array<{ year: string; count: number }>;
-  connectionDistribution: Array<{ bucket: string; count: number }>;
-  topConnectedNodes: Array<{ id: string; label: string; domainTag: string; count: number }>;
-  strengthDistribution: Array<{ strength: 1 | 2 | 3 | 4 | 5; count: number }>;
-};
+import type { StatisticsDomainEntry, StatisticsSummary } from '../statistics/graphStatistics';
 
 function buildTreemapLayout(
   entries: StatisticsDomainEntry[],
@@ -68,19 +53,24 @@ export function StatisticsPanel({
   entries,
   stats,
   onDeleteDomain,
+  panelLayout = 'default',
 }: {
   entries: StatisticsDomainEntry[];
   stats: StatisticsSummary;
   onDeleteDomain?: (entry: StatisticsDomainEntry) => void;
+  panelLayout?: 'default' | 'detail';
 }) {
+  const detailLayout = panelLayout === 'detail';
   const sortedEntries = [...entries].sort((left, right) => right.count - left.count || left.domain.localeCompare(right.domain));
-  const layout = buildTreemapLayout(sortedEntries, 0, 0, 100, 100);
+  const treemapLayout = buildTreemapLayout(sortedEntries, 0, 0, 100, 100);
   const maxCount = Math.max(...entries.map((entry) => entry.count), 1);
   const totalNodes = entries.reduce((sum, entry) => sum + entry.count, 0);
   const maxTimelineCount = Math.max(...stats.timelineByYear.map((entry) => entry.count), 1);
   const maxConnectionBucketCount = Math.max(...stats.connectionDistribution.map((entry) => entry.count), 1);
   const maxTopConnectedCount = Math.max(...stats.topConnectedNodes.map((entry) => entry.count), 1);
   const maxStrengthCount = Math.max(...stats.strengthDistribution.map((entry) => entry.count), 1);
+  const cardPadding = detailLayout ? '0.88rem 0.92rem' : '1rem 1.05rem';
+  const upperChartMinHeight = detailLayout ? '7.2rem' : '8.5rem';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -100,15 +90,16 @@ export function StatisticsPanel({
         style={{
           marginTop: '0.9rem',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) minmax(18rem, 2fr)',
-          gap: '0.9rem',
+          gridTemplateColumns: detailLayout ? 'minmax(0, 1fr) minmax(13.5rem, 1.55fr)' : 'minmax(0, 1fr) minmax(18rem, 2fr)',
+          rowGap: detailLayout ? '0.75rem' : '0.9rem',
+          columnGap: detailLayout ? '2rem' : '0.9rem',
           alignItems: 'stretch',
         }}
       >
-        <div style={{ display: 'grid', gap: '0.9rem' }}>
+        <div style={{ display: 'grid', gap: detailLayout ? '0.75rem' : '0.9rem' }}>
           <div
             style={{
-              padding: '1rem 1.05rem',
+              padding: cardPadding,
               borderRadius: '18px',
               background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
               border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
@@ -124,7 +115,7 @@ export function StatisticsPanel({
             <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
               {UI_COPY.nodeEditor.domainStats.timelineDetail}
             </div>
-            <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'flex-end', gap: '0.42rem', minHeight: '8.5rem', flex: 1 }}>
+            <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'flex-end', gap: detailLayout ? '0.34rem' : '0.42rem', minHeight: upperChartMinHeight, flex: 1 }}>
               {stats.timelineByYear.map((entry) => (
                 <div key={entry.year} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.42rem' }}>
                   <div style={{ fontSize: '0.74rem', opacity: 0.66 }}>{entry.count}</div>
@@ -145,7 +136,7 @@ export function StatisticsPanel({
 
           <div
             style={{
-              padding: '1rem 1.05rem',
+              padding: cardPadding,
               borderRadius: '18px',
               background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
               border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
@@ -167,9 +158,9 @@ export function StatisticsPanel({
                   key={entry.bucket}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '3rem 1fr auto',
+                    gridTemplateColumns: detailLayout ? '2.35rem 1fr auto' : '3rem 1fr auto',
                     alignItems: 'center',
-                    gap: '0.6rem',
+                    gap: detailLayout ? '0.45rem' : '0.6rem',
                   }}
                 >
                   <div style={{ fontSize: '0.78rem', opacity: 0.82 }}>{entry.bucket}</div>
@@ -199,7 +190,7 @@ export function StatisticsPanel({
 
           <div
             style={{
-              padding: '1rem 1.05rem',
+              padding: cardPadding,
               borderRadius: '18px',
               background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
               border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
@@ -215,20 +206,37 @@ export function StatisticsPanel({
             <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
               {UI_COPY.nodeEditor.domainStats.strengthDistributionDetail}
             </div>
-            <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'flex-end', gap: '0.48rem', minHeight: '8.5rem', flex: 1 }}>
+            <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.55rem', flex: 1, justifyContent: 'center' }}>
               {stats.strengthDistribution.map((entry) => (
-                <div key={entry.strength} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.42rem' }}>
-                  <div style={{ fontSize: '0.74rem', opacity: 0.66 }}>{entry.count}</div>
+                <div
+                  key={entry.strength}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: detailLayout ? '2.35rem 1fr auto' : '3rem 1fr auto',
+                    alignItems: 'center',
+                    gap: detailLayout ? '0.45rem' : '0.6rem',
+                  }}
+                >
+                  <div style={{ fontSize: '0.78rem', opacity: 0.82 }}>{entry.strength}</div>
                   <div
                     style={{
-                      width: '100%',
-                      minHeight: '0.45rem',
-                      height: `${Math.max(8, (entry.count / maxStrengthCount) * 110)}px`,
+                      height: '0.64rem',
                       borderRadius: '999px',
-                      background: 'color-mix(in srgb, var(--color-text) 28%, var(--color-background))',
+                      background: 'color-mix(in srgb, var(--color-background) 80%, white 20%)',
+                      overflow: 'hidden',
                     }}
-                  />
-                  <div style={{ fontSize: '0.72rem', opacity: 0.74 }}>{entry.strength}</div>
+                  >
+                    <div
+                      style={{
+                        width: `${(entry.count / maxStrengthCount) * 100}%`,
+                        minWidth: entry.count > 0 ? '0.24rem' : 0,
+                        height: '100%',
+                        borderRadius: '999px',
+                        background: 'color-mix(in srgb, var(--color-secondary) 70%, var(--color-text))',
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '0.77rem', opacity: 0.72 }}>{entry.count}</div>
                 </div>
               ))}
             </div>
@@ -237,7 +245,7 @@ export function StatisticsPanel({
 
         <div
           style={{
-            padding: '1rem 1.05rem',
+            padding: cardPadding,
             borderRadius: '18px',
             background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
             border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
@@ -260,15 +268,15 @@ export function StatisticsPanel({
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr auto',
-                  gap: '0.55rem',
+                  gap: detailLayout ? '0.42rem' : '0.55rem',
                   alignItems: 'center',
                 }}
               >
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontSize: detailLayout ? '0.78rem' : '0.82rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {entry.label}
                   </div>
-                  <div style={{ marginTop: '0.18rem', fontSize: '0.72rem', opacity: 0.68 }}>
+                  <div style={{ marginTop: '0.18rem', fontSize: detailLayout ? '0.69rem' : '0.72rem', opacity: 0.68 }}>
                     {entry.domainTag}
                   </div>
                   <div
@@ -291,7 +299,7 @@ export function StatisticsPanel({
                     />
                   </div>
                 </div>
-                <div style={{ fontSize: '0.78rem', opacity: 0.74 }}>{entry.count}</div>
+                <div style={{ fontSize: detailLayout ? '0.74rem' : '0.78rem', opacity: 0.74 }}>{entry.count}</div>
               </div>
             ))}
           </div>
@@ -302,8 +310,8 @@ export function StatisticsPanel({
           marginTop: '0.9rem',
           width: '100%',
           flex: 1.15,
-          minHeight: '25rem',
-          padding: '1rem 1.05rem',
+          minHeight: detailLayout ? '28rem' : '25rem',
+          padding: cardPadding,
           borderRadius: '22px',
           background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
           border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
@@ -324,7 +332,7 @@ export function StatisticsPanel({
             position: 'relative',
             marginTop: '0.9rem',
             flex: 1,
-            minHeight: '21rem',
+            minHeight: detailLayout ? '24rem' : '21rem',
             borderRadius: '18px',
             overflow: 'hidden',
             background:
@@ -332,9 +340,9 @@ export function StatisticsPanel({
             border: '1px solid color-mix(in srgb, var(--color-secondary) 22%, transparent)',
           }}
         >
-          {layout.map((entry) => {
+          {treemapLayout.map((entry) => {
             const intensity = 0.18 + (entry.count / maxCount) * 0.34;
-            const compact = entry.width < 22 || entry.height < 18;
+            const compact = detailLayout ? entry.width < 28 || entry.height < 22 : entry.width < 22 || entry.height < 18;
             return (
               <div
                 key={entry.domain}

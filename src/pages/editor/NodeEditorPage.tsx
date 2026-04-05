@@ -12,14 +12,18 @@ import { LANGUAGE_OPTIONS, getLocaleMessages, type AppLanguage } from '../../i18
 import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {
   CHRONOLOGY_FORMAT_HINT,
-  getChronologySortKey,
   getChronologyValidationError,
   getCurrentMonthChronologyValue,
   normalizeChronologyValue,
 } from '../../shared/chronology';
+import {
+  buildStatisticsDomainEntries,
+  buildStatisticsSummary,
+  type StatisticsDomainEntry,
+} from '../../shared/statistics/graphStatistics';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { getRelationKindLabel } from '../../shared/relationDisplay';
-import { StatisticsPanel, type StatisticsDomainEntry } from '../../shared/ui/StatisticsPanel';
+import { StatisticsPanel } from '../../shared/ui/StatisticsPanel';
 import ThemePicker from '../graph/ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from '../graph/content/BioTheme';
 import { loadBioPageContent, readCachedBioPageContent } from '../graph/content/BioPage';
@@ -970,69 +974,19 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
   const statisticsDomainEntries = useMemo<StatisticsDomainEntry[]>(
     () => {
       void language;
-      return DOMAIN_ORDER.map((domain) => ({
-        domain,
-        display: getDisplayDomain(domain),
-        cardTag: DOMAIN_CONFIG[domain].cardTag,
-        count: bootstrapNodes.filter((node) => node.domain === domain).length,
-        removable: bootstrapNodes.every((node) => node.domain !== domain),
-      }));
+      return buildStatisticsDomainEntries(
+        bootstrapNodes,
+        getDisplayDomain,
+        (domain) => bootstrapNodes.every((node) => node.domain !== domain)
+      );
     },
     [bootstrapNodes, language]
   );
 
-  const statisticsSummary = useMemo(() => {
-    const sortedByChronology = [...bootstrapNodes].sort(
-      (left, right) => getChronologySortKey(left.chronology) - getChronologySortKey(right.chronology)
-    );
-    const nodesByYear = new Map<string, number>();
-    for (const node of sortedByChronology) {
-      const year = node.chronology.slice(0, 4);
-      nodesByYear.set(year, (nodesByYear.get(year) ?? 0) + 1);
-    }
-
-    const degreeByNode = new Map<string, number>();
-    for (const node of bootstrapNodes) {
-      degreeByNode.set(node.id, 0);
-    }
-    const strengthCounts: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    for (const relation of bootstrapRelations) {
-      degreeByNode.set(relation.from, (degreeByNode.get(relation.from) ?? 0) + 1);
-      degreeByNode.set(relation.to, (degreeByNode.get(relation.to) ?? 0) + 1);
-      strengthCounts[relation.strength] += 1;
-    }
-    const degreeBuckets = new Map<string, number>([
-      ['0', 0],
-      ['1', 0],
-      ['2', 0],
-      ['3', 0],
-      ['4', 0],
-      ['5+', 0],
-    ]);
-    for (const degree of degreeByNode.values()) {
-      const key = degree >= 5 ? '5+' : String(degree);
-      degreeBuckets.set(key, (degreeBuckets.get(key) ?? 0) + 1);
-    }
-    const topConnectedNodes = [...bootstrapNodes]
-      .map((node) => ({
-        id: node.id,
-        label: node.title?.trim() ? node.title : node.id,
-        domainTag: DOMAIN_CONFIG[node.domain].cardTag,
-        count: degreeByNode.get(node.id) ?? 0,
-      }))
-      .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label))
-      .slice(0, 12);
-
-    return {
-      timelineByYear: [...nodesByYear.entries()].map(([year, count]) => ({ year, count })),
-      connectionDistribution: [...degreeBuckets.entries()].map(([bucket, count]) => ({ bucket, count })),
-      topConnectedNodes,
-      strengthDistribution: (Object.keys(strengthCounts) as Array<'1' | '2' | '3' | '4' | '5'>).map((strength) => ({
-        strength: Number(strength) as 1 | 2 | 3 | 4 | 5,
-        count: strengthCounts[Number(strength) as 1 | 2 | 3 | 4 | 5],
-      })),
-    };
-  }, [bootstrapNodes, bootstrapRelations]);
+  const statisticsSummary = useMemo(
+    () => buildStatisticsSummary(bootstrapNodes, bootstrapRelations),
+    [bootstrapNodes, bootstrapRelations]
+  );
 
   useEffect(() => {
     const cachedBio = readCachedBioPageContent(language);

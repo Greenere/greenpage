@@ -42,6 +42,9 @@ export const EN_MESSAGES = {
       loading: 'Loading graph...',
       errorLoading: 'Error loading graph model',
     },
+    graphStatisticsPage: {
+      eyebrow: 'Graph',
+    },
     storyNode: {
       moreDetails: 'more details',
       dragChildNodesHint: 'Drag child nodes inside this domain',
@@ -88,6 +91,8 @@ export const EN_MESSAGES = {
       fallbackThemeFactLabel: 'Current frame',
       fallbackPathsSectionLabel: 'Click to Explore Paths into the Graph',
       fallbackLinksSectionLabel: 'Elsewhere',
+      statisticsLinkLabel: 'Statistics',
+      editorLinkLabel: 'Editor',
       portraitAlt: (name: string) => `Portrait of ${name}`,
     },
     contentLoaders: {

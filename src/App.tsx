@@ -8,6 +8,7 @@ import DetailPageSkeleton from './shared/ui/DetailPageSkeleton'
 const NodeEditorPage = lazy(() => import('./pages/editor/NodeEditorPage'))
 const NodeDetailPage = lazy(() => import('./pages/graph/NodeDetailPage'))
 const BioDetailPage = lazy(() => import('./pages/graph/BioDetailPage'))
+const GraphStatisticsPage = lazy(() => import('./pages/graph/GraphStatisticsPage'))
 
 function App() {
   const location = useLocation()
@@ -50,6 +51,14 @@ function App() {
         element={
           <Suspense fallback={<DetailPageSkeleton variant="node" />}>
             <NodeDetailPage key={location.pathname} />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/graph/statistics"
+        element={
+          <Suspense fallback={<DetailPageSkeleton variant="node" />}>
+            <GraphStatisticsPage key={location.pathname} />
           </Suspense>
         }
       />

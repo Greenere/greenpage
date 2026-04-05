@@ -44,6 +44,9 @@ export const ZH_CN_MESSAGES = {
       loading: '正在加载图谱...',
       errorLoading: '图谱模型加载失败',
     },
+    graphStatisticsPage: {
+      eyebrow: '图谱',
+    },
     storyNode: {
       moreDetails: '更多详情',
       dragChildNodesHint: '在这个领域内拖动子节点',
@@ -90,6 +93,8 @@ export const ZH_CN_MESSAGES = {
       fallbackThemeFactLabel: '当前视角',
       fallbackPathsSectionLabel: '点击探索进入图谱的路径',
       fallbackLinksSectionLabel: '其他链接',
+      statisticsLinkLabel: '统计',
+      editorLinkLabel: '编辑器',
       portraitAlt: (name: string) => `${name} 的肖像`,
     },
     contentLoaders: {
