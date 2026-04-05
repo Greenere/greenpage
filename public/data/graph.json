@@ -139,17 +139,6 @@
   ],
   "relations": [
     {
-      "id": "editor-hust-time-louvre-evacuation-hust-5",
-      "from": "louvre-evacuation",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "competition project during college",
-        "zh-CN": "大学期间的竞赛项目"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-hust-mclab-time-hust-mclab-hust-1",
       "from": "hust-mclab",
       "to": "hust",
@@ -388,6 +377,28 @@
       "labels": {
         "en": "both are visualization heavy projects",
         "zh-CN": "都是可视化项目"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-louvre-evacuation-time-louvre-evacuation-hust-1",
+      "from": "louvre-evacuation",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "",
+        "zh-CN": ""
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-louvre-evacuation-reason-louvre-evacuation-puerto-rico-2022-2",
+      "from": "louvre-evacuation",
+      "to": "puerto-rico-2022",
+      "kind": "reason",
+      "labels": {
+        "en": "first time ever heard of Puerto Rico was in the ICM contest",
+        "zh-CN": "第一次听说波多黎各是在ICM的比赛中"
       },
       "strength": 1
     }
