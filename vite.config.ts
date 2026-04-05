@@ -40,7 +40,7 @@ type EditorExplicitRelation = {
   from: string
   to: string
   kind: string
-  label: string
+  labels: Partial<Record<AppLanguage, string>>
   strength: 1 | 2 | 3
 }
 
@@ -373,18 +373,6 @@ async function readBioContentWithFallback(
   throw new Error('No bio content file found.')
 }
 
-// Resolves a relation label for the given lang from the locale-aware `labels` map.
-function resolveRelationLabel(relation: Record<string, unknown>, lang: string): string {
-  const labels = relation.labels
-  if (labels && typeof labels === 'object' && !Array.isArray(labels)) {
-    const labelsObj = labels as Record<string, unknown>
-    for (const fallbackLanguage of getLocaleFallbackOrder(normalizeEditorLanguage(lang))) {
-      if (typeof labelsObj[fallbackLanguage] === 'string') return labelsObj[fallbackLanguage] as string
-    }
-  }
-  return ''
-}
-
 // Returns the existing locale labels for a relation.
 function getExistingRelationLabels(existing: Record<string, unknown> | undefined): Record<string, string> {
   if (!existing) return {}
@@ -570,7 +558,7 @@ function createNodeEditorPlugin(): Plugin {
                 })
                 .map((relation) => ({
                   ...relation,
-                  label: resolveRelationLabel(relation, lang),
+                  labels: getExistingRelationLabels(relation),
                 })),
             })
             return
@@ -654,7 +642,9 @@ function createNodeEditorPlugin(): Plugin {
                 typeof relation.from !== 'string' ||
                 typeof relation.to !== 'string' ||
                 typeof relation.kind !== 'string' ||
-                typeof relation.label !== 'string' ||
+                !relation.labels ||
+                typeof relation.labels !== 'object' ||
+                Array.isArray(relation.labels) ||
                 (relation.strength !== 1 && relation.strength !== 2 && relation.strength !== 3)
               ) {
                 throw new Error(`Invalid relation at index ${index}.`)
@@ -683,7 +673,14 @@ function createNodeEditorPlugin(): Plugin {
               const relationId = buildExplicitRelationId(nodeId, nextRelation, index)
               const existingRelation = graph.relations.find((r) => r.id === relationId)
               const existingLabels = getExistingRelationLabels(existingRelation)
-              const mergedLabels = { ...existingLabels, [lang]: nextRelation.label }
+              const mergedLabels = {
+                ...existingLabels,
+                ...Object.fromEntries(
+                  Object.entries(nextRelation.labels).filter((entry): entry is [AppLanguage, string] =>
+                    (entry[0] === 'en' || entry[0] === 'zh-CN') && typeof entry[1] === 'string'
+                  )
+                ),
+              }
 
               return [{
                 id: relationId,

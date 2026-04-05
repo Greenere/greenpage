@@ -23,12 +23,14 @@ export type EditorBootstrapResponse = {
   nodes: EditorNodeOption[];
 };
 
+export type EditorRelationLabels = Partial<Record<AppLanguage, string>>;
+
 export type EditorExplicitRelation = {
   id?: string;
   from: string;
   to: string;
   kind: RelationKind;
-  label: string;
+  labels: EditorRelationLabels;
   strength: 1 | 2 | 3;
 };
 
@@ -117,7 +119,12 @@ export async function fetchEditorNode(nodeId: string, lang: AppLanguage) {
     }
 
     const content = await loadGraphNodeContent(node, lang);
-    const explicitRelations = model.relations.filter((relation) => relation.from === nodeId || relation.to === nodeId);
+    const explicitRelations = model.relations
+      .filter((relation) => relation.from === nodeId || relation.to === nodeId)
+      .map((relation) => ({
+        ...relation,
+        labels: { [lang]: relation.label },
+      }));
 
     return {
       node: {

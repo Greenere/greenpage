@@ -119,12 +119,6 @@
       "chronology": "202205"
     },
     {
-      "id": "california-santa-barbara-2022",
-      "domain": "travel",
-      "kind": "travel",
-      "chronology": "202210"
-    },
-    {
       "id": "puerto-rico-2022",
       "kind": "travel",
       "domain": "travel",
@@ -149,7 +143,8 @@
       "to": "cornell",
       "kind": "outcome",
       "labels": {
-        "en": "internship emerged from the Cornell period"
+        "en": "internship emerged from the Cornell period",
+        "zh-CN": "康奈尔阶段延伸出的实习经历"
       },
       "strength": 2
     },
@@ -159,19 +154,10 @@
       "to": "verily",
       "kind": "reason",
       "labels": {
-        "en": "laid-off by Verily"
+        "en": "laid-off by Verily",
+        "zh-CN": "被 Verily 裁员"
       },
       "strength": 3
-    },
-    {
-      "id": "editor-programming-languages-time-programming-languages-cornell-1",
-      "from": "programming-languages",
-      "to": "cornell",
-      "kind": "time",
-      "labels": {
-        "en": "Data Visualization work at Cornell"
-      },
-      "strength": 2
     },
     {
       "id": "editor-california-one-2022-time-california-one-2022-cornell-1",
@@ -179,7 +165,8 @@
       "to": "cornell",
       "kind": "time",
       "labels": {
-        "en": "summer trip in the graduate-school stretch"
+        "en": "summer trip in the graduate-school stretch",
+        "zh-CN": "研究生阶段中的那次暑期旅行"
       },
       "strength": 1
     },
@@ -189,7 +176,8 @@
       "to": "verily-intern",
       "kind": "location",
       "labels": {
-        "en": "same California summer as the internship"
+        "en": "same California summer as the internship",
+        "zh-CN": "与实习发生在同一个加州夏天"
       },
       "strength": 3
     },
@@ -199,7 +187,8 @@
       "to": "hust",
       "kind": "time",
       "labels": {
-        "en": "coursework in sophomore year"
+        "en": "coursework in sophomore year",
+        "zh-CN": "大二时期的课程项目"
       },
       "strength": 2
     },
@@ -209,7 +198,8 @@
       "to": "hust",
       "kind": "time",
       "labels": {
-        "en": "competition project during college"
+        "en": "competition project during college",
+        "zh-CN": "大学期间的竞赛项目"
       },
       "strength": 1
     },
@@ -219,7 +209,8 @@
       "to": "hust",
       "kind": "time",
       "labels": {
-        "en": "big-data systems course project"
+        "en": "big-data systems course project",
+        "zh-CN": "大数据系统课程项目"
       },
       "strength": 2
     },
@@ -229,7 +220,8 @@
       "to": "hust",
       "kind": "time",
       "labels": {
-        "en": "graduation capstone project for bachelors"
+        "en": "graduation capstone project for bachelors",
+        "zh-CN": "本科毕业设计项目"
       },
       "strength": 2
     },
@@ -256,23 +248,13 @@
       "strength": 2
     },
     {
-      "id": "editor-noise-modulation-tool-realai-noise-modulation-2",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "tool",
-      "labels": {
-        "zh-CN": "与对抗样本相关的实习",
-        "en": "internship also related to adversarial examples"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-noise-modulation-reason-noise-modulation-hust-mclab-3",
       "from": "noise-modulation",
       "to": "hust-mclab",
       "kind": "reason",
       "labels": {
-        "en": "took shape during the research assistant period"
+        "en": "took shape during the research assistant period",
+        "zh-CN": "在研究助理阶段逐渐成形"
       },
       "strength": 3
     },
@@ -282,8 +264,8 @@
       "to": "naec",
       "kind": "reason",
       "labels": {
-        "en": "",
-        "zh-CN": ""
+        "en": "research direction developed during the NAEC internship",
+        "zh-CN": "在 NAEC 实习期间逐渐形成的研究方向"
       },
       "strength": 3
     },
@@ -293,8 +275,8 @@
       "to": "hust",
       "kind": "time",
       "labels": {
-        "en": "",
-        "zh-CN": ""
+        "en": "summer research during the HUST years",
+        "zh-CN": "HUST 时期的一段暑期研究"
       },
       "strength": 2
     },
@@ -304,8 +286,8 @@
       "to": "signature-attack",
       "kind": "topic",
       "labels": {
-        "en": "",
-        "zh-CN": ""
+        "en": "shared interest in adversarial and synthetic-image systems",
+        "zh-CN": "都围绕对抗样本与合成图像系统的兴趣展开"
       },
       "strength": 2
     },
@@ -341,6 +323,27 @@
         "zh-CN": "在这期间的科研笔记"
       },
       "strength": 3
+    },
+    {
+      "id": "editor-programming-languages-time-programming-languages-cornell-1",
+      "from": "programming-languages",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": "Data Visualization work at Cornell",
+        "zh-CN": "康奈尔时期的数据可视化项目"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-realai-tool-realai-noise-modulation-1",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "tool",
+      "labels": {
+        "en": "AI security internship echoed robustness research"
+      },
+      "strength": 2
     }
   ]
 }

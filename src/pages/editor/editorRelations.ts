@@ -1,3 +1,4 @@
+import type { AppLanguage } from '../../i18n';
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import type { GraphNodeRef } from '../graph/content/Nodes';
 import type { EditorExplicitRelation, EditorNodeOption } from './editorApi';
@@ -18,13 +19,31 @@ export function createEmptyExplicitRelation(nodeId: string): EditorExplicitRelat
     from: nodeId,
     to: '',
     kind: 'topic',
-    label: '',
+    labels: {},
     strength: 2,
   };
 }
 
 export function getExplicitRelationIdentityKey(relation: EditorExplicitRelation) {
   return relation.id ?? `${relation.from}::${relation.to}::${relation.kind}::${relation.strength}`;
+}
+
+export function getExplicitRelationLabel(relation: EditorExplicitRelation, language: AppLanguage) {
+  return relation.labels[language] ?? '';
+}
+
+export function setExplicitRelationLabel(
+  relation: EditorExplicitRelation,
+  language: AppLanguage,
+  value: string,
+): EditorExplicitRelation {
+  return {
+    ...relation,
+    labels: {
+      ...relation.labels,
+      [language]: value,
+    },
+  };
 }
 
 export function areExplicitRelationsEquivalent(left: EditorExplicitRelation[], right: EditorExplicitRelation[]) {
@@ -43,7 +62,7 @@ export function areExplicitRelationsEquivalent(left: EditorExplicitRelation[], r
       relation.from === other.from &&
       relation.to === other.to &&
       relation.kind === other.kind &&
-      relation.label === other.label &&
+      JSON.stringify(relation.labels) === JSON.stringify(other.labels) &&
       relation.strength === other.strength
     );
   });
@@ -229,10 +248,12 @@ export function buildExplicitConnectionEntry(
   relationIndex: number,
   currentNodeId: string,
   nodeById: Map<string, EditorNodeOption>,
+  language: AppLanguage,
 ): EditorConnectedNodeEntry {
   const relatedNodeId = getExplicitRelationPeerId(relation, currentNodeId);
   const relatedNode = nodeById.get(relatedNodeId);
   const hasChosenPeer = Boolean(relatedNodeId);
+  const relationLabel = getExplicitRelationLabel(relation, language);
 
   return {
     key: `explicit-${relationIndex}-${relation.from}-${relation.to}-${relation.kind}`,
@@ -240,7 +261,7 @@ export function buildExplicitConnectionEntry(
     relatedNodeTitle: hasChosenPeer ? getEditorNodeTitle(relatedNode, relatedNodeId) : UI_COPY.nodeEditor.common.chooseNodeFallback,
     displayKind: relation.kind,
     displayLabel:
-      relation.label.trim() ||
+      relationLabel.trim() ||
       (hasChosenPeer
         ? UI_COPY.nodeEditor.connectedNodes.relationLabelFallback
         : UI_COPY.nodeEditor.connectedNodes.relationIncompleteFallback),

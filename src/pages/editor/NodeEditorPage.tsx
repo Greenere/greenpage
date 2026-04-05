@@ -42,8 +42,10 @@ import {
   createEmptyExplicitRelation,
   findDuplicateExplicitRelationIndexes,
   getExplicitRelationIdentityKey,
+  getExplicitRelationLabel,
   getOccupiedConnectionPeerIds,
   isCompleteExplicitRelation,
+  setExplicitRelationLabel,
   wouldCreateDuplicateExplicitRelation,
 } from './editorRelations';
 import {
@@ -200,7 +202,32 @@ function lenientParseJsonText(text: string): unknown {
   }
 }
 
-function normalizeExplicitRelationsInput(raw: unknown, currentNodeId: string): EditorExplicitRelation[] {
+function normalizeRelationLabels(
+  rawLabels: unknown,
+  language: AppLanguage,
+  { allowLegacyLabel = false, legacyLabelValue }: { allowLegacyLabel?: boolean; legacyLabelValue?: unknown } = {},
+) {
+  if (rawLabels && typeof rawLabels === 'object' && !Array.isArray(rawLabels)) {
+    return Object.fromEntries(
+      Object.entries(rawLabels as Record<string, unknown>).filter((entry): entry is [AppLanguage, string] =>
+        (entry[0] === 'en' || entry[0] === 'zh-CN') && typeof entry[1] === 'string'
+      ),
+    ) as Partial<Record<AppLanguage, string>>;
+  }
+
+  if (allowLegacyLabel && typeof legacyLabelValue === 'string') {
+    return { [language]: legacyLabelValue };
+  }
+
+  return null;
+}
+
+function normalizeExplicitRelationsInput(
+  raw: unknown,
+  currentNodeId: string,
+  language: AppLanguage,
+  { allowLegacyLabel = false }: { allowLegacyLabel?: boolean } = {},
+): EditorExplicitRelation[] {
   if (!Array.isArray(raw)) {
     throw new Error('Explicit connections JSON must be an array.');
   }
@@ -217,11 +244,18 @@ function normalizeExplicitRelationsInput(raw: unknown, currentNodeId: string): E
     if (
       typeof candidate.from !== 'string' ||
       typeof candidate.to !== 'string' ||
-      typeof candidate.label !== 'string' ||
       !RELATION_KIND_OPTIONS.includes(kind as EditorExplicitRelation['kind']) ||
       (strength !== 1 && strength !== 2 && strength !== 3)
     ) {
       throw new Error(`Explicit connection at index ${index} is missing required fields.`);
+    }
+
+    const labels = normalizeRelationLabels(candidate.labels, language, {
+      allowLegacyLabel,
+      legacyLabelValue: candidate.label,
+    });
+    if (!labels) {
+      throw new Error(`Explicit connection at index ${index} must use a locale-aware "labels" object.`);
     }
 
     return anchorExplicitRelationToNode(
@@ -230,7 +264,7 @@ function normalizeExplicitRelationsInput(raw: unknown, currentNodeId: string): E
         from: candidate.from,
         to: candidate.to,
         kind: kind as EditorExplicitRelation['kind'],
-        label: candidate.label,
+        labels,
         strength: strength as 1 | 2 | 3,
       },
       currentNodeId,
@@ -256,13 +290,16 @@ function isStoredExplicitRelation(value: unknown): value is EditorExplicitRelati
     typeof candidate.from === 'string' &&
     typeof candidate.to === 'string' &&
     typeof candidate.kind === 'string' &&
-    typeof candidate.label === 'string' &&
+    (normalizeRelationLabels(candidate.labels, 'en', {
+      allowLegacyLabel: true,
+      legacyLabelValue: candidate.label,
+    }) !== null) &&
     (candidate.strength === 1 || candidate.strength === 2 || candidate.strength === 3) &&
     (candidate.id === undefined || typeof candidate.id === 'string')
   );
 }
 
-function parseStoredNodeDraft(rawValue: string | null, nodeId: string): RestoredNodeEditorDraft | null {
+function parseStoredNodeDraft(rawValue: string | null, nodeId: string, language: AppLanguage): RestoredNodeEditorDraft | null {
   if (!rawValue) return null;
 
   try {
@@ -287,9 +324,26 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string): Restored
     const content = normalizeNodeContent(candidate.content, nodeId);
     const jsonDraft = typeof candidate.jsonDraft === 'string' ? candidate.jsonDraft : prettyJson(content);
     const explicitRelations = Array.isArray(candidate.explicitRelations)
-      ? candidate.explicitRelations.filter(isStoredExplicitRelation)
+      ? candidate.explicitRelations
+          .filter(isStoredExplicitRelation)
+          .map((relation) => {
+            const relationCandidate = relation as Record<string, unknown>;
+            const labels = normalizeRelationLabels(relationCandidate.labels, language, {
+              allowLegacyLabel: true,
+              legacyLabelValue: relationCandidate.label,
+            }) ?? {};
+
+            return {
+              id: typeof relationCandidate.id === 'string' ? relationCandidate.id : undefined,
+              from: relationCandidate.from as string,
+              to: relationCandidate.to as string,
+              kind: relationCandidate.kind as EditorExplicitRelation['kind'],
+              labels,
+              strength: relationCandidate.strength as 1 | 2 | 3,
+            } satisfies EditorExplicitRelation;
+          })
       : undefined;
-    const explicitRelationsJsonDraft =
+    let explicitRelationsJsonDraft =
       typeof candidate.explicitRelationsJsonDraft === 'string'
         ? candidate.explicitRelationsJsonDraft
         : prettyJson(explicitRelations ?? []);
@@ -303,9 +357,19 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string): Restored
 
     let explicitRelationsJsonError: string | null = null;
     try {
-      normalizeExplicitRelationsInput(lenientParseJsonText(explicitRelationsJsonDraft), nodeId);
-    } catch (error) {
-      explicitRelationsJsonError = error instanceof Error ? error.message : 'Invalid explicit connections JSON.';
+      normalizeExplicitRelationsInput(lenientParseJsonText(explicitRelationsJsonDraft), nodeId, language);
+    } catch {
+      try {
+        const migratedRelations = normalizeExplicitRelationsInput(
+          lenientParseJsonText(explicitRelationsJsonDraft),
+          nodeId,
+          language,
+          { allowLegacyLabel: true },
+        );
+        explicitRelationsJsonDraft = prettyJson(migratedRelations);
+      } catch (legacyError) {
+        explicitRelationsJsonError = legacyError instanceof Error ? legacyError.message : 'Invalid explicit connections JSON.';
+      }
     }
 
     return {
@@ -324,40 +388,36 @@ function parseStoredNodeDraft(rawValue: string | null, nodeId: string): Restored
 
 function mergeExplicitRelationsForLanguageSwitch(
   currentRelations: EditorExplicitRelation[],
-  previousLoadedRelations: EditorExplicitRelation[],
+  targetLanguage: AppLanguage,
   nextLanguageRelations: EditorExplicitRelation[],
 ) {
   const nextLanguageByIdentity = new Map(
     nextLanguageRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
   );
-  const previousLoadedByIdentity = new Map(
-    previousLoadedRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
-  );
 
   return currentRelations.map((relation) => {
     const identity = getExplicitRelationIdentityKey(relation);
     const nextLanguageRelation = nextLanguageByIdentity.get(identity);
-    const previousLoadedRelation = previousLoadedByIdentity.get(identity);
 
     if (!nextLanguageRelation) {
       return {
         ...relation,
-        label: '',
+        labels: {
+          ...relation.labels,
+          [targetLanguage]: '',
+        },
       };
-    }
-
-    if (!previousLoadedRelation) {
-      return nextLanguageRelation;
-    }
-
-    const labelWasEditedLocally = relation.label !== previousLoadedRelation.label;
-    if (labelWasEditedLocally) {
-      return nextLanguageRelation;
     }
 
     return {
       ...relation,
-      label: nextLanguageRelation.label,
+      labels: {
+        ...nextLanguageRelation.labels,
+        ...relation.labels,
+        ...(targetLanguage in nextLanguageRelation.labels
+          ? { [targetLanguage]: nextLanguageRelation.labels[targetLanguage] }
+          : {}),
+      },
     };
   });
 }
@@ -365,25 +425,24 @@ function mergeExplicitRelationsForLanguageSwitch(
 function hydrateEmptyExplicitRelationLabels(
   relations: EditorExplicitRelation[],
   loadedRelations: EditorExplicitRelation[],
+  language: AppLanguage,
 ) {
   const loadedByIdentity = new Map(
     loadedRelations.map((relation) => [getExplicitRelationIdentityKey(relation), relation]),
   );
 
   return relations.map((relation) => {
-    if (relation.label.trim()) {
+    if (getExplicitRelationLabel(relation, language).trim()) {
       return relation;
     }
 
     const loadedRelation = loadedByIdentity.get(getExplicitRelationIdentityKey(relation));
-    if (!loadedRelation?.label.trim()) {
+    const loadedLabel = loadedRelation ? getExplicitRelationLabel(loadedRelation, language) : '';
+    if (!loadedLabel.trim()) {
       return relation;
     }
 
-    return {
-      ...relation,
-      label: loadedRelation.label,
-    };
+    return setExplicitRelationLabel(relation, language, loadedLabel);
   });
 }
 
@@ -626,6 +685,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
         const storedDraft = parseStoredNodeDraft(
           window.localStorage.getItem(getDraftStorageKey(decodedNodeId, language)),
           decodedNodeId,
+          language,
         );
         const nextContent =
           storedDraft
@@ -650,13 +710,13 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
         const nextExplicitRelationsBase = languageChangedForSameNode
           ? mergeExplicitRelationsForLanguageSwitch(
               explicitRelationsRef.current,
-              loadedExplicitRelationsRef.current,
+              language,
               storedExplicitRelations ?? anchoredRelations,
             )
           : hasUnsavedExplicitRelationChanges
             ? explicitRelationsRef.current
             : storedExplicitRelations ?? anchoredRelations;
-        const nextExplicitRelations = hydrateEmptyExplicitRelationLabels(nextExplicitRelationsBase, anchoredRelations);
+        const nextExplicitRelations = hydrateEmptyExplicitRelationLabels(nextExplicitRelationsBase, anchoredRelations, language);
         const shouldRefreshStoredExplicitRelationsJsonDraft =
           Boolean(storedDraft) &&
           !storedDraft?.explicitRelationsJsonError &&
@@ -836,7 +896,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     void language;
     return currentNodeRef
       ? explicitRelations.map((relation, relationIndex) =>
-          buildExplicitConnectionEntry(relation, relationIndex, currentNodeRef.id, editorNodeById)
+          buildExplicitConnectionEntry(relation, relationIndex, currentNodeRef.id, editorNodeById, language)
         )
       : [];
   }, [currentNodeRef, editorNodeById, explicitRelations, language]);
@@ -926,7 +986,7 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
     if (!currentNodeRef) return;
 
     try {
-      const parsed = normalizeExplicitRelationsInput(lenientParseJsonText(nextText), currentNodeRef.id);
+      const parsed = normalizeExplicitRelationsInput(lenientParseJsonText(nextText), currentNodeRef.id, language);
       dispatch({
         type: 'edit_explicit_relations_json_draft',
         value: nextText,
@@ -1983,8 +2043,12 @@ const StandardNodeEditorWorkspace = ({ decodedNodeId, initialTab }: StandardNode
                           <FieldShell>
                             <ControlLabel>{UI_COPY.nodeEditor.contentTab.label}</ControlLabel>
                             <input
-                              value={selectedExplicitRelation.label}
-                              onChange={(event) => updateSelectedExplicitRelation((entry) => ({ ...entry, label: event.target.value }))}
+                              value={getExplicitRelationLabel(selectedExplicitRelation, language)}
+                              onChange={(event) =>
+                                updateSelectedExplicitRelation((entry) =>
+                                  setExplicitRelationLabel(entry, language, event.target.value)
+                                )
+                              }
                               style={inputStyle()}
                             />
                           </FieldShell>

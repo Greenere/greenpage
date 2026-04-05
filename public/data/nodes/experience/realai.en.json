@@ -1,5 +1,5 @@
 {
-  "title": "Software Algorithm Engineer Intern at RealAI",
+  "title": "Algorithm Intern at RealAI",
   "subtitle": "AI security internship in Beijing",
   "summary": "A short industry chapter in AI security that sat between academic robustness research and later product engineering work.",
   "tags": [
@@ -8,7 +8,6 @@
   ],
   "sections": [
     {
-      "id": "overview",
       "label": "Overview",
       "blocks": [
         {
@@ -23,7 +22,8 @@
             "Helped mark the transition from research-heavy work toward engineering roles"
           ]
         }
-      ]
+      ],
+      "id": "overview"
     }
   ]
 }
