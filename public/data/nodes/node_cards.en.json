@@ -166,29 +166,25 @@
     ]
   },
   "verily-intern": {
-    "title": "Verily Summer Intern",
-    "subtitle": "Summer 2022, from Cornell to California",
-    "summary": "The internship that turned graduate school into a clearer engineering path, connecting Cornell coursework with California life and later full-time work.",
+    "title": "Summer Intern at Verily",
+    "subtitle": "Software Engineering Intern working on a retinal camera",
+    "summary": "I found this internship at late March when I almost lost hope in job searching, and it started in May, so everything felt lucky. It was my first time ever been to California and my first time ever do a \"real\" summer internship.",
     "tags": [
-      "internship",
-      "engineering"
+      "verily",
+      "internship"
     ],
     "preview": [
       {
         "type": "text",
-        "text": "This internship marks a real shift in the story of the graph. It is less about papers and experiments, and more about software teams, production thinking, and the rhythm of engineering work in practice."
+        "text": "Back then, Verily Life Sciences was still a subsidiary of Alphabet and we still had access to Google buildings. So the internship feels both like working in a large company in Google and working in a startup where everything is shifty."
       },
       {
         "type": "text",
-        "text": "It also changed how the summer itself felt. Workdays at Verily and weekend drives like [California State Route 1](/nodes/california-one-2022) started to belong to the same chapter rather than separate categories."
+        "text": "It was my first time in California, but I did not know how to drive. So I did not get a lot chances to explore the bay area but still managed to check out the Golden Gate Bridge, the California Coast and even made several short trips to visit my friends in Boston and Seattle."
       },
       {
-        "type": "list",
-        "items": [
-          "Software engineering became a concrete path rather than an abstract possibility",
-          "The distance between coursework and real product work became much smaller",
-          "The internship later connected forward into the full-time role that follows in the graph"
-        ]
+        "type": "text",
+        "text": "Our team was working on a retinal camera project, which was not launched back then but were to be canceled in 2025. I worked on building a visualization tool to help the development of the retinal imaging algorithms. But work was the least thing I can remember now when I think of this summer."
       }
     ]
   },

@@ -127,17 +127,6 @@
   ],
   "relations": [
     {
-      "id": "editor-california-one-2022-location-california-one-2022-verily-intern-2",
-      "from": "california-one-2022",
-      "to": "verily-intern",
-      "kind": "location",
-      "labels": {
-        "en": "same California summer as the internship",
-        "zh-CN": "与实习发生在同一个加州夏天"
-      },
-      "strength": 3
-    },
-    {
       "id": "editor-hust-time-wellmail-hust-3",
       "from": "wellmail",
       "to": "hust",
@@ -171,17 +160,6 @@
       "strength": 2
     },
     {
-      "id": "editor-naec-time-hust-naec-1",
-      "from": "hust",
-      "to": "naec",
-      "kind": "time",
-      "labels": {
-        "en": "it was during my junior year",
-        "zh-CN": "大三时期的科研实习"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-hust-mclab-time-hust-mclab-hust-1",
       "from": "hust-mclab",
       "to": "hust",
@@ -200,17 +178,6 @@
       "labels": {
         "en": "took shape during the research assistant period",
         "zh-CN": "在研究助理阶段逐渐成形"
-      },
-      "strength": 3
-    },
-    {
-      "id": "editor-signature-attack-reason-signature-attack-naec-1",
-      "from": "signature-attack",
-      "to": "naec",
-      "kind": "reason",
-      "labels": {
-        "en": "research direction developed during the NAEC internship",
-        "zh-CN": "在 NAEC 实习期间逐渐形成的研究方向"
       },
       "strength": 3
     },
@@ -303,17 +270,6 @@
       "strength": 2
     },
     {
-      "id": "editor-cornell-outcome-verily-intern-cornell-2",
-      "from": "verily-intern",
-      "to": "cornell",
-      "kind": "outcome",
-      "labels": {
-        "en": "internship emerged from the Cornell period",
-        "zh-CN": "康奈尔阶段延伸出的实习经历"
-      },
-      "strength": 2
-    },
-    {
       "id": "editor-cornell-time-california-one-2022-cornell-3",
       "from": "california-one-2022",
       "to": "cornell",
@@ -345,6 +301,49 @@
         "zh-CN": ""
       },
       "strength": 2
+    },
+    {
+      "id": "editor-naec-time-hust-naec-1",
+      "from": "hust",
+      "to": "naec",
+      "kind": "time",
+      "labels": {
+        "en": "it was during my junior year",
+        "zh-CN": "大三时期的科研实习"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-naec-reason-signature-attack-naec-2",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "reason",
+      "labels": {
+        "en": "research direction developed during the NAEC internship",
+        "zh-CN": "在 NAEC 实习期间逐渐形成的研究方向"
+      },
+      "strength": 3
+    },
+    {
+      "id": "editor-verily-intern-time-verily-intern-cornell-1",
+      "from": "verily-intern",
+      "to": "cornell",
+      "kind": "time",
+      "labels": {
+        "en": ""
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-verily-intern-location-california-one-2022-verily-intern-2",
+      "from": "california-one-2022",
+      "to": "verily-intern",
+      "kind": "location",
+      "labels": {
+        "en": "",
+        "zh-CN": "与实习发生在同一个加州夏天"
+      },
+      "strength": 3
     }
   ]
 }
