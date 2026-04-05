@@ -185,7 +185,7 @@
   "realai": {
     "title": "瑞莱智慧实习",
     "subtitle": "在北京的一段 AI 安全实习",
-    "summary": "一段短暂的产业章节，围绕 AI 安全展开，位置正好落在学术鲁棒性研究与后来的产品工程工作之间。",
+    "summary": "在研究对抗样本的过程中，我发现了一家致力于将人工智能安全应用于工业领域的有趣公司。于是我申请了他们的职位并在那里实习，结识了许多该领域的知名研究人员。",
     "tags": [
       "工业界",
       "ai 安全"
@@ -193,15 +193,15 @@
     "preview": [
       {
         "type": "text",
-        "text": "RealAI 像一座桥。同样是对抗机器学习的兴趣，但被放到了更偏应用的环境里，由行业节奏与产品约束来塑形。它让人更明确地感受到：鲁棒性的想法必须在论文世界之外也站得住。"
+        "text": "说实话，我不太明白RealAI到底在做什么。实习期间，带我的大哥让我研究如何针对真实的物理世界中的人脸识别系统生成稳定的对抗样本。"
       },
       {
-        "type": "list",
-        "items": [
-          "担任软件算法工程师实习生",
-          "持续靠近 AI 安全与鲁棒性主题",
-          "帮助标记了从重研究工作走向工程岗位的转折"
-        ]
+        "type": "text",
+        "text": "这个问题的难点主要在于现实世界和虚拟世界的映射。我们通常使用平面数字图像进行训练和对抗攻击，而现实世界中人脸并非平面，所以实习期间我一直在探索如何可靠地将不平坦的人脸映射到平面空间。"
+      },
+      {
+        "type": "text",
+        "text": "整个实习没有做出什么有意义的成果，虽然我认识了很多对抗攻防领域的大佬。"
       }
     ]
   },
@@ -420,12 +420,13 @@
       },
       {
         "type": "text",
-        "text": "论文最终发表在《Pattern Recognition》:"
+        "text": "论文最终发表在*《Pattern Recognition》*:"
       },
       {
-        "type": "link",
-        "label": "Black-box attack against handwritten signature verification with region-restricted adversarial perturbations",
-        "href": "https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921"
+        "type": "list",
+        "items": [
+          "[Black-box attack against handwritten signature verification with region-restricted adversarial perturbations](https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921)"
+        ]
       }
     ]
   },

@@ -419,12 +419,13 @@
       },
       {
         "type": "text",
-        "text": "You can find the paper here:"
+        "text": "The paper is published in *Pattern Recognition*:"
       },
       {
-        "type": "link",
-        "label": "Black-box attack against handwritten signature verification with region-restricted adversarial perturbations",
-        "href": "https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921"
+        "type": "list",
+        "items": [
+          "[Black-box attack against handwritten signature verification with region-restricted adversarial perturbations](https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921)"
+        ]
       }
     ]
   },

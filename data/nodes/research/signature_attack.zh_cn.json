@@ -13,25 +13,26 @@
         {
           "type": "text",
           "text": "这项工作起点是课程里对对抗样本的兴趣。核心是把扰动限制在笔画区域之内，使它们更不容易被注意到，也能在背景清理之后继续保留下来。"
-        },
-        {
-          "type": "text",
-          "text": "论文最终发表在《Pattern Recognition》:"
-        },
-        {
-          "type": "link",
-          "label": "Black-box attack against handwritten signature verification with region-restricted adversarial perturbations",
-          "href": "https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921"
         }
       ],
       "id": "overview"
     },
     {
-      "label": "源代码",
+      "label": "论文与代码",
       "blocks": [
         {
           "type": "text",
-          "text": "存档在：[rap_attack](https://github.com/Greenere/rap_attack)"
+          "text": "论文最终发表在*《Pattern Recognition》*:"
+        },
+        {
+          "type": "list",
+          "items": [
+            "[Black-box attack against handwritten signature verification with region-restricted adversarial perturbations](https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921)"
+          ]
+        },
+        {
+          "type": "text",
+          "text": "代码存档在：[rap_attack](https://github.com/Greenere/rap_attack)"
         }
       ]
     }

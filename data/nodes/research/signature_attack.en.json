@@ -13,22 +13,23 @@
         {
           "type": "text",
           "text": "The work started from a course interest in adversarial examples. It focused on keeping perturbations inside the stroke region, so they stayed hard to notice and survived background cleaning."
-        },
-        {
-          "type": "text",
-          "text": "You can find the paper here:"
-        },
-        {
-          "type": "link",
-          "label": "Black-box attack against handwritten signature verification with region-restricted adversarial perturbations",
-          "href": "https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921"
         }
       ],
       "id": "overview"
     },
     {
-      "label": "Source code",
+      "label": "Paper",
       "blocks": [
+        {
+          "type": "text",
+          "text": "The paper is published in *Pattern Recognition*:"
+        },
+        {
+          "type": "list",
+          "items": [
+            "[Black-box attack against handwritten signature verification with region-restricted adversarial perturbations](https://www.sciencedirect.com/science/article/abs/pii/S0031320320304921)"
+          ]
+        },
         {
           "type": "text",
           "text": "It's open sourced under an alias at: [rap_attack](https://github.com/Greenere/rap_attack)"

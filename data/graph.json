@@ -172,39 +172,6 @@
       "strength": 1
     },
     {
-      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-2",
-      "from": "signature-attack",
-      "to": "adversarial-writing",
-      "kind": "topic",
-      "labels": {
-        "zh-CN": "相关论文阅读笔记",
-        "en": "related reading notes"
-      },
-      "strength": 2
-    },
-    {
-      "id": "editor-signature-attack-outcome-signature-attack-naec-3",
-      "from": "signature-attack",
-      "to": "naec",
-      "kind": "outcome",
-      "labels": {
-        "en": "key research outcome",
-        "zh-CN": "实习期间的主要研究成果"
-      },
-      "strength": 5
-    },
-    {
-      "id": "editor-signature-attack-topic-faceswap-signature-attack-4",
-      "from": "faceswap",
-      "to": "signature-attack",
-      "kind": "topic",
-      "labels": {
-        "en": "both about AI security",
-        "zh-CN": "都关于 AI 安全"
-      },
-      "strength": 4
-    },
-    {
       "id": "editor-layoff-journey-reason-layoff-journey-verily-1",
       "from": "layoff-journey",
       "to": "verily",
@@ -247,28 +214,6 @@
         "zh-CN": "在研究助理阶段逐渐成形"
       },
       "strength": 5
-    },
-    {
-      "id": "editor-realai-topic-realai-noise-modulation-1",
-      "from": "realai",
-      "to": "noise-modulation",
-      "kind": "topic",
-      "labels": {
-        "zh-CN": "与对抗样本相关的实习",
-        "en": "internship also related to adversarial examples"
-      },
-      "strength": 1
-    },
-    {
-      "id": "editor-realai-topic-realai-signature-attack-2",
-      "from": "realai",
-      "to": "signature-attack",
-      "kind": "topic",
-      "labels": {
-        "en": "same research domain",
-        "zh-CN": "相同的研究方向"
-      },
-      "strength": 2
     },
     {
       "id": "editor-cornell-time-verily-intern-cornell-1",
@@ -337,17 +282,6 @@
       "strength": 4
     },
     {
-      "id": "editor-hust-time-signature-attack-hust-2",
-      "from": "signature-attack",
-      "to": "hust",
-      "kind": "time",
-      "labels": {
-        "en": "research during the undergraduate study",
-        "zh-CN": "大三期间的暑期科研项目"
-      },
-      "strength": 4
-    },
-    {
       "id": "editor-hust-time-weibe-hust-3",
       "from": "weibe",
       "to": "hust",
@@ -412,6 +346,72 @@
         "zh-CN": "课程学习笔记"
       },
       "strength": 3
+    },
+    {
+      "id": "editor-realai-topic-realai-noise-modulation-1",
+      "from": "realai",
+      "to": "noise-modulation",
+      "kind": "topic",
+      "labels": {
+        "zh-CN": "与对抗样本相关的实习",
+        "en": "internship also related to adversarial examples"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-signature-attack-topic-signature-attack-adversarial-writing-1",
+      "from": "signature-attack",
+      "to": "adversarial-writing",
+      "kind": "topic",
+      "labels": {
+        "zh-CN": "相关论文阅读笔记",
+        "en": "related reading notes"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-outcome-signature-attack-naec-2",
+      "from": "signature-attack",
+      "to": "naec",
+      "kind": "outcome",
+      "labels": {
+        "en": "key research outcome",
+        "zh-CN": "实习期间的主要研究成果"
+      },
+      "strength": 5
+    },
+    {
+      "id": "editor-signature-attack-topic-faceswap-signature-attack-3",
+      "from": "faceswap",
+      "to": "signature-attack",
+      "kind": "topic",
+      "labels": {
+        "en": "both about AI security",
+        "zh-CN": "都关于 AI 安全"
+      },
+      "strength": 4
+    },
+    {
+      "id": "editor-signature-attack-topic-realai-signature-attack-4",
+      "from": "realai",
+      "to": "signature-attack",
+      "kind": "topic",
+      "labels": {
+        "en": "same research domain",
+        "zh-CN": "相同的研究方向"
+      },
+      "strength": 2
+    },
+    {
+      "id": "editor-signature-attack-time-signature-attack-hust-5",
+      "from": "signature-attack",
+      "to": "hust",
+      "kind": "time",
+      "labels": {
+        "en": "research during the undergraduate study",
+        "zh-CN": "大三期间的暑期科研项目"
+      },
+      "strength": 4
     }
   ]
 }
