@@ -44,6 +44,7 @@ export type ContentBlock =
   | { type: 'text'; text: string }
   | { type: 'list'; items: string[] }
   | { type: 'quote'; text: string }
+  | { type: 'code'; code: string; language?: string }
   | { type: 'image'; src: string; alt: string; caption?: string }
   | { type: 'link'; label: string; href: string; description?: string };
 
@@ -231,6 +232,9 @@ function normalizeContentBlocks(value: unknown): ContentBlock[] | undefined {
     if (candidate.type === 'text' || candidate.type === 'quote') {
       return typeof candidate.text === 'string';
     }
+    if (candidate.type === 'code') {
+      return typeof candidate.code === 'string' && (candidate.language === undefined || typeof candidate.language === 'string');
+    }
     if (candidate.type === 'list') {
       return Array.isArray(candidate.items) && candidate.items.every((item) => typeof item === 'string');
     }
@@ -309,6 +313,10 @@ function normalizeArticleBlocks(value: unknown): ArticleBlock[] | undefined {
 
     if (block.type === 'text' || block.type === 'quote') {
       return typeof block.text === 'string';
+    }
+
+    if (block.type === 'code') {
+      return typeof block.code === 'string' && (block.language === undefined || typeof block.language === 'string');
     }
 
     if (block.type === 'list') {
@@ -402,6 +410,7 @@ function derivePreviewBlocks(sections: NodeArticleSection[] | undefined): Conten
       if (
         block.type === 'text' ||
         block.type === 'quote' ||
+        block.type === 'code' ||
         block.type === 'list' ||
         block.type === 'image' ||
         block.type === 'link'

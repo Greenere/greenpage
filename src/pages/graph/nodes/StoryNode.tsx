@@ -155,6 +155,28 @@ const StoryNode: React.FC<StoryNodeProps> = ({
                 </Paragraph>
             );
         }
+        if (block.type === 'code') {
+            return (
+                <pre
+                    key={idx}
+                    style={{
+                        marginTop: "0.35rem",
+                        marginBottom: 0,
+                        padding: "0.55rem 0.65rem",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        background: "color-mix(in srgb, var(--color-background) 82%, black 18%)",
+                        color: "var(--color-text)",
+                        fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace",
+                        fontSize: "0.72rem",
+                        lineHeight: 1.5,
+                        whiteSpace: "pre-wrap",
+                    }}
+                >
+                    <code>{block.code}</code>
+                </pre>
+            );
+        }
         if (block.type === 'list') {
             return (
                 <div key={idx} style={{ marginTop: "0.35rem", padding: "0 0.45rem" }}>

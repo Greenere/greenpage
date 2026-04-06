@@ -292,6 +292,49 @@ export function renderDetailContentBlock(
     );
   }
 
+  if (block.type === 'code') {
+    return (
+      <figure
+        key={`code-${index}`}
+        style={{
+          maxWidth: DETAIL_SECTION_WIDTH,
+          margin: '0 0 1.2rem',
+        }}
+      >
+        {block.language && (
+          <Footnote
+            style={{
+              display: 'block',
+              marginBottom: '0.4rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.11em',
+              fontSize: '0.64rem',
+              opacity: 0.68,
+            }}
+          >
+            {block.language}
+          </Footnote>
+        )}
+        <pre
+          style={{
+            margin: 0,
+            padding: '0.95rem 1rem',
+            borderRadius: '16px',
+            overflowX: 'auto',
+            background: 'color-mix(in srgb, var(--color-background) 80%, black 20%)',
+            color: 'var(--color-text)',
+            fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace',
+            fontSize: '0.82rem',
+            lineHeight: 1.65,
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          <code>{block.code}</code>
+        </pre>
+      </figure>
+    );
+  }
+
   if (block.type === 'list') {
     return (
       <ul

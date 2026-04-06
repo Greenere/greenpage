@@ -27,7 +27,7 @@ function SectionSyntaxHint() {
       <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintMediaLabel}</strong> <code>![alt](src "caption")</code> &nbsp;·&nbsp; <code>[label](href)</code> {UI_COPY.nodeEditor.sectionEditor.syntaxHintMediaBody}
       <br />
       <strong>{UI_COPY.nodeEditor.sectionEditor.syntaxHintBlocksLabel}</strong> <code>:::gallery columns=2 align=height:1</code>…<code>:::</code>
-      &nbsp;·&nbsp; <code>:::note</code> or <code>:::highlight</code>…<code>:::</code>
+      &nbsp;·&nbsp; <code>:::note</code> or <code>:::highlight</code>…<code>:::</code> &nbsp;·&nbsp; <code>{'```ts'}</code>…<code>{'```'}</code>
     </div>
   );
 }

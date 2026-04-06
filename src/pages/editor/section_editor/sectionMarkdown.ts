@@ -3,6 +3,7 @@ import { type ArticleBlock, type NodeArticleSection } from '../../graph/content/
 
 const IMAGE_LINE_PATTERN = /^!\[([^\]]*)\]\((\S+?)(?:\s+"([^"]*)")?\)$/;
 const LINK_LINE_PATTERN = /^\[([^\]]+)\]\((\S+?)\)$/;
+const CODE_FENCE_PATTERN = /^```([\w+-]+)?\s*$/;
 
 function trimBlockText(value: string) {
   return value.trim().replace(/\n{3,}/g, '\n\n');
@@ -29,6 +30,7 @@ export function serializeSectionMarkdown(section: NodeArticleSection) {
     .map((block) => {
       if (block.type === 'text') return block.text.trim();
       if (block.type === 'quote') return block.text.split('\n').map((line) => `> ${line}`).join('\n');
+      if (block.type === 'code') return `\`\`\`${block.language ?? ''}\n${block.code}\n\`\`\``;
       if (block.type === 'list') return block.items.map((item) => `- ${item}`).join('\n');
       if (block.type === 'image') return serializeImageLine(block.src, block.alt, block.caption);
       if (block.type === 'link') {
@@ -114,6 +116,26 @@ export function parseSectionMarkdown(markdown: string): ArticleBlock[] {
       continue;
     }
 
+    const codeFenceMatch = line.match(CODE_FENCE_PATTERN);
+    if (codeFenceMatch) {
+      const codeLines: string[] = [];
+      index += 1;
+
+      while (index < lines.length && lines[index].trim() !== '```') {
+        codeLines.push(lines[index]);
+        index += 1;
+      }
+
+      if (lines[index]?.trim() !== '```') throw new Error('Code block is missing closing ```.');
+      blocks.push({
+        type: 'code',
+        code: codeLines.join('\n'),
+        language: codeFenceMatch[1] || undefined,
+      });
+      index += 1;
+      continue;
+    }
+
     if (line.startsWith(':::note') || line.startsWith(':::highlight')) {
       const tone = line.startsWith(':::highlight') ? 'highlight' : 'note';
       const title = line.replace(/^:::(?:note|highlight)\s*/, '').trim() || undefined;
@@ -184,6 +206,7 @@ export function parseSectionMarkdown(markdown: string): ArticleBlock[] {
       index < lines.length &&
       lines[index].trim() &&
       !lines[index].trim().startsWith(':::') &&
+      !lines[index].trim().startsWith('```') &&
       !lines[index].trim().startsWith('> ') &&
       !lines[index].trim().startsWith('- ')
     ) {
