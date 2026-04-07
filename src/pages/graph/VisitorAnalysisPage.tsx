@@ -15,7 +15,9 @@ import { navigateWithViewTransition } from '../../shared/ui/viewTransitions';
 import DetailPageLanguageToggle from './DetailPageLanguageToggle';
 import { DETAIL_SECTION_WIDTH } from './DetailContent';
 import ThemePicker from './ThemePicker';
+import { loadBioPageContent, readCachedBioPageContent } from './content/BioPage';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
+import { loadGraphModel, readCachedGraphModel, type GraphModel } from './content/Nodes';
 import './VisitorAnalysisPage.css';
 
 const VISITOR_ANALYTICS_BASE_URL = import.meta.env.DEV
@@ -70,6 +72,55 @@ function formatPagePrimaryLabel(pagePath: string | null, homeLabel: string, unkn
     .join(' ');
 }
 
+function normalizeTrackedPagePath(pagePath: string | null) {
+  if (!pagePath) return null;
+
+  const [pathname] = pagePath.split(/[?#]/, 1);
+  if (!pathname) return '/';
+
+  return pathname.replace(/\/+$/, '') || '/';
+}
+
+function resolveTrackedPageTitle(
+  pagePath: string | null,
+  graphModel: GraphModel | null,
+  bioPageName: string | null,
+  homeLabel: string,
+  unknownLabel: string,
+) {
+  const normalizedPath = normalizeTrackedPagePath(pagePath);
+  if (!normalizedPath) {
+    return unknownLabel;
+  }
+
+  if (normalizedPath === '/' || normalizedPath === '/greenpage') {
+    return homeLabel;
+  }
+
+  if (normalizedPath === '/nodes/bio') {
+    return bioPageName ?? homeLabel;
+  }
+
+  if (normalizedPath === '/graph/statistics') {
+    return UI_COPY.nodeEditor.domainStats.title;
+  }
+
+  if (normalizedPath === '/visitor-analysis') {
+    return UI_COPY.visitorAnalysisPage.title;
+  }
+
+  const nodeIdMatch = normalizedPath.match(/^\/nodes\/([^/]+)$/);
+  if (nodeIdMatch) {
+    const nodeId = decodeURIComponent(nodeIdMatch[1]);
+    const matchedNode = graphModel?.nodes.find((node) => node.id === nodeId);
+    if (matchedNode?.title) {
+      return matchedNode.title;
+    }
+  }
+
+  return formatPagePrimaryLabel(normalizedPath, homeLabel, unknownLabel);
+}
+
 function formatCountryLabel(
   countryCode: string | null,
   displayNames: Intl.DisplayNames | null,
@@ -92,6 +143,8 @@ const VisitorAnalysisPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
+  const [graphModel, setGraphModel] = useState<GraphModel | null>(() => readCachedGraphModel(language));
+  const [bioPageName, setBioPageName] = useState<string | null>(() => readCachedBioPageContent(language)?.name ?? null);
 
   const locale = language === 'zh-CN' ? 'zh-CN' : 'en-US';
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -186,6 +239,37 @@ const VisitorAnalysisPage: React.FC = () => {
       controller.abort();
     };
   }, [selectedDays]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    setGraphModel(readCachedGraphModel(language));
+    setBioPageName(readCachedBioPageContent(language)?.name ?? null);
+
+    void loadGraphModel(undefined, language)
+      .then((model) => {
+        if (!cancelled) {
+          setGraphModel(model);
+        }
+      })
+      .catch(() => {
+        // Keep the page resilient even if the title lookup data is unavailable.
+      });
+
+    void loadBioPageContent(language)
+      .then((content) => {
+        if (!cancelled) {
+          setBioPageName(content.name);
+        }
+      })
+      .catch(() => {
+        // Fall back to generic labels if the bio page title is unavailable.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
 
   const sortedCountries = useMemo(
     () => [...(summary?.countries ?? [])].sort((left, right) => right.views - left.views),
@@ -370,8 +454,10 @@ const VisitorAnalysisPage: React.FC = () => {
                   {sortedPages.length > 0 ? (
                     <div className="visitor-analysis-page__rank-list">
                       {sortedPages.map((entry, index) => {
-                        const pageLabel = formatPagePrimaryLabel(
+                        const pageLabel = resolveTrackedPageTitle(
                           entry.page_path,
+                          graphModel,
+                          bioPageName,
                           UI_COPY.visitorAnalysisPage.homePageLabel,
                           UI_COPY.visitorAnalysisPage.unknownPageLabel
                         );
