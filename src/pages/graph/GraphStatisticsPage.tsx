@@ -22,6 +22,7 @@ import ThemePicker from './ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import { getDisplayDomain, loadGraphModel, readCachedGraphModel, type GraphModel } from './content/Nodes';
 import { DETAIL_SECTION_WIDTH } from './DetailContent';
+import './GraphStatisticsPage.css';
 
 const GraphStatisticsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -125,22 +126,13 @@ const GraphStatisticsPage: React.FC = () => {
   } as CSSProperties;
 
   return (
-    <div style={pageStyle}>
-      <div
-        style={{
-          maxWidth: '72rem',
-          margin: '0 auto',
-          padding: '2rem 1.4rem 4.5rem',
-        }}
-      >
+    <div className="graph-statistics-page" style={pageStyle}>
+      <div className="graph-statistics-page__inner">
         <div
+          className="graph-statistics-page__topbar"
           style={{
             maxWidth: DETAIL_SECTION_WIDTH,
             marginInline: 'auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '1rem',
           }}
         >
           <Link
@@ -154,12 +146,7 @@ const GraphStatisticsPage: React.FC = () => {
             <span>{UI_COPY.nodeDetailPage.backToGraph}</span>
           </Link>
           <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              gap: '0.4rem',
-            }}
+            className="graph-statistics-page__actions"
           >
             <DetailPageLanguageToggle />
             <ThemePicker theme={theme} setTheme={handleThemeChange} variant="inline" />
@@ -167,16 +154,14 @@ const GraphStatisticsPage: React.FC = () => {
         </div>
 
         <section
+          className="graph-statistics-page__section"
           style={{
-            marginTop: '1.15rem',
             maxWidth: DETAIL_SECTION_WIDTH,
             marginInline: 'auto',
-            padding: '2rem 2rem 2.4rem',
-            borderRadius: '34px',
             background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
           }}
         >
-          <div style={{ maxWidth: '38rem' }}>
+          <div className="graph-statistics-page__intro">
             <div
               style={{
                 fontSize: '0.76rem',
@@ -208,7 +193,7 @@ const GraphStatisticsPage: React.FC = () => {
             </p>
           </div>
 
-          <div style={{ marginTop: '1.35rem' }}>
+          <div className="graph-statistics-page__panel">
             <StatisticsPanel entries={statisticsEntries} stats={statisticsSummary} panelLayout="detail" />
           </div>
         </section>

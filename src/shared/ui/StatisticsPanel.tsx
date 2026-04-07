@@ -1,5 +1,6 @@
 import { UI_COPY } from '../../configs/ui/uiCopy';
 import type { StatisticsDomainEntry, StatisticsSummary } from '../statistics/graphStatistics';
+import './StatisticsPanel.css';
 
 function buildTreemapLayout(
   entries: StatisticsDomainEntry[],
@@ -61,6 +62,7 @@ export function StatisticsPanel({
   panelLayout?: 'default' | 'detail';
 }) {
   const detailLayout = panelLayout === 'detail';
+  const panelClassName = `statistics-panel${detailLayout ? ' statistics-panel--detail' : ''}`;
   const sortedEntries = [...entries].sort((left, right) => right.count - left.count || left.domain.localeCompare(right.domain));
   const treemapLayout = buildTreemapLayout(sortedEntries, 0, 0, 100, 100);
   const maxCount = Math.max(...entries.map((entry) => entry.count), 1);
@@ -69,44 +71,18 @@ export function StatisticsPanel({
   const maxConnectionBucketCount = Math.max(...stats.connectionDistribution.map((entry) => entry.count), 1);
   const maxTopConnectedCount = Math.max(...stats.topConnectedNodes.map((entry) => entry.count), 1);
   const maxStrengthCount = Math.max(...stats.strengthDistribution.map((entry) => entry.count), 1);
-  const cardPadding = detailLayout ? '0.88rem 0.92rem' : '1rem 1.05rem';
-  const upperChartMinHeight = detailLayout ? '7.2rem' : '8.5rem';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div
-        style={{
-          padding: '0.9rem 1rem',
-          borderRadius: '14px',
-          background: 'color-mix(in srgb, var(--color-background) 86%, white 14%)',
-          fontSize: '0.84rem',
-          lineHeight: 1.6,
-          opacity: 0.82,
-        }}
-      >
+    <div className={panelClassName}>
+      <div className="statistics-panel__summary">
         {UI_COPY.nodeEditor.domainStats.summary(totalNodes, entries.length)}
       </div>
-      <div
-        style={{
-          marginTop: '0.9rem',
-          display: 'grid',
-          gridTemplateColumns: detailLayout ? 'minmax(0, 1fr) minmax(13.5rem, 1.55fr)' : 'minmax(0, 1fr) minmax(18rem, 2fr)',
-          rowGap: detailLayout ? '0.75rem' : '0.9rem',
-          columnGap: detailLayout ? '2rem' : '0.9rem',
-          alignItems: 'stretch',
-        }}
-      >
-        <div style={{ display: 'grid', gap: detailLayout ? '0.75rem' : '0.9rem' }}>
+      <div className="statistics-panel__top-grid">
+        <div className="statistics-panel__column">
           <div
+            className="statistics-panel__card"
             style={{
-              padding: cardPadding,
-              borderRadius: '18px',
               background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-              border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
-              boxShadow:
-                'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
-              display: 'flex',
-              flexDirection: 'column',
             }}
           >
             <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
@@ -115,9 +91,9 @@ export function StatisticsPanel({
             <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
               {UI_COPY.nodeEditor.domainStats.timelineDetail}
             </div>
-            <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'flex-end', gap: detailLayout ? '0.34rem' : '0.42rem', minHeight: upperChartMinHeight, flex: 1 }}>
+            <div className="statistics-panel__timeline-chart">
               {stats.timelineByYear.map((entry) => (
-                <div key={entry.year} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.42rem' }}>
+                <div key={entry.year} className="statistics-panel__timeline-item">
                   <div style={{ fontSize: '0.74rem', opacity: 0.66 }}>{entry.count}</div>
                   <div
                     style={{
@@ -135,15 +111,9 @@ export function StatisticsPanel({
           </div>
 
           <div
+            className="statistics-panel__card"
             style={{
-              padding: cardPadding,
-              borderRadius: '18px',
               background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-              border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
-              boxShadow:
-                'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
-              display: 'flex',
-              flexDirection: 'column',
             }}
           >
             <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
@@ -152,16 +122,11 @@ export function StatisticsPanel({
             <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
               {UI_COPY.nodeEditor.domainStats.connectionDistributionDetail}
             </div>
-            <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.55rem', flex: 1, justifyContent: 'center' }}>
+            <div className="statistics-panel__distribution-list">
               {stats.connectionDistribution.map((entry) => (
                 <div
                   key={entry.bucket}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: detailLayout ? '2.35rem 1fr auto' : '3rem 1fr auto',
-                    alignItems: 'center',
-                    gap: detailLayout ? '0.45rem' : '0.6rem',
-                  }}
+                  className="statistics-panel__distribution-row"
                 >
                   <div style={{ fontSize: '0.78rem', opacity: 0.82 }}>{entry.bucket}</div>
                   <div
@@ -189,15 +154,9 @@ export function StatisticsPanel({
           </div>
 
           <div
+            className="statistics-panel__card"
             style={{
-              padding: cardPadding,
-              borderRadius: '18px',
               background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-              border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
-              boxShadow:
-                'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
-              display: 'flex',
-              flexDirection: 'column',
             }}
           >
             <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
@@ -206,16 +165,11 @@ export function StatisticsPanel({
             <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
               {UI_COPY.nodeEditor.domainStats.strengthDistributionDetail}
             </div>
-            <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.55rem', flex: 1, justifyContent: 'center' }}>
+            <div className="statistics-panel__distribution-list">
               {stats.strengthDistribution.map((entry) => (
                 <div
                   key={entry.strength}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: detailLayout ? '2.35rem 1fr auto' : '3rem 1fr auto',
-                    alignItems: 'center',
-                    gap: detailLayout ? '0.45rem' : '0.6rem',
-                  }}
+                  className="statistics-panel__distribution-row"
                 >
                   <div style={{ fontSize: '0.78rem', opacity: 0.82 }}>{entry.strength}</div>
                   <div
@@ -244,15 +198,9 @@ export function StatisticsPanel({
         </div>
 
         <div
+          className="statistics-panel__card"
           style={{
-            padding: cardPadding,
-            borderRadius: '18px',
             background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-            border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
-            boxShadow:
-              'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
-            display: 'flex',
-            flexDirection: 'column',
           }}
         >
           <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
@@ -261,19 +209,14 @@ export function StatisticsPanel({
           <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
             {UI_COPY.nodeEditor.domainStats.topConnectedNodesDetail}
           </div>
-          <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.62rem', flex: 1, justifyContent: 'center' }}>
+          <div className="statistics-panel__top-connected-list">
             {stats.topConnectedNodes.map((entry) => (
               <div
                 key={entry.id}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr auto',
-                  gap: detailLayout ? '0.42rem' : '0.55rem',
-                  alignItems: 'center',
-                }}
+                className="statistics-panel__top-connected-row"
               >
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: detailLayout ? '0.78rem' : '0.82rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div className="statistics-panel__top-connected-label" style={{ fontSize: detailLayout ? '0.78rem' : '0.82rem' }}>
                     {entry.label}
                   </div>
                   <div style={{ marginTop: '0.18rem', fontSize: detailLayout ? '0.69rem' : '0.72rem', opacity: 0.68 }}>
@@ -306,19 +249,9 @@ export function StatisticsPanel({
         </div>
       </div>
       <div
+        className="statistics-panel__treemap-card"
         style={{
-          marginTop: '0.9rem',
-          width: '100%',
-          flex: 1.15,
-          minHeight: detailLayout ? '28rem' : '25rem',
-          padding: cardPadding,
-          borderRadius: '22px',
           background: 'color-mix(in srgb, var(--color-background) 90%, white 10%)',
-          border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
-          boxShadow:
-            'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
         <div style={{ fontSize: '0.76rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.68 }}>
@@ -327,50 +260,30 @@ export function StatisticsPanel({
         <div style={{ marginTop: '0.34rem', fontSize: '0.8rem', lineHeight: 1.45, opacity: 0.72 }}>
           {UI_COPY.nodeEditor.domainStats.treemapDetail}
         </div>
-        <div
-          style={{
-            position: 'relative',
-            marginTop: '0.9rem',
-            flex: 1,
-            minHeight: detailLayout ? '24rem' : '21rem',
-            borderRadius: '18px',
-            overflow: 'hidden',
-            background: 'color-mix(in srgb, var(--color-background) 84%, white 16%)',
-            border: '1px solid color-mix(in srgb, var(--color-secondary) 22%, transparent)',
-          }}
-        >
+        <div className="statistics-panel__treemap-canvas">
           {treemapLayout.map((entry) => {
             const intensity = 0.18 + (entry.count / maxCount) * 0.34;
             const compact = detailLayout ? entry.width < 28 || entry.height < 22 : entry.width < 22 || entry.height < 18;
             return (
               <div
                 key={entry.domain}
+                className={`statistics-panel__treemap-tile-shell${compact ? ' statistics-panel__treemap-tile-shell--compact' : ''}`}
                 style={{
                   position: 'absolute',
                   left: `${entry.x}%`,
                   top: `${entry.y}%`,
                   width: `${entry.width}%`,
                   height: `${entry.height}%`,
-                  padding: compact ? '0.3rem' : '0.42rem',
-                  boxSizing: 'border-box',
                 }}
               >
                 <div
+                  className={`statistics-panel__treemap-tile${compact ? ' statistics-panel__treemap-tile--compact' : ''}`}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    padding: compact ? '0.7rem 0.72rem' : '0.9rem',
-                    borderRadius: compact ? '16px' : '18px',
                     border: '1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent)',
                     background: `color-mix(in srgb, var(--color-background) ${Math.round(86 - intensity * 10)}%, white ${Math.round(14 + intensity * 10)}%)`,
                     boxShadow:
                       'var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px) color-mix(in srgb, var(--color-secondary) 20%, transparent)',
                     color: 'var(--color-text)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: '0.5rem',
-                    boxSizing: 'border-box',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
@@ -381,24 +294,14 @@ export function StatisticsPanel({
                       <button
                         type="button"
                         onClick={() => onDeleteDomain(entry)}
-                        style={{
-                          padding: '0.22rem 0.55rem',
-                          borderRadius: '999px',
-                          border: '1px solid color-mix(in srgb, crimson 22%, transparent)',
-                          background: 'transparent',
-                          color: 'inherit',
-                          cursor: 'pointer',
-                          fontSize: '0.72rem',
-                          fontFamily: 'inherit',
-                          opacity: 0.88,
-                        }}
+                        className="statistics-panel__delete-button"
                       >
                         {UI_COPY.nodeEditor.domainStats.delete}
                       </button>
                     ) : null}
                   </div>
                   <div>
-                    <div style={{ fontSize: compact ? '0.95rem' : '1.18rem', fontWeight: 700, lineHeight: 1.05 }}>
+                    <div className="statistics-panel__treemap-value">
                       {entry.display}
                     </div>
                     <div style={{ marginTop: '0.3rem', fontSize: '0.8rem', opacity: 0.78 }}>

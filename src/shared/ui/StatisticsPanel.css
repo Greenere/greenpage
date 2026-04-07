@@ -1,0 +1,273 @@
+.statistics-panel {
+  --statistics-summary-padding: 0.9rem 1rem;
+  --statistics-card-padding: 1rem 1.05rem;
+  --statistics-top-grid-columns: minmax(0, 1fr) minmax(18rem, 2fr);
+  --statistics-top-grid-row-gap: 0.9rem;
+  --statistics-top-grid-column-gap: 0.9rem;
+  --statistics-column-gap: 0.9rem;
+  --statistics-upper-chart-min-height: 8.5rem;
+  --statistics-timeline-gap: 0.42rem;
+  --statistics-distribution-columns: 3rem minmax(0, 1fr) auto;
+  --statistics-distribution-gap: 0.6rem;
+  --statistics-top-connected-gap: 0.62rem;
+  --statistics-top-connected-count-gap: 0.55rem;
+  --statistics-treemap-min-height: 25rem;
+  --statistics-treemap-canvas-min-height: 21rem;
+  --statistics-treemap-shell-padding: 0.42rem;
+  --statistics-treemap-shell-padding-compact: 0.3rem;
+  --statistics-treemap-tile-padding: 0.9rem;
+  --statistics-treemap-tile-padding-compact: 0.7rem 0.72rem;
+  --statistics-treemap-tile-radius: 18px;
+  --statistics-treemap-tile-radius-compact: 16px;
+  --statistics-treemap-value-size: 1.18rem;
+  --statistics-treemap-value-size-compact: 0.95rem;
+  --statistics-delete-button-padding: 0.22rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.statistics-panel--detail {
+  --statistics-card-padding: 0.88rem 0.92rem;
+  --statistics-top-grid-columns: minmax(0, 1fr) minmax(13.5rem, 1.55fr);
+  --statistics-top-grid-row-gap: 0.75rem;
+  --statistics-top-grid-column-gap: 2rem;
+  --statistics-column-gap: 0.75rem;
+  --statistics-upper-chart-min-height: 7.2rem;
+  --statistics-timeline-gap: 0.34rem;
+  --statistics-distribution-columns: 2.35rem minmax(0, 1fr) auto;
+  --statistics-distribution-gap: 0.45rem;
+  --statistics-top-connected-count-gap: 0.42rem;
+  --statistics-treemap-min-height: 28rem;
+  --statistics-treemap-canvas-min-height: 24rem;
+}
+
+.statistics-panel__summary {
+  padding: var(--statistics-summary-padding);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-background) 86%, white 14%);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  opacity: 0.82;
+}
+
+.statistics-panel__top-grid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: var(--statistics-top-grid-columns);
+  row-gap: var(--statistics-top-grid-row-gap);
+  column-gap: var(--statistics-top-grid-column-gap);
+  align-items: stretch;
+}
+
+.statistics-panel__column {
+  display: grid;
+  gap: var(--statistics-column-gap);
+}
+
+.statistics-panel__card,
+.statistics-panel__treemap-card {
+  padding: var(--statistics-card-padding);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 24%, transparent);
+  box-shadow:
+    var(--greenpage-node-ring-shadow-prefix, inset 0 0 0) var(--greenpage-node-ring-width, 1.5px)
+    color-mix(in srgb, var(--color-secondary) 20%, transparent);
+  display: flex;
+  flex-direction: column;
+}
+
+.statistics-panel__timeline-chart {
+  margin-top: 0.9rem;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--statistics-timeline-gap);
+  min-height: var(--statistics-upper-chart-min-height);
+  flex: 1;
+}
+
+.statistics-panel__timeline-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--statistics-timeline-gap);
+}
+
+.statistics-panel__distribution-list,
+.statistics-panel__top-connected-list {
+  margin-top: 0.9rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.statistics-panel__distribution-list {
+  gap: 0.55rem;
+}
+
+.statistics-panel__distribution-row {
+  display: grid;
+  grid-template-columns: var(--statistics-distribution-columns);
+  align-items: center;
+  gap: var(--statistics-distribution-gap);
+}
+
+.statistics-panel__top-connected-list {
+  gap: var(--statistics-top-connected-gap);
+}
+
+.statistics-panel__top-connected-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--statistics-top-connected-count-gap);
+  align-items: center;
+}
+
+.statistics-panel__top-connected-label {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statistics-panel__treemap-card {
+  margin-top: 0.9rem;
+  width: 100%;
+  flex: 1.15;
+  min-height: var(--statistics-treemap-min-height);
+  border-radius: 22px;
+}
+
+.statistics-panel__treemap-canvas {
+  position: relative;
+  margin-top: 0.9rem;
+  flex: 1;
+  min-height: var(--statistics-treemap-canvas-min-height);
+  border-radius: 18px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-background) 84%, white 16%);
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 22%, transparent);
+}
+
+.statistics-panel__treemap-tile-shell {
+  padding: var(--statistics-treemap-shell-padding);
+  box-sizing: border-box;
+}
+
+.statistics-panel__treemap-tile-shell--compact {
+  padding: var(--statistics-treemap-shell-padding-compact);
+}
+
+.statistics-panel__treemap-tile {
+  width: 100%;
+  height: 100%;
+  padding: var(--statistics-treemap-tile-padding);
+  border-radius: var(--statistics-treemap-tile-radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  box-sizing: border-box;
+}
+
+.statistics-panel__treemap-tile--compact {
+  padding: var(--statistics-treemap-tile-padding-compact);
+  border-radius: var(--statistics-treemap-tile-radius-compact);
+}
+
+.statistics-panel__delete-button {
+  padding: var(--statistics-delete-button-padding);
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, crimson 22%, transparent);
+  background: transparent;
+  color: inherit;
+  font-size: 0.72rem;
+  font-family: inherit;
+  opacity: 0.88;
+}
+
+.statistics-panel__treemap-value {
+  font-size: var(--statistics-treemap-value-size);
+  font-weight: 700;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.statistics-panel__treemap-tile--compact .statistics-panel__treemap-value {
+  font-size: var(--statistics-treemap-value-size-compact);
+}
+
+@media (max-width: 860px) {
+  .statistics-panel {
+    --statistics-summary-padding: 0.82rem 0.9rem;
+    --statistics-card-padding: 0.92rem 0.95rem;
+    --statistics-top-grid-columns: minmax(0, 1fr);
+    --statistics-top-grid-row-gap: 0.75rem;
+    --statistics-top-grid-column-gap: 0.75rem;
+    --statistics-column-gap: 0.75rem;
+    --statistics-upper-chart-min-height: 7.1rem;
+    --statistics-distribution-columns: 2.45rem minmax(0, 1fr) auto;
+    --statistics-distribution-gap: 0.5rem;
+    --statistics-top-connected-gap: 0.55rem;
+    --statistics-top-connected-count-gap: 0.5rem;
+    --statistics-treemap-min-height: 23rem;
+    --statistics-treemap-canvas-min-height: 18rem;
+    --statistics-treemap-shell-padding: 0.28rem;
+    --statistics-treemap-shell-padding-compact: 0.2rem;
+    --statistics-treemap-tile-padding: 0.78rem;
+    --statistics-treemap-tile-padding-compact: 0.62rem;
+    --statistics-delete-button-padding: 0.2rem 0.5rem;
+  }
+
+  .statistics-panel__summary {
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+
+  .statistics-panel__top-connected-label {
+    white-space: normal;
+    line-height: 1.22;
+  }
+}
+
+@media (max-width: 640px) {
+  .statistics-panel {
+    --statistics-summary-padding: 0.78rem 0.82rem;
+    --statistics-card-padding: 0.84rem 0.8rem;
+    --statistics-upper-chart-min-height: 6.35rem;
+    --statistics-distribution-columns: 2rem minmax(0, 1fr) auto;
+    --statistics-distribution-gap: 0.42rem;
+    --statistics-top-connected-gap: 0.48rem;
+    --statistics-top-connected-count-gap: 0.42rem;
+    --statistics-treemap-min-height: 20rem;
+    --statistics-treemap-canvas-min-height: 16.5rem;
+    --statistics-treemap-shell-padding: 0.18rem;
+    --statistics-treemap-shell-padding-compact: 0.12rem;
+    --statistics-treemap-tile-padding: 0.66rem;
+    --statistics-treemap-tile-padding-compact: 0.52rem;
+    --statistics-treemap-value-size: 1rem;
+    --statistics-treemap-value-size-compact: 0.86rem;
+    --statistics-delete-button-padding: 0.18rem 0.42rem;
+  }
+
+  .statistics-panel__summary {
+    font-size: 0.78rem;
+  }
+
+  .statistics-panel__timeline-chart,
+  .statistics-panel__timeline-item {
+    gap: 0.3rem;
+  }
+
+  .statistics-panel__treemap-card,
+  .statistics-panel__treemap-canvas {
+    border-radius: 16px;
+  }
+
+  .statistics-panel__delete-button {
+    font-size: 0.68rem;
+  }
+}
