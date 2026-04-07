@@ -1,9 +1,10 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import './App.css'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NodeHomePage from './pages/graph/NodeHomePage'
 import PageLoadingFallback from './shared/ui/PageLoadingFallback'
 import DetailPageSkeleton from './shared/ui/DetailPageSkeleton'
+import { trackVisitorEvent } from './shared/analytics/visitorTracking'
 
 const NodeEditorPage = lazy(() => import('./pages/editor/NodeEditorPage'))
 const NodeDetailPage = lazy(() => import('./pages/graph/NodeDetailPage'))
@@ -12,8 +13,20 @@ const GraphStatisticsPage = lazy(() => import('./pages/graph/GraphStatisticsPage
 
 function App() {
   const location = useLocation()
+  const hasTrackedEntryRef = useRef(false)
   const editorTab = new URLSearchParams(location.search).get('tab')
   const renderEditorWorkspace = editorTab === 'new-node' || editorTab === 'new-domain'
+
+  useEffect(() => {
+    if (!hasTrackedEntryRef.current) {
+      trackVisitorEvent('entry')
+      hasTrackedEntryRef.current = true
+    }
+  }, [])
+
+  useEffect(() => {
+    trackVisitorEvent('page_view')
+  }, [location.pathname, location.search, location.hash])
 
   return (
     <Routes>
