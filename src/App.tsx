@@ -10,6 +10,7 @@ const NodeEditorPage = lazy(() => import('./pages/editor/NodeEditorPage'))
 const NodeDetailPage = lazy(() => import('./pages/graph/NodeDetailPage'))
 const BioDetailPage = lazy(() => import('./pages/graph/BioDetailPage'))
 const GraphStatisticsPage = lazy(() => import('./pages/graph/GraphStatisticsPage'))
+const VisitorAnalysisPage = lazy(() => import('./pages/graph/VisitorAnalysisPage'))
 
 function App() {
   const location = useLocation()
@@ -72,6 +73,14 @@ function App() {
         element={
           <Suspense fallback={<DetailPageSkeleton variant="node" />}>
             <GraphStatisticsPage key={location.pathname} />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/visitor-analysis"
+        element={
+          <Suspense fallback={<DetailPageSkeleton variant="node" />}>
+            <VisitorAnalysisPage key={location.pathname} />
           </Suspense>
         }
       />

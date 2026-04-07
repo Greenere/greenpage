@@ -3,6 +3,8 @@ const VISITOR_SESSION_STORAGE_KEY = 'greenpage_visitor_session_id'
 
 export type VisitorAnalyticsEventType = 'entry' | 'page_view'
 
+function noop() {}
+
 function createSessionId() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
@@ -29,39 +31,43 @@ function getSessionId() {
 export function trackVisitorEvent(eventType: VisitorAnalyticsEventType) {
   if (typeof window === 'undefined' || typeof document === 'undefined') return
 
-  const payload = {
-    event_type: eventType,
-    event_at: new Date().toISOString(),
-    session_id: getSessionId(),
-    page_url: window.location.href,
-    page_path: window.location.pathname,
-    page_search: window.location.search || null,
-    page_hash: window.location.hash || null,
-    referrer: document.referrer || null,
-    title: document.title || null,
-    screen_width: window.screen.width,
-    screen_height: window.screen.height,
-    language: navigator.language || null,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
-  }
+  try {
+    const payload = {
+      event_type: eventType,
+      event_at: new Date().toISOString(),
+      session_id: getSessionId(),
+      page_url: window.location.href,
+      page_path: window.location.pathname,
+      page_search: window.location.search || null,
+      page_hash: window.location.hash || null,
+      referrer: document.referrer || null,
+      title: document.title || null,
+      screen_width: window.screen.width,
+      screen_height: window.screen.height,
+      language: navigator.language || null,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+    }
 
-  const body = JSON.stringify(payload)
+    const body = JSON.stringify(payload)
 
-  if (navigator.sendBeacon) {
-    const blob = new Blob([body], { type: 'application/json' })
-    navigator.sendBeacon(VISITOR_ANALYTICS_ENDPOINT, blob)
-    return
-  }
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: 'application/json' })
+      if (navigator.sendBeacon(VISITOR_ANALYTICS_ENDPOINT, blob)) {
+        return
+      }
+    }
 
-  fetch(VISITOR_ANALYTICS_ENDPOINT, {
-    method: 'POST',
-    mode: 'cors',
-    keepalive: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body,
-  }).catch(() => {
+    // Detach the Promise chain so analytics transport failures never surface to the app.
+    void fetch(VISITOR_ANALYTICS_ENDPOINT, {
+      method: 'POST',
+      mode: 'cors',
+      keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body,
+    }).catch(noop)
+  } catch {
     // Ignore analytics send failures so page rendering stays unaffected.
-  })
+  }
 }
