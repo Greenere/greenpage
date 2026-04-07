@@ -199,6 +199,7 @@ const VisitorAnalysisPage: React.FC = () => {
     const controller = new AbortController();
     const requestUrl = new URL(VISITOR_SUMMARY_ENDPOINT);
     requestUrl.searchParams.set('days', String(selectedDays));
+    requestUrl.searchParams.set('_ts', String(Date.now()));
 
     setLoading(true);
     setError(null);
@@ -206,6 +207,7 @@ const VisitorAnalysisPage: React.FC = () => {
     fetch(requestUrl.toString(), {
       method: 'GET',
       mode: 'cors',
+      cache: 'no-store',
       signal: controller.signal,
     })
       .then(async (response) => {
