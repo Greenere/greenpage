@@ -18,7 +18,10 @@ import ThemePicker from './ThemePicker';
 import { readStoredTheme, THEME_STORAGE_KEY, type Theme } from './content/BioTheme';
 import './VisitorAnalysisPage.css';
 
-const VISITOR_SUMMARY_ENDPOINT = 'https://visitor-analysis.haoyanghowyoung.workers.dev/public/summary';
+const VISITOR_ANALYTICS_BASE_URL = import.meta.env.DEV
+  ? 'http://localhost:8787'
+  : 'https://visitor-analysis.haoyanghowyoung.workers.dev';
+const VISITOR_SUMMARY_ENDPOINT = `${VISITOR_ANALYTICS_BASE_URL}/public/summary`;
 const DAY_OPTIONS = [7, 30, 90] as const;
 const DEFAULT_DAYS = 30;
 
