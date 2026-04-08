@@ -27,7 +27,7 @@ function App() {
 
   useEffect(() => {
     trackVisitorEvent('page_view')
-  }, [location.pathname, location.search, location.hash])
+  }, [location.pathname])
 
   return (
     <Routes>
