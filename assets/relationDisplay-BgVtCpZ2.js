@@ -1,0 +1,1 @@
+import{U as n}from"./index-CtmWSu4y.js";function t(e){return n.graphRelations.kindLabels[e]}function a(e){return e==="next"?n.graphRelations.next:n.graphRelations.previous}function r(e){return e==="next"?n.graphRelations.nextInTimeline:n.graphRelations.previousInTimeline}export{a,t as b,r as g};

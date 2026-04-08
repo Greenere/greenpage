@@ -150,17 +150,6 @@
       "strength": 4
     },
     {
-      "id": "editor-howlang-time-howlang-waymo-1",
-      "from": "howlang",
-      "to": "waymo",
-      "kind": "time",
-      "labels": {
-        "en": "during my spare time ",
-        "zh-CN": "工作之余的个人项目"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-data-visualizations-2021-topic-data-visualizations-2021-weibe-2",
       "from": "data-visualizations-2021",
       "to": "weibe",
@@ -412,6 +401,17 @@
         "zh-CN": "大三期间的暑期科研项目"
       },
       "strength": 4
+    },
+    {
+      "id": "editor-howlang-time-howlang-waymo-1",
+      "from": "howlang",
+      "to": "waymo",
+      "kind": "time",
+      "labels": {
+        "en": "during my spare time ",
+        "zh-CN": "工作之余的个人项目"
+      },
+      "strength": 1
     }
   ]
 }
