@@ -1,9 +1,20 @@
 .greenpage-code-block {
+  --greenpage-code-surface: color-mix(in srgb, var(--color-background) 80%, white 20%);
+  --greenpage-code-text: color-mix(in srgb, var(--color-primary) 46%, #0f172a 54%);
+  --greenpage-code-comment: color-mix(in srgb, var(--greenpage-code-text) 48%, #94a3b8 52%);
+  --greenpage-code-punctuation: color-mix(in srgb, var(--greenpage-code-text) 84%, #475569 16%);
+  --greenpage-code-literal: color-mix(in srgb, #c2410c 86%, var(--color-accent) 14%);
+  --greenpage-code-string: color-mix(in srgb, #15803d 84%, var(--color-secondary) 16%);
+  --greenpage-code-operator: color-mix(in srgb, #6d28d9 86%, var(--color-primary) 14%);
+  --greenpage-code-keyword: color-mix(in srgb, #1d4ed8 85%, var(--color-primary) 15%);
+  --greenpage-code-function: color-mix(in srgb, #92400e 82%, var(--color-secondary) 18%);
+  --greenpage-code-emphasis: color-mix(in srgb, #be123c 84%, var(--color-accent) 16%);
   margin: 0;
   overflow-x: auto;
-  background: color-mix(in srgb, var(--color-background) 80%, black 20%);
-  color: var(--color-text);
+  background: var(--greenpage-code-surface);
+  color: var(--greenpage-code-text);
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 28%, transparent);
 }
 
 .greenpage-code-block code {
@@ -16,11 +27,11 @@
 .greenpage-code-block .token.prolog,
 .greenpage-code-block .token.doctype,
 .greenpage-code-block .token.cdata {
-  color: color-mix(in srgb, var(--color-text) 44%, transparent);
+  color: var(--greenpage-code-comment);
 }
 
 .greenpage-code-block .token.punctuation {
-  color: color-mix(in srgb, var(--color-text) 82%, transparent);
+  color: var(--greenpage-code-punctuation);
 }
 
 .greenpage-code-block .token.property,
@@ -30,7 +41,7 @@
 .greenpage-code-block .token.constant,
 .greenpage-code-block .token.symbol,
 .greenpage-code-block .token.deleted {
-  color: #d96b3b;
+  color: var(--greenpage-code-literal);
 }
 
 .greenpage-code-block .token.selector,
@@ -39,30 +50,32 @@
 .greenpage-code-block .token.char,
 .greenpage-code-block .token.builtin,
 .greenpage-code-block .token.inserted {
-  color: #4d8f63;
+  color: var(--greenpage-code-string);
 }
 
 .greenpage-code-block .token.operator,
 .greenpage-code-block .token.entity,
 .greenpage-code-block .token.url,
 .greenpage-code-block .token.variable {
-  color: #7a6dc3;
+  color: var(--greenpage-code-operator);
 }
 
 .greenpage-code-block .token.atrule,
 .greenpage-code-block .token.attr-value,
 .greenpage-code-block .token.keyword {
-  color: #2f72c8;
+  color: var(--greenpage-code-keyword);
+  font-weight: 600;
 }
 
 .greenpage-code-block .token.function,
 .greenpage-code-block .token.class-name {
-  color: #8f5e2c;
+  color: var(--greenpage-code-function);
+  font-weight: 600;
 }
 
 .greenpage-code-block .token.regex,
 .greenpage-code-block .token.important {
-  color: #b34563;
+  color: var(--greenpage-code-emphasis);
 }
 
 .greenpage-code-block .token.important,
