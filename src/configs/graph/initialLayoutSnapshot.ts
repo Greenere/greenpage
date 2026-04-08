@@ -1,5 +1,6 @@
 export type GraphInitialLayoutSnapshot = {
-    signature: string;
+    graphHash?: string;
+    signature?: string;
     initialZoom?: number;
     positionsByNodeId: Record<string, { x: number; y: number }>;
 };
@@ -8,7 +9,7 @@ export type GraphInitialLayoutSnapshot = {
 // top-left corner so the snapshot stays portable across viewport sizes.
 // Keep this as `null` to use the computed layout path.
 export const GRAPH_INITIAL_LAYOUT_SNAPSHOT: GraphInitialLayoutSnapshot | null = {
-  "signature": "adversarial-writing|bio|biotoggle|california-one-2022|cornell|data-visualizations-2021|faceswap|howlang|hust|hust-mclab|layoff-journey|louvre-evacuation|microwave-notes-2019|naec|noise-modulation|oxford|puerto-rico-2022|realai|signature-attack|verily|verily-intern|waymo|weibe|wellmail",
+  "graphHash":"graph-7deec41b",
   "initialZoom": 1.5,
   "positionsByNodeId": {
     "bio": {

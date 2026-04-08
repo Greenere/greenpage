@@ -119,6 +119,7 @@ const EMPTY_HANDLES: DynamicHandle[] = [];
 type StoredGraphView = {
     nodes: Array<{ id: string; x: number; y: number }>;
     viewport?: Viewport;
+    graphHash?: string;
     signature?: string;
 };
 
@@ -183,9 +184,53 @@ function buildNodeSetSignature(nodeIds: Iterable<string>) {
     return [...nodeIds].sort().join('|');
 }
 
-function getStoredGraphViewSignature(view: StoredGraphView | null) {
+function buildStringHash(value: string) {
+    let hash = 0x811c9dc5;
+
+    for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 0x01000193);
+    }
+
+    return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+function buildGraphLayoutHash(model: GraphModel, graphRelations: GraphModel['relations']) {
+    const payload = JSON.stringify({
+        version: 1,
+        nodes: [
+            { id: 'bio', kind: 'bio' },
+            { id: 'biotoggle', kind: 'toggle' },
+            ...[...getContentNodes(model)]
+                .map((node) => ({
+                    id: node.id,
+                    kind: node.kind,
+                    domain: node.domain,
+                    chronology: node.chronology,
+                }))
+                .sort((left, right) => left.id.localeCompare(right.id)),
+        ],
+        relations: [...graphRelations]
+            .map((relation) => ({
+                id: relation.id,
+                from: relation.from,
+                to: relation.to,
+                kind: relation.kind,
+                strength: relation.strength,
+            }))
+            .sort((left, right) => left.id.localeCompare(right.id)),
+    });
+
+    return `graph-${buildStringHash(payload)}`;
+}
+
+function getStoredGraphViewHash(view: StoredGraphView | null) {
     if (!view) {
         return null;
+    }
+
+    if (typeof view.graphHash === 'string' && view.graphHash.length > 0) {
+        return view.graphHash;
     }
 
     if (typeof view.signature === 'string' && view.signature.length > 0) {
@@ -221,14 +266,15 @@ function readStoredGraphView(): StoredGraphView | null {
                 ? parsed.viewport
                 : undefined;
 
+        const graphHash = typeof parsed.graphHash === 'string' ? parsed.graphHash : undefined;
         const signature = typeof parsed.signature === 'string' ? parsed.signature : undefined;
-        return { nodes, viewport, signature };
+        return { nodes, viewport, graphHash, signature };
     } catch {
         return null;
     }
 }
 
-function persistGraphView(nodes: Node[], viewport?: Viewport) {
+function persistGraphView(nodes: Node[], graphHash: string, viewport?: Viewport) {
     if (typeof window === 'undefined') return;
 
     const payload: StoredGraphView = {
@@ -238,7 +284,7 @@ function persistGraphView(nodes: Node[], viewport?: Viewport) {
             y: node.position.y,
         })),
         viewport,
-        signature: buildNodeSetSignature(nodes.map((node) => node.id)),
+        graphHash,
     };
 
     window.sessionStorage.setItem(GRAPH_VIEW_STORAGE_KEY, JSON.stringify(payload));
@@ -286,9 +332,29 @@ function roundLayoutExportZoom(value: number) {
     return Math.round(value * 1000) / 1000;
 }
 
-function buildInitialLayoutSnapshotPayload(nodes: Node[], initialZoom?: number | null): GraphInitialLayoutSnapshot | null {
+function getInitialLayoutSnapshotHash(snapshot: GraphInitialLayoutSnapshot | null) {
+    if (!snapshot) {
+        return null;
+    }
+
+    if (typeof snapshot.graphHash === 'string' && snapshot.graphHash.length > 0) {
+        return snapshot.graphHash;
+    }
+
+    if (typeof snapshot.signature === 'string' && snapshot.signature.length > 0) {
+        return snapshot.signature;
+    }
+
+    return null;
+}
+
+function buildInitialLayoutSnapshotPayload(
+    nodes: Node[],
+    graphHash: string | null,
+    initialZoom?: number | null
+): GraphInitialLayoutSnapshot | null {
     const bioNode = nodes.find((node) => node.id === 'bio');
-    if (!bioNode) {
+    if (!bioNode || !graphHash) {
         return null;
     }
 
@@ -304,14 +370,14 @@ function buildInitialLayoutSnapshotPayload(nodes: Node[], initialZoom?: number |
     ) as GraphInitialLayoutSnapshot['positionsByNodeId'];
 
     return {
-        signature: buildNodeSetSignature(orderedNodes.map((node) => node.id)),
+        graphHash,
         initialZoom: typeof initialZoom === 'number' ? roundLayoutExportZoom(initialZoom) : undefined,
         positionsByNodeId,
     };
 }
 
-function buildInitialLayoutSnapshotExport(nodes: Node[], initialZoom?: number | null) {
-    const payload = buildInitialLayoutSnapshotPayload(nodes, initialZoom);
+function buildInitialLayoutSnapshotExport(nodes: Node[], graphHash: string | null, initialZoom?: number | null) {
+    const payload = buildInitialLayoutSnapshotPayload(nodes, graphHash, initialZoom);
     if (!payload) {
         return '';
     }
@@ -319,14 +385,14 @@ function buildInitialLayoutSnapshotExport(nodes: Node[], initialZoom?: number | 
     return `export const GRAPH_INITIAL_LAYOUT_SNAPSHOT: GraphInitialLayoutSnapshot | null = ${JSON.stringify(payload, null, 2)};`;
 }
 
-function applyInitialLayoutSnapshot(nodes: Node[], bioPosition: Point) {
+function applyInitialLayoutSnapshot(nodes: Node[], bioPosition: Point, graphHash: string | null) {
     const snapshot = GRAPH_INITIAL_LAYOUT_SNAPSHOT;
     if (!snapshot) {
         return null;
     }
 
-    const signature = buildNodeSetSignature(nodes.map((node) => node.id));
-    if (snapshot.signature !== signature) {
+    const snapshotHash = getInitialLayoutSnapshotHash(snapshot);
+    if (!graphHash || !snapshotHash || snapshotHash !== graphHash) {
         return null;
     }
 
@@ -990,6 +1056,7 @@ function settleNodesAroundAnchor(
 function buildInitialGraph(
     model: GraphModel,
     graphRelations: GraphModel['relations'],
+    graphHash: string | null,
     theme: Theme,
     setTheme: (theme: Theme) => void,
     viewportWidth: number,
@@ -1079,7 +1146,7 @@ function buildInitialGraph(
         }),
     ];
     const relaxedNodes = relaxInitialNodes(seedNodes, targetCenters, graphRelations, nodeSpringK);
-    const snapshotNodes = applyInitialLayoutSnapshot(relaxedNodes, bioPosition);
+    const snapshotNodes = applyInitialLayoutSnapshot(relaxedNodes, bioPosition, graphHash);
     const initialNodes = snapshotNodes ?? relaxedNodes;
     const layoutSource: InitialLayoutSource = snapshotNodes ? 'snapshot' : 'computed';
 
@@ -1097,7 +1164,7 @@ const NodeCanvas: React.FC = () => {
     const hasHydratedStoredViewRef = useRef(false);
     const restoredStoredViewRef = useRef(false);
     const hasAppliedMeasuredInitialLayoutRef = useRef(false);
-    const hydratedGraphNodeSetSignatureRef = useRef<string | null>(null);
+    const hydratedGraphLayoutHashRef = useRef<string | null>(null);
     const flowReadyRef = useRef(false);
     const pendingGraphRestoreRef = useRef<PendingGraphRestore | null>(null);
     const viewport = useMemo(
@@ -1112,6 +1179,10 @@ const NodeCanvas: React.FC = () => {
         () => graphModel ? getGraphRelations(graphModel) : [],
         [graphModel]
     );
+    const graphLayoutHash = useMemo(
+        () => graphModel ? buildGraphLayoutHash(graphModel, graphRelations) : null,
+        [graphModel, graphRelations]
+    );
     const connectedNodeIdsByNode = useMemo(
         () => buildConnectedNodeIdsByNode(graphRelations),
         [graphRelations]
@@ -1122,22 +1193,18 @@ const NodeCanvas: React.FC = () => {
     );
     const initialGraph = useMemo(
         () => graphModel
-            ? buildInitialGraph(graphModel, graphRelations, initialThemeRef.current, setTheme, viewport.width, viewport.height)
+            ? buildInitialGraph(graphModel, graphRelations, graphLayoutHash, initialThemeRef.current, setTheme, viewport.width, viewport.height)
             : { nodes: [], edges: [], targets: new Map<string, Point>(), nodeSpringK: new Map<string, number>(), layoutSource: 'computed' as const },
-        [graphModel, graphRelations, viewport.height, viewport.width]
+        [graphLayoutHash, graphModel, graphRelations, viewport.height, viewport.width]
     );
     const nodesInitialized = useNodesInitialized();
-    const graphNodeSetSignature = useMemo(
-        () => buildNodeSetSignature(initialGraph.nodes.map((node) => node.id)),
-        [initialGraph.nodes]
-    );
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
     const { getViewport, setCenter, setViewport } = useReactFlow();
     const currentLayoutExport = useMemo(
-        () => buildInitialLayoutSnapshotExport(nodes, devLayoutViewportZoom),
-        [devLayoutViewportZoom, nodes]
+        () => buildInitialLayoutSnapshotExport(nodes, graphLayoutHash, devLayoutViewportZoom),
+        [devLayoutViewportZoom, graphLayoutHash, nodes]
     );
     const dragRafId = useRef<number | null>(null);
     const nodesRef = useRef<Node[]>(initialGraph.nodes);
@@ -1146,9 +1213,9 @@ const NodeCanvas: React.FC = () => {
     const lastDragEdgeSyncAtRef = useRef(0);
     const lastDragEdgeSyncPositionRef = useRef<Point | null>(null);
     const persistCurrentGraphView = useCallback((nextNodes: Node[], viewport?: Viewport) => {
-        if (!graphModel || nextNodes.length === 0) return;
-        persistGraphView(nextNodes, viewport ?? getViewport());
-    }, [getViewport, graphModel]);
+        if (!graphLayoutHash || nextNodes.length === 0) return;
+        persistGraphView(nextNodes, graphLayoutHash, viewport ?? getViewport());
+    }, [getViewport, graphLayoutHash]);
 
     const focusNode = useCallback((
         node: Node,
@@ -1315,7 +1382,7 @@ const NodeCanvas: React.FC = () => {
         let storedViewport: Viewport | undefined;
 
         if (hasHydratedStoredViewRef.current) {
-            const canReuseLiveLayout = hydratedGraphNodeSetSignatureRef.current === graphNodeSetSignature;
+            const canReuseLiveLayout = hydratedGraphLayoutHashRef.current === graphLayoutHash;
 
             if (canReuseLiveLayout) {
                 // Same graph, new copy/theme data: preserve live positions.
@@ -1335,7 +1402,7 @@ const NodeCanvas: React.FC = () => {
             const storedView = readStoredGraphView();
             const canRestoreStoredView =
                 Boolean(storedView?.nodes.length) &&
-                getStoredGraphViewSignature(storedView) === graphNodeSetSignature;
+                getStoredGraphViewHash(storedView) === graphLayoutHash;
             restoredStoredViewRef.current = canRestoreStoredView;
             storedViewport = canRestoreStoredView ? storedView?.viewport : undefined;
 
@@ -1359,7 +1426,7 @@ const NodeCanvas: React.FC = () => {
         if (!hasHydratedStoredViewRef.current) {
             hasHydratedStoredViewRef.current = true;
         }
-        hydratedGraphNodeSetSignatureRef.current = graphNodeSetSignature;
+        hydratedGraphLayoutHashRef.current = graphLayoutHash;
 
         pendingGraphRestoreRef.current = {
             nodes: restoredGraph.nodes,
@@ -1367,11 +1434,11 @@ const NodeCanvas: React.FC = () => {
             returnFocusNodeId,
         };
         applyPendingGraphRestore();
-    }, [applyPendingGraphRestore, graphModel, graphNodeSetSignature, initialGraph, orderedGraphRelations, setEdges, setNodes]);
+    }, [applyPendingGraphRestore, graphLayoutHash, graphModel, initialGraph, orderedGraphRelations, setEdges, setNodes]);
 
     useEffect(() => {
         hasAppliedMeasuredInitialLayoutRef.current = false;
-    }, [graphNodeSetSignature]);
+    }, [graphLayoutHash]);
 
     useEffect(() => {
         if (!graphModel || !nodesInitialized) return;
@@ -1549,7 +1616,7 @@ const NodeCanvas: React.FC = () => {
 
         if (initialGraph.nodes.length === 0) return;
         const storedView = readStoredGraphView();
-        if (storedView?.viewport && getStoredGraphViewSignature(storedView) === graphNodeSetSignature) {
+        if (storedView?.viewport && getStoredGraphViewHash(storedView) === graphLayoutHash) {
             instance.setViewport(storedView.viewport, { duration: 0 });
             setDevLayoutViewportZoom(storedView.viewport.zoom);
             return;
@@ -1770,7 +1837,7 @@ const NodeCanvas: React.FC = () => {
     }, [theme]);
 
     const handleCopyDevLayoutExport = useCallback(() => {
-        const liveLayoutExport = buildInitialLayoutSnapshotExport(nodesRef.current, getViewport().zoom);
+        const liveLayoutExport = buildInitialLayoutSnapshotExport(nodesRef.current, graphLayoutHash, getViewport().zoom);
         if (!liveLayoutExport) {
             setDevLayoutPanelStatus('No graph layout is available yet.');
             return;
@@ -1790,7 +1857,7 @@ const NodeCanvas: React.FC = () => {
             .catch(() => {
                 setDevLayoutPanelStatus('Clipboard copy failed.');
             });
-    }, [getViewport]);
+    }, [getViewport, graphLayoutHash]);
 
     const handleClearStoredDevLayout = useCallback(() => {
         clearStoredGraphView();
@@ -1799,12 +1866,12 @@ const NodeCanvas: React.FC = () => {
 
     useEffect(() => {
         return () => {
-            if (graphModel && nodesRef.current.length > 0) {
-                persistGraphView(nodesRef.current, getViewport());
+            if (graphLayoutHash && nodesRef.current.length > 0) {
+                persistGraphView(nodesRef.current, graphLayoutHash, getViewport());
             }
             if (dragRafId.current) cancelAnimationFrame(dragRafId.current);
         };
-    }, [getViewport, graphModel]);
+    }, [getViewport, graphLayoutHash]);
 
     if (graphError) {
         return (
