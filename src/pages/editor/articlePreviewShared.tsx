@@ -234,6 +234,7 @@ export function renderContentBlock(block: ContentBlock | ArticleBlock, index: nu
         items={block.items}
         columns={block.columns}
         align={block.align}
+        mode={block.mode}
         keyPrefix={`gallery-${index}`}
         maxWidth={DETAIL_SECTION_WIDTH}
         renderCaption={(caption, captionKeyPrefix) => renderInlineMarkdown(caption, captionKeyPrefix)}

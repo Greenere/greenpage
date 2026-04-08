@@ -70,7 +70,8 @@
             }
           ],
           "columns": 2,
-          "align": "height"
+          "align": "height",
+          "mode": "faithful"
         },
         {
           "type": "text",

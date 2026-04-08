@@ -34,6 +34,7 @@ export type NodeGalleryImage = {
 };
 
 export type NodeGalleryAlignment = 'height' | `height:${number}` | 'natural';
+export type NodeGalleryMode = 'default' | 'faithful';
 
 export type NodeArticleLink = {
   label: string;
@@ -50,7 +51,7 @@ export type ContentBlock =
 
 export type ArticleBlock =
   | ContentBlock
-  | { type: 'gallery'; items: NodeGalleryImage[]; columns?: 1 | 2 | 3; align?: NodeGalleryAlignment }
+  | { type: 'gallery'; items: NodeGalleryImage[]; columns?: 1 | 2 | 3; align?: NodeGalleryAlignment; mode?: NodeGalleryMode }
   | { type: 'callout'; text: string; title?: string; tone?: 'note' | 'highlight' };
 
 export type NodeArticleHero = {
@@ -339,10 +340,13 @@ function normalizeArticleBlocks(value: unknown): ArticleBlock[] | undefined {
       const items = normalizeGalleryImages(block.items);
       const align =
         typeof block.align === 'string' ? block.align : undefined;
+      const mode =
+        typeof block.mode === 'string' ? block.mode : undefined;
       return (
         Boolean(items?.length) &&
         (block.columns === undefined || block.columns === 1 || block.columns === 2 || block.columns === 3) &&
-        (align === undefined || align === 'natural' || align === 'height' || /^height:\d+$/.test(align))
+        (align === undefined || align === 'natural' || align === 'height' || /^height:\d+$/.test(align)) &&
+        (mode === undefined || mode === 'default' || mode === 'faithful')
       );
     }
 

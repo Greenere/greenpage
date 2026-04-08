@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 
-import { resolveAssetUrl, type NodeGalleryAlignment, type NodeGalleryImage } from '../../pages/graph/content/Nodes';
+import { resolveAssetUrl, type NodeGalleryAlignment, type NodeGalleryImage, type NodeGalleryMode } from '../../pages/graph/content/Nodes';
 
 const DEFAULT_GALLERY_RATIO = 4 / 3;
 const GALLERY_TRACKS_PER_COLUMN = 6;
@@ -68,6 +68,7 @@ type ArticleGalleryProps = {
   items: NodeGalleryImage[];
   columns: number;
   align: NodeGalleryAlignment;
+  mode: NodeGalleryMode;
   keyPrefix: string;
   renderCaption?: (caption: string, keyPrefix: string) => ReactNode;
 };
@@ -76,6 +77,7 @@ export default function ArticleGallery({
   items,
   columns,
   align,
+  mode,
   keyPrefix,
   renderCaption,
 }: ArticleGalleryProps) {
@@ -83,6 +85,7 @@ export default function ArticleGallery({
   const galleryRows = chunkGalleryItems(items, columns);
   const totalTracks = columns * GALLERY_TRACKS_PER_COLUMN;
   const { mode: alignmentMode, referenceIndex } = parseGalleryAlignment(align);
+  const isFaithfulMode = mode === 'faithful';
 
   return (
     <div
@@ -124,12 +127,12 @@ export default function ArticleGallery({
             >
               <div
                 style={{
-                  borderRadius: '12px',
-                  overflow: 'hidden',
+                  borderRadius: isFaithfulMode ? undefined : '12px',
+                  overflow: isFaithfulMode ? 'visible' : 'hidden',
                   flexShrink: 0,
                   aspectRatio: alignmentMode === 'height' ? `${heightAlignedAspectRatio}` : undefined,
-                  background: 'color-mix(in srgb, var(--color-secondary) 10%, transparent)',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.10)',
+                  background: isFaithfulMode ? 'transparent' : 'color-mix(in srgb, var(--color-secondary) 10%, transparent)',
+                  boxShadow: isFaithfulMode ? 'none' : '0 2px 12px rgba(0,0,0,0.10)',
                 }}
                 className="gallery-image-frame"
               >
@@ -149,8 +152,9 @@ export default function ArticleGallery({
                     display: 'block',
                     width: '100%',
                     height: alignmentMode === 'height' ? '100%' : 'auto',
-                    objectFit: alignmentMode === 'height' ? 'cover' : undefined,
+                    objectFit: alignmentMode === 'height' ? (isFaithfulMode ? 'contain' : 'cover') : undefined,
                     objectPosition: 'center',
+                    borderRadius: isFaithfulMode ? undefined : 'inherit',
                     transition: 'transform 0.3s ease, filter 0.3s ease',
                   }}
                   className="gallery-image"

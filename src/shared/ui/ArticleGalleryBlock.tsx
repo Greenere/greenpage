@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 
-import { type NodeGalleryAlignment, type NodeGalleryImage } from '../../pages/graph/content/Nodes';
+import { type NodeGalleryAlignment, type NodeGalleryImage, type NodeGalleryMode } from '../../pages/graph/content/Nodes';
 import ArticleGallery from './ArticleGallery';
 
 type ArticleGalleryBlockProps = {
@@ -8,6 +8,7 @@ type ArticleGalleryBlockProps = {
   keyPrefix: string;
   columns?: number;
   align?: NodeGalleryAlignment;
+  mode?: NodeGalleryMode;
   maxWidth?: string;
   marginBottom?: string;
   renderCaption?: (caption: string, keyPrefix: string) => ReactNode;
@@ -18,6 +19,7 @@ export default function ArticleGalleryBlock({
   keyPrefix,
   columns,
   align = 'height',
+  mode = 'default',
   maxWidth = '48rem',
   marginBottom = '1.3rem',
   renderCaption,
@@ -35,6 +37,7 @@ export default function ArticleGalleryBlock({
         items={items}
         columns={galleryColumns}
         align={align}
+        mode={mode}
         keyPrefix={keyPrefix}
         renderCaption={renderCaption}
       />

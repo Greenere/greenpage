@@ -385,6 +385,7 @@ export function renderDetailContentBlock(
         items={block.items}
         columns={block.columns}
         align={block.align}
+        mode={block.mode}
         keyPrefix={`gallery-${index}`}
         maxWidth={DETAIL_SECTION_WIDTH}
         renderCaption={(caption, captionKeyPrefix) => renderDetailInlineMarkdown(caption, captionKeyPrefix, onNavigate)}

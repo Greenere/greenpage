@@ -40,7 +40,15 @@ export function serializeSectionMarkdown(section: NodeArticleSection) {
         return `[${block.label}](${block.href})`;
       }
       if (block.type === 'gallery') {
-        const header = `:::gallery columns=${block.columns ?? 2} align=${block.align ?? 'height:1'}`;
+        const headerParts = [
+          ':::gallery',
+          `columns=${block.columns ?? 2}`,
+          `align=${block.align ?? 'height:1'}`,
+        ];
+        if (block.mode === 'faithful') {
+          headerParts.push('mode=faithful');
+        }
+        const header = headerParts.join(' ');
         const body = block.items.map((item) => serializeImageLine(item.src, item.alt, item.caption)).join('\n');
         return `${header}\n${body}\n:::`;
       }
@@ -90,6 +98,7 @@ export function parseSectionMarkdown(markdown: string): ArticleBlock[] {
     if (line.startsWith(':::gallery')) {
       const columnsMatch = line.match(/columns=(1|2|3)/);
       const alignMatch = line.match(/align=(natural|height(?::\d+)?)/);
+      const modeMatch = line.match(/mode=(default|faithful)/);
       const items: NonNullable<Extract<ArticleBlock, { type: 'gallery' }>['items']> = [];
       index += 1;
 
@@ -111,6 +120,7 @@ export function parseSectionMarkdown(markdown: string): ArticleBlock[] {
         items,
         columns: columnsMatch ? (Number(columnsMatch[1]) as 1 | 2 | 3) : 2,
         align: alignMatch ? (alignMatch[1] as Extract<ArticleBlock, { type: 'gallery' }>['align']) : 'height:1',
+        mode: modeMatch ? (modeMatch[1] as Extract<ArticleBlock, { type: 'gallery' }>['mode']) : undefined,
       });
       index += 1;
       continue;
