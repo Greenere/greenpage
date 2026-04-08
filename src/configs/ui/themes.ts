@@ -163,7 +163,7 @@ export const THEME_CONFIG = {
 export type Theme = keyof typeof THEME_CONFIG;
 
 // Controls the initial style when there is no saved preference in localStorage yet.
-export const DEFAULT_THEME: Theme = 'machupicchu';
+export const DEFAULT_THEME: Theme = 'whitesands';
 export const THEME_ORDER: Theme[] = [
     'cornellsailing',
     'sfhill',
