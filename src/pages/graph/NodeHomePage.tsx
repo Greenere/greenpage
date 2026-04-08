@@ -21,6 +21,7 @@ import type { DynamicHandle } from './nodes/Handles';
 import { applyThemeVars } from '../../shared/styles/colors';
 import { waitForCurrentViewTransition } from '../../shared/ui/viewTransitions';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graph/focus';
+import { GRAPH_INITIAL_LAYOUT_SNAPSHOT, type GraphInitialLayoutSnapshot } from '../../configs/graph/initialLayoutSnapshot';
 import { GRAPH_LAYOUT } from '../../configs/graph/layout';
 import {
     GRAPH_BIO_PORTRAIT_BORDER_OPACITY,
@@ -126,6 +127,8 @@ type PendingGraphRestore = {
     viewport?: Viewport;
     returnFocusNodeId: string | null;
 };
+
+type InitialLayoutSource = 'computed' | 'snapshot';
 
 function getNodeDimensions(node: Node) {
     if (typeof node.measured?.width === 'number' && typeof node.measured?.height === 'number') {
@@ -241,6 +244,11 @@ function persistGraphView(nodes: Node[], viewport?: Viewport) {
     window.sessionStorage.setItem(GRAPH_VIEW_STORAGE_KEY, JSON.stringify(payload));
 }
 
+function clearStoredGraphView() {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.removeItem(GRAPH_VIEW_STORAGE_KEY);
+}
+
 function readReturnFocusNodeId() {
     if (typeof window === 'undefined') return null;
     return window.sessionStorage.getItem(GRAPH_RETURN_FOCUS_NODE_KEY);
@@ -257,6 +265,85 @@ function getCenter(node: Node) {
         x: node.position.x + half(w),
         y: node.position.y + half(h),
     };
+}
+
+function orderLayoutExportNodes(nodes: Node[]) {
+    return [...nodes].sort((left, right) => {
+        if (left.id === right.id) return 0;
+        if (left.id === 'bio') return -1;
+        if (right.id === 'bio') return 1;
+        if (left.id === 'biotoggle') return -1;
+        if (right.id === 'biotoggle') return 1;
+        return left.id.localeCompare(right.id);
+    });
+}
+
+function roundLayoutExportValue(value: number) {
+    return Math.round(value * 100) / 100;
+}
+
+function buildInitialLayoutSnapshotPayload(nodes: Node[]): GraphInitialLayoutSnapshot | null {
+    const bioNode = nodes.find((node) => node.id === 'bio');
+    if (!bioNode) {
+        return null;
+    }
+
+    const orderedNodes = orderLayoutExportNodes(nodes);
+    const positionsByNodeId = Object.fromEntries(
+        orderedNodes.map((node) => [
+            node.id,
+            {
+                x: roundLayoutExportValue(node.position.x - bioNode.position.x),
+                y: roundLayoutExportValue(node.position.y - bioNode.position.y),
+            },
+        ])
+    ) as GraphInitialLayoutSnapshot['positionsByNodeId'];
+
+    return {
+        signature: buildNodeSetSignature(orderedNodes.map((node) => node.id)),
+        positionsByNodeId,
+    };
+}
+
+function buildInitialLayoutSnapshotExport(nodes: Node[]) {
+    const payload = buildInitialLayoutSnapshotPayload(nodes);
+    if (!payload) {
+        return '';
+    }
+
+    return `export const GRAPH_INITIAL_LAYOUT_SNAPSHOT: GraphInitialLayoutSnapshot | null = ${JSON.stringify(payload, null, 2)};`;
+}
+
+function applyInitialLayoutSnapshot(nodes: Node[], bioPosition: Point) {
+    const snapshot = GRAPH_INITIAL_LAYOUT_SNAPSHOT;
+    if (!snapshot) {
+        return null;
+    }
+
+    const signature = buildNodeSetSignature(nodes.map((node) => node.id));
+    if (snapshot.signature !== signature) {
+        return null;
+    }
+
+    const hasPositionsForAllNodes = nodes.every((node) => {
+        const position = snapshot.positionsByNodeId[node.id];
+        return Boolean(position) && typeof position.x === 'number' && typeof position.y === 'number';
+    });
+
+    if (!hasPositionsForAllNodes) {
+        return null;
+    }
+
+    return nodes.map((node) => {
+        const relativePosition = snapshot.positionsByNodeId[node.id];
+        return {
+            ...node,
+            position: {
+                x: bioPosition.x + relativePosition.x,
+                y: bioPosition.y + relativePosition.y,
+            },
+        };
+    });
 }
 
 function clampZoom(zoom: number) {
@@ -944,7 +1031,7 @@ function buildInitialGraph(
         ])
     );
 
-    const relaxedNodes = relaxInitialNodes([
+    const seedNodes = [
         {
             id: 'bio',
             type: 'bioNode',
@@ -985,9 +1072,13 @@ function buildInitialGraph(
                 } satisfies StoryNodeData,
             };
         }),
-    ], targetCenters, graphRelations, nodeSpringK);
+    ];
+    const relaxedNodes = relaxInitialNodes(seedNodes, targetCenters, graphRelations, nodeSpringK);
+    const snapshotNodes = applyInitialLayoutSnapshot(relaxedNodes, bioPosition);
+    const initialNodes = snapshotNodes ?? relaxedNodes;
+    const layoutSource: InitialLayoutSource = snapshotNodes ? 'snapshot' : 'computed';
 
-    return { ...buildEdgesForNodes(relaxedNodes, graphRelations), targets: targetCenters, nodeSpringK };
+    return { ...buildEdgesForNodes(initialNodes, graphRelations), targets: targetCenters, nodeSpringK, layoutSource };
 }
 
 const NodeCanvas: React.FC = () => {
@@ -1009,6 +1100,8 @@ const NodeCanvas: React.FC = () => {
         []
     );
     const highlightedNodeId = draggingNodeId ?? hoveredNodeId;
+    const [isDevLayoutPanelOpen, setIsDevLayoutPanelOpen] = useState(false);
+    const [devLayoutPanelStatus, setDevLayoutPanelStatus] = useState<string | null>(null);
     const graphRelations = useMemo(
         () => graphModel ? getGraphRelations(graphModel) : [],
         [graphModel]
@@ -1024,7 +1117,7 @@ const NodeCanvas: React.FC = () => {
     const initialGraph = useMemo(
         () => graphModel
             ? buildInitialGraph(graphModel, graphRelations, initialThemeRef.current, setTheme, viewport.width, viewport.height)
-            : { nodes: [], edges: [], targets: new Map<string, Point>(), nodeSpringK: new Map<string, number>() },
+            : { nodes: [], edges: [], targets: new Map<string, Point>(), nodeSpringK: new Map<string, number>(), layoutSource: 'computed' as const },
         [graphModel, graphRelations, viewport.height, viewport.width]
     );
     const nodesInitialized = useNodesInitialized();
@@ -1035,6 +1128,7 @@ const NodeCanvas: React.FC = () => {
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
+    const currentLayoutExport = useMemo(() => buildInitialLayoutSnapshotExport(nodes), [nodes]);
     const { getViewport, setCenter, setViewport } = useReactFlow();
     const dragRafId = useRef<number | null>(null);
     const nodesRef = useRef<Node[]>(initialGraph.nodes);
@@ -1115,11 +1209,13 @@ const NodeCanvas: React.FC = () => {
             };
         });
 
-        const settledResetNodes = settleNodesAroundAnchor(resetNodes, 'bio', {
-            targets: initialGraph.targets,
-            nodeSpringK: initialGraph.nodeSpringK,
-            relations: orderedGraphRelations,
-        });
+        const settledResetNodes = initialGraph.layoutSource === 'snapshot'
+            ? resetNodes
+            : settleNodesAroundAnchor(resetNodes, 'bio', {
+                targets: initialGraph.targets,
+                nodeSpringK: initialGraph.nodeSpringK,
+                relations: orderedGraphRelations,
+            });
         const resetGraph = buildEdgesForNodes(settledResetNodes, orderedGraphRelations, null);
         setNodes(resetGraph.nodes);
         setEdges(resetGraph.edges);
@@ -1269,6 +1365,7 @@ const NodeCanvas: React.FC = () => {
         if (!graphModel || !nodesInitialized) return;
         if (!hasHydratedStoredViewRef.current) return;
         if (restoredStoredViewRef.current) return;
+        if (initialGraph.layoutSource === 'snapshot') return;
         if (hasAppliedMeasuredInitialLayoutRef.current) return;
         if (nodes.length === 0) return;
 
@@ -1304,6 +1401,7 @@ const NodeCanvas: React.FC = () => {
     }, [
         graphModel,
         initialGraph.nodeSpringK,
+        initialGraph.layoutSource,
         initialGraph.targets,
         nodes,
         nodesInitialized,
@@ -1644,6 +1742,32 @@ const NodeCanvas: React.FC = () => {
         persistTheme(theme);
     }, [theme]);
 
+    const handleCopyDevLayoutExport = useCallback(() => {
+        if (!currentLayoutExport) {
+            setDevLayoutPanelStatus('No graph layout is available yet.');
+            return;
+        }
+
+        const clipboard = navigator.clipboard;
+        if (!clipboard?.writeText) {
+            setDevLayoutPanelStatus('Clipboard copy is not available in this browser.');
+            return;
+        }
+
+        void clipboard.writeText(currentLayoutExport)
+            .then(() => {
+                setDevLayoutPanelStatus('Copied snapshot export for initialLayoutSnapshot.ts.');
+            })
+            .catch(() => {
+                setDevLayoutPanelStatus('Clipboard copy failed.');
+            });
+    }, [currentLayoutExport]);
+
+    const handleClearStoredDevLayout = useCallback(() => {
+        clearStoredGraphView();
+        setDevLayoutPanelStatus('Cleared the session-stored graph layout.');
+    }, []);
+
     useEffect(() => {
         return () => {
             if (graphModel && nodesRef.current.length > 0) {
@@ -1666,28 +1790,152 @@ const NodeCanvas: React.FC = () => {
     }
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            nodeClickDistance={6}
-            nodeDragThreshold={4}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onNodeClick={onNodeClick}
-            onNodeDoubleClick={onNodeDoubleClick}
-            onNodeMouseEnter={onNodeMouseEnter}
-            onNodeMouseLeave={onNodeMouseLeave}
-            onInit={onInit}
-            onNodeDrag={onNodeDrag}
-            onNodeDragStop={onNodeDragStop}
-            onMoveEnd={onMoveEnd}
-            elevateNodesOnSelect={false}
-            panOnDrag
-            zoomOnScroll
-            proOptions={{ hideAttribution: true }}
-        />
+        <>
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
+                nodeClickDistance={6}
+                nodeDragThreshold={4}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onNodeClick={onNodeClick}
+                onNodeDoubleClick={onNodeDoubleClick}
+                onNodeMouseEnter={onNodeMouseEnter}
+                onNodeMouseLeave={onNodeMouseLeave}
+                onInit={onInit}
+                onNodeDrag={onNodeDrag}
+                onNodeDragStop={onNodeDragStop}
+                onMoveEnd={onMoveEnd}
+                elevateNodesOnSelect={false}
+                panOnDrag
+                zoomOnScroll
+                proOptions={{ hideAttribution: true }}
+            />
+            {import.meta.env.DEV && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        right: '1rem',
+                        bottom: '1rem',
+                        zIndex: FLOATING_EDGE_Z_INDEX + 10,
+                        width: isDevLayoutPanelOpen ? '24rem' : 'auto',
+                        padding: isDevLayoutPanelOpen ? '0.8rem 0.9rem 0.9rem' : '0.55rem 0.7rem',
+                        borderRadius: '14px',
+                        background: 'color-mix(in srgb, var(--color-background) 88%, white 12%)',
+                        border: '1px solid color-mix(in srgb, var(--color-secondary) 22%, transparent)',
+                        boxShadow: '0 10px 32px rgba(0,0,0,0.12)',
+                        color: 'var(--color-text)',
+                        backdropFilter: 'blur(10px)',
+                    }}
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '0.6rem',
+                        }}
+                    >
+                        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                            Layout Export
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsDevLayoutPanelOpen((current) => !current);
+                                setDevLayoutPanelStatus(null);
+                            }}
+                            style={{
+                                border: 'none',
+                                background: 'transparent',
+                                color: 'inherit',
+                                cursor: 'pointer',
+                                fontSize: '0.74rem',
+                                fontWeight: 600,
+                                letterSpacing: '0.04em',
+                                padding: 0,
+                            }}
+                        >
+                            {isDevLayoutPanelOpen ? 'Hide' : 'Show'}
+                        </button>
+                    </div>
+                    {isDevLayoutPanelOpen && (
+                        <>
+                            <div style={{ marginTop: '0.45rem', fontSize: '0.76rem', lineHeight: 1.5, opacity: 0.76 }}>
+                                Export the current manually placed graph as a snapshot for <code>src/configs/graph/initialLayoutSnapshot.ts</code>. The computed layout path still stays as fallback when the snapshot is <code>null</code> or mismatched.
+                            </div>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    gap: '0.55rem',
+                                    marginTop: '0.7rem',
+                                    marginBottom: '0.6rem',
+                                }}
+                            >
+                                <button
+                                    type="button"
+                                    onClick={handleCopyDevLayoutExport}
+                                    style={{
+                                        border: '1px solid color-mix(in srgb, var(--color-secondary) 26%, transparent)',
+                                        background: 'color-mix(in srgb, var(--color-background) 76%, white 24%)',
+                                        color: 'inherit',
+                                        borderRadius: '999px',
+                                        padding: '0.38rem 0.72rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Copy Snapshot
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleClearStoredDevLayout}
+                                    style={{
+                                        border: '1px solid color-mix(in srgb, var(--color-secondary) 22%, transparent)',
+                                        background: 'transparent',
+                                        color: 'inherit',
+                                        borderRadius: '999px',
+                                        padding: '0.38rem 0.72rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Clear Session
+                                </button>
+                            </div>
+                            <textarea
+                                value={currentLayoutExport}
+                                readOnly
+                                spellCheck={false}
+                                style={{
+                                    width: '100%',
+                                    minHeight: '11rem',
+                                    resize: 'vertical',
+                                    padding: '0.7rem 0.8rem',
+                                    borderRadius: '12px',
+                                    border: '1px solid color-mix(in srgb, var(--color-secondary) 18%, transparent)',
+                                    background: 'color-mix(in srgb, var(--color-background) 92%, white 8%)',
+                                    color: 'inherit',
+                                    fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace',
+                                    fontSize: '0.68rem',
+                                    lineHeight: 1.45,
+                                    boxSizing: 'border-box',
+                                }}
+                            />
+                            {devLayoutPanelStatus && (
+                                <div style={{ marginTop: '0.5rem', fontSize: '0.73rem', opacity: 0.78 }}>
+                                    {devLayoutPanelStatus}
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
+        </>
     );
 }
 
@@ -1695,6 +1943,7 @@ export default function NodeHomePage() {
     const graphStyleVars = {
         width: "100vw",
         height: "100vh",
+        position: 'relative',
         margin: 0,
         inset: 0,
         ['--greenpage-node-ring-width-idle' as const]: GRAPH_NODE_HIGHLIGHT_RING_WIDTH.idle,
