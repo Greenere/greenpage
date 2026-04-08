@@ -50,8 +50,14 @@ Put something in `content/` if it defines:
 - [`highlight.ts`](./graph/highlight.ts)
   Shared graph highlight and action-border behavior.
 
+- [`initialLayoutSnapshot.ts`](./graph/initialLayoutSnapshot.ts)
+  Optional hand-tuned initial graph layout snapshot, including exported node positions and initial zoom.
+
 - [`layout.ts`](./graph/layout.ts)
   Graph-level layout knobs/config used outside the page-local layout implementation.
+
+- [`generatedGraphLayoutHash.ts`](./graph/generatedGraphLayoutHash.ts)
+  Build-generated graph hash used to validate layout snapshots and persisted graph layouts against the current graph structure.
 
 Put something in `graph/` if it controls:
 
@@ -59,6 +65,14 @@ Put something in `graph/` if it controls:
 - graph highlighting
 - graph layout or spacing knobs
 - graph-specific visual affordances
+
+Graph layout snapshot compatibility uses a generated graph hash rather than article/content text. The hash is produced at build time from `public/data/graph.json` and changes when graph structure changes, such as:
+
+- graph settings flags
+- node ids, kinds, domains, or chronology values
+- relation ids, endpoints, kinds, or strengths
+
+Editing the authored content of an existing node does not change the hash.
 
 Note that `src/pages/graph/layout/` contains the page-local layout implementation and algorithms, while `src/configs/graph/` is for shared graph configuration values that conceptually belong to app config.
 
