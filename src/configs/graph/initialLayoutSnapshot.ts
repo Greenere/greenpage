@@ -9,7 +9,7 @@ export type GraphInitialLayoutSnapshot = {
 // top-left corner so the snapshot stays portable across viewport sizes.
 // Keep this as `null` to use the computed layout path.
 export const GRAPH_INITIAL_LAYOUT_SNAPSHOT: GraphInitialLayoutSnapshot | null = {
-  "graphHash":"graph-7deec41b",
+  "graphHash":"graph-49cb12e7",
   "initialZoom": 1.5,
   "positionsByNodeId": {
     "bio": {

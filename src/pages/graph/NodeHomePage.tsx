@@ -22,6 +22,7 @@ import { applyThemeVars } from '../../shared/styles/colors';
 import { waitForCurrentViewTransition } from '../../shared/ui/viewTransitions';
 import { GRAPH_NODE_FOCUS_ZOOM } from '../../configs/graph/focus';
 import { GRAPH_INITIAL_LAYOUT_SNAPSHOT, type GraphInitialLayoutSnapshot } from '../../configs/graph/initialLayoutSnapshot';
+import { GRAPH_LAYOUT_HASH } from '../../configs/graph/generatedGraphLayoutHash';
 import { GRAPH_LAYOUT } from '../../configs/graph/layout';
 import {
     GRAPH_BIO_PORTRAIT_BORDER_OPACITY,
@@ -182,46 +183,6 @@ function participatesInCollision(nodeId: string) {
 
 function buildNodeSetSignature(nodeIds: Iterable<string>) {
     return [...nodeIds].sort().join('|');
-}
-
-function buildStringHash(value: string) {
-    let hash = 0x811c9dc5;
-
-    for (let index = 0; index < value.length; index += 1) {
-        hash ^= value.charCodeAt(index);
-        hash = Math.imul(hash, 0x01000193);
-    }
-
-    return (hash >>> 0).toString(16).padStart(8, '0');
-}
-
-function buildGraphLayoutHash(model: GraphModel, graphRelations: GraphModel['relations']) {
-    const payload = JSON.stringify({
-        version: 1,
-        nodes: [
-            { id: 'bio', kind: 'bio' },
-            { id: 'biotoggle', kind: 'toggle' },
-            ...[...getContentNodes(model)]
-                .map((node) => ({
-                    id: node.id,
-                    kind: node.kind,
-                    domain: node.domain,
-                    chronology: node.chronology,
-                }))
-                .sort((left, right) => left.id.localeCompare(right.id)),
-        ],
-        relations: [...graphRelations]
-            .map((relation) => ({
-                id: relation.id,
-                from: relation.from,
-                to: relation.to,
-                kind: relation.kind,
-                strength: relation.strength,
-            }))
-            .sort((left, right) => left.id.localeCompare(right.id)),
-    });
-
-    return `graph-${buildStringHash(payload)}`;
 }
 
 function getStoredGraphViewHash(view: StoredGraphView | null) {
@@ -1179,10 +1140,7 @@ const NodeCanvas: React.FC = () => {
         () => graphModel ? getGraphRelations(graphModel) : [],
         [graphModel]
     );
-    const graphLayoutHash = useMemo(
-        () => graphModel ? buildGraphLayoutHash(graphModel, graphRelations) : null,
-        [graphModel, graphRelations]
-    );
+    const graphLayoutHash = graphModel ? GRAPH_LAYOUT_HASH : null;
     const connectedNodeIdsByNode = useMemo(
         () => buildConnectedNodeIdsByNode(graphRelations),
         [graphRelations]

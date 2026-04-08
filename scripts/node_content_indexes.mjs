@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { buildGraphLayoutHash, buildGraphLayoutHashModuleSource } from './graph_layout_hash.mjs';
 
 export const LOCALES = [
   { lang: 'en', suffix: 'en' },
@@ -198,13 +199,17 @@ export async function generateNodeContentIndexes({
   log = console.log,
 } = {}) {
   const publicDir = path.join(rootDir, 'public');
+  const srcDir = path.join(rootDir, 'src');
   const graphPath = path.join(publicDir, 'data', 'graph.json');
   const nodesDir = path.join(publicDir, 'data', 'nodes');
+  const generatedGraphHashPath = path.join(srcDir, 'configs', 'graph', 'generatedGraphLayoutHash.ts');
   const graphRaw = await fs.readFile(graphPath, 'utf8');
   const graph = JSON.parse(graphRaw);
+  const graphHash = buildGraphLayoutHash(graph);
   const nodeRefs = Array.isArray(graph.nodes) ? graph.nodes : [];
 
   await fs.mkdir(nodesDir, { recursive: true });
+  await fs.mkdir(path.dirname(generatedGraphHashPath), { recursive: true });
 
   for (const locale of LOCALES) {
     const cardIndex = {};
@@ -224,5 +229,11 @@ export async function generateNodeContentIndexes({
     if (typeof log === 'function') {
       log(`Generated ${path.relative(rootDir, cardIndexPath)} with ${Object.keys(cardIndex).length} node entries.`);
     }
+  }
+
+  await fs.writeFile(generatedGraphHashPath, buildGraphLayoutHashModuleSource(graphHash));
+
+  if (typeof log === 'function') {
+    log(`Generated ${path.relative(rootDir, generatedGraphHashPath)} with graph hash ${graphHash}.`);
   }
 }
