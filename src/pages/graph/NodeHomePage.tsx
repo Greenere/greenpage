@@ -282,7 +282,11 @@ function roundLayoutExportValue(value: number) {
     return Math.round(value * 100) / 100;
 }
 
-function buildInitialLayoutSnapshotPayload(nodes: Node[]): GraphInitialLayoutSnapshot | null {
+function roundLayoutExportZoom(value: number) {
+    return Math.round(value * 1000) / 1000;
+}
+
+function buildInitialLayoutSnapshotPayload(nodes: Node[], initialZoom?: number | null): GraphInitialLayoutSnapshot | null {
     const bioNode = nodes.find((node) => node.id === 'bio');
     if (!bioNode) {
         return null;
@@ -301,12 +305,13 @@ function buildInitialLayoutSnapshotPayload(nodes: Node[]): GraphInitialLayoutSna
 
     return {
         signature: buildNodeSetSignature(orderedNodes.map((node) => node.id)),
+        initialZoom: typeof initialZoom === 'number' ? roundLayoutExportZoom(initialZoom) : undefined,
         positionsByNodeId,
     };
 }
 
-function buildInitialLayoutSnapshotExport(nodes: Node[]) {
-    const payload = buildInitialLayoutSnapshotPayload(nodes);
+function buildInitialLayoutSnapshotExport(nodes: Node[], initialZoom?: number | null) {
+    const payload = buildInitialLayoutSnapshotPayload(nodes, initialZoom);
     if (!payload) {
         return '';
     }
@@ -1102,6 +1107,7 @@ const NodeCanvas: React.FC = () => {
     const highlightedNodeId = draggingNodeId ?? hoveredNodeId;
     const [isDevLayoutPanelOpen, setIsDevLayoutPanelOpen] = useState(false);
     const [devLayoutPanelStatus, setDevLayoutPanelStatus] = useState<string | null>(null);
+    const [devLayoutViewportZoom, setDevLayoutViewportZoom] = useState<number | null>(null);
     const graphRelations = useMemo(
         () => graphModel ? getGraphRelations(graphModel) : [],
         [graphModel]
@@ -1128,8 +1134,11 @@ const NodeCanvas: React.FC = () => {
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
-    const currentLayoutExport = useMemo(() => buildInitialLayoutSnapshotExport(nodes), [nodes]);
     const { getViewport, setCenter, setViewport } = useReactFlow();
+    const currentLayoutExport = useMemo(
+        () => buildInitialLayoutSnapshotExport(nodes, devLayoutViewportZoom),
+        [devLayoutViewportZoom, nodes]
+    );
     const dragRafId = useRef<number | null>(null);
     const nodesRef = useRef<Node[]>(initialGraph.nodes);
     const edgesRef = useRef<Edge[]>(initialGraph.edges);
@@ -1241,9 +1250,11 @@ const NodeCanvas: React.FC = () => {
         requestAnimationFrame(() => {
             if (pendingRestore.viewport) {
                 setViewport(pendingRestore.viewport, { duration: 0 });
+                setDevLayoutViewportZoom(pendingRestore.viewport.zoom);
             }
 
             if (!pendingRestore.returnFocusNodeId) {
+                setDevLayoutViewportZoom((current) => current ?? getViewport().zoom);
                 return;
             }
 
@@ -1255,6 +1266,7 @@ const NodeCanvas: React.FC = () => {
 
             const center = getCenter(targetNode);
             const targetZoom = pendingRestore.viewport?.zoom ?? getViewport().zoom;
+            setDevLayoutViewportZoom(targetZoom);
 
             requestAnimationFrame(() => {
                 void waitForCurrentViewTransition().finally(() => {
@@ -1539,7 +1551,20 @@ const NodeCanvas: React.FC = () => {
         const storedView = readStoredGraphView();
         if (storedView?.viewport && getStoredGraphViewSignature(storedView) === graphNodeSetSignature) {
             instance.setViewport(storedView.viewport, { duration: 0 });
+            setDevLayoutViewportZoom(storedView.viewport.zoom);
             return;
+        }
+        if (initialGraph.layoutSource === 'snapshot' && typeof GRAPH_INITIAL_LAYOUT_SNAPSHOT?.initialZoom === 'number') {
+            const bioNode = initialGraph.nodes.find((node) => node.id === 'bio');
+            if (bioNode) {
+                const bioCenter = getCenter(bioNode);
+                instance.setCenter(bioCenter.x, bioCenter.y, {
+                    zoom: GRAPH_INITIAL_LAYOUT_SNAPSHOT.initialZoom,
+                    duration: 0,
+                });
+                setDevLayoutViewportZoom(GRAPH_INITIAL_LAYOUT_SNAPSHOT.initialZoom);
+                return;
+            }
         }
         instance.fitView({
             nodes: initialGraph.nodes.map((node) => ({ id: node.id })),
@@ -1547,11 +1572,13 @@ const NodeCanvas: React.FC = () => {
             duration: 500,
             includeHiddenNodes: false,
         });
+        setDevLayoutViewportZoom(instance.getViewport().zoom);
     };
 
     const onMoveEnd = useCallback(() => {
         persistCurrentGraphView(nodes);
-    }, [nodes, persistCurrentGraphView]);
+        setDevLayoutViewportZoom(getViewport().zoom);
+    }, [getViewport, nodes, persistCurrentGraphView]);
 
     const onNodeDrag = useCallback((_: unknown, dragged: Node) => {
         if (!graphModel) {
@@ -1743,7 +1770,8 @@ const NodeCanvas: React.FC = () => {
     }, [theme]);
 
     const handleCopyDevLayoutExport = useCallback(() => {
-        if (!currentLayoutExport) {
+        const liveLayoutExport = buildInitialLayoutSnapshotExport(nodesRef.current, getViewport().zoom);
+        if (!liveLayoutExport) {
             setDevLayoutPanelStatus('No graph layout is available yet.');
             return;
         }
@@ -1754,14 +1782,15 @@ const NodeCanvas: React.FC = () => {
             return;
         }
 
-        void clipboard.writeText(currentLayoutExport)
+        void clipboard.writeText(liveLayoutExport)
             .then(() => {
-                setDevLayoutPanelStatus('Copied snapshot export for initialLayoutSnapshot.ts.');
+                setDevLayoutViewportZoom(getViewport().zoom);
+                setDevLayoutPanelStatus('Copied snapshot export with initial zoom for initialLayoutSnapshot.ts.');
             })
             .catch(() => {
                 setDevLayoutPanelStatus('Clipboard copy failed.');
             });
-    }, [currentLayoutExport]);
+    }, [getViewport]);
 
     const handleClearStoredDevLayout = useCallback(() => {
         clearStoredGraphView();
@@ -1864,7 +1893,7 @@ const NodeCanvas: React.FC = () => {
                     {isDevLayoutPanelOpen && (
                         <>
                             <div style={{ marginTop: '0.45rem', fontSize: '0.76rem', lineHeight: 1.5, opacity: 0.76 }}>
-                                Export the current manually placed graph as a snapshot for <code>src/configs/graph/initialLayoutSnapshot.ts</code>. The computed layout path still stays as fallback when the snapshot is <code>null</code> or mismatched.
+                                Export the current manually placed graph and current zoom as a snapshot for <code>src/configs/graph/initialLayoutSnapshot.ts</code>. The computed layout path still stays as fallback when the snapshot is <code>null</code> or mismatched.
                             </div>
                             <div
                                 style={{
