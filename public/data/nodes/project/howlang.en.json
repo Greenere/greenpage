@@ -26,6 +26,20 @@
       "id": "overview"
     },
     {
+      "label": "Demo",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Sorting in howlang:"
+        },
+        {
+          "type": "code",
+          "code": "var merge = (nums1, nums2){\n    len(nums1) == 0 :: nums2,\n    len(nums2) == 0 :: nums1,\n    nums1(0) <= nums2(0) :: nums1(:1) + merge(nums1(1:),nums2),\n    :: nums2(:1) + merge(nums2(1:),nums1)\n}\n\nvar sort = (nums){\n    len(nums) == 1 :: {nums(0)},\n    len(nums) == 2 :: (ns){\n        ns(0) <= ns(1) :: ns,\n        :: {ns(1), ns(0)}\n    }(nums)\n    :: merge(sort(nums(:len(nums)/2)), sort(nums(len(nums)/2:)))\n}\n\nvar nums = {3,4,2,1,5,7,10,-1}\n\nprint(sort(nums))",
+          "language": "how"
+        }
+      ]
+    },
+    {
       "label": "source",
       "blocks": [
         {

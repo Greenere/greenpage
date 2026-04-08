@@ -1,0 +1,75 @@
+.greenpage-code-block {
+  margin: 0;
+  overflow-x: auto;
+  background: color-mix(in srgb, var(--color-background) 80%, black 20%);
+  color: var(--color-text);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.greenpage-code-block code {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.greenpage-code-block .token.comment,
+.greenpage-code-block .token.prolog,
+.greenpage-code-block .token.doctype,
+.greenpage-code-block .token.cdata {
+  color: color-mix(in srgb, var(--color-text) 44%, transparent);
+}
+
+.greenpage-code-block .token.punctuation {
+  color: color-mix(in srgb, var(--color-text) 82%, transparent);
+}
+
+.greenpage-code-block .token.property,
+.greenpage-code-block .token.tag,
+.greenpage-code-block .token.boolean,
+.greenpage-code-block .token.number,
+.greenpage-code-block .token.constant,
+.greenpage-code-block .token.symbol,
+.greenpage-code-block .token.deleted {
+  color: #d96b3b;
+}
+
+.greenpage-code-block .token.selector,
+.greenpage-code-block .token.attr-name,
+.greenpage-code-block .token.string,
+.greenpage-code-block .token.char,
+.greenpage-code-block .token.builtin,
+.greenpage-code-block .token.inserted {
+  color: #4d8f63;
+}
+
+.greenpage-code-block .token.operator,
+.greenpage-code-block .token.entity,
+.greenpage-code-block .token.url,
+.greenpage-code-block .token.variable {
+  color: #7a6dc3;
+}
+
+.greenpage-code-block .token.atrule,
+.greenpage-code-block .token.attr-value,
+.greenpage-code-block .token.keyword {
+  color: #2f72c8;
+}
+
+.greenpage-code-block .token.function,
+.greenpage-code-block .token.class-name {
+  color: #8f5e2c;
+}
+
+.greenpage-code-block .token.regex,
+.greenpage-code-block .token.important {
+  color: #b34563;
+}
+
+.greenpage-code-block .token.important,
+.greenpage-code-block .token.bold {
+  font-weight: 700;
+}
+
+.greenpage-code-block .token.italic {
+  font-style: italic;
+}
