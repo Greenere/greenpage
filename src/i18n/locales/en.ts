@@ -1,6 +1,6 @@
 export const EN_MESSAGES = {
   siteMeta: {
-    title: 'Entangled Life',
+    title: 'Haoyang Li\'s Entangled Life',
     iconHref: '/assets/icons/smile.svg',
     iconType: 'image/svg+xml',
   },
