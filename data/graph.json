@@ -348,17 +348,6 @@
       "strength": 4
     },
     {
-      "id": "editor-howlang-time-howlang-waymo-1",
-      "from": "howlang",
-      "to": "waymo",
-      "kind": "time",
-      "labels": {
-        "en": "during my spare time ",
-        "zh-CN": "工作之余的个人项目"
-      },
-      "strength": 1
-    },
-    {
       "id": "editor-cornell-time-verily-intern-cornell-1",
       "from": "verily-intern",
       "to": "cornell",
@@ -412,6 +401,17 @@
         "en": "trip during the Cornell years"
       },
       "strength": 2
+    },
+    {
+      "id": "editor-waymo-time-howlang-waymo-1",
+      "from": "howlang",
+      "to": "waymo",
+      "kind": "time",
+      "labels": {
+        "en": "during my spare time ",
+        "zh-CN": "工作之余的个人项目"
+      },
+      "strength": 1
     }
   ]
 }
