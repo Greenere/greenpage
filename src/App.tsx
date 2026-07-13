@@ -11,6 +11,7 @@ const NodeDetailPage = lazy(() => import('./pages/graph/NodeDetailPage'))
 const BioDetailPage = lazy(() => import('./pages/graph/BioDetailPage'))
 const GraphStatisticsPage = lazy(() => import('./pages/graph/GraphStatisticsPage'))
 const VisitorAnalysisPage = lazy(() => import('./pages/graph/VisitorAnalysisPage'))
+const TripDotsPage = lazy(() => import('./pages/tripdots/TripDotsPage'))
 
 function App() {
   const location = useLocation()
@@ -81,6 +82,14 @@ function App() {
         element={
           <Suspense fallback={<DetailPageSkeleton variant="node" />}>
             <VisitorAnalysisPage key={location.pathname} />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/tripdots"
+        element={
+          <Suspense fallback={<DetailPageSkeleton variant="node" />}>
+            <TripDotsPage key={location.pathname} />
           </Suspense>
         }
       />

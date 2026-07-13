@@ -1,0 +1,39 @@
+.tripdots-display-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tripdots-display-toggles__chip {
+  /* Solid border = on, dotted = off — the fill/text color never changes
+     with state, only the border style, so toggling doesn't compete for
+     attention with the map's own use of color. */
+  border: 1.5px dotted color-mix(in srgb, var(--color-secondary) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-background) 82%, white 18%);
+  color: inherit;
+  padding: calc(0.38rem - 1.5px) calc(0.75rem - 1.5px);
+  font-size: 0.74rem;
+  font-weight: 600;
+  opacity: 0.72;
+  cursor: pointer;
+  transition: opacity 160ms ease;
+}
+
+.tripdots-display-toggles__chip--active {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--color-secondary) 55%, transparent);
+  opacity: 1;
+}
+
+/* The dotted/solid border already communicates state — a browser focus
+   ring on top of it (which appears even on a plain mouse click) is just
+   visual noise. Keep an outline for real keyboard navigation only. */
+.tripdots-display-toggles__chip:focus {
+  outline: none;
+}
+
+.tripdots-display-toggles__chip:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-secondary) 60%, transparent);
+  outline-offset: 2px;
+}

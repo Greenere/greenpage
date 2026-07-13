@@ -1,0 +1,73 @@
+.tripdots-time-slider {
+  padding: 0.7rem 0.9rem 0.8rem;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--color-background) 82%, white 18%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 12%, transparent);
+}
+
+.tripdots-time-slider__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.tripdots-time-slider__value {
+  font-weight: 600;
+  opacity: 1;
+  text-align: right;
+}
+
+.tripdots-time-slider__track {
+  position: relative;
+  height: 1.6rem;
+  margin-top: 0.35rem;
+}
+
+.tripdots-time-slider__track input[type='range'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.tripdots-time-slider__track input[type='range']::-webkit-slider-runnable-track {
+  height: 0.3rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-secondary) 24%, transparent);
+}
+
+.tripdots-time-slider__track input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.35rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-background) 60%, white 40%);
+  cursor: pointer;
+}
+
+.tripdots-time-slider__track input[type='range']::-moz-range-track {
+  height: 0.3rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-secondary) 24%, transparent);
+}
+
+.tripdots-time-slider__track input[type='range']::-moz-range-thumb {
+  pointer-events: auto;
+  width: 1rem;
+  height: 1rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+}

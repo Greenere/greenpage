@@ -1,0 +1,69 @@
+.tripdots-funfacts {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-secondary) 18%, transparent);
+  /* The parent intro card is pointer-events:none (so the map underneath it
+     stays interactive) — re-enable it here so the month bar can be hovered. */
+  pointer-events: auto;
+}
+
+.tripdots-funfacts__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem 0.9rem;
+}
+
+.tripdots-funfacts__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.tripdots-funfacts__value {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.tripdots-funfacts__label {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.tripdots-funfacts__place {
+  font-size: 0.74rem;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tripdots-funfacts__month {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+}
+
+.tripdots-funfacts__bar {
+  display: flex;
+  gap: 2px;
+  height: 0.55rem;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.tripdots-funfacts__bar-segment {
+  flex-basis: 0;
+  min-width: 2px;
+  background: color-mix(in srgb, var(--color-primary) 70%, transparent);
+  transition: background-color 120ms ease;
+  cursor: default;
+}
+
+.tripdots-funfacts__bar-segment:hover {
+  background: var(--color-primary);
+}

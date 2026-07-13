@@ -109,6 +109,10 @@ function resolveTrackedPageTitle(
     return UI_COPY.visitorAnalysisPage.title;
   }
 
+  if (normalizedPath === '/tripdots') {
+    return UI_COPY.tripDotsPage.title;
+  }
+
   const nodeIdMatch = normalizedPath.match(/^\/nodes\/([^/]+)$/);
   if (nodeIdMatch) {
     const nodeId = decodeURIComponent(nodeIdMatch[1]);

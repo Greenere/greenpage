@@ -1,0 +1,84 @@
+.tripdots-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.tripdots-sidebar__heading {
+  padding: 0 0.2rem 0.6rem;
+}
+
+.tripdots-sidebar__heading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.tripdots-sidebar__heading p {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.68;
+}
+
+.tripdots-sidebar__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.5rem;
+  padding-right: 0.15rem;
+}
+
+.tripdots-sidebar__item {
+  /* Solid border = selected, dotted = unselected — fill/text color never
+     changes with state, matching the display-toggle chips' language. */
+  text-align: left;
+  border: 1.5px dotted color-mix(in srgb, var(--color-secondary) 30%, transparent);
+  border-radius: 0.9rem;
+  padding: calc(0.65rem - 1.5px) calc(0.8rem - 1.5px);
+  background: color-mix(in srgb, var(--color-background) 82%, white 18%);
+  cursor: pointer;
+  transition: border-color 160ms ease;
+  color: inherit;
+  font-family: inherit;
+}
+
+.tripdots-sidebar__item:hover,
+.tripdots-sidebar__item:focus-visible {
+  border-color: color-mix(in srgb, var(--color-secondary) 55%, transparent);
+}
+
+/* The border-color bump above is the focus/hover affordance — the browser's
+   default focus ring (which appears even on a plain mouse click) on top of
+   it is just visual noise. */
+.tripdots-sidebar__item:focus {
+  outline: none;
+}
+
+.tripdots-sidebar__item--active {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--color-secondary) 60%, transparent);
+}
+
+.tripdots-sidebar__item-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+.tripdots-sidebar__item-meta {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  opacity: 0.7;
+}
+
+.tripdots-sidebar__empty {
+  padding: 1rem 0.9rem;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--color-background) 78%, white 22%);
+  font-size: 0.86rem;
+  opacity: 0.75;
+}
