@@ -13,8 +13,10 @@ const MIN_SEGMENT_FLEX = 1.5;
 function StatItem({ value, label, place }: { value: string; label: string; place: string }) {
   return (
     <div className="tripdots-funfacts__stat">
-      <span className="tripdots-funfacts__value">{value}</span>
-      <span className="tripdots-funfacts__label">{label}</span>
+      <div className="tripdots-funfacts__stat-row">
+        <span className="tripdots-funfacts__value">{value}</span>
+        <span className="tripdots-funfacts__label">{label}</span>
+      </div>
       <span className="tripdots-funfacts__place">{place}</span>
     </div>
   );

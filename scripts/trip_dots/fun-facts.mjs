@@ -1,3 +1,4 @@
+import { haversineDistanceKm } from './geo-utils.mjs';
 import { ALTITUDE_SENTINEL_M } from './constants.mjs';
 
 // Fun facts for the intro card: geographic extremes (lat/lon + the ground
@@ -34,10 +35,20 @@ export function computeFunFacts(cleanedPoints, trips, stays) {
     }
   }
 
+  // Attributed hop-by-hop (not the trip's whole distance dumped into its
+  // start month) — a trip spanning a month boundary, or a multi-month trip
+  // like a long road trip, would otherwise wildly overcount whichever month
+  // it happened to start in.
   const monthlyDistanceKm = new Array(12).fill(0);
   for (const trip of trips) {
-    const month = new Date(trip.startTs * 1000).getUTCMonth();
-    monthlyDistanceKm[month] += trip.totalDistanceKm;
+    const points = trip.points;
+    for (let i = 1; i < points.length; i++) {
+      const a = points[i - 1];
+      const b = points[i];
+      const midTs = (a.ts + b.ts) / 2;
+      const month = new Date(midTs * 1000).getUTCMonth();
+      monthlyDistanceKm[month] += haversineDistanceKm(a.lon, a.lat, b.lon, b.lat);
+    }
   }
   const totalDistanceKm = monthlyDistanceKm.reduce((sum, km) => sum + km, 0);
 
