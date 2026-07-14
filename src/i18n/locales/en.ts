@@ -82,7 +82,7 @@ export const EN_MESSAGES = {
     tripDotsPage: {
       eyebrow: 'Travel',
       title: 'Trip dots',
-      subtitle: 'GPS history, mapped on the globe.',
+      subtitle: 'GPS history on the globe.',
       loading: 'Loading travel history...',
       errorLoading: 'Error loading travel history',
       viewModeGlobe: 'Globe',

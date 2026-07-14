@@ -82,7 +82,7 @@ export const ZH_CN_MESSAGES = {
     tripDotsPage: {
       eyebrow: '旅行',
       title: '足迹地图',
-      subtitle: 'GPS 记录，绘制在地球上。',
+      subtitle: '地球上的 GPS 记录。',
       loading: '正在加载旅行记录...',
       errorLoading: '旅行记录加载失败',
       viewModeGlobe: '地球',
