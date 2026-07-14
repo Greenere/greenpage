@@ -91,6 +91,20 @@ export const OSRM_USER_AGENT = 'greenpage-tripdots-builder/1.0 (personal site bu
 // confirmed flight (~1600km, Miami to Puerto Rico).
 export const PHOTO_TRIP_MAX_DRIVE_KM = 700;
 
+// tripline's per-trip files (see tripline-import.mjs) skip our own stay
+// detection entirely, so unlike GPS-derived stays (always >= 20 dwell
+// minutes, STAY_MIN_DURATION_MIN) they carry no minimum-dwell floor — a
+// single photo snapped in passing during a long walk or drive becomes its
+// own "stay" with durationMin 0. Confirmed on real data (Boston, Old San
+// Juan, Puerto Rico trips): every point tripline ever merges more than one
+// photo into (pointCount >= 2) has real dwell time; every pointCount === 1
+// point has durationMin === 0, with no exceptions. That split is a clean,
+// principled signal for "did this look like an actual stop" — a dot is only
+// drawn for a stay meeting this floor; stays below it still contribute their
+// coordinates to the connecting route line, just without their own marker
+// (see buildTripGeoJson in write-outputs.mjs).
+export const MIN_STAY_POINT_COUNT_FOR_DOT = 2;
+
 // Fun facts (intro-card stats): a bogus GPS altitude reading recurs as this
 // exact value (found identically 8 times across unrelated points in this
 // dataset — real altitude noise never repeats exactly) — almost certainly a

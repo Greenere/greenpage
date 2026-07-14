@@ -18,6 +18,7 @@ import {
   HOME_NIGHT_END_HOUR,
   OVERNIGHT_MIN_DURATION_MIN,
   PHOTO_TRIP_MAX_DRIVE_KM,
+  MIN_STAY_POINT_COUNT_FOR_DOT,
 } from './constants.mjs';
 
 function monthYearLabel(ts) {
@@ -227,10 +228,18 @@ function renderTripLineFeatures(segments, recoveredRoutes) {
   });
 }
 
+// Only stays that look like a real stop get their own dot — a single
+// passing photo (pointCount 1, see MIN_STAY_POINT_COUNT_FOR_DOT) still
+// contributes its coordinates to the connecting route line above, just
+// without a marker cluttering the map. The trip's first and last stay are
+// always kept regardless, since they're the visual anchor a boundary hop
+// (departure/return correction, or a GPS trip's home leg) connects to.
 function buildTripGeoJson(trip, getLabel, segments, recoveredRoutes) {
   const features = renderTripLineFeatures(segments, recoveredRoutes);
 
-  for (const stay of trip.stays) {
+  trip.stays.forEach((stay, index) => {
+    const isBoundary = index === 0 || index === trip.stays.length - 1;
+    if (!isBoundary && (stay.pointCount ?? Infinity) < MIN_STAY_POINT_COUNT_FOR_DOT) return;
     features.push(
       point([stay.lon, stay.lat], {
         startTs: stay.startTs,
@@ -241,7 +250,7 @@ function buildTripGeoJson(trip, getLabel, segments, recoveredRoutes) {
         isOvernight: isOvernightStay(stay),
       }),
     );
-  }
+  });
   const fc = featureCollection(features);
   fc.bbox = features.length > 0 ? bboxOf(fc) : trip.bbox;
   return fc;
@@ -471,9 +480,20 @@ export async function writeOutputs({
   const allGapHops = tripPlans.flatMap(({ trip, segments }) => {
     const gaps = segments.filter((segment) => segment.type === 'gap');
     if (trip.source !== 'photo') return gaps;
-    // See PHOTO_TRIP_MAX_DRIVE_KM — without reliable timing, distance alone
-    // has to stand in for "is this even plausible to drive".
-    return gaps.filter((hop) => haversineDistanceKm(hop.a.lon, hop.a.lat, hop.b.lon, hop.b.lat) <= PHOTO_TRIP_MAX_DRIVE_KM);
+    const window = trip.nonDrivableWindow;
+    return gaps.filter((hop) => {
+      // See PHOTO_TRIP_MAX_DRIVE_KM — without reliable timing, distance alone
+      // has to stand in for "is this even plausible to drive".
+      if (haversineDistanceKm(hop.a.lon, hop.a.lat, hop.b.lon, hop.b.lat) > PHOTO_TRIP_MAX_DRIVE_KM) return false;
+      // trip.nonDrivableWindow (see photo-trip-corrections.mjs) marks a span
+      // where consecutive stays are close enough to look drivable but
+      // weren't — e.g. a boat tour, where OSRM would otherwise snap the
+      // offshore endpoints onto the nearest coastal road.
+      if (window && hop.a.startTs >= window.startTs && hop.a.startTs <= window.endTs && hop.b.startTs >= window.startTs && hop.b.startTs <= window.endTs) {
+        return false;
+      }
+      return true;
+    });
   });
   const recoveredRoutes = await recoverDriveSegments(allGapHops);
 

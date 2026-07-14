@@ -178,6 +178,7 @@ export async function detectPhotoTrips({ csvPath, cutoffTs }) {
         source: 'photo',
         departureOverride: correction?.departure ?? null,
         returnOverride: correction?.return ?? null,
+        nonDrivableWindow: correction?.nonDrivableWindow ?? null,
       };
     })
     .filter((trip) => trip.maxDistanceFromHomeKm >= TRIP_MIN_DISTANCE_KM);

@@ -22,6 +22,15 @@
 // including) the trip's first stay; `return.waypoints` runs from (but not
 // including) the trip's last stay back to home.
 //
+// `nonDrivableWindow` marks a [startTs, endTs] span within the trip where
+// consecutive stays shouldn't attempt driving-route recovery even though
+// they're close enough in distance/time to look plausible — e.g. a boat
+// tour, where OSRM will happily snap the offshore endpoints onto the
+// nearest coastal road and "recover" a winding road route that was never
+// actually driven. Any internal hop with both endpoints inside the window
+// falls back to the plain great-circle arc every other unresolved gap uses
+// (see the allGapHops filter in write-outputs.mjs).
+//
 // Every hop in a chain renders with the correction's own `mode` by default,
 // but an individual waypoint can carry its own `mode` to override just the
 // hop arriving at it — e.g. a flight chain that lands at an airport and
@@ -112,9 +121,12 @@ export const PHOTO_TRIP_CORRECTIONS = {
   },
   // Boston, Jun 23-28 2022: summer 2022 was based out of the San Bruno home;
   // flew both ways (only sensible mode for a ~4000km round trip this short).
+  // Also took a whale-watching boat tour out of Boston Harbor (the stretch
+  // of stays out toward Cohasset/Hull and beyond) — not road travel at all.
   'photo-trip-1656023736': {
     departure: { waypoints: [SAN_BRUNO_HOME], mode: 'flight' },
     return: { waypoints: [SAN_BRUNO_HOME], mode: 'flight' },
+    nonDrivableWindow: { startTs: 1656279085, endTs: 1656289828 },
   },
   // Seattle, Jul 16-18 2022: same San Bruno summer base; flew both ways.
   'photo-trip-1657956002': {
