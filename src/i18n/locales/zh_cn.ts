@@ -99,6 +99,7 @@ export const ZH_CN_MESSAGES = {
       homeLabel: (label: string) => `家 · ${label}`,
       tripDurationDays: (days: number) => `${days} 天`,
       allTrailsButton: '全部轨迹',
+      photoTripsButton: '照片行程',
       showFlightsToggle: '航班',
       highlightOvernightToggle: '过夜地点',
       showDotsToggle: '点位',

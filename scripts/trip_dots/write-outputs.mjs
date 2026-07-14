@@ -17,6 +17,7 @@ import {
   HOME_NIGHT_START_HOUR,
   HOME_NIGHT_END_HOUR,
   OVERNIGHT_MIN_DURATION_MIN,
+  PHOTO_TRIP_MAX_DRIVE_KM,
 } from './constants.mjs';
 
 function monthYearLabel(ts) {
@@ -135,6 +136,68 @@ function planTripSegments(trip, home) {
     const homeEndpoint = { lon: home.lon, lat: home.lat, ts: trip.followingHomeStayStartTs };
     const returnType = classifyBoundaryHop(lastPoint, homeEndpoint);
     segments.push({ type: returnType, key: `${trip.id}:return`, a: lastPoint, b: homeEndpoint });
+  }
+
+  return segments;
+}
+
+// Photo-derived trips have no continuous GPS trace at all — every hop
+// between consecutive stays is planned as a "gap" or "flight" descriptor
+// (never 'trace', since we have no real path data to back that up). Stay
+// startTs/endTs are reliable here (unlike the raw CSV source, tripline's
+// per-trip files carry real photo timestamps throughout), so a plain
+// implied-speed check is enough to separate the two — same threshold the
+// main pipeline uses. "gap" stay objects never carry a `.ts` field (only
+// startTs/endTs), so recoverDriveSegments treats every one of these as "no
+// reliable timing" and validates purely on route-distance plausibility —
+// same path already used for the main pipeline's departure/return
+// home-boundary hops. The caller additionally caps which of these are even
+// attempted (PHOTO_TRIP_MAX_DRIVE_KM) so an implausibly long hop that
+// happens to have *some* valid driving route doesn't get wrongly accepted
+// just because there's no duration to check it against — see
+// write-outputs.mjs's allGapHops collection. "flight" hops skip recovery
+// entirely, same as the main pipeline.
+//
+// Unlike GPS trips, there's no automatic departure/return leg to a home
+// anchor — no reliable timestamp at the home end to know it even happened,
+// let alone how. trip.departureOverride/returnOverride (see
+// photo-trip-corrections.mjs) supply that by hand where it's been manually
+// confirmed; trips without a correction simply don't get a boundary hop
+// drawn, same as before. A boundary "leg" can be more than one hop (e.g. a
+// connecting flight through another city) — waypoints is the ordered chain
+// of points to insert. Every hop renders as override.mode by default, but a
+// waypoint can carry its own `mode` to override just the hop arriving at it
+// (e.g. a flight chain that finishes with a short drive home from the
+// airport).
+function planBoundaryChain(trip, override, keyPrefix, chain) {
+  const segments = [];
+  for (let i = 1; i < chain.length; i++) {
+    const hopType = chain[i].mode ?? override.mode;
+    segments.push({ type: hopType, key: `${trip.id}:photo:${keyPrefix}:${i}`, a: chain[i - 1], b: chain[i] });
+  }
+  return segments;
+}
+
+function planPhotoTripSegments(trip) {
+  const segments = [];
+
+  if (trip.departureOverride) {
+    segments.push(...planBoundaryChain(trip, trip.departureOverride, 'departure', [...trip.departureOverride.waypoints, trip.stays[0]]));
+  }
+
+  for (let i = 1; i < trip.stays.length; i++) {
+    const a = trip.stays[i - 1];
+    const b = trip.stays[i];
+    const distanceKm = haversineDistanceKm(a.lon, a.lat, b.lon, b.lat);
+    const timeHours = (b.startTs - a.startTs) / 3600;
+    const speedKmh = timeHours > 0 ? distanceKm / timeHours : Infinity;
+    const type = speedKmh >= GAP_MIN_SPEED_KMH ? 'flight' : 'gap';
+    segments.push({ type, key: `${trip.id}:photo:${i}`, a, b });
+  }
+
+  if (trip.returnOverride) {
+    const lastStay = trip.stays[trip.stays.length - 1];
+    segments.push(...planBoundaryChain(trip, trip.returnOverride, 'return', [lastStay, ...trip.returnOverride.waypoints]));
   }
 
   return segments;
@@ -279,6 +342,7 @@ export async function writeOutputs({
   outputDir,
   trips,
   homeCenters,
+  historicalHomeCenters,
   cleanedPoints,
   classifiedStays,
   getLabel,
@@ -298,6 +362,61 @@ export async function writeOutputs({
 
   const homeById = new Map(homeCenters.map((home) => [home.id, home]));
 
+  // historicalHomeCenters (see photo-trip-corrections.mjs) are hand-supplied
+  // pre-2023 homes that predate the dense-GPS dataset entirely — merged in
+  // here, after detectHomeCenters()'s real output is already finalized, so
+  // they can't influence which home a 2023+ GPS stay gets classified against
+  // (they're display-only, for the map's home markers).
+  const allHomeCenters = [...homeCenters, ...(historicalHomeCenters ?? [])].sort((a, b) => a.activeStart - b.activeStart);
+
+  // Home center(s) near a point, within a tight tolerance — used to figure
+  // out which home marker(s) are actually relevant to a given trip. Most
+  // corrected photo-trip boundary waypoints reuse the exact same coordinates
+  // as their matching HISTORICAL_HOME_CENTERS entry (see
+  // photo-trip-corrections.mjs); a couple (Philly/Niagara's ITHACA_ROUGH) are
+  // a rough pre-address-confirmation stand-in for the same physical home,
+  // ~1.15km from its precise geocoded address — 2km comfortably covers that
+  // gap without being loose enough to conflate genuinely different places
+  // (e.g. SFO_AIRPORT sits ~4km from the San Bruno home). That same rough
+  // anchor sits almost equidistant between two *different* real addresses
+  // (Dearborn Pl and the later Veterans Pl home, ~1.15km and ~1.15km away
+  // respectively) — nearest-distance alone can't disambiguate them, so when
+  // more than one home is within tolerance, the trip's own date breaks the
+  // tie (whichever home's active range covers, or is closest to, refTs).
+  const HOME_MATCH_MAX_KM = 2;
+  function matchHomeCenterId(pt, refTs) {
+    const candidates = allHomeCenters.filter((home) => haversineDistanceKm(pt.lon, pt.lat, home.lon, home.lat) <= HOME_MATCH_MAX_KM);
+    if (candidates.length === 0) return null;
+    let best = candidates[0];
+    let bestGap = Infinity;
+    for (const home of candidates) {
+      const gap = refTs < home.activeStart ? home.activeStart - refTs : refTs > home.activeEnd ? refTs - home.activeEnd : 0;
+      if (gap < bestGap) {
+        bestGap = gap;
+        best = home;
+      }
+    }
+    return best.id;
+  }
+
+  // Which home marker(s) are relevant to this trip. GPS trips already carry
+  // a single classified home; photo trips have no such classification, so
+  // this is derived from whichever manually-confirmed boundary waypoints
+  // (see photo-trip-corrections.mjs) land on a known home — e.g. a trip that
+  // departs from one home and returns to a different one (a relocation
+  // mid-trip) legitimately has two. Trips without a matching home (nothing
+  // confirmed yet) get none.
+  function tripHomeCenterIds(trip) {
+    if (trip.source !== 'photo') return trip.homeCenterId ? [trip.homeCenterId] : [];
+    const ids = [
+      trip.departureOverride ? matchHomeCenterId(trip.departureOverride.waypoints[0], trip.startTs) : null,
+      trip.returnOverride
+        ? matchHomeCenterId(trip.returnOverride.waypoints[trip.returnOverride.waypoints.length - 1], trip.endTs)
+        : null,
+    ].filter(Boolean);
+    return [...new Set(ids)];
+  }
+
   const tripsIndex = trips.map((trip) => {
     const placeNames = [];
     for (const stay of trip.stays) {
@@ -312,6 +431,8 @@ export async function writeOutputs({
       distanceKm: Math.round(trip.totalDistanceKm),
       bbox: trip.bbox,
       stayPoints: trip.stays.map((stay) => [Number(stay.lon.toFixed(4)), Number(stay.lat.toFixed(4))]),
+      source: trip.source ?? 'gps',
+      homeCenterIds: tripHomeCenterIds(trip),
     };
   });
 
@@ -345,9 +466,15 @@ export async function writeOutputs({
   // one batch (shared cache across trips, one throttled pass over the net).
   const tripPlans = trips.map((trip) => ({
     trip,
-    segments: planTripSegments(trip, homeById.get(trip.homeCenterId)),
+    segments: trip.source === 'photo' ? planPhotoTripSegments(trip) : planTripSegments(trip, homeById.get(trip.homeCenterId)),
   }));
-  const allGapHops = tripPlans.flatMap(({ segments }) => segments.filter((segment) => segment.type === 'gap'));
+  const allGapHops = tripPlans.flatMap(({ trip, segments }) => {
+    const gaps = segments.filter((segment) => segment.type === 'gap');
+    if (trip.source !== 'photo') return gaps;
+    // See PHOTO_TRIP_MAX_DRIVE_KM — without reliable timing, distance alone
+    // has to stand in for "is this even plausible to drive".
+    return gaps.filter((hop) => haversineDistanceKm(hop.a.lon, hop.a.lat, hop.b.lon, hop.b.lat) <= PHOTO_TRIP_MAX_DRIVE_KM);
+  });
   const recoveredRoutes = await recoverDriveSegments(allGapHops);
 
   // Compute each trip's GeoJSON once, write it to its own lazy-loaded file,
@@ -375,7 +502,11 @@ export async function writeOutputs({
     'utf8',
   );
 
-  const homeLifeFeatures = buildHomeLifeFeatures(cleanedPoints, trips, classifiedStays);
+  // Photo-derived trips aren't part of cleanedPoints (a separate historical
+  // dataset entirely) — computeNonTripChunks' cursor logic assumes every
+  // trip's window falls within cleanedPoints, so only GPS trips belong here.
+  const gpsTrips = trips.filter((trip) => trip.source !== 'photo');
+  const homeLifeFeatures = buildHomeLifeFeatures(cleanedPoints, gpsTrips, classifiedStays);
   await writeFile(
     path.join(outputDir, 'all-trails.geojson'),
     JSON.stringify({ type: 'FeatureCollection', features: [...overviewFeatures, ...homeLifeFeatures] }),
@@ -385,7 +516,7 @@ export async function writeOutputs({
   await writeFile(
     path.join(outputDir, 'home-centers.json'),
     JSON.stringify(
-      homeCenters.map((home) => ({
+      allHomeCenters.map((home) => ({
         id: home.id,
         label: getLabel(home.lon, home.lat),
         center: [Number(home.lon.toFixed(5)), Number(home.lat.toFixed(5))],
@@ -402,9 +533,15 @@ export async function writeOutputs({
     'utf8',
   );
 
-  const dateRange = cleanedPoints.reduce(
-    (range, pt) => ({ startTs: Math.min(range.startTs, pt.ts), endTs: Math.max(range.endTs, pt.ts) }),
-    { startTs: Infinity, endTs: -Infinity },
+  // Photo-derived trips can predate cleanedPoints entirely (a separate,
+  // earlier historical dataset) — fold their dates in too, or the time-range
+  // slider's default "all time" span wouldn't actually include them.
+  const dateRange = trips.reduce(
+    (range, trip) => ({ startTs: Math.min(range.startTs, trip.startTs), endTs: Math.max(range.endTs, trip.endTs) }),
+    cleanedPoints.reduce(
+      (range, pt) => ({ startTs: Math.min(range.startTs, pt.ts), endTs: Math.max(range.endTs, pt.ts) }),
+      { startTs: Infinity, endTs: -Infinity },
+    ),
   );
 
   await writeFile(

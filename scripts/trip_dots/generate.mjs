@@ -1,4 +1,5 @@
 import path from 'node:path';
+import os from 'node:os';
 import { access } from 'node:fs/promises';
 import { loadCleanedPoints } from './parse-csv.mjs';
 import { detectStayPoints } from './stay-points.mjs';
@@ -8,9 +9,15 @@ import { geocodeCentroids } from './geocode.mjs';
 import { writeOutputs } from './write-outputs.mjs';
 import { getCentralStay } from './trip-naming.mjs';
 import { computeFunFacts } from './fun-facts.mjs';
+import { detectPhotoTrips } from './photo-trips.mjs';
+import { HISTORICAL_HOME_CENTERS } from './photo-trip-corrections.mjs';
+import { ANALYSIS_START_TS } from './constants.mjs';
 
-const CSV_RELATIVE_PATH = 'public/data/trip_dots_20260712.csv';
 const OUTPUT_RELATIVE_DIR = 'public/data/tripdots';
+// Personal location history, deliberately kept outside the repo entirely —
+// see scripts/trip_dots/README.md.
+const MAIN_CSV_PATH = path.join(os.homedir(), 'files/tripdots/trip_dots_20260712.csv');
+const PHOTO_CSV_PATH = path.join(os.homedir(), 'files/tripdots/photo_dots_2023.csv');
 
 function formatTripDebugRow(trip, getLabel) {
   const startDate = new Date(trip.startTs * 1000).toISOString().slice(0, 10);
@@ -29,7 +36,7 @@ function formatTripDebugRow(trip, getLabel) {
 }
 
 export async function generateTripDots({ rootDir, debug = false }) {
-  const csvPath = path.resolve(rootDir, CSV_RELATIVE_PATH);
+  const csvPath = MAIN_CSV_PATH;
   const outputDir = path.resolve(rootDir, OUTPUT_RELATIVE_DIR);
 
   // The raw GPS CSV is deliberately not committed (85MB of personal location
@@ -50,12 +57,15 @@ export async function generateTripDots({ rootDir, debug = false }) {
   const homeCenters = detectHomeCenters(stays);
   const classifiedStays = classifyStays(stays, homeCenters);
 
-  const trips = segmentTrips(classifiedStays, cleanedPoints, homeCenters);
+  const gpsTrips = segmentTrips(classifiedStays, cleanedPoints, homeCenters);
+  const photoTrips = await detectPhotoTrips({ csvPath: PHOTO_CSV_PATH, cutoffTs: ANALYSIS_START_TS });
+  const trips = [...photoTrips, ...gpsTrips];
   const funFacts = computeFunFacts(cleanedPoints, trips, stays);
 
   const funFactPoints = [funFacts.northmost, funFacts.southmost, funFacts.highest, funFacts.lowest].filter(Boolean);
   const centroidsToGeocode = [
     ...homeCenters.map((home) => ({ lon: home.lon, lat: home.lat })),
+    ...HISTORICAL_HOME_CENTERS.map((home) => ({ lon: home.lon, lat: home.lat })),
     ...trips.flatMap((trip) => trip.stays.map((stay) => ({ lon: stay.lon, lat: stay.lat }))),
     ...funFactPoints.map((point) => ({ lon: point.lon, lat: point.lat })),
   ];
@@ -87,6 +97,7 @@ export async function generateTripDots({ rootDir, debug = false }) {
     outputDir,
     trips,
     homeCenters,
+    historicalHomeCenters: HISTORICAL_HOME_CENTERS,
     cleanedPoints,
     classifiedStays,
     getLabel,

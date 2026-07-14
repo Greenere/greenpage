@@ -1,4 +1,7 @@
 // Computed/derived fields, regenerated from raw GPS data on every build.
+// "photo" trips are a one-off historical reconstruction from photo EXIF
+// locations (2022-2023, before continuous GPS tracking starts) — sparser and
+// less precise than "gps" trips (see scripts/trip_dots/photo-trips.mjs).
 type TripIndexEntry = {
   id: string;
   startTs: number;
@@ -7,6 +10,8 @@ type TripIndexEntry = {
   distanceKm: number;
   bbox: [number, number, number, number];
   stayPoints: [number, number][];
+  source: 'gps' | 'photo';
+  homeCenterIds: string[];
 };
 
 // Human-editable fields, hand-tuned per trip and preserved across

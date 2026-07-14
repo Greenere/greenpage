@@ -25,7 +25,7 @@
     "displayDurationDays": 1
   },
   "trip-1690564400": {
-    "title": "New York City, United States · Jul 2023",
+    "title": "New York City · Jul 2023",
     "displayStartTs": 1690564400,
     "displayDurationDays": 7
   },
@@ -65,7 +65,7 @@
     "displayDurationDays": 9
   },
   "trip-1702162208": {
-    "title": "Marin Headlands, California · Dec 2023",
+    "title": "Point Reyes, California · Dec 2023",
     "displayStartTs": 1702162208,
     "displayDurationDays": 2
   },
@@ -203,5 +203,80 @@
     "title": "Newport & Ithaca, RI/MA/NY· Jul 2026",
     "displayStartTs": 1782985244,
     "displayDurationDays": 6
+  },
+  "photo-trip-1653849389": {
+    "title": "Santa Cruz, California · May 2022",
+    "displayStartTs": 1653849389,
+    "displayDurationDays": 1
+  },
+  "photo-trip-1656023736": {
+    "title": "Boston, Massachusetts · Jun 2022",
+    "displayStartTs": 1656023736,
+    "displayDurationDays": 4
+  },
+  "photo-trip-1657997104": {
+    "title": "Seattle, Washington · Jul 2022",
+    "displayStartTs": 1657997104,
+    "displayDurationDays": 1
+  },
+  "photo-trip-1660626893": {
+    "title": "Washington, District of Columbia · Aug 2022",
+    "displayStartTs": 1660626893,
+    "displayDurationDays": 6
+  },
+  "photo-trip-1664636182": {
+    "title": "Watertown, New York · Oct 2022",
+    "displayStartTs": 1664636182,
+    "displayDurationDays": 1
+  },
+  "photo-trip-1669942563": {
+    "title": "Santa Barbara, California · Dec 2022",
+    "displayStartTs": 1669942563,
+    "displayDurationDays": 2
+  },
+  "photo-trip-1671577817": {
+    "title": "San Juan, Puerto Rico · Dec 2022",
+    "displayStartTs": 1671577817,
+    "displayDurationDays": 5
+  },
+  "photo-trip-1673391334": {
+    "title": "New York City · Jan 2023",
+    "displayStartTs": 1673391334,
+    "displayDurationDays": 6
+  },
+  "photo-trip-1685126044": {
+    "title": "San Diego, California · May 2023",
+    "displayStartTs": 1685126044,
+    "displayDurationDays": 3
+  },
+  "photo-trip-1642767913": {
+    "title": "New York City · Jan 2022",
+    "displayStartTs": 1642767913,
+    "displayDurationDays": 2
+  },
+  "photo-trip-1645821620": {
+    "title": "Philadelphia, Pennsylvania · Feb 2022",
+    "displayStartTs": 1645821620,
+    "displayDurationDays": 3
+  },
+  "photo-trip-1649100115": {
+    "title": "Niagara Falls, New York · Apr 2022",
+    "displayStartTs": 1649100115,
+    "displayDurationDays": 3
+  },
+  "photo-trip-1657956002": {
+    "title": "Seattle, Washington · Jul 2022",
+    "displayStartTs": 1657956002,
+    "displayDurationDays": 2
+  },
+  "photo-trip-1660617447": {
+    "title": "Washington, D.C.· Aug 2022",
+    "displayStartTs": 1660617447,
+    "displayDurationDays": 6
+  },
+  "photo-trip-1669940236": {
+    "title": "Santa Barbara, California · Dec 2022",
+    "displayStartTs": 1669940236,
+    "displayDurationDays": 2
   }
 }

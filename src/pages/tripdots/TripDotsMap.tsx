@@ -61,7 +61,6 @@ function resolveFlavor(): Flavor {
 type TripDotsPalette = {
   tripLine: string;
   tripStay: string;
-  homeMarker: string;
   overnightHighlight: string;
 };
 
@@ -74,7 +73,6 @@ function resolvePalette(): TripDotsPalette {
   return {
     tripLine: read('--color-primary', '#d3564b'),
     tripStay: read('--color-accent', '#e0a45c'),
-    homeMarker: read('--color-text', '#46513a'),
     overnightHighlight: '#f4c542',
   };
 }
@@ -507,34 +505,41 @@ export default function TripDotsMap({
         type: 'circle',
         source: markerId,
         paint: {
-          'circle-radius': 6,
-          'circle-color': paletteRef.current.homeMarker,
+          'circle-radius': 5,
+          'circle-color': paletteRef.current.tripStay,
           'circle-stroke-color': '#fff',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1.5,
         },
       });
     }
   }, [homeCenters, mapReady]);
 
-  // Home markers follow the same "dots"/"overnight" language as the stay
-  // dots above: "dots" governs whether they show at all, and since a home
-  // is by definition a place you stay overnight, "overnight" always
-  // highlights them (no isOvernight property needed) and — when dots are
-  // off — keeps them visible as a hollow ring instead of hiding them too.
+  // Home markers follow the same "dots"/"overnight" language and the same
+  // fill/stroke treatment as the stay dots above (a home is just a place you
+  // stay, definitionally overnight) — no separate "home" color, so it reads
+  // as part of the same dot vocabulary rather than a distinct, louder marker.
+  // When a specific trip is selected, only the home(s) actually relevant to
+  // that trip (trip.homeCenterIds, computed at build time from the trip's
+  // classified home or its confirmed departure/return waypoints — see
+  // write-outputs.mjs) stay visible; a trip that departed from one home and
+  // returned to a different one shows both. Otherwise every home marker
+  // shows regardless of which trip you're looking at.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
     const palette = paletteRef.current;
-    const visible = showDots || highlightOvernight;
+    const dotsVisible = showDots || highlightOvernight;
+    const relevantHomeIds = selectedTrip ? new Set(selectedTrip.homeCenterIds) : null;
     for (const home of homeCenters) {
       const markerId = `home-marker-${home.id}`;
       if (!map.getLayer(markerId)) continue;
-      map.setLayoutProperty(markerId, 'visibility', visible ? 'visible' : 'none');
-      map.setPaintProperty(markerId, 'circle-color', showDots ? palette.homeMarker : 'transparent');
-      map.setPaintProperty(markerId, 'circle-stroke-width', highlightOvernight ? 4 : 2);
+      const isRelevant = !relevantHomeIds || relevantHomeIds.has(home.id);
+      map.setLayoutProperty(markerId, 'visibility', dotsVisible && isRelevant ? 'visible' : 'none');
+      map.setPaintProperty(markerId, 'circle-color', showDots ? palette.tripStay : 'transparent');
+      map.setPaintProperty(markerId, 'circle-stroke-width', highlightOvernight ? 3.5 : 1.5);
       map.setPaintProperty(markerId, 'circle-stroke-color', highlightOvernight ? palette.overnightHighlight : '#fff');
     }
-  }, [homeCenters, showDots, highlightOvernight, mapReady]);
+  }, [homeCenters, showDots, highlightOvernight, selectedTrip, mapReady]);
 
   return (
     <div className="tripdots-map">

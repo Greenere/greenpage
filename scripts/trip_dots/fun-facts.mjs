@@ -38,10 +38,13 @@ export function computeFunFacts(cleanedPoints, trips, stays) {
   // Attributed hop-by-hop (not the trip's whole distance dumped into its
   // start month) — a trip spanning a month boundary, or a multi-month trip
   // like a long road trip, would otherwise wildly overcount whichever month
-  // it happened to start in.
+  // it happened to start in. Photo-derived trips have no continuous trace
+  // (no trip.points), so their stay centroids stand in as hop endpoints —
+  // the same straight-line approximation already used for their distance
+  // and line rendering elsewhere (see photo-trips.mjs / planPhotoTripSegments).
   const monthlyDistanceKm = new Array(12).fill(0);
   for (const trip of trips) {
-    const points = trip.points;
+    const points = trip.points ?? trip.stays.map((stay) => ({ lon: stay.lon, lat: stay.lat, ts: (stay.startTs + stay.endTs) / 2 }));
     for (let i = 1; i < points.length; i++) {
       const a = points[i - 1];
       const b = points[i];

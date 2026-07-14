@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Camera, Globe, Map, Route } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
@@ -40,6 +41,7 @@ export default function TripDotsPage() {
   const [timeRange, setTimeRange] = useState<[number, number] | null>(null);
   const [viewMode, setViewMode] = useState<'globe' | 'flat'>('globe');
   const [showingAllTrails, setShowingAllTrails] = useState(false);
+  const [showPhotoTrips, setShowPhotoTrips] = useState(true);
   const [showDots, setShowDots] = useState(true);
   const [showRoutes, setShowRoutes] = useState(true);
   const [showFlights, setShowFlights] = useState(true);
@@ -111,9 +113,10 @@ export default function TripDotsPage() {
     if (!trips) return [];
     return trips.filter((trip) => {
       if (timeRange && (trip.endTs < timeRange[0] || trip.startTs > timeRange[1])) return false;
+      if (trip.source === 'photo' && !showPhotoTrips) return false;
       return true;
     });
-  }, [trips, timeRange]);
+  }, [trips, timeRange, showPhotoTrips]);
 
   useEffect(() => {
     if (selectedTripId && !visibleTrips.some((trip) => trip.id === selectedTripId)) {
@@ -194,28 +197,44 @@ export default function TripDotsPage() {
             type="button"
             role="tab"
             aria-selected={viewMode === 'globe'}
+            aria-label={UI_COPY.tripDotsPage.viewModeGlobe}
+            title={UI_COPY.tripDotsPage.viewModeGlobe}
             className={`tripdots-page__view-button${viewMode === 'globe' ? ' tripdots-page__view-button--active' : ''}`}
             onClick={() => setViewMode('globe')}
           >
-            {UI_COPY.tripDotsPage.viewModeGlobe}
+            <Globe size={16} strokeWidth={2} aria-hidden="true" />
           </button>
           <button
             type="button"
             role="tab"
             aria-selected={viewMode === 'flat'}
+            aria-label={UI_COPY.tripDotsPage.viewModeFlat}
+            title={UI_COPY.tripDotsPage.viewModeFlat}
             className={`tripdots-page__view-button${viewMode === 'flat' ? ' tripdots-page__view-button--active' : ''}`}
             onClick={() => setViewMode('flat')}
           >
-            {UI_COPY.tripDotsPage.viewModeFlat}
+            <Map size={16} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
 
         <button
           type="button"
+          aria-label={UI_COPY.tripDotsPage.allTrailsButton}
+          title={UI_COPY.tripDotsPage.allTrailsButton}
           className={`tripdots-page__all-trails-button${showingAllTrails ? ' tripdots-page__all-trails-button--active' : ''}`}
           onClick={handleToggleAllTrails}
         >
-          {UI_COPY.tripDotsPage.allTrailsButton}
+          <Route size={16} strokeWidth={2} aria-hidden="true" />
+        </button>
+
+        <button
+          type="button"
+          aria-label={UI_COPY.tripDotsPage.photoTripsButton}
+          title={UI_COPY.tripDotsPage.photoTripsButton}
+          className={`tripdots-page__all-trails-button${showPhotoTrips ? ' tripdots-page__all-trails-button--active' : ''}`}
+          onClick={() => setShowPhotoTrips((prev) => !prev)}
+        >
+          <Camera size={16} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 

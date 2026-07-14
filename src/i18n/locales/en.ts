@@ -99,6 +99,7 @@ export const EN_MESSAGES = {
       homeLabel: (label: string) => `Home · ${label}`,
       tripDurationDays: (days: number) => `${days} day${days === 1 ? '' : 's'}`,
       allTrailsButton: 'All trails',
+      photoTripsButton: 'Photo trips',
       showFlightsToggle: 'Flights',
       highlightOvernightToggle: 'Overnight stays',
       showDotsToggle: 'Dots',

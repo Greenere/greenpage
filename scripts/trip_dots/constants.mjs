@@ -80,6 +80,17 @@ export const ROUTE_CACHE_PRECISION = 3; // decimal places, ~100m
 export const ROUTE_THROTTLE_MS = 500;
 export const OSRM_USER_AGENT = 'greenpage-tripdots-builder/1.0 (personal site build script)';
 
+// Photo-derived trips (see photo-trips.mjs) have no reliable timestamp
+// signal, so route-recovery for them can only validate a candidate route on
+// distance plausibility (same "no timing" path already used for the main
+// pipeline's departure/return home-boundary hops) — there's no duration
+// check to catch "a real highway route technically exists between these two
+// cities, but this hop was actually flown, not driven". A hard distance cap
+// stands in for that: comfortably above the longest confirmed real drive in
+// this reconstruction (~520km, Virginia to DC) and well below the shortest
+// confirmed flight (~1600km, Miami to Puerto Rico).
+export const PHOTO_TRIP_MAX_DRIVE_KM = 700;
+
 // Fun facts (intro-card stats): a bogus GPS altitude reading recurs as this
 // exact value (found identically 8 times across unrelated points in this
 // dataset — real altitude noise never repeats exactly) — almost certainly a
