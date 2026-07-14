@@ -82,7 +82,7 @@ export const EN_MESSAGES = {
     tripDotsPage: {
       eyebrow: 'Travel',
       title: 'Trip dots',
-      subtitle: 'Three years of GPS history, mapped.',
+      subtitle: 'GPS history, mapped on the globe.',
       loading: 'Loading travel history...',
       errorLoading: 'Error loading travel history',
       viewModeGlobe: 'Globe',
@@ -107,11 +107,13 @@ export const EN_MESSAGES = {
       funFactsSouthmost: 'Southernmost',
       funFactsHighest: 'Highest point',
       funFactsLowest: 'Lowest point',
-      funFactsMonthlyDistance: 'Distance by month',
       funFactsLatDeg: (lat: number) => `${Math.abs(lat).toFixed(1)}°${lat >= 0 ? 'N' : 'S'}`,
       funFactsElevationM: (m: number) => `${m.toLocaleString()} m`,
       funFactsMonthTooltip: (monthLabel: string, km: number, pct: number) =>
         `${monthLabel}: ${km.toLocaleString()} km (${pct}%)`,
+      funFactsPointTooltip: (label: string, value: string, place: string) => `${label}: ${value} · ${place}`,
+      funFactsChartLabel: 'Northernmost, southernmost, highest and lowest points reached, and distance traveled by month',
+      funFactsHoverHint: 'Hover the globe for details',
       monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     },
     storyNode: {

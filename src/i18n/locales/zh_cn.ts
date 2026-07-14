@@ -82,7 +82,7 @@ export const ZH_CN_MESSAGES = {
     tripDotsPage: {
       eyebrow: '旅行',
       title: '足迹地图',
-      subtitle: '三年 GPS 记录，绘制成图。',
+      subtitle: 'GPS 记录，绘制在地球上。',
       loading: '正在加载旅行记录...',
       errorLoading: '旅行记录加载失败',
       viewModeGlobe: '地球',
@@ -107,11 +107,13 @@ export const ZH_CN_MESSAGES = {
       funFactsSouthmost: '最南点',
       funFactsHighest: '最高点',
       funFactsLowest: '最低点',
-      funFactsMonthlyDistance: '每月里程分布',
       funFactsLatDeg: (lat: number) => `${lat >= 0 ? '北纬' : '南纬'} ${Math.abs(lat).toFixed(1)}°`,
       funFactsElevationM: (m: number) => `${m.toLocaleString()} 米`,
       funFactsMonthTooltip: (monthLabel: string, km: number, pct: number) =>
         `${monthLabel}：${km.toLocaleString()} 公里（${pct}%）`,
+      funFactsPointTooltip: (label: string, value: string, place: string) => `${label}：${value} · ${place}`,
+      funFactsChartLabel: '最北点、最南点、最高点、最低点，以及每月旅行里程分布',
+      funFactsHoverHint: '将鼠标悬停在地球上查看详情',
       monthNamesShort: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
     },
     storyNode: {

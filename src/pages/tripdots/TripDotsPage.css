@@ -40,7 +40,7 @@
   top: 4.4rem;
   left: 1.1rem;
   z-index: 3;
-  width: 21rem;
+  width: 13rem;
   max-width: calc(100vw - 2.2rem);
   padding: 0.9rem 1rem;
   border-radius: 1rem;
@@ -159,7 +159,7 @@
   background: var(--color-background);
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 14%, transparent),
-    0 0.8rem 2.2rem color-mix(in srgb, var(--color-secondary) 22%, transparent);
+    0 0.25rem 0.7rem color-mix(in srgb, black 18%, transparent);
   overflow: hidden;
 }
 

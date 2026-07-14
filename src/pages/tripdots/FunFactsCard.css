@@ -1,83 +1,74 @@
 .tripdots-funfacts {
-  margin-top: 0.55rem;
-  padding-top: 0.5rem;
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
   border-top: 1px solid color-mix(in srgb, var(--color-secondary) 18%, transparent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
   /* The parent intro card is pointer-events:none (so the map underneath it
-     stays interactive) — re-enable it here so the month bar can be hovered. */
+     stays interactive) — re-enable it here so the chart can be hovered. */
   pointer-events: auto;
 }
 
-.tripdots-funfacts__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.4rem 0.7rem;
+.tripdots-funfacts__globe {
+  width: 6.6rem;
+  height: 6.6rem;
 }
 
-.tripdots-funfacts__stat {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+.tripdots-funfacts__sphere-stop-start {
+  stop-color: color-mix(in srgb, var(--color-primary) 45%, white 55%);
 }
 
-.tripdots-funfacts__stat-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.3rem;
+.tripdots-funfacts__sphere-stop-end {
+  stop-color: var(--color-primary);
 }
 
-.tripdots-funfacts__value {
-  font-size: 0.86rem;
-  font-weight: 700;
-  line-height: 1.3;
-  white-space: nowrap;
-}
-
-.tripdots-funfacts__label {
-  font-size: 0.6rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  opacity: 0.6;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tripdots-funfacts__place {
-  font-size: 0.7rem;
-  line-height: 1.25;
-  opacity: 0.6;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tripdots-funfacts__month {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin-top: 0.5rem;
-}
-
-.tripdots-funfacts__month > .tripdots-funfacts__label {
-  overflow: visible;
-}
-
-.tripdots-funfacts__bar {
-  display: flex;
-  gap: 2px;
-  height: 0.4rem;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.tripdots-funfacts__bar-segment {
-  flex-basis: 0;
-  min-width: 2px;
-  background: color-mix(in srgb, var(--color-primary) 70%, transparent);
-  transition: background-color 120ms ease;
+.tripdots-funfacts__wedge {
+  fill: color-mix(in srgb, var(--color-primary) 60%, transparent);
+  transition: fill 120ms ease;
   cursor: default;
+  outline: none;
 }
 
-.tripdots-funfacts__bar-segment:hover {
-  background: var(--color-primary);
+.tripdots-funfacts__wedge:hover,
+.tripdots-funfacts__wedge:focus-visible {
+  fill: var(--color-primary);
+}
+
+.tripdots-funfacts__sphere {
+  fill: url(#tripdots-funfacts-sphere);
+  stroke: color-mix(in srgb, var(--color-secondary) 30%, transparent);
+  stroke-width: 0.5;
+}
+
+.tripdots-funfacts__meridian {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 0.5;
+}
+
+.tripdots-funfacts__marker {
+  fill: var(--color-accent);
+  stroke: color-mix(in srgb, var(--color-background) 70%, white 30%);
+  stroke-width: 1.2;
+  cursor: default;
+  outline: none;
+}
+
+.tripdots-funfacts__marker:hover,
+.tripdots-funfacts__marker:focus-visible {
+  fill: color-mix(in srgb, var(--color-accent) 65%, white 35%);
+}
+
+.tripdots-funfacts__readout {
+  width: 100%;
+  min-height: 1.35rem;
+  font-size: 0.68rem;
+  line-height: 1.35rem;
+  text-align: center;
+  opacity: 0.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
