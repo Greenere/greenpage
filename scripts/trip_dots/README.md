@@ -36,3 +36,19 @@ It's a one-time, manual step — not part of `predev`/`prebuild` — since it ne
 3. Commit the resulting `basemap.pmtiles` (same convention as the trip CSV — this repo commits its large static data files directly).
 
 The frontend renders it with `@protomaps/basemaps`' `layers()` helper (see `src/pages/tripdots/TripDotsMap.tsx`), which generates the MapLibre style-layer array for this schema in a light/dark flavor.
+
+## Regional high-detail extract
+
+`public/data/tripdots/basemap-ca.pmtiles` is a second, much higher-zoom extract limited to California + neighboring states (NV, AZ, southern OR) — most trips are clustered there, so a real street-level basemap is affordable for that region even though it's not affordable globally (see the maxzoom/size table above: a global maxzoom-7 extract alone would already be ~186MB, over GitHub's 100MB single-file push limit).
+
+`src/pages/tripdots/TripDotsMap.tsx` swaps the map's `protomaps` vector source to this file (via `VectorTileSource.setUrl`) only when the selected trip's own bbox fits entirely inside `REGIONAL_BASEMAP_BBOX` — that constant **must** match the `--bbox` this was built with, since the file has no data at all outside it. Any other trip (or the no-selection overview) falls back to the global `basemap.pmtiles`.
+
+Regenerate the same way as above, but bbox-limited and at a much higher zoom:
+```
+/tmp/pmtiles-cli/pmtiles extract \
+  "https://build.protomaps.com/<date>.pmtiles" \
+  public/data/tripdots/basemap-ca.pmtiles \
+  --bbox=-125,32,-113,42.5 \
+  --maxzoom=10
+```
+This bbox/maxzoom combination measured ~21MB (`--dry-run` first to confirm before a real re-extract). If future trips add another cluster of destinations outside this box, consider a similar bbox-limited extract for that region rather than raising the global maxzoom.

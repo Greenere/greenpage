@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Map as MapLibreMap, addProtocol, type GeoJSONSource, type StyleSpecification } from 'maplibre-gl';
+import {
+  Map as MapLibreMap,
+  addProtocol,
+  type GeoJSONSource,
+  type StyleSpecification,
+  type VectorTileSource,
+} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Protocol } from 'pmtiles';
 import { layers as protomapsLayers, LIGHT, DARK, type Flavor } from '@protomaps/basemaps';
@@ -9,10 +15,22 @@ import {
   loadOverviewTrips,
   loadTripDetail,
   tripDotsBasemapUrl,
+  tripDotsRegionalBasemapUrl,
   type HomeCenter,
   type TripSummary,
 } from './content/tripDotsData';
 import './TripDotsMap.css';
+
+// Must match the bbox public/data/tripdots/basemap-ca.pmtiles was built with
+// (see scripts/trip_dots/README.md) — the regional extract has no data at
+// all outside it, so it's only usable when a trip's own bbox fits inside.
+const REGIONAL_BASEMAP_BBOX: [number, number, number, number] = [-125, 32, -113, 42.5];
+
+function isBboxInsideRegion(bbox: [number, number, number, number]): boolean {
+  const [minLon, minLat, maxLon, maxLat] = bbox;
+  const [regionMinLon, regionMinLat, regionMaxLon, regionMaxLat] = REGIONAL_BASEMAP_BBOX;
+  return minLon >= regionMinLon && maxLon <= regionMaxLon && minLat >= regionMinLat && maxLat <= regionMaxLat;
+}
 
 let pmtilesProtocolRegistered = false;
 function ensurePmtilesProtocol() {
@@ -386,6 +404,22 @@ export default function TripDotsMap({
       cancelled = true;
     };
   }, [selectedTripId, selectedTrip, mapReady]);
+
+  // Swap the basemap's tile source between the global (whole-planet,
+  // low-zoom) and regional (California + neighbors, real street-level zoom)
+  // extracts. The regional file has no data outside its bbox, so it's only
+  // used when the selected trip's own bbox fits entirely inside it —
+  // otherwise (including the no-selection overview) the global file stays
+  // active so areas outside the region don't render blank.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    const source = map.getSource('protomaps') as VectorTileSource | undefined;
+    if (!source) return;
+    const useRegional = selectedTrip ? isBboxInsideRegion(selectedTrip.bbox) : false;
+    const url = `pmtiles://${useRegional ? tripDotsRegionalBasemapUrl() : tripDotsBasemapUrl()}`;
+    if (source.url !== url) source.setUrl(url);
+  }, [selectedTrip, mapReady]);
 
   // Master visibility for line/stay layers: overview lines+stays hide while
   // a specific trip is selected (in favor of that trip's own detail layer);

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { access } from 'node:fs/promises';
 import { loadCleanedPoints } from './parse-csv.mjs';
 import { detectStayPoints } from './stay-points.mjs';
 import { detectHomeCenters, classifyStays } from './home-base.mjs';
@@ -30,6 +31,19 @@ function formatTripDebugRow(trip, getLabel) {
 export async function generateTripDots({ rootDir, debug = false }) {
   const csvPath = path.resolve(rootDir, CSV_RELATIVE_PATH);
   const outputDir = path.resolve(rootDir, OUTPUT_RELATIVE_DIR);
+
+  // The raw GPS CSV is deliberately not committed (85MB of personal location
+  // history) — only its committed, already-generated output under
+  // public/data/tripdots/ ships with the repo. Regeneration is only possible
+  // with the source file present locally, so skip it gracefully rather than
+  // failing predev/prebuild for anyone (including CI) without a local copy.
+  const csvExists = await access(csvPath)
+    .then(() => true)
+    .catch(() => false);
+  if (!csvExists) {
+    console.log(`Source CSV not found at ${csvPath} — skipping trip-dots regeneration, keeping committed output as-is.`);
+    return { tripCount: null, homeCenterCount: null, skipped: true };
+  }
 
   const cleanedPoints = await loadCleanedPoints(csvPath);
   const stays = detectStayPoints(cleanedPoints);

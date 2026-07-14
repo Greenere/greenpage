@@ -129,3 +129,11 @@ export function loadTripDetail(tripId: string): Promise<GeoJSON.FeatureCollectio
 export function tripDotsBasemapUrl(): string {
   return `${TRIPDOTS_BASE_URL}/basemap.pmtiles`;
 }
+
+// Higher-detail extract covering just California + neighboring states (see
+// scripts/trip_dots/README.md for the bbox/maxzoom it was built with) — swapped
+// in only when the selected trip's bbox falls entirely inside that region,
+// since it has no data at all outside it.
+export function tripDotsRegionalBasemapUrl(): string {
+  return `${TRIPDOTS_BASE_URL}/basemap-ca.pmtiles`;
+}
