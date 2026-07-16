@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Camera, Globe, Map, Route } from 'lucide-react';
+import { Camera, Globe, Map, MapPin, Route } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
@@ -22,10 +22,12 @@ import {
   loadHomeCenters,
   loadMeta,
   loadTripsIndex,
+  loadTripVlogs,
   type FunFacts,
   type HomeCenter,
   type TripDotsMeta,
   type TripSummary,
+  type TripVlog,
 } from './content/tripDotsData';
 import './TripDotsPage.css';
 
@@ -37,11 +39,13 @@ export default function TripDotsPage() {
   const [homeCenters, setHomeCenters] = useState<HomeCenter[]>([]);
   const [meta, setMeta] = useState<TripDotsMeta | null>(null);
   const [funFacts, setFunFacts] = useState<FunFacts | null>(null);
+  const [tripVlogs, setTripVlogs] = useState<TripVlog[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<[number, number] | null>(null);
   const [viewMode, setViewMode] = useState<'globe' | 'flat'>('globe');
   const [showingAllTrails, setShowingAllTrails] = useState(false);
   const [showPhotoTrips, setShowPhotoTrips] = useState(true);
+  const [showAllVlogs, setShowAllVlogs] = useState(false);
   const [showDots, setShowDots] = useState(true);
   const [showRoutes, setShowRoutes] = useState(true);
   const [showFlights, setShowFlights] = useState(true);
@@ -90,13 +94,14 @@ export default function TripDotsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([loadTripsIndex(), loadHomeCenters(), loadMeta(), loadFunFacts()]).then(
-      ([tripsIndex, homes, metaPayload, funFactsPayload]) => {
+    Promise.all([loadTripsIndex(), loadHomeCenters(), loadMeta(), loadFunFacts(), loadTripVlogs()]).then(
+      ([tripsIndex, homes, metaPayload, funFactsPayload, vlogs]) => {
         if (cancelled) return;
         setTrips(tripsIndex);
         setHomeCenters(homes);
         setMeta(metaPayload);
         setFunFacts(funFactsPayload);
+        setTripVlogs(vlogs);
         setTimeRange([metaPayload.dateRange.startTs, metaPayload.dateRange.endTs]);
       },
     );
@@ -164,6 +169,8 @@ export default function TripDotsPage() {
           showRoutes={showRoutes}
           showFlights={showFlights}
           highlightOvernight={highlightOvernight}
+          tripVlogs={tripVlogs}
+          showAllVlogs={showAllVlogs}
         />
       </div>
 
@@ -235,6 +242,16 @@ export default function TripDotsPage() {
           onClick={() => setShowPhotoTrips((prev) => !prev)}
         >
           <Camera size={16} strokeWidth={2} aria-hidden="true" />
+        </button>
+
+        <button
+          type="button"
+          aria-label={UI_COPY.tripDotsPage.showAllVlogsButton}
+          title={UI_COPY.tripDotsPage.showAllVlogsButton}
+          className={`tripdots-page__all-trails-button${showAllVlogs ? ' tripdots-page__all-trails-button--active' : ''}`}
+          onClick={() => setShowAllVlogs((prev) => !prev)}
+        >
+          <MapPin size={16} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 

@@ -59,6 +59,28 @@ export type FunFacts = {
   monthlyDistance: { month: number; km: number; pct: number }[];
 };
 
+// `zh_cn` is optional so a hand-edited entry doesn't need a translation the
+// moment it's added — see pickLocalizedText in TripDotsMap.tsx, which falls
+// back to `en` when it's missing.
+export type LocalizedText = { en: string; zh_cn?: string };
+
+type TripVlogEntry = {
+  // Optional — a vlog doesn't have to belong to any trip (a daily-life or
+  // otherwise "virtual" one just omits this) and only ever shows up via the
+  // "All vlogs" toggle rather than a specific trip's selection.
+  tripId?: string;
+  title: LocalizedText;
+  description: LocalizedText;
+  url: string;
+  lon: number;
+  lat: number;
+  // Optional thumbnail — a plain image URL, no i18n (it's a screenshot, not
+  // text). Omit it and the card falls back to text-only.
+  coverImageUrl?: string;
+};
+
+export type TripVlog = TripVlogEntry & { id: string };
+
 const TRIPDOTS_BASE_URL = `${import.meta.env.BASE_URL}data/tripdots`;
 
 function fetchJson<T>(path: string): Promise<T> {
@@ -103,6 +125,23 @@ export function loadFunFacts(): Promise<FunFacts> {
     funFactsPromise = fetchJson<FunFacts>('fun-facts.json');
   }
   return funFactsPromise;
+}
+
+// trip-vlogs.json is hand-edited directly (not build-generated — see
+// scripts/trip_dots/generate.mjs's validateTripVlogs), a flat array so a
+// vlog's `tripId` is optional (a daily-life/virtual vlog can omit it
+// entirely — see TripVlogEntry). It carries no id field to keep typing it
+// out by hand as light as possible; a stable id is derived here instead,
+// purely from position (fine since this file has no reordering/
+// regeneration step that would shift it).
+let tripVlogsPromise: Promise<TripVlog[]> | null = null;
+export function loadTripVlogs(): Promise<TripVlog[]> {
+  if (!tripVlogsPromise) {
+    tripVlogsPromise = fetchJson<TripVlogEntry[]>('trip-vlogs.json').then((entries) =>
+      entries.map((entry, index) => ({ ...entry, id: `vlog-${index}` })),
+    );
+  }
+  return tripVlogsPromise;
 }
 
 let overviewTripsPromise: Promise<GeoJSON.FeatureCollection> | null = null;

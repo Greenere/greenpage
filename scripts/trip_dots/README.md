@@ -70,3 +70,34 @@ Wherever tripline covers a trip, it wins — `detectPhotoTrips` excludes the CSV
 Each reconstructed trip is tagged `source: "photo"` in `trips-index.json` (vs. `"gps"` for the main pipeline) so the frontend can filter/label them separately — this is a lower-confidence reconstruction (no real continuous trace, dates bounded only by when photos happen to exist), not to be trusted quite the same as continuously-tracked trips. The "Photo trips" toggle in `TripDotsPage.tsx` lets it be hidden.
 
 `generateTripDots()` in `generate.mjs` calls `detectPhotoTrips()` unconditionally and merges its output into the same `trips` array the main pipeline produces. Each source degrades independently and gracefully: if `~/files/tripdots/photo_dots_2023.csv` isn't present, the CSV side just contributes nothing; if `~/projects/tripline` isn't present, `loadTriplineStays()` returns empty stays/windows and every trip falls back to CSV-only (or is dropped if the CSV doesn't cover it either). Only if *both* are absent does `detectPhotoTrips` return `[]` — same graceful-skip convention as the main CSV.
+
+# Trip vlogs
+
+`public/data/tripdots/trip-vlogs.json` is a hand-edited file (not build-generated — unlike everything else in that directory) that pins vlog/clip references onto the map. Every field is typed by hand; there's nothing for the pipeline to compute, so it's just committed directly and fetched as-is by the frontend (`loadTripVlogs` in `content/tripDotsData.ts`).
+
+Schema — a flat array of entries, each optionally tied to a trip id (same ids as `trips-index.json`):
+```json
+[
+  {
+    "tripId": "photo-trip-1656023736",
+    "title": { "en": "Whale watching out of Boston Harbor", "zh_cn": "波士顿港观鲸之旅" },
+    "description": { "en": "A short recap of the boat tour.", "zh_cn": "短片回顾。" },
+    "url": "https://...",
+    "coverImageUrl": "https://...",
+    "lon": -70.7,
+    "lat": 42.27
+  }
+]
+```
+- `tripId` is optional — a daily-life or otherwise "virtual" vlog with no corresponding trip just omits it. A vlog with a `tripId` shows when that trip is selected (or in "All vlogs" mode); one without only ever shows in "All vlogs" mode, never tied to a specific trip selection.
+- `title`/`description` are per-language (`zh_cn` optional — falls back to `en` if omitted, see `pickLocalizedText` in `TripDotsMap.tsx`).
+- `coverImageUrl` is optional — a plain thumbnail URL (no i18n, it's a screenshot not text). Without it, the card falls back to text-only with an icon-only "Watch" button inline; with it, the thumbnail sits above the text with the "Watch" button overlaid on its own corner instead.
+- `lon`/`lat` can be any point you choose — it doesn't need to land exactly on an existing stay dot.
+- `url` opens in a new tab from the map popup; no embedding, so it works the same regardless of platform.
+- No `id` field — one is derived from array position at load time (`vlog-${index}`), so there's nothing extra to keep in sync by hand.
+
+On the map, each vlog renders as a `maplibregl.Marker` pin (a small flat pin tinted to match the route line color, distinct from the plain circular stay/home dots — see `VLOG_PIN_SVG`/`VLOG_PIN_SIZE_PX` in `TripDotsMap.tsx`, both easy to retune directly) for the currently-selected trip, or for every vlog at once when the "All vlogs" toggle (map icon in the bottom-left controls, off by default) is on. Pins that land on (near-)identical coordinates are fanned out along a small golden-angle spiral (`jitteredVlogPosition`) so every one stays independently clickable. A pin gets a border ring on hover, and keeps that ring persistently while its card is open (`tripdots-vlog-pin--open`), matching the solid-border-means-active language used by the toggle buttons elsewhere on this page — `--vlog-pin-ring-width` in `TripDotsMap.css` controls the ring's thickness.
+
+Clicking a pin closes whatever other card is currently open (only one is ever open at a time — stacked cards can occlude each other), eases the camera to center/zoom on the clicked pin (capped to the global basemap's own `--maxzoom=6`, since a plain pin click doesn't trigger the trip-selection-only regional-basemap swap), and only fades the new card in once that camera move settles (`map.once('moveend', ...)`) rather than popping it in immediately and dragging it along mid-pan. The card itself fades in/out (`tripdots-vlog-popup--visible` in `TripDotsMap.css`, `VLOG_POPUP_FADE_MS` in `TripDotsMap.tsx` — keep both in sync if either changes) rather than appearing/disappearing abruptly.
+
+`generate.mjs`'s `validateTripVlogs` runs on every `predev`/`prebuild` and warns (doesn't fail the build) if an entry's `tripId` is set but doesn't match any current trip — e.g. after retuning the detection algorithm shifts a photo-trip's id.

@@ -8,3 +8,239 @@
   position: absolute;
   inset: 0;
 }
+
+/* Vlog pin hover/open state — a ring traced around the pin's own teardrop
+   silhouette (a CSS border can't follow that shape; the pin's size stays
+   fixed either way), matching the solid-border-means-active language the
+   toggle buttons use elsewhere on this page rather than a "grow on hover"
+   idiom. .tripdots-vlog-pin--open is toggled by hand in the vlog-pins
+   effect, kept in sync with the popup's real open/closed state, so a pin
+   whose card is open keeps the ring even after the mouse moves away.
+
+   Built from 8 stacked drop-shadows rather than an SVG `stroke` — a stroke
+   straddles the path boundary 50/50, so half of it bleeds inward over the
+   pin's own fill; a drop-shadow only ever paints outside the source alpha
+   shape, so stacking copies in a ring of directions produces a border that
+   grows outward only. Both states declare the same 8 shadows (transparent
+   vs. white) so `transition: filter` has a matching structure to
+   interpolate between — mismatched drop-shadow counts can't animate.
+   Diagonal offsets are the cardinal one times cos(45°) (≈0.7071), via
+   calc(), so all 8 sit the same true distance from the pin — otherwise the
+   diagonals would poke out further than the cardinals and the ring would
+   read as a soft octagon instead of a circle. --vlog-pin-ring-width is the
+   one number to tune if the ring looks too thick/thin. */
+.tripdots-map .maplibregl-marker {
+  cursor: pointer;
+}
+
+.tripdots-map .maplibregl-marker svg {
+  --vlog-pin-ring-width: 0.5px;
+  transition: filter 140ms ease;
+  filter: drop-shadow(var(--vlog-pin-ring-width) 0 0 transparent)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * -1) 0 0 transparent)
+    drop-shadow(0 var(--vlog-pin-ring-width) 0 transparent)
+    drop-shadow(0 calc(var(--vlog-pin-ring-width) * -1) 0 transparent)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * 0.7071) calc(var(--vlog-pin-ring-width) * 0.7071) 0 transparent)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * -0.7071) calc(var(--vlog-pin-ring-width) * 0.7071) 0 transparent)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * 0.7071) calc(var(--vlog-pin-ring-width) * -0.7071) 0 transparent)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * -0.7071) calc(var(--vlog-pin-ring-width) * -0.7071) 0 transparent);
+}
+
+.tripdots-map .maplibregl-marker:hover svg,
+.tripdots-map .maplibregl-marker.tripdots-vlog-pin--open svg {
+  filter: drop-shadow(var(--vlog-pin-ring-width) 0 0 #fff)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * -1) 0 0 #fff) drop-shadow(0 var(--vlog-pin-ring-width) 0 #fff)
+    drop-shadow(0 calc(var(--vlog-pin-ring-width) * -1) 0 #fff)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * 0.7071) calc(var(--vlog-pin-ring-width) * 0.7071) 0 #fff)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * -0.7071) calc(var(--vlog-pin-ring-width) * 0.7071) 0 #fff)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * 0.7071) calc(var(--vlog-pin-ring-width) * -0.7071) 0 #fff)
+    drop-shadow(calc(var(--vlog-pin-ring-width) * -0.7071) calc(var(--vlog-pin-ring-width) * -0.7071) 0 #fff);
+}
+
+/* Fade in/out for the vlog popup — starts at opacity 0 (so
+   Popup.addTo(map) never flashes it in at full strength) and only reaches
+   opacity 1 once .tripdots-vlog-popup--visible is added a couple frames
+   later. The showPopup/closePopup pair in the vlog-pins effect toggles that
+   class and times the popup's actual DOM removal (VLOG_POPUP_FADE_MS) to
+   match this duration — keep the two in sync if either changes. */
+.tripdots-map .maplibregl-popup {
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.tripdots-map .maplibregl-popup.tripdots-vlog-popup--visible {
+  opacity: 1;
+}
+
+/* Vlog popup (see TripDotsMap.tsx's buildVlogPopupContent) — overrides
+   maplibre-gl's default popup chrome to match this page's card language
+   instead of the library's plain white box. Padding lives on
+   .tripdots-vlog-popup__body instead of here, so an optional cover image
+   can bleed flush to the card's own rounded corners (clipped via
+   overflow: hidden here). */
+.tripdots-map .maplibregl-popup-content {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--color-background) 92%, white 8%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 18%, transparent),
+    0 6px 18px rgba(0, 0, 0, 0.18);
+  color: var(--color-text);
+  font-family: inherit;
+}
+
+.tripdots-map .maplibregl-popup-tip {
+  border-top-color: color-mix(in srgb, var(--color-background) 92%, white 8%);
+}
+
+.tripdots-vlog-popup {
+  position: relative;
+  max-width: 16rem;
+}
+
+/* Popup lifecycle (open/closed) is managed by hand in TripDotsMap.tsx, so
+   this is our own close button, not MapLibre's built-in one — see the
+   vlog-pins effect for why. Absolutely positioned (rather than a text-row
+   header) so it sits correctly whether or not a cover image is present —
+   a soft scrim behind it keeps it legible over a photo. */
+.tripdots-vlog-popup__close {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-background) 55%, transparent);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  color: var(--color-text);
+  opacity: 0.75;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.tripdots-vlog-popup__close:hover {
+  opacity: 1;
+}
+
+/* Same convention as the toggle buttons in TripDotsPage.css — a browser
+   focus ring appearing on every plain mouse click is just visual noise;
+   keep it for real keyboard navigation only. */
+.tripdots-vlog-popup__close:focus,
+.tripdots-vlog-popup__cover:focus,
+.tripdots-vlog-popup__link:focus {
+  outline: none;
+}
+
+.tripdots-vlog-popup__close:focus-visible,
+.tripdots-vlog-popup__cover:focus-visible,
+.tripdots-vlog-popup__link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-secondary) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.tripdots-vlog-popup__cover {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: color-mix(in srgb, var(--color-secondary) 15%, transparent);
+}
+
+.tripdots-vlog-popup__cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 200ms ease;
+}
+
+.tripdots-vlog-popup__cover:hover img {
+  transform: scale(1.04);
+}
+
+/* Corner "Watch" badge overlaid on the cover image — a visual affordance,
+   not a second link (the whole .tripdots-vlog-popup__cover anchor already
+   covers this area, so nesting another <a> here would be invalid HTML).
+   Icon-only, same as .tripdots-vlog-popup__link below — the accessible name
+   lives on the enclosing <a>, not this badge (see buildVlogPopupContent). */
+.tripdots-vlog-popup__watch-badge {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 88%, transparent);
+  color: var(--color-background);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 140ms ease;
+}
+
+.tripdots-vlog-popup__cover:hover .tripdots-vlog-popup__watch-badge {
+  background: var(--color-primary);
+}
+
+.tripdots-vlog-popup__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  padding-right: 1.7rem;
+}
+
+.tripdots-vlog-popup__title {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.tripdots-vlog-popup__description {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+/* Icon-only circular CTA, right-aligned like a deliberate button rather
+   than a full-width block — accessible name lives on this <a> itself (see
+   buildVlogPopupContent), since there's no visible text here. */
+.tripdots-vlog-popup__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-end;
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-top: 0.15rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 85%, transparent);
+  color: var(--color-background);
+  text-decoration: none;
+}
+
+.tripdots-vlog-popup__link:hover {
+  background: var(--color-primary);
+}
+
+.tripdots-vlog-popup__link-icon {
+  display: inline-flex;
+}
+
+.tripdots-vlog-popup__link-icon svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  /* Nudges the play triangle to visually center within the circle — its
+     rightward-pointing shape otherwise reads as slightly left-of-center. */
+  margin-left: 0.05rem;
+}

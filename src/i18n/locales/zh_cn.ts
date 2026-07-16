@@ -100,6 +100,7 @@ export const ZH_CN_MESSAGES = {
       tripDurationDays: (days: number) => `${days} 天`,
       allTrailsButton: '全部轨迹',
       photoTripsButton: '照片行程',
+      showAllVlogsButton: '全部 Vlog',
       showFlightsToggle: '航班',
       highlightOvernightToggle: '过夜地点',
       showDotsToggle: '点位',
@@ -116,6 +117,8 @@ export const ZH_CN_MESSAGES = {
       funFactsChartLabel: '最北点、最南点、最高点、最低点，以及每月旅行里程分布',
       funFactsHoverHint: '将鼠标悬停在地球上查看详情',
       monthNamesShort: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+      vlogWatchLink: '观看',
+      vlogCloseLabel: '关闭',
     },
     storyNode: {
       moreDetails: '更多详情',

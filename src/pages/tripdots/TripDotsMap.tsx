@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Map as MapLibreMap,
+  Marker,
+  Popup,
   addProtocol,
   type GeoJSONSource,
   type StyleSpecification,
@@ -10,6 +12,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { Protocol } from 'pmtiles';
 import { layers as protomapsLayers, LIGHT, DARK, type Flavor } from '@protomaps/basemaps';
 
+import { UI_COPY } from '../../configs/ui/uiCopy';
+import type { AppLanguage } from '../../i18n/config';
+import { useAppLanguage } from '../../i18n/useAppLanguage';
 import {
   loadAllTrails,
   loadOverviewTrips,
@@ -17,7 +22,9 @@ import {
   tripDotsBasemapUrl,
   tripDotsRegionalBasemapUrl,
   type HomeCenter,
+  type LocalizedText,
   type TripSummary,
+  type TripVlog,
 } from './content/tripDotsData';
 import './TripDotsMap.css';
 
@@ -249,6 +256,178 @@ function addOverlaySourcesAndLayers(map: MapLibreMap, palette: TripDotsPalette) 
   }
 }
 
+// zh_cn is optional on each hand-edited entry — fall back to English rather
+// than showing a blank title/description for a not-yet-translated vlog.
+function pickLocalizedText(text: LocalizedText, language: AppLanguage): string {
+  return language === 'zh-CN' ? (text.zh_cn ?? text.en) : text.en;
+}
+
+// Static, hand-written (not lucide-react — this file builds plain DOM nodes,
+// not React elements) so it's safe to insert via innerHTML; every other
+// piece of text in this popup is untrusted-ish hand-edited data and goes
+// through textContent instead, never this.
+// Solid-filled, not stroke-only like lucide's line icons elsewhere on this
+// page — a play triangle needs to read at a glance even this small, and a
+// 2px outline alone is nearly invisible at 14px.
+const PLAY_ICON_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>';
+
+// Tune this directly to resize the vlog pin — nothing else needs to change.
+// The rendered pin looks smaller than this number: the teardrop shape only
+// fills ~16 of the SVG's 24 viewBox units, so e.g. 22px here reads as ~15px
+// wide on screen (roughly a longer-duration stay dot's diameter — see
+// trip-stays' circle-radius in addOverlaySourcesAndLayers, which tops out
+// at 11px/22px-across).
+const VLOG_PIN_SIZE_PX = 32;
+
+// Minimum zoom level a click-to-open pin brings the camera to (never zooms
+// out if already closer than this — see the vlog-pins effect). Capped to
+// match the global basemap.pmtiles' own --maxzoom=6 (see
+// scripts/trip_dots/README.md) rather than the deeper 12 used for a
+// selected trip's bbox — a plain pin click doesn't trigger the
+// regional-basemap swap (that's keyed off trip selection, not the pin), so
+// zooming past what the active (likely global) source actually has just
+// stretches its zoom-6 tile into a blank, detail-less blob.
+const VLOG_PIN_FOCUS_MIN_ZOOM = 6;
+
+// Fade duration for a vlog popup opening/closing — must match the
+// `transition: opacity` duration on .maplibregl-popup in TripDotsMap.css,
+// since the close path uses this to time the actual DOM removal (popup.
+// remove() can't itself be animated — the fade is faked by delaying it
+// until the opacity transition has had time to finish).
+const VLOG_POPUP_FADE_MS = 160;
+
+// A small flat pin (fill + a plain white dot, no gradients/embossing) rather
+// than maplibregl.Marker's default teardrop — that built-in SVG bakes in a
+// ground-shadow ellipse, a semi-transparent bezel outline, and a shadowed
+// inner dot, all of which read as skeuomorphic next to this page's flat
+// circular stay/home dots. Colored via `currentColor`/wrapper.style.color
+// (see the vlog-pins effect) since a custom marker element bypasses
+// maplibregl.Marker's own `color` option entirely.
+const VLOG_PIN_SVG =
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${VLOG_PIN_SIZE_PX}" height="${VLOG_PIN_SIZE_PX}" viewBox="0 0 24 24" fill="currentColor">` +
+  '<path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8z"/>' +
+  '<circle cx="12" cy="10" r="3" fill="#fff"/>' +
+  '</svg>';
+
+// Appends a bare play icon into any element — shared between the standalone
+// link (no cover image) and the badge overlaid on the cover image's corner
+// (see buildVlogPopupContent), so the two stay visually identical without
+// duplicating markup. Icon-only by design — the caller is responsible for
+// giving its own element an aria-label, since there's no visible text here
+// for an accessible name to fall back to.
+function appendWatchIcon(target: HTMLElement) {
+  const icon = document.createElement('span');
+  icon.className = 'tripdots-vlog-popup__link-icon';
+  icon.innerHTML = PLAY_ICON_SVG;
+  target.appendChild(icon);
+}
+
+// Built via DOM APIs (not innerHTML) so a title/description containing
+// special characters is never at risk of being interpreted as markup — the
+// one exception is PLAY_ICON_SVG above, a static constant with no user data
+// in it. `onClose` wires the card's own close button — see the vlog-pins
+// effect below for why popup lifecycle is managed by hand rather than
+// MapLibre's built-in close button/event.
+//
+// Layout: text (title/description) always comes first, then — only when
+// there's a coverImageUrl — the thumbnail with its own "Watch" badge pinned to
+// the bottom-right corner (the whole thumbnail is still one big click
+// target; the badge is a visual affordance, not a second nested link).
+// Without a cover image, the "Watch" link renders inline in the text body
+// instead, since there's no image corner to host it on.
+function buildVlogPopupContent(vlog: TripVlog, language: AppLanguage, onClose: () => void): HTMLElement {
+  const container = document.createElement('div');
+  container.className = 'tripdots-vlog-popup';
+
+  // Absolutely positioned over everything (including the cover image, when
+  // present) rather than living in a text-row header, so it works the same
+  // whether or not this vlog has a cover image.
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = 'tripdots-vlog-popup__close';
+  closeButton.setAttribute('aria-label', UI_COPY.tripDotsPage.vlogCloseLabel);
+  closeButton.textContent = '×';
+  closeButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    onClose();
+  });
+  container.appendChild(closeButton);
+
+  const body = document.createElement('div');
+  body.className = 'tripdots-vlog-popup__body';
+
+  const title = document.createElement('div');
+  title.className = 'tripdots-vlog-popup__title';
+  title.textContent = pickLocalizedText(vlog.title, language);
+  body.appendChild(title);
+
+  const descriptionText = pickLocalizedText(vlog.description, language);
+  if (descriptionText) {
+    const description = document.createElement('p');
+    description.className = 'tripdots-vlog-popup__description';
+    description.textContent = descriptionText;
+    body.appendChild(description);
+  }
+
+  if (!vlog.coverImageUrl) {
+    const link = document.createElement('a');
+    link.className = 'tripdots-vlog-popup__link';
+    link.href = vlog.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.setAttribute('aria-label', UI_COPY.tripDotsPage.vlogWatchLink);
+    appendWatchIcon(link);
+    body.appendChild(link);
+  }
+
+  container.appendChild(body);
+
+  // coverImageUrl is optional (see TripVlog) — plain thumbnail URL, no i18n,
+  // since it's a screenshot rather than text.
+  if (vlog.coverImageUrl) {
+    const coverLink = document.createElement('a');
+    coverLink.className = 'tripdots-vlog-popup__cover';
+    coverLink.href = vlog.url;
+    coverLink.target = '_blank';
+    coverLink.rel = 'noopener noreferrer';
+    // The badge below is icon-only, so this is the anchor's only accessible
+    // name — the image itself carries alt="" since it's purely decorative.
+    coverLink.setAttribute('aria-label', UI_COPY.tripDotsPage.vlogWatchLink);
+
+    const img = document.createElement('img');
+    // Some CDNs (bilibili's included — confirmed via curl: 403 "deny by
+    // referer access rule" for any foreign Referer, 200 with none at all)
+    // hotlink-protect by rejecting cross-site Referer headers. Sending none
+    // sidesteps that without needing our own proxy.
+    img.referrerPolicy = 'no-referrer';
+    img.src = vlog.coverImageUrl;
+    img.alt = '';
+    img.loading = 'lazy';
+    coverLink.appendChild(img);
+
+    const watchBadge = document.createElement('span');
+    watchBadge.className = 'tripdots-vlog-popup__watch-badge';
+    appendWatchIcon(watchBadge);
+    coverLink.appendChild(watchBadge);
+
+    container.appendChild(coverLink);
+  }
+
+  return container;
+}
+
+// Vlog pins sharing (near-)identical coordinates would otherwise render
+// exactly on top of each other and be unclickable individually — fan
+// duplicates out along a small golden-angle spiral so every one stays a
+// separate, independently-clickable pin, each with its own popup.
+const VLOG_DUPLICATE_JITTER_DEG = 0.0006;
+function jitteredVlogPosition(vlog: TripVlog, occurrenceIndex: number): [number, number] {
+  if (occurrenceIndex === 0) return [vlog.lon, vlog.lat];
+  const angle = (occurrenceIndex * 137.5 * Math.PI) / 180;
+  return [vlog.lon + Math.cos(angle) * VLOG_DUPLICATE_JITTER_DEG, vlog.lat + Math.sin(angle) * VLOG_DUPLICATE_JITTER_DEG];
+}
+
 type TripDotsMapProps = {
   homeCenters: HomeCenter[];
   visibleTripIds: string[];
@@ -260,6 +439,8 @@ type TripDotsMapProps = {
   showRoutes: boolean;
   showFlights: boolean;
   highlightOvernight: boolean;
+  tripVlogs: TripVlog[];
+  showAllVlogs: boolean;
 };
 
 export default function TripDotsMap({
@@ -273,11 +454,18 @@ export default function TripDotsMap({
   showRoutes,
   showFlights,
   highlightOvernight,
+  tripVlogs,
+  showAllVlogs,
 }: TripDotsMapProps) {
+  const { language } = useAppLanguage();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const paletteRef = useRef<TripDotsPalette>(resolvePalette());
+  // Which vlog popups are currently open, kept across marker rebuilds (e.g.
+  // a language switch tears down and recreates every marker+popup) so an
+  // open card doesn't silently vanish — see the vlog-pins effect below.
+  const openVlogIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -402,6 +590,142 @@ export default function TripDotsMap({
       cancelled = true;
     };
   }, [selectedTripId, selectedTrip, mapReady]);
+
+  // Vlog pins (see public/data/tripdots/trip-vlogs.json) — independent of
+  // the dots/routes/flights toggles, since these are hand-curated
+  // highlights rather than derived GPS data. Shown for the selected trip
+  // (matched by vlog.tripId — a vlog with no tripId never shows this way,
+  // only via "All vlogs") by default, or every vlog at once when the "All
+  // vlogs" toggle (showAllVlogs, off by default) is on — a
+  // maplibregl.Marker (a small flat pin, tinted to match the route line
+  // color) makes clicking-to-open obvious, distinct from the plain circular
+  // stay/home dots. At most one popup is open at a time (see openPopup's
+  // closePopupById below). Rebuilt on language change too, so an
+  // already-open popup's content switches immediately — open/closed state
+  // is tracked by hand in openVlogIdsRef (not MapLibre's built-in
+  // closeOnClick/close-button/'close' event) specifically so that a
+  // rebuild's teardown, which removes every popup, doesn't itself look like
+  // the user closing them and wipe that state right before it's needed.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    const vlogs = showAllVlogs ? tripVlogs : selectedTripId ? tripVlogs.filter((vlog) => vlog.tripId === selectedTripId) : [];
+    if (vlogs.length === 0) return;
+
+    const markers: Marker[] = [];
+    const popups: Popup[] = [];
+    // At most one card open at a time (see openPopup below) — this maps a
+    // vlog id back to its own closePopup so a *different* vlog's click
+    // handler can close whichever one is currently open. Populated as the
+    // loop runs, but only ever read from a click handler after the loop has
+    // finished and every entry exists, so iteration order doesn't matter.
+    const closePopupById = new Map<string, () => void>();
+    const occurrenceByKey = new Map<string, number>();
+    for (const vlog of vlogs) {
+      const key = `${vlog.lon.toFixed(4)},${vlog.lat.toFixed(4)}`;
+      const occurrenceIndex = occurrenceByKey.get(key) ?? 0;
+      occurrenceByKey.set(key, occurrenceIndex + 1);
+      const position = jitteredVlogPosition(vlog, occurrenceIndex);
+
+      // closeOnClick: false — opening a pin shouldn't get dismissed by the
+      // camera pan/click that opening it just did; "only one card open"
+      // (see openPopup below) is instead enforced by hand.
+      const popup = new Popup({ offset: 28, maxWidth: '260px', closeOnClick: false, closeButton: false }).setLngLat(
+        position,
+      );
+      // A custom `element` bypasses maplibregl.Marker's own `color` option
+      // (that only styles its built-in default SVG), so the pin's color is
+      // set by hand on the wrapper via CSS currentColor instead.
+      const pinWrapper = document.createElement('div');
+      pinWrapper.innerHTML = VLOG_PIN_SVG;
+      pinWrapper.style.color = paletteRef.current.tripLine;
+      const marker = new Marker({ element: pinWrapper, anchor: 'bottom' }).setLngLat(position).addTo(map);
+      const markerElement = marker.getElement();
+      markerElement.classList.add('tripdots-vlog-pin');
+
+      // popup.remove() can't itself be animated, so the fade-out is faked:
+      // drop the CSS class that holds it at opacity 1, then delay the real
+      // removal by VLOG_POPUP_FADE_MS so the transition has time to play.
+      // fadeOutTimeoutId lets a show-after-close (e.g. rapid double-click)
+      // cancel a pending removal instead of it firing late and deleting a
+      // popup that was actually just reopened.
+      let fadeOutTimeoutId: number | undefined;
+      const closePopup = () => {
+        openVlogIdsRef.current.delete(vlog.id);
+        markerElement.classList.remove('tripdots-vlog-pin--open');
+        popup.getElement()?.classList.remove('tripdots-vlog-popup--visible');
+        fadeOutTimeoutId = window.setTimeout(() => {
+          popup.remove();
+          fadeOutTimeoutId = undefined;
+        }, VLOG_POPUP_FADE_MS);
+      };
+      closePopupById.set(vlog.id, closePopup);
+      const showPopup = () => {
+        if (fadeOutTimeoutId !== undefined) {
+          window.clearTimeout(fadeOutTimeoutId);
+          fadeOutTimeoutId = undefined;
+        }
+        popup.addTo(map);
+        openVlogIdsRef.current.add(vlog.id);
+        markerElement.classList.add('tripdots-vlog-pin--open');
+        // Double rAF: a single frame can land in the same paint as the
+        // class-less initial state, which some browsers coalesce and skip
+        // the transition for entirely.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            popup.getElement()?.classList.add('tripdots-vlog-popup--visible');
+          });
+        });
+      };
+      // moveCamera is false when this runs as part of a rebuild reopening an
+      // already-open popup (e.g. a language switch tearing every marker
+      // down and back up) — only a real click should recenter the map. When
+      // it does, the camera settles first and the card only appears once
+      // that finishes (map.once('moveend', ...)), rather than popping in
+      // immediately and getting dragged along mid-animation.
+      const openPopup = (moveCamera: boolean) => {
+        // At most one card open at a time — close whichever other one(s)
+        // are open first (stacked cards can occlude each other). Snapshot
+        // via spread since closePopup mutates openVlogIdsRef as it goes,
+        // and mutating a Set mid-iteration can skip entries.
+        for (const openId of [...openVlogIdsRef.current]) {
+          if (openId !== vlog.id) closePopupById.get(openId)?.();
+        }
+        if (!moveCamera) {
+          showPopup();
+          return;
+        }
+        map.once('moveend', showPopup);
+        map.easeTo({
+          center: position,
+          zoom: Math.max(map.getZoom(), VLOG_PIN_FOCUS_MIN_ZOOM),
+          // Leaves room above the pin for the popup card itself, so opening
+          // it doesn't require a second pan to actually read it.
+          padding: { top: 160, bottom: 0, left: 0, right: 0 },
+          duration: 600,
+        });
+      };
+      popup.setDOMContent(buildVlogPopupContent(vlog, language, closePopup));
+      popups.push(popup);
+
+      markerElement.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (popup.isOpen()) {
+          closePopup();
+        } else {
+          openPopup(true);
+        }
+      });
+      markers.push(marker);
+
+      if (openVlogIdsRef.current.has(vlog.id)) openPopup(false);
+    }
+
+    return () => {
+      popups.forEach((popup) => popup.remove());
+      markers.forEach((marker) => marker.remove());
+    };
+  }, [selectedTripId, tripVlogs, language, mapReady, showAllVlogs]);
 
   // Swap the basemap's tile source between the global (whole-planet,
   // low-zoom) and regional (California + neighbors, real street-level zoom)

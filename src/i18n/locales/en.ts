@@ -100,6 +100,7 @@ export const EN_MESSAGES = {
       tripDurationDays: (days: number) => `${days} day${days === 1 ? '' : 's'}`,
       allTrailsButton: 'All trails',
       photoTripsButton: 'Photo trips',
+      showAllVlogsButton: 'All vlogs',
       showFlightsToggle: 'Flights',
       highlightOvernightToggle: 'Overnight stays',
       showDotsToggle: 'Dots',
@@ -116,6 +117,8 @@ export const EN_MESSAGES = {
       funFactsChartLabel: 'Northernmost, southernmost, highest and lowest points reached, and distance traveled by month',
       funFactsHoverHint: 'Hover the globe for details',
       monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      vlogWatchLink: 'Watch',
+      vlogCloseLabel: 'Close',
     },
     storyNode: {
       moreDetails: 'more details',

@@ -553,6 +553,11 @@ export async function writeOutputs({
     'utf8',
   );
 
+  // trip-vlogs.json (see generate.mjs's validateTripVlogs) is hand-edited
+  // directly in public/data/tripdots/ — nothing to compute (title/
+  // description/url/lon/lat are all typed by hand), so unlike every other
+  // file here it's not written by this function at all.
+
   // Photo-derived trips can predate cleanedPoints entirely (a separate,
   // earlier historical dataset) — fold their dates in too, or the time-range
   // slider's default "all time" span wouldn't actually include them.
