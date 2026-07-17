@@ -21,29 +21,30 @@
    straddles the path boundary 50/50, so half of it bleeds inward over the
    pin's own fill; a drop-shadow only ever paints outside the source alpha
    shape, so stacking copies in a ring of directions produces a border that
-   grows outward only. Both states declare the same 8 shadows (transparent
-   vs. white) so `transition: filter` has a matching structure to
-   interpolate between — mismatched drop-shadow counts can't animate.
-   Diagonal offsets are the cardinal one times cos(45°) (≈0.7071), via
-   calc(), so all 8 sit the same true distance from the pin — otherwise the
-   diagonals would poke out further than the cardinals and the ring would
-   read as a soft octagon instead of a circle. --vlog-pin-ring-width is the
-   one number to tune if the ring looks too thick/thin. */
+   grows outward only. Diagonal offsets are the cardinal one times cos(45°)
+   (≈0.7071), via calc(), so all 8 sit the same true distance from the pin —
+   otherwise the diagonals would poke out further than the cardinals and the
+   ring would read as a soft octagon instead of a circle.
+   --vlog-pin-ring-width is the one number to tune if the ring looks too
+   thick/thin.
+
+   No `filter` at all in the idle state — deliberately, not just omitted.
+   MapLibre repositions every marker's `transform` on every frame while
+   panning, and a `filter` forces the browser to composite that element as
+   its own rasterized layer instead of a plain GPU-translated one; with tens
+   of markers all idle at once (e.g. "All vlogs" mode), that per-marker cost
+   was making panning noticeably sluggish. Only the (at most a couple)
+   actively hovered/open marker(s) pay for it now. The tradeoff: the ring
+   can't cross-fade in/out anymore (a `filter: none` <-> a real filter list
+   is a mismatched transition, so browsers just snap between them) — it pops
+   instead, which is the right trade for "always avoid a per-frame cost you
+   pay 80+ times over one you pay at most once." */
 .tripdots-map .maplibregl-marker {
   cursor: pointer;
 }
 
 .tripdots-map .maplibregl-marker svg {
   --vlog-pin-ring-width: 0.5px;
-  transition: filter 140ms ease;
-  filter: drop-shadow(var(--vlog-pin-ring-width) 0 0 transparent)
-    drop-shadow(calc(var(--vlog-pin-ring-width) * -1) 0 0 transparent)
-    drop-shadow(0 var(--vlog-pin-ring-width) 0 transparent)
-    drop-shadow(0 calc(var(--vlog-pin-ring-width) * -1) 0 transparent)
-    drop-shadow(calc(var(--vlog-pin-ring-width) * 0.7071) calc(var(--vlog-pin-ring-width) * 0.7071) 0 transparent)
-    drop-shadow(calc(var(--vlog-pin-ring-width) * -0.7071) calc(var(--vlog-pin-ring-width) * 0.7071) 0 transparent)
-    drop-shadow(calc(var(--vlog-pin-ring-width) * 0.7071) calc(var(--vlog-pin-ring-width) * -0.7071) 0 transparent)
-    drop-shadow(calc(var(--vlog-pin-ring-width) * -0.7071) calc(var(--vlog-pin-ring-width) * -0.7071) 0 transparent);
 }
 
 .tripdots-map .maplibregl-marker:hover svg,

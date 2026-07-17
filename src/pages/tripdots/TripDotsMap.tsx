@@ -19,12 +19,14 @@ import {
   loadAllTrails,
   loadOverviewTrips,
   loadTripDetail,
+  loadTripVlogDetails,
   tripDotsBasemapUrl,
   tripDotsRegionalBasemapUrl,
   type HomeCenter,
   type LocalizedText,
   type TripSummary,
   type TripVlog,
+  type TripVlogDetails,
 } from './content/tripDotsData';
 import './TripDotsMap.css';
 
@@ -40,7 +42,7 @@ function isBboxInsideRegion(bbox: [number, number, number, number]): boolean {
 }
 
 let pmtilesProtocolRegistered = false;
-function ensurePmtilesProtocol() {
+export function ensurePmtilesProtocol() {
   if (pmtilesProtocolRegistered) return;
   const protocol = new Protocol();
   addProtocol('pmtiles', protocol.tile);
@@ -59,13 +61,13 @@ function getLuminanceFromCssColor(cssColor: string): number {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
 }
 
-function resolveFlavor(): Flavor {
+export function resolveFlavor(): Flavor {
   const bg = getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim();
   if (!bg) return LIGHT;
   return getLuminanceFromCssColor(bg) < 0.5 ? DARK : LIGHT;
 }
 
-type TripDotsPalette = {
+export type TripDotsPalette = {
   tripLine: string;
   tripStay: string;
   overnightHighlight: string;
@@ -74,7 +76,7 @@ type TripDotsPalette = {
 // MapLibre paint properties are style-spec values, not live CSS — they can't
 // reference CSS custom properties via var(). Resolve the current theme's
 // colors to concrete strings once, at map-creation time, instead.
-function resolvePalette(): TripDotsPalette {
+export function resolvePalette(): TripDotsPalette {
   const styles = getComputedStyle(document.documentElement);
   const read = (name: string, fallback: string) => styles.getPropertyValue(name).trim() || fallback;
   return {
@@ -93,7 +95,7 @@ const EMPTY_FEATURE_COLLECTION: GeoJSON.FeatureCollection = { type: 'FeatureColl
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const IS_LINE_GEOMETRY: any = ['any', ['==', ['geometry-type'], 'LineString'], ['==', ['geometry-type'], 'MultiLineString']];
 
-function buildStyle(flavor: Flavor): StyleSpecification {
+export function buildStyle(flavor: Flavor): StyleSpecification {
   return {
     version: 8,
     sources: {
@@ -107,7 +109,7 @@ function buildStyle(flavor: Flavor): StyleSpecification {
   };
 }
 
-function addOverlaySourcesAndLayers(map: MapLibreMap, palette: TripDotsPalette) {
+export function addOverlaySourcesAndLayers(map: MapLibreMap, palette: TripDotsPalette) {
   if (!map.getSource('overview-trips')) {
     map.addSource('overview-trips', { type: 'geojson', data: EMPTY_FEATURE_COLLECTION });
   }
@@ -278,7 +280,7 @@ const PLAY_ICON_SVG =
 // wide on screen (roughly a longer-duration stay dot's diameter — see
 // trip-stays' circle-radius in addOverlaySourcesAndLayers, which tops out
 // at 11px/22px-across).
-const VLOG_PIN_SIZE_PX = 32;
+export const VLOG_PIN_SIZE_PX = 32;
 
 // Minimum zoom level a click-to-open pin brings the camera to (never zooms
 // out if already closer than this — see the vlog-pins effect). Capped to
@@ -304,7 +306,7 @@ const VLOG_POPUP_FADE_MS = 160;
 // circular stay/home dots. Colored via `currentColor`/wrapper.style.color
 // (see the vlog-pins effect) since a custom marker element bypasses
 // maplibregl.Marker's own `color` option entirely.
-const VLOG_PIN_SVG =
+export const VLOG_PIN_SVG =
   `<svg xmlns="http://www.w3.org/2000/svg" width="${VLOG_PIN_SIZE_PX}" height="${VLOG_PIN_SIZE_PX}" viewBox="0 0 24 24" fill="currentColor">` +
   '<path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8z"/>' +
   '<circle cx="12" cy="10" r="3" fill="#fff"/>' +
@@ -330,13 +332,17 @@ function appendWatchIcon(target: HTMLElement) {
 // effect below for why popup lifecycle is managed by hand rather than
 // MapLibre's built-in close button/event.
 //
+// `details` (description/url/coverImageUrl) comes from trip-vlog-details.json
+// — fetched lazily, only once a pin is actually clicked (see the vlog-pins
+// effect), so this function itself only ever runs after that fetch resolves.
+//
 // Layout: text (title/description) always comes first, then — only when
 // there's a coverImageUrl — the thumbnail with its own "Watch" badge pinned to
 // the bottom-right corner (the whole thumbnail is still one big click
 // target; the badge is a visual affordance, not a second nested link).
 // Without a cover image, the "Watch" link renders inline in the text body
 // instead, since there's no image corner to host it on.
-function buildVlogPopupContent(vlog: TripVlog, language: AppLanguage, onClose: () => void): HTMLElement {
+function buildVlogPopupContent(details: TripVlogDetails, language: AppLanguage, onClose: () => void): HTMLElement {
   const container = document.createElement('div');
   container.className = 'tripdots-vlog-popup';
 
@@ -359,10 +365,10 @@ function buildVlogPopupContent(vlog: TripVlog, language: AppLanguage, onClose: (
 
   const title = document.createElement('div');
   title.className = 'tripdots-vlog-popup__title';
-  title.textContent = pickLocalizedText(vlog.title, language);
+  title.textContent = pickLocalizedText(details.title, language);
   body.appendChild(title);
 
-  const descriptionText = pickLocalizedText(vlog.description, language);
+  const descriptionText = pickLocalizedText(details.description, language);
   if (descriptionText) {
     const description = document.createElement('p');
     description.className = 'tripdots-vlog-popup__description';
@@ -370,10 +376,10 @@ function buildVlogPopupContent(vlog: TripVlog, language: AppLanguage, onClose: (
     body.appendChild(description);
   }
 
-  if (!vlog.coverImageUrl) {
+  if (!details.coverImageUrl) {
     const link = document.createElement('a');
     link.className = 'tripdots-vlog-popup__link';
-    link.href = vlog.url;
+    link.href = details.url;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.setAttribute('aria-label', UI_COPY.tripDotsPage.vlogWatchLink);
@@ -383,12 +389,12 @@ function buildVlogPopupContent(vlog: TripVlog, language: AppLanguage, onClose: (
 
   container.appendChild(body);
 
-  // coverImageUrl is optional (see TripVlog) — plain thumbnail URL, no i18n,
-  // since it's a screenshot rather than text.
-  if (vlog.coverImageUrl) {
+  // coverImageUrl is optional (see TripVlogDetails) — plain thumbnail URL,
+  // no i18n, since it's a screenshot rather than text.
+  if (details.coverImageUrl) {
     const coverLink = document.createElement('a');
     coverLink.className = 'tripdots-vlog-popup__cover';
-    coverLink.href = vlog.url;
+    coverLink.href = details.url;
     coverLink.target = '_blank';
     coverLink.rel = 'noopener noreferrer';
     // The badge below is icon-only, so this is the anchor's only accessible
@@ -401,7 +407,7 @@ function buildVlogPopupContent(vlog: TripVlog, language: AppLanguage, onClose: (
     // hotlink-protect by rejecting cross-site Referer headers. Sending none
     // sidesteps that without needing our own proxy.
     img.referrerPolicy = 'no-referrer';
-    img.src = vlog.coverImageUrl;
+    img.src = details.coverImageUrl;
     img.alt = '';
     img.loading = 'lazy';
     coverLink.appendChild(img);
@@ -421,8 +427,8 @@ function buildVlogPopupContent(vlog: TripVlog, language: AppLanguage, onClose: (
 // exactly on top of each other and be unclickable individually — fan
 // duplicates out along a small golden-angle spiral so every one stays a
 // separate, independently-clickable pin, each with its own popup.
-const VLOG_DUPLICATE_JITTER_DEG = 0.0006;
-function jitteredVlogPosition(vlog: TripVlog, occurrenceIndex: number): [number, number] {
+export const VLOG_DUPLICATE_JITTER_DEG = 0.0006;
+export function jitteredVlogPosition(vlog: TripVlog, occurrenceIndex: number): [number, number] {
   if (occurrenceIndex === 0) return [vlog.lon, vlog.lat];
   const angle = (occurrenceIndex * 137.5 * Math.PI) / 180;
   return [vlog.lon + Math.cos(angle) * VLOG_DUPLICATE_JITTER_DEG, vlog.lat + Math.sin(angle) * VLOG_DUPLICATE_JITTER_DEG];
@@ -651,7 +657,7 @@ export default function TripDotsMap({
       // popup that was actually just reopened.
       let fadeOutTimeoutId: number | undefined;
       const closePopup = () => {
-        openVlogIdsRef.current.delete(vlog.id);
+        openVlogIdsRef.current.delete(vlog.vlogId);
         markerElement.classList.remove('tripdots-vlog-pin--open');
         popup.getElement()?.classList.remove('tripdots-vlog-popup--visible');
         fadeOutTimeoutId = window.setTimeout(() => {
@@ -659,14 +665,37 @@ export default function TripDotsMap({
           fadeOutTimeoutId = undefined;
         }, VLOG_POPUP_FADE_MS);
       };
-      closePopupById.set(vlog.id, closePopup);
-      const showPopup = () => {
+      closePopupById.set(vlog.vlogId, closePopup);
+
+      // The popup's DOM content (in particular its <img>, which starts
+      // downloading the instant it's created) is built lazily on first
+      // open rather than eagerly for every pin up front — with "All vlogs"
+      // on, building all of them immediately meant every pin's thumbnail
+      // started loading at once, which is what made panning sluggish.
+      // loadTripVlogDetails() itself is only fetched once (cached) across
+      // every pin, so only the very first open of the whole session pays
+      // for that request.
+      let contentReady = false;
+      const ensureContent = async () => {
+        if (contentReady) return;
+        const detailsById = await loadTripVlogDetails();
+        const details = detailsById[vlog.vlogId];
+        if (!details) {
+          console.warn(`No trip-vlog-details.json entry for vlogId "${vlog.vlogId}"`);
+          return;
+        }
+        popup.setDOMContent(buildVlogPopupContent(details, language, closePopup));
+        contentReady = true;
+      };
+
+      const showPopup = async () => {
         if (fadeOutTimeoutId !== undefined) {
           window.clearTimeout(fadeOutTimeoutId);
           fadeOutTimeoutId = undefined;
         }
+        await ensureContent();
         popup.addTo(map);
-        openVlogIdsRef.current.add(vlog.id);
+        openVlogIdsRef.current.add(vlog.vlogId);
         markerElement.classList.add('tripdots-vlog-pin--open');
         // Double rAF: a single frame can land in the same paint as the
         // class-less initial state, which some browsers coalesce and skip
@@ -689,13 +718,13 @@ export default function TripDotsMap({
         // via spread since closePopup mutates openVlogIdsRef as it goes,
         // and mutating a Set mid-iteration can skip entries.
         for (const openId of [...openVlogIdsRef.current]) {
-          if (openId !== vlog.id) closePopupById.get(openId)?.();
+          if (openId !== vlog.vlogId) closePopupById.get(openId)?.();
         }
         if (!moveCamera) {
-          showPopup();
+          void showPopup();
           return;
         }
-        map.once('moveend', showPopup);
+        map.once('moveend', () => void showPopup());
         map.easeTo({
           center: position,
           zoom: Math.max(map.getZoom(), VLOG_PIN_FOCUS_MIN_ZOOM),
@@ -705,7 +734,6 @@ export default function TripDotsMap({
           duration: 600,
         });
       };
-      popup.setDOMContent(buildVlogPopupContent(vlog, language, closePopup));
       popups.push(popup);
 
       markerElement.addEventListener('click', (event) => {
@@ -718,7 +746,7 @@ export default function TripDotsMap({
       });
       markers.push(marker);
 
-      if (openVlogIdsRef.current.has(vlog.id)) openPopup(false);
+      if (openVlogIdsRef.current.has(vlog.vlogId)) openPopup(false);
     }
 
     return () => {

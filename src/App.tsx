@@ -12,6 +12,7 @@ const BioDetailPage = lazy(() => import('./pages/graph/BioDetailPage'))
 const GraphStatisticsPage = lazy(() => import('./pages/graph/GraphStatisticsPage'))
 const VisitorAnalysisPage = lazy(() => import('./pages/graph/VisitorAnalysisPage'))
 const TripDotsPage = lazy(() => import('./pages/tripdots/TripDotsPage'))
+const TripVlogPinEditorPage = lazy(() => import('./pages/tripdots/TripVlogPinEditorPage'))
 
 function App() {
   const location = useLocation()
@@ -93,6 +94,16 @@ function App() {
           </Suspense>
         }
       />
+      {import.meta.env.DEV && (
+        <Route
+          path="/tripdots/edit-vlogs"
+          element={
+            <Suspense fallback={<PageLoadingFallback />}>
+              <TripVlogPinEditorPage />
+            </Suspense>
+          }
+        />
+      )}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

@@ -64,22 +64,36 @@ export type FunFacts = {
 // back to `en` when it's missing.
 export type LocalizedText = { en: string; zh_cn?: string };
 
-type TripVlogEntry = {
+// Split across two files — trip-vlogs.json (this type) is small and fetched
+// eagerly on page load to place every pin; trip-vlog-details.json
+// (TripVlogDetails, keyed by vlogId) holds the heavier fields — most
+// importantly coverImageUrl, which used to mean every pin's popup, and thus
+// its <img>, got built (and started downloading) the moment "All vlogs" was
+// turned on, regardless of whether it was ever clicked. Details are now
+// fetched once, lazily, on the first pin click of the session (see
+// loadTripVlogDetails and the vlog-pins effect in TripDotsMap.tsx).
+export type TripVlog = {
+  vlogId: string;
   // Optional — a vlog doesn't have to belong to any trip (a daily-life or
   // otherwise "virtual" one just omits this) and only ever shows up via the
   // "All vlogs" toggle rather than a specific trip's selection.
   tripId?: string;
+  lon: number;
+  lat: number;
+};
+
+// title lives here (not in TripVlog) even though it's small — the root
+// visualization only needs a pin's position and which trip it belongs to,
+// never its text, so there's no reason for it to be in the eagerly-fetched
+// file either.
+export type TripVlogDetails = {
   title: LocalizedText;
   description: LocalizedText;
   url: string;
-  lon: number;
-  lat: number;
   // Optional thumbnail — a plain image URL, no i18n (it's a screenshot, not
   // text). Omit it and the card falls back to text-only.
   coverImageUrl?: string;
 };
-
-export type TripVlog = TripVlogEntry & { id: string };
 
 const TRIPDOTS_BASE_URL = `${import.meta.env.BASE_URL}data/tripdots`;
 
@@ -130,18 +144,30 @@ export function loadFunFacts(): Promise<FunFacts> {
 // trip-vlogs.json is hand-edited directly (not build-generated — see
 // scripts/trip_dots/generate.mjs's validateTripVlogs), a flat array so a
 // vlog's `tripId` is optional (a daily-life/virtual vlog can omit it
-// entirely — see TripVlogEntry). It carries no id field to keep typing it
-// out by hand as light as possible; a stable id is derived here instead,
-// purely from position (fine since this file has no reordering/
-// regeneration step that would shift it).
+// entirely). Fetched eagerly on page load — this file is deliberately kept
+// to just what's needed to place a pin (no title/description/coverImageUrl)
+// so rendering every pin doesn't also mean downloading every pin's text and
+// thumbnail.
 let tripVlogsPromise: Promise<TripVlog[]> | null = null;
 export function loadTripVlogs(): Promise<TripVlog[]> {
   if (!tripVlogsPromise) {
-    tripVlogsPromise = fetchJson<TripVlogEntry[]>('trip-vlogs.json').then((entries) =>
-      entries.map((entry, index) => ({ ...entry, id: `vlog-${index}` })),
-    );
+    tripVlogsPromise = fetchJson<TripVlog[]>('trip-vlogs.json');
   }
   return tripVlogsPromise;
+}
+
+// trip-vlog-details.json, keyed by vlogId — fetched once, lazily, the first
+// time any vlog pin is clicked (see the vlog-pins effect in
+// TripDotsMap.tsx), not on page load. One combined file rather than one
+// request per vlogId: simpler to hand-edit (matches trip-vlogs.json's single-
+// file authoring) and avoids one HTTP round trip per pin for a dataset this
+// size.
+let tripVlogDetailsPromise: Promise<Record<string, TripVlogDetails>> | null = null;
+export function loadTripVlogDetails(): Promise<Record<string, TripVlogDetails>> {
+  if (!tripVlogDetailsPromise) {
+    tripVlogDetailsPromise = fetchJson<Record<string, TripVlogDetails>>('trip-vlog-details.json');
+  }
+  return tripVlogDetailsPromise;
 }
 
 let overviewTripsPromise: Promise<GeoJSON.FeatureCollection> | null = null;

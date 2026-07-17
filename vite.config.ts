@@ -15,7 +15,15 @@ const GRAPH_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/graph.json')
 const NODES_DIR = path.resolve(ROOT_DIR, 'public/data/nodes')
 const BIO_DATA_DIR = path.resolve(ROOT_DIR, 'public/data')
 const DOMAINS_CONFIG_PATH = path.resolve(ROOT_DIR, 'src/configs/content/domains.ts')
+const TRIP_VLOGS_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/tripdots/trip-vlogs.json')
 const execFileAsync = promisify(execFile)
+
+type EditorTripVlog = {
+  vlogId: string
+  tripId?: string
+  lon: number
+  lat: number
+}
 
 type EditorGraphNode = {
   id: string
@@ -918,8 +926,61 @@ function createNodeEditorPlugin(): Plugin {
   }
 }
 
+// Dev-only endpoint backing src/pages/tripdots/TripVlogPinEditorPage.tsx — a
+// small tool for dragging vlog pins to correct their lon/lat. There's no
+// backend in production (this is a static site), so this plugin's
+// `apply: 'serve'` is what makes "dev only" literally true rather than just
+// a UI label: the route can only ever save when running `vite dev`.
+function createVlogPinEditorPlugin(): Plugin {
+  return {
+    name: 'greenpage-vlog-pin-editor-dev-api',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use(async (request, response, next) => {
+        try {
+          const requestUrl = new URL(request.url ?? '/', 'http://localhost')
+
+          if (request.method === 'POST' && requestUrl.pathname === '/__vlog-editor/pin/save') {
+            const body = await parseBody(request)
+            const vlogId = typeof body.vlogId === 'string' ? body.vlogId.trim() : ''
+            const lon = typeof body.lon === 'number' ? body.lon : Number(body.lon)
+            const lat = typeof body.lat === 'number' ? body.lat : Number(body.lat)
+
+            if (!vlogId || Number.isNaN(lon) || Number.isNaN(lat)) {
+              sendJson(response, 400, { error: 'Missing or invalid vlogId/lon/lat.' })
+              return
+            }
+
+            const vlogs = await readJsonFile<EditorTripVlog[]>(TRIP_VLOGS_JSON_PATH)
+            const entry = vlogs.find((candidate) => candidate.vlogId === vlogId)
+            if (!entry) {
+              sendJson(response, 404, { error: `vlogId "${vlogId}" was not found.` })
+              return
+            }
+
+            // Matches the precision already used throughout the hand-edited file.
+            entry.lon = Math.round(lon * 1e4) / 1e4
+            entry.lat = Math.round(lat * 1e4) / 1e4
+
+            // Written without serializeJson's trailing newline, matching this
+            // file's existing (no-trailing-newline) formatting exactly.
+            await fs.writeFile(TRIP_VLOGS_JSON_PATH, JSON.stringify(vlogs, null, 2), 'utf8')
+            sendJson(response, 200, { ok: true, vlogId, lon: entry.lon, lat: entry.lat })
+            return
+          }
+
+          next()
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Vlog pin editor API failed.'
+          sendJson(response, 500, { error: message })
+        }
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), createNodeEditorPlugin()],
+  plugins: [react(), createNodeEditorPlugin(), createVlogPinEditorPlugin()],
   base: "/greenpage/",
 })
