@@ -1,0 +1,52 @@
+{
+  "title": "Trip Dots",
+  "subtitle": "Visualizing my travel history in the globe",
+  "summary": "A map-based visualization of my travel history in the world for the pass four years. I always want to create such a visualization to track all my trips and travel vlogs by geological location.\n\nMostly my trips are around the Pacific Ocean, and I have been to China, Japan, Canada, United States and Puerto Rico for the past four years.",
+  "tags": [
+    "travel",
+    "data visualization"
+  ],
+  "sections": [
+    {
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "A map-based visualization of my travel history in the world for the pass four years. I always want to do such a visualization to track all my trips and travel vlogs by geological location."
+        },
+        {
+          "type": "text",
+          "text": "Mostly my trips are around the Pacific Ocean, and I have been to China, Japan, Canada, United States and Puerto Rico for the past four years."
+        },
+        {
+          "type": "text",
+          "text": "You can find it in [tripdots](https://greenere.github.io/greenpage/tripdots)"
+        },
+        {
+          "type": "image",
+          "alt": "Visualization Demo 0",
+          "src": "public/assets/imgs/tripdots_demo_0.png"
+        },
+        {
+          "type": "text",
+          "text": "Zoom in a specific trip:"
+        },
+        {
+          "type": "image",
+          "alt": "Visualization Demo 1",
+          "src": "public/assets/imgs/tripdots_demo_1.png"
+        },
+        {
+          "type": "text",
+          "text": "See where I ever had a travel vlog:"
+        },
+        {
+          "type": "image",
+          "alt": "Visualization Demo 2",
+          "src": "public/assets/imgs/tripdots_demo_2.png"
+        }
+      ],
+      "id": "overview"
+    }
+  ]
+}

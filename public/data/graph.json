@@ -113,6 +113,12 @@
       "chronology": "202603"
     },
     {
+      "id": "trip-dots",
+      "domain": "project",
+      "kind": "project",
+      "chronology": "20260716"
+    },
+    {
       "id": "signature-attack",
       "kind": "research",
       "domain": "research",
@@ -410,6 +416,26 @@
       "labels": {
         "en": "during my spare time ",
         "zh-CN": "工作之余的个人项目"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-trip-dots-reason-trip-dots-california-one-2022-1",
+      "from": "trip-dots",
+      "to": "california-one-2022",
+      "kind": "reason",
+      "labels": {
+        "en": "this was the first road trip I ever had"
+      },
+      "strength": 1
+    },
+    {
+      "id": "editor-trip-dots-topic-trip-dots-data-visualizations-2021-2",
+      "from": "trip-dots",
+      "to": "data-visualizations-2021",
+      "kind": "topic",
+      "labels": {
+        "en": "data visualization projects in various flavors"
       },
       "strength": 1
     }
