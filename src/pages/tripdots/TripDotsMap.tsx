@@ -446,7 +446,7 @@ type TripDotsMapProps = {
   showFlights: boolean;
   highlightOvernight: boolean;
   tripVlogs: TripVlog[];
-  showAllVlogs: boolean;
+  showVlogs: boolean;
 };
 
 export default function TripDotsMap({
@@ -461,7 +461,7 @@ export default function TripDotsMap({
   showFlights,
   highlightOvernight,
   tripVlogs,
-  showAllVlogs,
+  showVlogs,
 }: TripDotsMapProps) {
   const { language } = useAppLanguage();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -599,10 +599,12 @@ export default function TripDotsMap({
 
   // Vlog pins (see public/data/tripdots/trip-vlogs.json) — independent of
   // the dots/routes/flights toggles, since these are hand-curated
-  // highlights rather than derived GPS data. Shown for the selected trip
-  // (matched by vlog.tripId — a vlog with no tripId never shows this way,
-  // only via "All vlogs") by default, or every vlog at once when the "All
-  // vlogs" toggle (showAllVlogs, off by default) is on — a
+  // highlights rather than derived GPS data. showVlogs (off by default) is a
+  // plain visibility switch, not its own "show everything" mode — it
+  // combines with trip selection like any other filter: off hides vlog pins
+  // unconditionally (even if a trip is selected), on shows just the
+  // selected trip's vlogs (matched by vlog.tripId — a vlog with no tripId
+  // never shows this way) or, with no trip selected, every vlog at once. A
   // maplibregl.Marker (a small flat pin, tinted to match the route line
   // color) makes clicking-to-open obvious, distinct from the plain circular
   // stay/home dots. At most one popup is open at a time (see openPopup's
@@ -615,7 +617,7 @@ export default function TripDotsMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
-    const vlogs = showAllVlogs ? tripVlogs : selectedTripId ? tripVlogs.filter((vlog) => vlog.tripId === selectedTripId) : [];
+    const vlogs = !showVlogs ? [] : selectedTripId ? tripVlogs.filter((vlog) => vlog.tripId === selectedTripId) : tripVlogs;
     if (vlogs.length === 0) return;
 
     const markers: Marker[] = [];
@@ -753,7 +755,7 @@ export default function TripDotsMap({
       popups.forEach((popup) => popup.remove());
       markers.forEach((marker) => marker.remove());
     };
-  }, [selectedTripId, tripVlogs, language, mapReady, showAllVlogs]);
+  }, [selectedTripId, tripVlogs, language, mapReady, showVlogs]);
 
   // Swap the basemap's tile source between the global (whole-planet,
   // low-zoom) and regional (California + neighbors, real street-level zoom)

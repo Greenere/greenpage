@@ -45,7 +45,7 @@ export default function TripDotsPage() {
   const [viewMode, setViewMode] = useState<'globe' | 'flat'>('globe');
   const [showingAllTrails, setShowingAllTrails] = useState(false);
   const [showPhotoTrips, setShowPhotoTrips] = useState(true);
-  const [showAllVlogs, setShowAllVlogs] = useState(false);
+  const [showVlogs, setShowVlogs] = useState(false);
   const [showDots, setShowDots] = useState(true);
   const [showRoutes, setShowRoutes] = useState(true);
   const [showFlights, setShowFlights] = useState(true);
@@ -170,7 +170,7 @@ export default function TripDotsPage() {
           showFlights={showFlights}
           highlightOvernight={highlightOvernight}
           tripVlogs={tripVlogs}
-          showAllVlogs={showAllVlogs}
+          showVlogs={showVlogs}
         />
       </div>
 
@@ -246,10 +246,10 @@ export default function TripDotsPage() {
 
         <button
           type="button"
-          aria-label={UI_COPY.tripDotsPage.showAllVlogsButton}
-          title={UI_COPY.tripDotsPage.showAllVlogsButton}
-          className={`tripdots-page__all-trails-button${showAllVlogs ? ' tripdots-page__all-trails-button--active' : ''}`}
-          onClick={() => setShowAllVlogs((prev) => !prev)}
+          aria-label={UI_COPY.tripDotsPage.showVlogsButton}
+          title={UI_COPY.tripDotsPage.showVlogsButton}
+          className={`tripdots-page__all-trails-button${showVlogs ? ' tripdots-page__all-trails-button--active' : ''}`}
+          onClick={() => setShowVlogs((prev) => !prev)}
         >
           <MapPin size={16} strokeWidth={2} aria-hidden="true" />
         </button>

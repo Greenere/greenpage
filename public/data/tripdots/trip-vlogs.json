@@ -56,8 +56,8 @@
   {
     "vlogId": "BV1J4yoBMENt",
     "tripId": "trip-1747943554",
-    "lon": -106.4193,
-    "lat": 35.6578
+    "lon": -106.4099,
+    "lat": 35.6668
   },
   {
     "vlogId": "BV1PPhnzFEoE",
@@ -138,14 +138,14 @@
   {
     "vlogId": "BV1eKmNYcEgT",
     "tripId": "trip-1711907331",
-    "lon": -123.2088,
-    "lat": 49.6401
+    "lon": -123.2915,
+    "lat": 49.3656
   },
   {
     "vlogId": "BV1CXxVeNEGd",
     "tripId": "trip-1711907331",
-    "lon": -116.186,
-    "lat": 51.3216
+    "lon": -116.182,
+    "lat": 51.3249
   },
   {
     "vlogId": "BV12AtqeCE7t",
@@ -243,20 +243,20 @@
   {
     "vlogId": "BV1yB1aB1E1a",
     "tripId": "trip-1747943554",
-    "lon": -106.651,
-    "lat": 35.0841
+    "lon": -107.1359,
+    "lat": 35.1019
   },
   {
     "vlogId": "BV1GneWzdExb",
     "tripId": "trip-1747943554",
-    "lon": -106.3129,
-    "lat": 35.7845
+    "lon": -106.2841,
+    "lat": 35.787
   },
   {
     "vlogId": "BV1m4bwzCEdi",
     "tripId": "trip-1747943554",
-    "lon": -105.9425,
-    "lat": 35.6876
+    "lon": -105.9487,
+    "lat": 35.6799
   },
   {
     "vlogId": "BV1y9uRzTEcb",
@@ -477,5 +477,119 @@
     "tripId": "trip-1711907331",
     "lon": 139.5354,
     "lat": 35.3147
+  },
+  {
+    "vlogId": "BV1Cs421M7vv",
+    "tripId": "trip-1703550519",
+    "lon": -116.0127,
+    "lat": 33.9868
+  },
+  {
+    "vlogId": "BV1pZ421g7dm",
+    "tripId": "trip-1703550519",
+    "lon": -116.1715,
+    "lat": 34.0136
+  },
+  {
+    "vlogId": "BV1z1421C7x3",
+    "tripId": "trip-1708136923",
+    "lon": -119.6914,
+    "lat": 34.023
+  },
+  {
+    "vlogId": "BV1NpCeBmExi",
+    "tripId": "trip-1757639978",
+    "lon": -121.5114,
+    "lat": 41.7303
+  },
+  {
+    "vlogId": "BV1fQ1GYREJM",
+    "tripId": "trip-1729321674",
+    "lon": -119.027,
+    "lat": 37.9399
+  },
+  {
+    "vlogId": "BV1YB4y1R7yt",
+    "tripId": "trip-1697330366",
+    "lon": -119.1262,
+    "lat": 37.7706
+  },
+  {
+    "vlogId": "BV16u411w7ZJ",
+    "tripId": "trip-1693088995",
+    "lon": -120.8931,
+    "lat": 38.804
+  },
+  {
+    "vlogId": "BV1vm4y1J7yv",
+    "tripId": "trip-1688228282",
+    "lon": -123.2428,
+    "lat": 38.5162
+  },
+  {
+    "vlogId": "BV1ET421i7QG",
+    "tripId": "trip-1700706573",
+    "lon": -110.7098,
+    "lat": 32.2022
+  },
+  {
+    "vlogId": "BV1Ct1ZBEExY",
+    "tripId": "trip-1747943554",
+    "lon": -105.5261,
+    "lat": 37.7431
+  },
+  {
+    "vlogId": "BV1P81KYmESE",
+    "tripId": "trip-1711907331",
+    "lon": -123.1453,
+    "lat": 49.6814
+  },
+  {
+    "vlogId": "BV1s32wYTEA8",
+    "tripId": "trip-1711907331",
+    "lon": -116.4805,
+    "lat": 51.496
+  },
+  {
+    "vlogId": "BV1F22jYzEM8",
+    "tripId": "trip-1711907331",
+    "lon": -116.5346,
+    "lat": 51.4485
+  },
+  {
+    "vlogId": "BV1yp4jejEDs",
+    "tripId": "trip-1711907331",
+    "lon": -117.2435,
+    "lat": 52.1965
+  },
+  {
+    "vlogId": "BV1Sg4NeREpN",
+    "tripId": "trip-1711907331",
+    "lon": -115.5721,
+    "lat": 51.1751
+  },
+  {
+    "vlogId": "BV1uhx8esEME",
+    "tripId": "trip-1711907331",
+    "lon": -116.5071,
+    "lat": 51.717
+  },
+  {
+    "vlogId": "BV1vN4EeiE8k",
+    "tripId": "trip-1711907331",
+    "lon": 139.0965,
+    "lat": 34.905
+  },
+  {
+    "vlogId": "BV1Ki4ieuEaK",
+    "tripId": "trip-1711907331",
+    "lon": 138.9203,
+    "lat": 35.0118
+  },
+  {
+    "vlogId": "BV1CppWeREZS",
+    "tripId": "trip-1711907331",
+    "lon": 138.7616,
+    "lat": 35.5042
   }
 ]

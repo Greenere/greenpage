@@ -100,7 +100,7 @@ export const EN_MESSAGES = {
       tripDurationDays: (days: number) => `${days} day${days === 1 ? '' : 's'}`,
       allTrailsButton: 'All trails',
       photoTripsButton: 'Photo trips',
-      showAllVlogsButton: 'All vlogs',
+      showVlogsButton: 'Vlogs',
       showFlightsToggle: 'Flights',
       highlightOvernightToggle: 'Overnight stays',
       showDotsToggle: 'Dots',
