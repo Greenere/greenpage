@@ -1,0 +1,52 @@
+{
+  "title": "旅行足迹👣",
+  "subtitle": "走遍地球常回头🌍",
+  "summary": "这是一张基于地图的可视化项目，展示了我过去四年在全球各地的旅行轨迹。我一直想制作这样的可视化图表，按地理位置追踪我的所有旅行和旅行vlog。我的旅行主要集中在太平洋沿岸，过去四年里我到过中国、日本、加拿大、美国和波多黎各。",
+  "tags": [
+    "旅行",
+    "数据可视化"
+  ],
+  "sections": [
+    {
+      "label": "Overview",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "这是一张基于地图的可视化图表，展示了我过去四年在全球各地的旅行轨迹。我一直想做这样一个可视化图表，以便按地理位置追踪我的所有旅行和旅行vlog。"
+        },
+        {
+          "type": "text",
+          "text": "我的旅行大多在太平洋沿岸地区，过去四年里，我去过中国、日本、加拿大、美国和波多黎各。"
+        },
+        {
+          "type": "text",
+          "text": "它在这里：[tripdots](https://greenere.github.io/greenpage/tripdots)"
+        },
+        {
+          "type": "image",
+          "alt": "Visualization Demo 0",
+          "src": "public/assets/imgs/tripdots_demo_0.png"
+        },
+        {
+          "type": "text",
+          "text": "查看某一次旅行:"
+        },
+        {
+          "type": "image",
+          "alt": "Visualization Demo 1",
+          "src": "public/assets/imgs/tripdots_demo_1.png"
+        },
+        {
+          "type": "text",
+          "text": "看看我在哪里留下了vlog:"
+        },
+        {
+          "type": "image",
+          "alt": "Visualization Demo 2",
+          "src": "public/assets/imgs/tripdots_demo_2.png"
+        }
+      ],
+      "id": "overview"
+    }
+  ]
+}
