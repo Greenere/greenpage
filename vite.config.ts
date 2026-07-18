@@ -16,6 +16,7 @@ const NODES_DIR = path.resolve(ROOT_DIR, 'public/data/nodes')
 const BIO_DATA_DIR = path.resolve(ROOT_DIR, 'public/data')
 const DOMAINS_CONFIG_PATH = path.resolve(ROOT_DIR, 'src/configs/content/domains.ts')
 const TRIP_VLOGS_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/tripdots/trip-vlogs.json')
+const TRIP_VLOG_DETAILS_JSON_PATH = path.resolve(ROOT_DIR, 'public/data/tripdots/trip-vlog-details.json')
 const execFileAsync = promisify(execFile)
 
 type EditorTripVlog = {
@@ -23,6 +24,18 @@ type EditorTripVlog = {
   tripId?: string
   lon: number
   lat: number
+}
+
+type EditorLocalizedText = {
+  en: string
+  zh_cn?: string
+}
+
+type EditorTripVlogDetails = {
+  title: EditorLocalizedText
+  description: EditorLocalizedText
+  url: string
+  coverImageUrl?: string
 }
 
 type EditorGraphNode = {
@@ -966,6 +979,37 @@ function createVlogPinEditorPlugin(): Plugin {
             // file's existing (no-trailing-newline) formatting exactly.
             await fs.writeFile(TRIP_VLOGS_JSON_PATH, JSON.stringify(vlogs, null, 2), 'utf8')
             sendJson(response, 200, { ok: true, vlogId, lon: entry.lon, lat: entry.lat })
+            return
+          }
+
+          if (request.method === 'POST' && requestUrl.pathname === '/__vlog-editor/details/save') {
+            const body = await parseBody(request)
+            const vlogId = typeof body.vlogId === 'string' ? body.vlogId.trim() : ''
+            const titleEn = typeof body.titleEn === 'string' ? body.titleEn.trim() : ''
+            const titleZhCn = typeof body.titleZhCn === 'string' ? body.titleZhCn.trim() : ''
+            const descriptionEn = typeof body.descriptionEn === 'string' ? body.descriptionEn.trim() : ''
+            const descriptionZhCn = typeof body.descriptionZhCn === 'string' ? body.descriptionZhCn.trim() : ''
+            const url = typeof body.url === 'string' ? body.url.trim() : ''
+            const coverImageUrl = typeof body.coverImageUrl === 'string' ? body.coverImageUrl.trim() : ''
+
+            if (!vlogId || !titleEn || !url) {
+              sendJson(response, 400, { error: 'vlogId, title (EN), and url are required.' })
+              return
+            }
+
+            const details = await readJsonFile<Record<string, EditorTripVlogDetails>>(TRIP_VLOG_DETAILS_JSON_PATH)
+            const nextEntry: EditorTripVlogDetails = {
+              title: { en: titleEn, ...(titleZhCn ? { zh_cn: titleZhCn } : {}) },
+              description: { en: descriptionEn, ...(descriptionZhCn ? { zh_cn: descriptionZhCn } : {}) },
+              url,
+              ...(coverImageUrl ? { coverImageUrl } : {}),
+            }
+            details[vlogId] = nextEntry
+
+            // Written without serializeJson's trailing newline, matching this
+            // file's existing (no-trailing-newline) formatting exactly.
+            await fs.writeFile(TRIP_VLOG_DETAILS_JSON_PATH, JSON.stringify(details, null, 2), 'utf8')
+            sendJson(response, 200, { ok: true, vlogId, details: nextEntry })
             return
           }
 

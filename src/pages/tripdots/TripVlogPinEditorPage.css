@@ -93,3 +93,108 @@
 .tripdots-vlog-editor .maplibregl-marker:active {
   cursor: grabbing;
 }
+
+/* Double-click edit card chrome (see TripVlogPinEditorPage.tsx's
+   buildVlogEditCardContent) — overrides maplibre-gl's plain default popup
+   box to match this page's dark/light card look. Unlike TripDotsMap's
+   read-only vlog popup, this one uses MapLibre's own close button/
+   closeOnClick machinery instead of a hand-rolled one — this is a
+   dev-only form, not a polished public-facing card, so there's no fade
+   animation or custom chrome to keep in sync. */
+.tripdots-vlog-editor .maplibregl-popup-content {
+  padding: 0.85rem 1rem;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--color-background) 92%, black 8%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 25%, transparent),
+    0 6px 18px rgba(0, 0, 0, 0.25);
+  color: var(--color-text);
+  font-family: inherit;
+}
+
+.tripdots-vlog-editor .maplibregl-popup-tip {
+  border-top-color: color-mix(in srgb, var(--color-background) 92%, black 8%);
+}
+
+.tripdots-vlog-edit-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 18rem;
+}
+
+.tripdots-vlog-edit-card__heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0.6;
+  letter-spacing: 0.02em;
+}
+
+.tripdots-vlog-edit-card__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+.tripdots-vlog-edit-card__input {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 30%, transparent);
+  background: var(--color-background);
+  color: var(--color-text);
+  resize: vertical;
+}
+
+textarea.tripdots-vlog-edit-card__input {
+  min-height: 3.2rem;
+}
+
+.tripdots-vlog-edit-card__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.tripdots-vlog-edit-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.15rem;
+}
+
+.tripdots-vlog-edit-card__status {
+  margin-right: auto;
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.tripdots-vlog-edit-card__status--error {
+  color: #d9534f;
+  opacity: 1;
+}
+
+.tripdots-vlog-edit-card__button {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 30%, transparent);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.tripdots-vlog-edit-card__button--primary {
+  border-color: transparent;
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+.tripdots-vlog-edit-card__button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
