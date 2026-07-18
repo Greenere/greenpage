@@ -1013,6 +1013,61 @@ function createVlogPinEditorPlugin(): Plugin {
             return
           }
 
+          if (request.method === 'POST' && requestUrl.pathname === '/__vlog-editor/pin/create') {
+            const body = await parseBody(request)
+            const vlogId = typeof body.vlogId === 'string' ? body.vlogId.trim() : ''
+            const tripId = typeof body.tripId === 'string' ? body.tripId.trim() : ''
+            const lon = typeof body.lon === 'number' ? body.lon : Number(body.lon)
+            const lat = typeof body.lat === 'number' ? body.lat : Number(body.lat)
+
+            if (!vlogId || Number.isNaN(lon) || Number.isNaN(lat)) {
+              sendJson(response, 400, { error: 'Missing or invalid vlogId/lon/lat.' })
+              return
+            }
+
+            const vlogs = await readJsonFile<EditorTripVlog[]>(TRIP_VLOGS_JSON_PATH)
+            if (vlogs.some((candidate) => candidate.vlogId === vlogId)) {
+              sendJson(response, 409, { error: `vlogId "${vlogId}" already exists.` })
+              return
+            }
+
+            const entry: EditorTripVlog = {
+              vlogId,
+              ...(tripId ? { tripId } : {}),
+              // Matches the precision already used throughout the hand-edited file.
+              lon: Math.round(lon * 1e4) / 1e4,
+              lat: Math.round(lat * 1e4) / 1e4,
+            }
+            vlogs.push(entry)
+
+            await fs.writeFile(TRIP_VLOGS_JSON_PATH, JSON.stringify(vlogs, null, 2), 'utf8')
+            sendJson(response, 200, { ok: true, vlog: entry })
+            return
+          }
+
+          if (request.method === 'POST' && requestUrl.pathname === '/__vlog-editor/pin/delete') {
+            const body = await parseBody(request)
+            const vlogId = typeof body.vlogId === 'string' ? body.vlogId.trim() : ''
+
+            if (!vlogId) {
+              sendJson(response, 400, { error: 'Missing vlogId.' })
+              return
+            }
+
+            // Deletes from both files together so the two never drift out of
+            // sync — validateTripVlogs (scripts/trip_dots/generate.mjs) warns
+            // on an orphan in either direction.
+            const vlogs = await readJsonFile<EditorTripVlog[]>(TRIP_VLOGS_JSON_PATH)
+            const nextVlogs = vlogs.filter((candidate) => candidate.vlogId !== vlogId)
+            const details = await readJsonFile<Record<string, EditorTripVlogDetails>>(TRIP_VLOG_DETAILS_JSON_PATH)
+            delete details[vlogId]
+
+            await fs.writeFile(TRIP_VLOGS_JSON_PATH, JSON.stringify(nextVlogs, null, 2), 'utf8')
+            await fs.writeFile(TRIP_VLOG_DETAILS_JSON_PATH, JSON.stringify(details, null, 2), 'utf8')
+            sendJson(response, 200, { ok: true, vlogId })
+            return
+          }
+
           next()
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Vlog pin editor API failed.'

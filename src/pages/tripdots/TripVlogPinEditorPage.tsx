@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LngLatBounds, Map as MapLibreMap, Marker, Popup, type GeoJSONSource, type LngLatLike } from 'maplibre-gl';
+import { LngLatBounds, Map as MapLibreMap, Marker, Popup, type GeoJSONSource, type LngLatLike, type MapMouseEvent } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Link } from 'react-router-dom';
 
@@ -13,7 +13,13 @@ import {
   VLOG_PIN_SVG,
 } from './TripDotsMap';
 import { loadAllTrails, loadTripVlogDetails, loadTripVlogs, type TripVlog, type TripVlogDetails } from './content/tripDotsData';
-import { saveVlogDetails, saveVlogPinPosition, type VlogDetailsDraft } from './vlogPinEditorApi';
+import {
+  createVlogPin,
+  deleteVlogPin,
+  saveVlogDetails,
+  saveVlogPinPosition,
+  type VlogDetailsDraft,
+} from './vlogPinEditorApi';
 import './TripVlogPinEditorPage.css';
 
 type SaveStatus = { vlogId: string; ok: boolean; message: string };
@@ -28,6 +34,7 @@ function buildVlogEditCardContent(
   vlogId: string,
   existing: TripVlogDetails | undefined,
   onSave: (draft: VlogDetailsDraft) => void,
+  onDelete: () => void,
 ) {
   const container = document.createElement('div');
   container.className = 'tripdots-vlog-edit-card';
@@ -37,27 +44,50 @@ function buildVlogEditCardContent(
   heading.textContent = vlogId;
   container.appendChild(heading);
 
-  function addField(labelText: string, tag: 'input' | 'textarea', value: string) {
+  // Titles use a <textarea> too (not <input>) so long text wraps within the
+  // card instead of scrolling off sideways in a single line — but a title is
+  // still a single logical line of data (TripVlogDetails.title.en is a plain
+  // string, no embedded newlines), so Enter is trapped below to stop it from
+  // inserting a line break. Descriptions genuinely are multi-line/paragraph
+  // text already (see e.g. the Lava Beds entry), so Enter behaves normally
+  // there.
+  function addField(labelText: string, rows: number, value: string, trapEnter: boolean) {
     const label = document.createElement('label');
     label.className = 'tripdots-vlog-edit-card__label';
     label.textContent = labelText;
-    const control = document.createElement(tag);
+    const control = document.createElement('textarea');
     control.className = 'tripdots-vlog-edit-card__input';
+    control.rows = rows;
     control.value = value;
+    if (trapEnter) {
+      control.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') event.preventDefault();
+      });
+    }
     label.appendChild(control);
     container.appendChild(label);
     return control;
   }
 
-  const titleEnInput = addField('Title (EN)', 'input', existing?.title.en ?? '');
-  const titleZhCnInput = addField('Title (中文, optional)', 'input', existing?.title.zh_cn ?? '');
-  const descriptionEnInput = addField('Description (EN)', 'textarea', existing?.description.en ?? '');
-  const descriptionZhCnInput = addField('Description (中文, optional)', 'textarea', existing?.description.zh_cn ?? '');
-  const urlInput = addField('Video URL', 'input', existing?.url ?? '');
-  const coverImageUrlInput = addField('Cover image URL (optional)', 'input', existing?.coverImageUrl ?? '');
+  const titleEnInput = addField('Title (EN)', 2, existing?.title.en ?? '', true);
+  const titleZhCnInput = addField('Title (中文, optional)', 2, existing?.title.zh_cn ?? '', true);
+  const descriptionEnInput = addField('Description (EN)', 4, existing?.description.en ?? '', false);
+  const descriptionZhCnInput = addField('Description (中文, optional)', 4, existing?.description.zh_cn ?? '', false);
+  const urlInput = addField('Video URL', 1, existing?.url ?? '', true);
+  const coverImageUrlInput = addField('Cover image URL (optional)', 1, existing?.coverImageUrl ?? '', true);
 
   const actions = document.createElement('div');
   actions.className = 'tripdots-vlog-edit-card__actions';
+
+  // Far left, separated from Save by the auto-margin status text between
+  // them — the actual "are you sure" safety net is the window.confirm() in
+  // openEditCard's onDelete callback, but keeping this physically apart
+  // from Save still helps avoid a mis-click between the two.
+  const deleteButton = document.createElement('button');
+  deleteButton.type = 'button';
+  deleteButton.className = 'tripdots-vlog-edit-card__button tripdots-vlog-edit-card__button--danger';
+  deleteButton.textContent = 'Delete';
+  deleteButton.addEventListener('click', onDelete);
 
   const statusEl = document.createElement('span');
   statusEl.className = 'tripdots-vlog-edit-card__status';
@@ -78,6 +108,7 @@ function buildVlogEditCardContent(
     });
   });
 
+  actions.appendChild(deleteButton);
   actions.appendChild(statusEl);
   actions.appendChild(saveButton);
   container.appendChild(actions);
@@ -90,6 +121,7 @@ function buildVlogEditCardContent(
     },
     setSaving: (saving: boolean) => {
       saveButton.disabled = saving;
+      deleteButton.disabled = saving;
     },
   };
 }
@@ -120,10 +152,24 @@ export default function TripVlogPinEditorPage() {
   // whichever was already open, same "single active popup" convention as
   // TripDotsMap's read-only vlog popups.
   const activeEditPopupRef = useRef<Popup | null>(null);
+  // The map's own click handler (registered once, on mount) needs the
+  // latest "am I in add-pin mode?"/vlogs-so-far values at click time, but
+  // effect closures only ever see what was current when they were set up —
+  // hence mirroring both into refs that are kept in sync below, rather than
+  // relying on stale values captured when the mount effect first ran.
+  const isAddingRef = useRef(false);
+  const vlogsRef = useRef<TripVlog[]>([]);
+  // Set right after a new pin is created so the markers effect's next run
+  // (triggered by the vlogs state update below) knows to auto-open that
+  // one vlog's edit card once its marker exists, instead of leaving a
+  // freshly-placed pin with no details at all until the user remembers to
+  // double-click it themselves.
+  const pendingAutoEditVlogIdRef = useRef<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [vlogs, setVlogs] = useState<TripVlog[] | null>(null);
   const [detailsById, setDetailsById] = useState<Record<string, TripVlogDetails> | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     Promise.all([loadTripVlogs(), loadTripVlogDetails()]).then(([loadedVlogs, loadedDetails]) => {
@@ -131,6 +177,25 @@ export default function TripVlogPinEditorPage() {
       setDetailsById(loadedDetails);
     });
   }, []);
+
+  useEffect(() => {
+    vlogsRef.current = vlogs ?? [];
+  }, [vlogs]);
+
+  useEffect(() => {
+    isAddingRef.current = isAdding;
+    const canvas = mapRef.current?.getCanvas();
+    if (canvas) canvas.style.cursor = isAdding ? 'crosshair' : '';
+  }, [isAdding, mapReady]);
+
+  useEffect(() => {
+    if (!isAdding) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsAdding(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isAdding]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -144,6 +209,43 @@ export default function TripVlogPinEditorPage() {
       attributionControl: { compact: true },
     });
     mapRef.current = map;
+
+    // Placing a new pin (see the "Add pin" button) is a single click on the
+    // map background — this is registered once, here, rather than per-pin
+    // like the marker listeners below, since it's a property of the map
+    // itself, not of any one marker (and a marker's own DOM element sits
+    // above the canvas, so a click on an existing pin never reaches this
+    // handler anyway).
+    const handleMapClick = (event: MapMouseEvent) => {
+      if (!isAddingRef.current) return;
+      setIsAdding(false);
+
+      const vlogId = window.prompt('New vlog pin — enter a unique vlogId (e.g. a bilibili BV id):')?.trim();
+      if (!vlogId) return;
+      if (vlogsRef.current.some((candidate) => candidate.vlogId === vlogId)) {
+        window.alert(`vlogId "${vlogId}" already exists.`);
+        return;
+      }
+      const tripId =
+        window.prompt('Optional: tripId to associate this pin with a trip (leave blank for none):')?.trim() ?? '';
+
+      const { lng, lat } = event.lngLat;
+      setSaveStatus({ vlogId, ok: true, message: `Creating ${vlogId}…` });
+      createVlogPin(vlogId, tripId, lng, lat)
+        .then((createdVlog) => {
+          pendingAutoEditVlogIdRef.current = vlogId;
+          setVlogs((prev) => [...(prev ?? []), createdVlog]);
+          setSaveStatus({ vlogId, ok: true, message: `Created ${vlogId} — fill in its details below` });
+        })
+        .catch((error: unknown) => {
+          setSaveStatus({
+            vlogId,
+            ok: false,
+            message: `Failed to create ${vlogId}: ${error instanceof Error ? error.message : 'unknown error'}`,
+          });
+        });
+    };
+    map.on('click', handleMapClick);
 
     map.on('load', () => {
       // Flat, not globe — a pin-editing tool benefits from predictable
@@ -192,20 +294,50 @@ export default function TripVlogPinEditorPage() {
         if (activeEditPopupRef.current === popup) activeEditPopupRef.current = null;
       });
 
-      const card = buildVlogEditCardContent(vlog.vlogId, detailsById[vlog.vlogId], (draft) => {
-        card.setSaving(true);
-        card.setStatus('Saving…', false);
-        saveVlogDetails(draft)
-          .then((savedDetails) => {
-            setDetailsById((prev) => ({ ...(prev ?? {}), [vlog.vlogId]: savedDetails }));
-            setSaveStatus({ vlogId: vlog.vlogId, ok: true, message: `Saved details for ${vlog.vlogId}` });
-            popup.remove();
-          })
-          .catch((error: unknown) => {
-            card.setSaving(false);
-            card.setStatus(error instanceof Error ? error.message : 'Save failed.', true);
-          });
-      });
+      const card = buildVlogEditCardContent(
+        vlog.vlogId,
+        detailsById[vlog.vlogId],
+        (draft) => {
+          card.setSaving(true);
+          card.setStatus('Saving…', false);
+          saveVlogDetails(draft)
+            .then((savedDetails) => {
+              setDetailsById((prev) => ({ ...(prev ?? {}), [vlog.vlogId]: savedDetails }));
+              setSaveStatus({ vlogId: vlog.vlogId, ok: true, message: `Saved details for ${vlog.vlogId}` });
+              popup.remove();
+            })
+            .catch((error: unknown) => {
+              card.setSaving(false);
+              card.setStatus(error instanceof Error ? error.message : 'Save failed.', true);
+            });
+        },
+        () => {
+          const label = detailsById[vlog.vlogId]?.title.en ?? vlog.vlogId;
+          const confirmed = window.confirm(
+            `Delete vlog pin "${label}" (${vlog.vlogId})?\n\nThis removes it from both trip-vlogs.json and trip-vlog-details.json and cannot be undone.`,
+          );
+          if (!confirmed) return;
+
+          card.setSaving(true);
+          card.setStatus('Deleting…', false);
+          deleteVlogPin(vlog.vlogId)
+            .then(() => {
+              setVlogs((prev) => (prev ?? []).filter((candidate) => candidate.vlogId !== vlog.vlogId));
+              setDetailsById((prev) => {
+                if (!prev) return prev;
+                const next = { ...prev };
+                delete next[vlog.vlogId];
+                return next;
+              });
+              setSaveStatus({ vlogId: vlog.vlogId, ok: true, message: `Deleted ${vlog.vlogId}` });
+              popup.remove();
+            })
+            .catch((error: unknown) => {
+              card.setSaving(false);
+              card.setStatus(error instanceof Error ? error.message : 'Delete failed.', true);
+            });
+        },
+      );
 
       popup.setDOMContent(card.element);
       popup.addTo(map);
@@ -273,6 +405,11 @@ export default function TripVlogPinEditorPage() {
       });
 
       markers.push(marker);
+
+      if (pendingAutoEditVlogIdRef.current === vlog.vlogId) {
+        pendingAutoEditVlogIdRef.current = null;
+        openEditCard(vlog, position);
+      }
     }
 
     if (!hasFitBoundsRef.current) {
@@ -299,6 +436,13 @@ export default function TripVlogPinEditorPage() {
           ← Trip dots
         </Link>
         <span className="tripdots-vlog-editor__title">Vlog pin editor (dev only)</span>
+        <button
+          type="button"
+          className={`tripdots-vlog-editor__add-button${isAdding ? ' tripdots-vlog-editor__add-button--active' : ''}`}
+          onClick={() => setIsAdding((prev) => !prev)}
+        >
+          {isAdding ? 'Click the map to place… (Esc to cancel)' : '+ Add pin'}
+        </button>
         <span className="tripdots-vlog-editor__count">
           {vlogs ? `${vlogs.length} pins — drag to reposition, double-click to edit details` : 'Loading…'}
         </span>

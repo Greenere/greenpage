@@ -47,6 +47,29 @@
   opacity: 0.65;
 }
 
+.tripdots-vlog-editor__add-button {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 30%, transparent);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.tripdots-vlog-editor__add-button:hover {
+  border-color: var(--color-primary);
+}
+
+/* Active = "click the map to place it" is currently armed — filled instead
+   of outlined so it reads as a distinct mode, not just a hover state. */
+.tripdots-vlog-editor__add-button--active {
+  border-color: transparent;
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
 /* Plain browser-cursor tooltip (not a maplibregl.Popup) — this is
    ephemeral, mouse-follows-position hover text, not a card with its own
    open/close lifecycle like TripDotsMap's vlog popups. Positioned by hand
@@ -138,6 +161,11 @@
   opacity: 0.75;
 }
 
+/* Every field is a <textarea> (see buildVlogEditCardContent) so long text
+   wraps within the card instead of scrolling sideways in a single line —
+   each field's `rows` attribute controls its default height, this just
+   controls wrapping/overflow behavior and lets resize:vertical still make
+   a field taller by hand if needed. */
 .tripdots-vlog-edit-card__input {
   font: inherit;
   font-size: 0.8rem;
@@ -147,10 +175,7 @@
   background: var(--color-background);
   color: var(--color-text);
   resize: vertical;
-}
-
-textarea.tripdots-vlog-edit-card__input {
-  min-height: 3.2rem;
+  overflow-wrap: break-word;
 }
 
 .tripdots-vlog-edit-card__input:focus {
@@ -192,6 +217,21 @@ textarea.tripdots-vlog-edit-card__input {
   border-color: transparent;
   background: var(--color-primary);
   color: var(--color-background);
+}
+
+/* Outlined, not filled — a filled red button sitting right next to Save
+   reads as equally routine, which is the opposite of what a destructive
+   action should look like. The real friction is the window.confirm()
+   dialog in openEditCard; this just keeps the button itself visually
+   quieter than Save until you actually mean to click it. */
+.tripdots-vlog-edit-card__button--danger {
+  border-color: color-mix(in srgb, #d9534f 50%, transparent);
+  color: #d9534f;
+}
+
+.tripdots-vlog-edit-card__button--danger:hover {
+  border-color: #d9534f;
+  background: color-mix(in srgb, #d9534f 12%, transparent);
 }
 
 .tripdots-vlog-edit-card__button:disabled {

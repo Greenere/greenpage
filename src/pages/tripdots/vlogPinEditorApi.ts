@@ -1,4 +1,4 @@
-import type { TripVlogDetails } from './content/tripDotsData';
+import type { TripVlog, TripVlogDetails } from './content/tripDotsData';
 
 // Client for the dev-only save endpoints in vite.config.ts
 // (createVlogPinEditorPlugin) — only reachable while running `vite dev`,
@@ -37,4 +37,29 @@ export async function saveVlogDetails(draft: VlogDetailsDraft): Promise<TripVlog
     throw new Error(typeof payload?.error === 'string' ? payload.error : 'Save failed.');
   }
   return payload.details as TripVlogDetails;
+}
+
+export async function createVlogPin(vlogId: string, tripId: string, lon: number, lat: number): Promise<TripVlog> {
+  const response = await fetch('/__vlog-editor/pin/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vlogId, tripId, lon, lat }),
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(typeof payload?.error === 'string' ? payload.error : 'Create failed.');
+  }
+  return payload.vlog as TripVlog;
+}
+
+export async function deleteVlogPin(vlogId: string): Promise<void> {
+  const response = await fetch('/__vlog-editor/pin/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vlogId }),
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(typeof payload?.error === 'string' ? payload.error : 'Delete failed.');
+  }
 }
