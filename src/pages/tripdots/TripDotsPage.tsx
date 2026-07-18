@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Camera, Globe, Map, MapPin, Route } from 'lucide-react';
+import { Globe, Images, Map, MapPin, Route } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
@@ -241,7 +241,7 @@ export default function TripDotsPage() {
           className={`tripdots-page__all-trails-button${showPhotoTrips ? ' tripdots-page__all-trails-button--active' : ''}`}
           onClick={() => setShowPhotoTrips((prev) => !prev)}
         >
-          <Camera size={16} strokeWidth={2} aria-hidden="true" />
+          <Images size={16} strokeWidth={2} aria-hidden="true" />
         </button>
 
         <button

@@ -25,7 +25,7 @@
         {
           "type": "image",
           "alt": "Visualization Demo 0",
-          "src": "public/assets/imgs/tripdots_demo_0.png"
+          "src": "https://greenere.github.io/greenpage/assets/imgs/tripdots_demo_0.png"
         },
         {
           "type": "text",
@@ -34,7 +34,7 @@
         {
           "type": "image",
           "alt": "Visualization Demo 1",
-          "src": "public/assets/imgs/tripdots_demo_1.png"
+          "src": "https://greenere.github.io/greenpage/assets/imgs/tripdots_demo_1.png"
         },
         {
           "type": "text",
@@ -43,7 +43,7 @@
         {
           "type": "image",
           "alt": "Visualization Demo 2",
-          "src": "public/assets/imgs/tripdots_demo_2.png"
+          "src": "https://greenere.github.io/greenpage/assets/imgs/tripdots_demo_2.png"
         }
       ],
       "id": "overview"
