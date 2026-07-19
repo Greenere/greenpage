@@ -274,6 +274,14 @@ function pickLocalizedText(text: LocalizedText, language: AppLanguage): string {
 const PLAY_ICON_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>';
 
+// Same "static, hand-written, safe to insert via innerHTML" reasoning as
+// PLAY_ICON_SVG above. Stroke-only (not filled), matching lucide's line-icon
+// style used everywhere else on this page outside the popup — a plain
+// chevron reads fine as an outline even this small, unlike the play
+// triangle, which is why that one stays solid.
+const CHEVRON_ICON_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
 // Tune this directly to resize the vlog pin — nothing else needs to change.
 // The rendered pin looks smaller than this number: the teardrop shape only
 // fills ~16 of the SVG's 24 viewBox units, so e.g. 22px here reads as ~15px
@@ -336,12 +344,20 @@ function appendWatchIcon(target: HTMLElement) {
 // — fetched lazily, only once a pin is actually clicked (see the vlog-pins
 // effect), so this function itself only ever runs after that fetch resolves.
 //
-// Layout: text (title/description) always comes first, then — only when
-// there's a coverImageUrl — the thumbnail with its own "Watch" badge pinned to
-// the bottom-right corner (the whole thumbnail is still one big click
-// target; the badge is a visual affordance, not a second nested link).
-// Without a cover image, the "Watch" link renders inline in the text body
-// instead, since there's no image corner to host it on.
+// Layout: a full-width hero image on top (native 16:9, edge to edge, never
+// cropped since the box matches the image's own aspect ratio), title below
+// it, description collapsed by default and only revealed by clicking the
+// title. This is what lets the image stay genuinely large — carrying most
+// of "what this place feels like" — without also making the *default* card
+// tall: the description (the one truly variable-height part) only counts
+// against the card's footprint once someone actually asks to read it. Two
+// earlier layouts were tried and rejected: a side-by-side thumbnail sized to
+// fill the card's height either cropped the image or left it too small to
+// read as a real photo; the same full-width banner with the description
+// always visible worked but made every card tall regardless of whether
+// anyone wanted the extra text. Without a cover image, the "Watch" link
+// still renders inline, outside the collapsible region, since it's a
+// separate action from reading the description.
 function buildVlogPopupContent(details: TripVlogDetails, language: AppLanguage, onClose: () => void): HTMLElement {
   const container = document.createElement('div');
   container.className = 'tripdots-vlog-popup';
@@ -359,35 +375,6 @@ function buildVlogPopupContent(details: TripVlogDetails, language: AppLanguage, 
     onClose();
   });
   container.appendChild(closeButton);
-
-  const body = document.createElement('div');
-  body.className = 'tripdots-vlog-popup__body';
-
-  const title = document.createElement('div');
-  title.className = 'tripdots-vlog-popup__title';
-  title.textContent = pickLocalizedText(details.title, language);
-  body.appendChild(title);
-
-  const descriptionText = pickLocalizedText(details.description, language);
-  if (descriptionText) {
-    const description = document.createElement('p');
-    description.className = 'tripdots-vlog-popup__description';
-    description.textContent = descriptionText;
-    body.appendChild(description);
-  }
-
-  if (!details.coverImageUrl) {
-    const link = document.createElement('a');
-    link.className = 'tripdots-vlog-popup__link';
-    link.href = details.url;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.setAttribute('aria-label', UI_COPY.tripDotsPage.vlogWatchLink);
-    appendWatchIcon(link);
-    body.appendChild(link);
-  }
-
-  container.appendChild(body);
 
   // coverImageUrl is optional (see TripVlogDetails) — plain thumbnail URL,
   // no i18n, since it's a screenshot rather than text.
@@ -419,6 +406,66 @@ function buildVlogPopupContent(details: TripVlogDetails, language: AppLanguage, 
 
     container.appendChild(coverLink);
   }
+
+  const content = document.createElement('div');
+  content.className = 'tripdots-vlog-popup__content';
+
+  const descriptionText = pickLocalizedText(details.description, language);
+
+  // A <button> (not a div) so it's keyboard-focusable/activatable like any
+  // other toggle on this page — styled to look like plain text, same
+  // "override the native chrome" convention as .tripdots-vlog-popup__close.
+  // Only wired as a toggle when there's actually a description to reveal;
+  // otherwise it renders as inert plain text with no chevron, since there's
+  // nothing to expand.
+  const title = document.createElement(descriptionText ? 'button' : 'div');
+  title.className = 'tripdots-vlog-popup__title';
+  if (descriptionText) {
+    (title as HTMLButtonElement).type = 'button';
+  }
+  const titleText = document.createElement('span');
+  titleText.textContent = pickLocalizedText(details.title, language);
+  title.appendChild(titleText);
+  content.appendChild(title);
+
+  if (descriptionText) {
+    const chevron = document.createElement('span');
+    chevron.className = 'tripdots-vlog-popup__title-chevron';
+    chevron.innerHTML = CHEVRON_ICON_SVG;
+    title.appendChild(chevron);
+
+    // The CSS grid-template-rows 0fr/1fr trick (see TripDotsMap.css) needs
+    // an outer row-animated wrapper plus an inner overflow:hidden clip —
+    // a single element can't do both jobs at once.
+    const descriptionRow = document.createElement('div');
+    descriptionRow.className = 'tripdots-vlog-popup__description-row';
+    const descriptionClip = document.createElement('div');
+    descriptionClip.className = 'tripdots-vlog-popup__description-clip';
+    const description = document.createElement('p');
+    description.className = 'tripdots-vlog-popup__description';
+    description.textContent = descriptionText;
+    descriptionClip.appendChild(description);
+    descriptionRow.appendChild(descriptionClip);
+    content.appendChild(descriptionRow);
+
+    title.addEventListener('click', (event) => {
+      event.stopPropagation();
+      container.classList.toggle('tripdots-vlog-popup--expanded');
+    });
+  }
+
+  if (!details.coverImageUrl) {
+    const link = document.createElement('a');
+    link.className = 'tripdots-vlog-popup__link';
+    link.href = details.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.setAttribute('aria-label', UI_COPY.tripDotsPage.vlogWatchLink);
+    appendWatchIcon(link);
+    content.appendChild(link);
+  }
+
+  container.appendChild(content);
 
   return container;
 }
@@ -638,7 +685,17 @@ export default function TripDotsMap({
       // closeOnClick: false — opening a pin shouldn't get dismissed by the
       // camera pan/click that opening it just did; "only one card open"
       // (see openPopup below) is instead enforced by hand.
-      const popup = new Popup({ offset: 28, maxWidth: '260px', closeOnClick: false, closeButton: false }).setLngLat(
+      // anchor: 'top' — the popup hangs *below* the pin (tip at its own top
+      // edge) rather than above it. This matters for the expand/collapse
+      // description: MapLibre keeps a popup's anchor edge pinned to the map
+      // coordinate and repositions the *other* edge as content resizes, so
+      // an anchor: 'bottom' popup (sitting above the pin) grows upward when
+      // expanded — the header visibly slides up the screen. Anchoring from
+      // the top instead means growing taller only extends the bottom edge
+      // further down, leaving the header (right under the tip) fixed in
+      // place. See the padding on the easeTo call below, which reserves
+      // room *under* the pin to match.
+      const popup = new Popup({ offset: 28, maxWidth: '336px', closeOnClick: false, closeButton: false, anchor: 'top' }).setLngLat(
         position,
       );
       // A custom `element` bypasses maplibregl.Marker's own `color` option
@@ -647,7 +704,17 @@ export default function TripDotsMap({
       const pinWrapper = document.createElement('div');
       pinWrapper.innerHTML = VLOG_PIN_SVG;
       pinWrapper.style.color = paletteRef.current.tripLine;
-      const marker = new Marker({ element: pinWrapper, anchor: 'bottom' }).setLngLat(position).addTo(map);
+      // opacityWhenCovered: 0 — in globe mode, MapLibre's default is to fade
+      // (not hide) markers on the far side of the planet, which reads fine
+      // at today's pin count but would turn into visual noise as more vlogs
+      // get added; hiding them outright scales better. No effect in flat
+      // mode (nothing is ever "occluded" there). MapLibre only toggles this
+      // via inline style opacity, not display/pointer-events, hence the
+      // .maplibregl-marker-covered CSS rule in TripDotsMap.css disabling
+      // clicks/hover on an invisible-but-still-present covered marker.
+      const marker = new Marker({ element: pinWrapper, anchor: 'bottom', opacityWhenCovered: 0 })
+        .setLngLat(position)
+        .addTo(map);
       const markerElement = marker.getElement();
       markerElement.classList.add('tripdots-vlog-pin');
 
@@ -730,9 +797,10 @@ export default function TripDotsMap({
         map.easeTo({
           center: position,
           zoom: Math.max(map.getZoom(), VLOG_PIN_FOCUS_MIN_ZOOM),
-          // Leaves room above the pin for the popup card itself, so opening
-          // it doesn't require a second pan to actually read it.
-          padding: { top: 160, bottom: 0, left: 0, right: 0 },
+          // Leaves room below the pin for the popup card itself (which now
+          // hangs below the pin — see the Popup's anchor: 'top' above), so
+          // opening it doesn't require a second pan to actually read it.
+          padding: { top: 0, bottom: 160, left: 0, right: 0 },
           duration: 600,
         });
       };

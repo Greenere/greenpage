@@ -41,6 +41,26 @@
    pay 80+ times over one you pay at most once." */
 .tripdots-map .maplibregl-marker {
   cursor: pointer;
+  /* Softens the occlusion cutoff below (opacityWhenCovered: 0) into a brief
+     fade instead of an instant pop as a pin crosses the globe's horizon —
+     MapLibre flips the element's inline `opacity` directly between 1 and 0
+     each frame it recalculates occlusion, and a plain CSS transition on
+     that property smooths the jump without needing to touch MapLibre's own
+     per-frame logic. Scoped to opacity only — transform gets repositioned
+     every frame during pan/rotate and must never be transitioned, or the
+     pin would visibly lag behind the cursor. */
+  transition: opacity 250ms ease;
+}
+
+/* MapLibre toggles this class itself (see the vlog-pins effect's
+   opacityWhenCovered: 0) whenever a marker is occluded — on the far side of
+   the globe in globe mode — but only ever sets the element's inline
+   `opacity`, not display or pointer-events. Without this rule an invisible
+   covered pin would still intercept hover/click, which would be confusing
+   (a tooltip or card opening for a pin the user can't see). No effect in
+   flat mode, since nothing is ever occluded there. */
+.tripdots-map .maplibregl-marker.maplibregl-marker-covered {
+  pointer-events: none;
 }
 
 .tripdots-map .maplibregl-marker svg {
@@ -76,8 +96,8 @@
 /* Vlog popup (see TripDotsMap.tsx's buildVlogPopupContent) — overrides
    maplibre-gl's default popup chrome to match this page's card language
    instead of the library's plain white box. Padding lives on
-   .tripdots-vlog-popup__body instead of here, so an optional cover image
-   can bleed flush to the card's own rounded corners (clipped via
+   .tripdots-vlog-popup__content instead of here, so the full-bleed cover
+   banner can reach the card's own rounded corners (clipped via
    overflow: hidden here). */
 .tripdots-map .maplibregl-popup-content {
   padding: 0;
@@ -91,13 +111,30 @@
   font-family: inherit;
 }
 
+/* Covers both tip directions — MapLibre colors a popup's tip via
+   border-top-color when it's anchored below its reference point (tip points
+   down) and border-bottom-color when anchored above it (tip points up, our
+   vlog popups' case — see anchor: 'top' in the vlog-pins effect). */
 .tripdots-map .maplibregl-popup-tip {
   border-top-color: color-mix(in srgb, var(--color-background) 92%, white 8%);
+  border-bottom-color: color-mix(in srgb, var(--color-background) 92%, white 8%);
 }
 
 .tripdots-vlog-popup {
   position: relative;
-  max-width: 16rem;
+  /* Matches .tripdots-page__panel's own 21rem (TripDotsPage.css) — the trip
+     sidebar — so the card reads as consistently sized with the rest of the
+     page's chrome rather than an arbitrary one-off width. Keep in sync with
+     the Popup's own maxWidth in the vlog-pins effect. */
+  max-width: 21rem;
+}
+
+.tripdots-vlog-popup__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  padding-right: 1.7rem;
 }
 
 /* Popup lifecycle (open/closed) is managed by hand in TripDotsMap.tsx, so
@@ -137,17 +174,25 @@
    keep it for real keyboard navigation only. */
 .tripdots-vlog-popup__close:focus,
 .tripdots-vlog-popup__cover:focus,
-.tripdots-vlog-popup__link:focus {
+.tripdots-vlog-popup__link:focus,
+.tripdots-vlog-popup__title:focus {
   outline: none;
 }
 
 .tripdots-vlog-popup__close:focus-visible,
 .tripdots-vlog-popup__cover:focus-visible,
-.tripdots-vlog-popup__link:focus-visible {
+.tripdots-vlog-popup__link:focus-visible,
+.tripdots-vlog-popup__title:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--color-secondary) 60%, transparent);
   outline-offset: 2px;
 }
 
+/* Full-bleed hero banner — full card width, aspect-ratio 16:9 to match
+   bilibili's own cover thumbnails exactly, so object-fit: cover below has
+   nothing to crop and the whole image always shows. This is the one place
+   in the card that's deliberately large: the photo is meant to carry most
+   of "what this place feels like," so it gets real size instead of being
+   squeezed into a small supporting thumbnail. */
 .tripdots-vlog-popup__cover {
   position: relative;
   display: block;
@@ -168,47 +213,124 @@
   transform: scale(1.04);
 }
 
-/* Corner "Watch" badge overlaid on the cover image — a visual affordance,
-   not a second link (the whole .tripdots-vlog-popup__cover anchor already
-   covers this area, so nesting another <a> here would be invalid HTML).
-   Icon-only, same as .tripdots-vlog-popup__link below — the accessible name
-   lives on the enclosing <a>, not this badge (see buildVlogPopupContent). */
+/* Centered "Watch" badge, hidden until hover — not a corner badge,
+   deliberately. Pairing it against the close button (top-right corner) in
+   some other corner kept reading as unbalanced no matter which corner it
+   went in, since a two-corner composition asks to be compared/mirrored.
+   Centering sidesteps that (nothing to balance against), and is also the
+   more universal "this is a playable video" affordance — same pattern
+   YouTube/Netflix/Vimeo use. Kept modestly sized and invisible at rest
+   (rather than a big permanent overlay) so the cover photo itself — the
+   whole point of showing it large — stays completely unobstructed; the
+   badge only appears once someone's actually interested enough to hover.
+   Not a second link — the whole .tripdots-vlog-popup__cover anchor already
+   covers this area, so nesting another <a> here would be invalid HTML.
+   Icon-only; the accessible name lives on the enclosing <a>, not this badge
+   (see buildVlogPopupContent). */
 .tripdots-vlog-popup__watch-badge {
   position: absolute;
-  right: 0.5rem;
-  bottom: 0.5rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.1rem;
+  height: 2.1rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-primary) 88%, transparent);
-  color: var(--color-background);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: background-color 140ms ease;
+  background: color-mix(in srgb, black 50%, transparent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
 }
 
+.tripdots-vlog-popup__watch-badge .tripdots-vlog-popup__link-icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+/* transition-delay only on the hover-in rule, not the base rule above — so
+   hovering has to be sustained for a beat before the badge appears (avoids
+   a flash on every quick mouse pass over the card), but moving away hides
+   it immediately via the base rule's own (undelayed) transition. If the
+   mouse leaves before this delay elapses, the hover rule stops applying and
+   the fade-in this was counting down to never happens at all. */
 .tripdots-vlog-popup__cover:hover .tripdots-vlog-popup__watch-badge {
-  background: var(--color-primary);
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    opacity 140ms ease 400ms,
+    transform 140ms ease 400ms;
 }
 
-.tripdots-vlog-popup__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.85rem 1rem;
-  padding-right: 1.7rem;
-}
-
+/* Rendered as a <button> when there's a description to toggle, a plain <div>
+   otherwise (see buildVlogPopupContent) — this resets the native button
+   chrome (border/background/font) so it reads as plain bold text either
+   way, with only the cursor and the chevron hinting that it's interactive. */
 .tripdots-vlog-popup__title {
-  font-size: 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.75rem;
   font-weight: 700;
+  color: inherit;
+  text-align: left;
+}
+
+button.tripdots-vlog-popup__title {
+  cursor: pointer;
+}
+
+.tripdots-vlog-popup__title-chevron {
+  flex: 0 0 auto;
+  display: inline-flex;
+  margin-top: 0.15rem;
+  opacity: 0.6;
+  transition: transform 200ms ease;
+}
+
+.tripdots-vlog-popup__title-chevron svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Points down at rest ("reveal more below"), flips to point up once
+   expanded — .tripdots-vlog-popup--expanded is toggled by the title's own
+   click handler in buildVlogPopupContent. */
+.tripdots-vlog-popup--expanded .tripdots-vlog-popup__title-chevron {
+  transform: rotate(180deg);
+}
+
+/* CSS-only expand/collapse, no JS height measurement: the outer row element
+   animates grid-template-rows between 0fr and 1fr (a fixed 0 doesn't
+   transition, but a fixed *fraction* does), while the inner clip element's
+   overflow: hidden actually crops the content during that transition — a
+   single element can't do both jobs, hence the pair. */
+.tripdots-vlog-popup__description-row {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms ease;
+}
+
+.tripdots-vlog-popup--expanded .tripdots-vlog-popup__description-row {
+  grid-template-rows: 1fr;
+}
+
+.tripdots-vlog-popup__description-clip {
+  overflow: hidden;
 }
 
 .tripdots-vlog-popup__description {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   line-height: 1.4;
   opacity: 0.85;
 }
