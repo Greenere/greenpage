@@ -591,5 +591,56 @@
     "tripId": "trip-1711907331",
     "lon": 138.7616,
     "lat": 35.5042
+  },
+  {
+    "vlogId": "BV1CQ4y157rW",
+    "tripId": "trip-1700706573",
+    "lon": -111.863,
+    "lat": 34.9321
+  },
+  {
+    "vlogId": "BV1364y1K7cF",
+    "tripId": "trip-1700706573",
+    "lon": -111.7894,
+    "lat": 34.8234
+  },
+  {
+    "vlogId": "BV1Ei4y1q7Aa",
+    "tripId": "trip-1700706573",
+    "lon": -111.0234,
+    "lat": 35.0332
+  },
+  {
+    "vlogId": "BV13C4y1L7Gx",
+    "tripId": "trip-1693625519",
+    "lon": -122.3347,
+    "lat": 41.2794
+  },
+  {
+    "vlogId": "BV19C4y1R7gE",
+    "tripId": "trip-1693625519",
+    "lon": -121.3209,
+    "lat": 40.5506
+  },
+  {
+    "vlogId": "BV1Fu4y1h7Ag",
+    "tripId": "trip-1697330366",
+    "lon": -120.082,
+    "lat": 38.9569
+  },
+  {
+    "vlogId": "BV11G411S76T",
+    "lon": -122.536,
+    "lat": 38.5614
+  },
+  {
+    "vlogId": "BV16h4y1j7eo",
+    "lon": -122.437,
+    "lat": 37.8637
+  },
+  {
+    "vlogId": "BV1yQ4y1J7fo",
+    "lon": -122.3673,
+    "lat": 37.5816
   }
 ]
