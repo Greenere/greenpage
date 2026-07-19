@@ -101,6 +101,8 @@ export const EN_MESSAGES = {
       allTrailsButton: 'All trails',
       photoTripsButton: 'Photo trips',
       showVlogsButton: 'Vlogs',
+      expandPanelLabel: 'Show trip list',
+      collapsePanelLabel: 'Hide trip list',
       showFlightsToggle: 'Flights',
       highlightOvernightToggle: 'Overnight stays',
       showDotsToggle: 'Dots',

@@ -118,12 +118,14 @@
    ring on top of it (which appears even on a plain mouse click) is just
    visual noise. Keep an outline for real keyboard navigation only. */
 .tripdots-page__all-trails-button:focus,
-.tripdots-page__view-button:focus {
+.tripdots-page__view-button:focus,
+.tripdots-page__panel-toggle:focus {
   outline: none;
 }
 
 .tripdots-page__all-trails-button:focus-visible,
-.tripdots-page__view-button:focus-visible {
+.tripdots-page__view-button:focus-visible,
+.tripdots-page__panel-toggle:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--color-secondary) 60%, transparent);
   outline-offset: 2px;
 }
@@ -175,11 +177,64 @@
 .tripdots-page__panel-content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
   padding: 0.9rem;
-  overflow-y: auto;
+  /* Scrolling now happens only inside the trip list itself (see
+     .tripdots-page__panel-body and .tripdots-sidebar's own overflow-y:auto)
+     — the stats/toggles/time-range above it stay in view instead of
+     scrolling away with the list. overflow: hidden here is just a safety
+     net against a stray 1px rounding overflow, not the real scroll region. */
+  overflow: hidden;
+}
+
+/* Decorative drag-handle bar and the header row (stats + expand/collapse
+   toggle) are only meaningful once the panel becomes a mobile bottom sheet
+   below — on desktop the panel is a plain, fully-visible, always-scrollable
+   sidebar, so both stay hidden and .tripdots-page__panel-body (the
+   toggles/time-range/trip-list) is just shown in full, unconditionally. */
+.tripdots-page__panel-handle-row {
+  display: none;
+}
+
+.tripdots-page__panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Previously .tripdots-legend (LegendStatsPanel) was a direct child of the
+   column-flex .tripdots-page__panel-content, which stretches its children
+   to fill the cross axis (full width) by default — nesting it one level
+   deeper inside .tripdots-page__panel-header (a *row* flex container, whose
+   main axis is horizontal) loses that stretch, since row children default
+   to shrink-to-fit width instead. flex: 1 here restores the original
+   full-width look on desktop, where .tripdots-page__panel-toggle is
+   display: none and this would otherwise be the row's only, under-sized
+   child. */
+.tripdots-page__panel-header .tripdots-legend {
+  flex: 1;
+  min-width: 0;
+}
+
+.tripdots-page__panel-toggle {
+  display: none;
+}
+
+.tripdots-page__panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  /* Fills whatever vertical space panel-content has left after the header
+     row above — giving this a definite (not just content-sized) height is
+     what lets TripSidebar's own flex: 1 (TripSidebar.css) in turn size
+     itself and scroll independently, instead of the space being ambiguous
+     and the whole panel falling back to growing/scrolling as one block. */
+  flex: 1;
+  min-height: 0;
 }
 
 @media (max-width: 720px) {
@@ -187,6 +242,11 @@
     display: none;
   }
 
+  /* Collapsed by default (see isMobilePanelExpanded in TripDotsPage.tsx) —
+     tall enough for just the handle + stats row, so most of the map stays
+     visible until someone actually wants the trip list. Animates between
+     the two heights instead of snapping, matching the vlog popup's own
+     expand/collapse elsewhere on this page. */
   .tripdots-page__panel {
     top: auto;
     bottom: 0;
@@ -194,11 +254,103 @@
     right: 0;
     width: 100%;
     max-width: 100%;
-    height: 46vh;
+    height: 6.5rem;
     border-radius: 1.4rem 1.4rem 0 0;
+    transition: height 220ms ease;
+  }
+
+  .tripdots-page__panel--expanded {
+    height: 52vh;
   }
 
   .tripdots-page__panel-content {
-    padding: 0.8rem;
+    padding: 0.7rem 0.9rem 0.9rem;
+  }
+
+  .tripdots-page__panel-handle-row {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0.15rem;
+  }
+
+  .tripdots-page__panel-handle {
+    width: 2.2rem;
+    height: 0.28rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-secondary) 35%, transparent);
+  }
+
+  .tripdots-page__panel-header {
+    flex: 0 0 auto;
+  }
+
+  .tripdots-page__panel-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: none;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-secondary) 14%, transparent);
+    color: inherit;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .tripdots-page__panel-toggle svg {
+    transition: transform 220ms ease;
+  }
+
+  /* Chevron points up at rest ("more above, tap to reveal"), flips to point
+     down once expanded ("collapse back down"). */
+  .tripdots-page__panel--expanded .tripdots-page__panel-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  /* Collapsed: just don't render the body at all rather than animate it —
+     the panel's own height transition above is what carries the visual
+     motion; the list/toggles/slider can pop in the instant there's room
+     for them, no separate fade needed. */
+  .tripdots-page__panel:not(.tripdots-page__panel--expanded) .tripdots-page__panel-body {
+    display: none;
+  }
+
+  /* Repositioned to clear the collapsed (6.5rem) panel instead of sitting
+     at the page's absolute bottom, where the bottom sheet would otherwise
+     cover them entirely — and hidden outright while the sheet is expanded,
+     since it then covers this whole area anyway and the trip list is the
+     focus at that point. */
+  .tripdots-page__bottom-left-controls {
+    bottom: calc(6.5rem + 0.7rem);
+  }
+
+  .tripdots-page__bottom-left-controls--hidden {
+    display: none;
+  }
+
+  /* On mobile, the whole body scrolls together as one region — only the
+     handle + stats header stays pinned above it — instead of the desktop
+     behavior of pinning toggles/time-range too and confining scrolling to
+     just the innermost trip list. On a short phone screen there isn't
+     enough height to dedicate a fixed slot to filters *and* leave the list
+     itself more than a sliver; letting the whole body scroll means the
+     "reachable" area for the trip list is the full expanded panel height
+     minus the header, not just whatever was left after the filters. */
+  .tripdots-page__panel-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .tripdots-sidebar {
+    flex: none;
+    height: auto;
+  }
+
+  .tripdots-sidebar__list {
+    flex: none;
+    overflow-y: visible;
   }
 }

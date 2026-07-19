@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Globe, Images, Map, MapPin, Route } from 'lucide-react';
+import { ChevronUp, Globe, Images, Map, MapPin, Route } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { PAGE_BACK_TRANSITION_CONFIG } from '../../configs/ui/pageTransitions';
@@ -50,6 +50,12 @@ export default function TripDotsPage() {
   const [showRoutes, setShowRoutes] = useState(true);
   const [showFlights, setShowFlights] = useState(true);
   const [highlightOvernight, setHighlightOvernight] = useState(false);
+  // Mobile only (see the @media block in TripDotsPage.css) — the trip
+  // sidebar becomes a bottom sheet there, and defaults to a short, collapsed
+  // "peek" state (just the stats row) so it doesn't cover most of the map.
+  // The toggle button that flips this is itself only rendered visible in
+  // that same breakpoint, so this state never does anything on desktop.
+  const [isMobilePanelExpanded, setIsMobilePanelExpanded] = useState(false);
 
   const handleSelectTrip = (id: string | null) => {
     setSelectedTripId(id);
@@ -198,7 +204,9 @@ export default function TripDotsPage() {
         {funFacts ? <FunFactsCard facts={funFacts} /> : null}
       </div>
 
-      <div className="tripdots-page__bottom-left-controls">
+      <div
+        className={`tripdots-page__bottom-left-controls${isMobilePanelExpanded ? ' tripdots-page__bottom-left-controls--hidden' : ''}`}
+      >
         <div className="tripdots-page__view-toggle" role="tablist">
           <button
             type="button"
@@ -255,26 +263,50 @@ export default function TripDotsPage() {
         </button>
       </div>
 
-      <div className="tripdots-page__panel">
+      <div
+        className={`tripdots-page__panel${isMobilePanelExpanded ? ' tripdots-page__panel--expanded' : ''}`}
+      >
         <div className="tripdots-page__panel-content">
-          <LegendStatsPanel tripCount={visibleTrips.length} totalDistanceKm={totalDistanceKm} placeCount={placeCount} />
-          <DisplayToggles
-            showDots={showDots}
-            onShowDotsChange={setShowDots}
-            showRoutes={showRoutes}
-            onShowRoutesChange={setShowRoutes}
-            showFlights={showFlights}
-            onShowFlightsChange={setShowFlights}
-            highlightOvernight={highlightOvernight}
-            onHighlightOvernightChange={setHighlightOvernight}
-          />
-          <TimeRangeSlider
-            min={meta.dateRange.startTs}
-            max={meta.dateRange.endTs}
-            value={timeRange}
-            onChange={setTimeRange}
-          />
-          <TripSidebar trips={visibleTripsNewestFirst} selectedTripId={selectedTripId} onSelectTrip={handleSelectTrip} />
+          {/* Decorative — a plain visual "this is a sheet you can drag/tap"
+              cue, only shown in the mobile breakpoint. The actual toggle
+              control is tripdots-page__panel-toggle below. */}
+          <div className="tripdots-page__panel-handle-row" aria-hidden="true">
+            <div className="tripdots-page__panel-handle" />
+          </div>
+          <div className="tripdots-page__panel-header">
+            <LegendStatsPanel tripCount={visibleTrips.length} totalDistanceKm={totalDistanceKm} placeCount={placeCount} />
+            <button
+              type="button"
+              className="tripdots-page__panel-toggle"
+              aria-expanded={isMobilePanelExpanded ? 'true' : 'false'}
+              aria-label={
+                isMobilePanelExpanded ? UI_COPY.tripDotsPage.collapsePanelLabel : UI_COPY.tripDotsPage.expandPanelLabel
+              }
+              title={isMobilePanelExpanded ? UI_COPY.tripDotsPage.collapsePanelLabel : UI_COPY.tripDotsPage.expandPanelLabel}
+              onClick={() => setIsMobilePanelExpanded((prev) => !prev)}
+            >
+              <ChevronUp size={16} strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+          <div className="tripdots-page__panel-body">
+            <DisplayToggles
+              showDots={showDots}
+              onShowDotsChange={setShowDots}
+              showRoutes={showRoutes}
+              onShowRoutesChange={setShowRoutes}
+              showFlights={showFlights}
+              onShowFlightsChange={setShowFlights}
+              highlightOvernight={highlightOvernight}
+              onHighlightOvernightChange={setHighlightOvernight}
+            />
+            <TimeRangeSlider
+              min={meta.dateRange.startTs}
+              max={meta.dateRange.endTs}
+              value={timeRange}
+              onChange={setTimeRange}
+            />
+            <TripSidebar trips={visibleTripsNewestFirst} selectedTripId={selectedTripId} onSelectTrip={handleSelectTrip} />
+          </div>
         </div>
       </div>
     </div>

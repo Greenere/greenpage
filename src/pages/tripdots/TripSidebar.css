@@ -1,6 +1,13 @@
 .tripdots-sidebar {
   display: flex;
   flex-direction: column;
+  /* flex: 1 is what actually claims the remaining vertical space inside
+     .tripdots-page__panel-body (a column flex container alongside
+     DisplayToggles/TimeRangeSlider, which stay their natural height) — the
+     height: 100%/min-height: 0 pair below only governs how *this* element's
+     own children (heading vs. the scrollable __list) split up whatever
+     height that turns out to be. */
+  flex: 1;
   height: 100%;
   min-height: 0;
 }

@@ -101,6 +101,8 @@ export const ZH_CN_MESSAGES = {
       allTrailsButton: '全部轨迹',
       photoTripsButton: '照片行程',
       showVlogsButton: 'Vlog',
+      expandPanelLabel: '展开行程列表',
+      collapsePanelLabel: '收起行程列表',
       showFlightsToggle: '航班',
       highlightOvernightToggle: '过夜地点',
       showDotsToggle: '点位',

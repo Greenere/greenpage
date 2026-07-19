@@ -125,8 +125,23 @@
   /* Matches .tripdots-page__panel's own 21rem (TripDotsPage.css) — the trip
      sidebar — so the card reads as consistently sized with the rest of the
      page's chrome rather than an arbitrary one-off width. Keep in sync with
-     the Popup's own maxWidth in the vlog-pins effect. */
-  max-width: 21rem;
+     the Popup's own maxWidth in the vlog-pins effect. The calc() clause is
+     the binding constraint on narrow phones, where the sidebar itself has
+     already collapsed into a bottom sheet and 21rem would otherwise overflow
+     the viewport's sides. */
+  max-width: min(21rem, calc(100vw - 2rem));
+}
+
+/* Same breakpoint as TripDotsPage.css's bottom-sheet layout — a smaller cap
+   than the calc() above alone, since that one still leaves the card nearly
+   full-screen-wide on a phone. Shrinking it here also shrinks the hero
+   image (fixed at 16:9 of the card's own width), trimming a bit of the
+   card's total height too — desktop is untouched, this only ever applies
+   below the same width this whole bottom-sheet treatment kicks in at. */
+@media (max-width: 720px) {
+  .tripdots-vlog-popup {
+    max-width: min(18rem, calc(100vw - 4rem));
+  }
 }
 
 .tripdots-vlog-popup__content {

@@ -300,6 +300,18 @@ export const VLOG_PIN_SIZE_PX = 32;
 // stretches its zoom-6 tile into a blank, detail-less blob.
 const VLOG_PIN_FOCUS_MIN_ZOOM = 6;
 
+// Matches the @media (max-width: 720px) breakpoint in TripDotsPage.css,
+// where the trip sidebar becomes a collapsed bottom sheet with its own
+// floating toggle buttons above it — extra fixed chrome at the bottom of
+// the screen that desktop doesn't have. The desktop bottom-padding
+// reservation below (160px) leaves the popup with room to spare there, but
+// on mobile it's not enough to also clear that sheet+buttons, so the vlog
+// card can end up overlapping them. Only affects the click-to-focus camera
+// move, not any layout/behavior on desktop.
+const VLOG_PIN_FOCUS_MOBILE_QUERY = '(max-width: 720px)';
+const VLOG_PIN_FOCUS_BOTTOM_PADDING = 160;
+const VLOG_PIN_FOCUS_BOTTOM_PADDING_MOBILE = 340;
+
 // Fade duration for a vlog popup opening/closing — must match the
 // `transition: opacity` duration on .maplibregl-popup in TripDotsMap.css,
 // since the close path uses this to time the actual DOM removal (popup.
@@ -527,7 +539,12 @@ export default function TripDotsMap({
     const map = new MapLibreMap({
       container: containerRef.current,
       style: buildStyle(resolveFlavor()),
-      center: [0, 20],
+      // A rough, hand-picked stand-in for "the mass center of all the trip
+      // data" (most of it is North America-heavy) rather than an actual
+      // computed centroid — [0, 20] (off the coast of Africa) put the
+      // initial view centered on empty ocean with no dots anywhere nearby,
+      // which read as a bug on first load rather than a deliberate default.
+      center: [-97, 32],
       zoom: 1.4,
       attributionControl: { compact: true },
     });
@@ -794,13 +811,19 @@ export default function TripDotsMap({
           return;
         }
         map.once('moveend', () => void showPopup());
+        const isMobileLayout = window.matchMedia(VLOG_PIN_FOCUS_MOBILE_QUERY).matches;
         map.easeTo({
           center: position,
           zoom: Math.max(map.getZoom(), VLOG_PIN_FOCUS_MIN_ZOOM),
           // Leaves room below the pin for the popup card itself (which now
           // hangs below the pin — see the Popup's anchor: 'top' above), so
           // opening it doesn't require a second pan to actually read it.
-          padding: { top: 0, bottom: 160, left: 0, right: 0 },
+          padding: {
+            top: 0,
+            bottom: isMobileLayout ? VLOG_PIN_FOCUS_BOTTOM_PADDING_MOBILE : VLOG_PIN_FOCUS_BOTTOM_PADDING,
+            left: 0,
+            right: 0,
+          },
           duration: 600,
         });
       };
