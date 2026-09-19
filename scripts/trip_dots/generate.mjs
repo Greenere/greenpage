@@ -16,7 +16,7 @@ import { ANALYSIS_START_TS } from './constants.mjs';
 const OUTPUT_RELATIVE_DIR = 'public/data/tripdots';
 // Personal location history, deliberately kept outside the repo entirely —
 // see scripts/trip_dots/README.md.
-const MAIN_CSV_PATH = path.join(os.homedir(), 'files/tripdots/trip_dots_20260712.csv');
+const MAIN_CSV_PATH = path.join(os.homedir(), 'files/tripdots/trip_dots_20260919.csv');
 const PHOTO_CSV_PATH = path.join(os.homedir(), 'files/tripdots/photo_dots_2023.csv');
 
 // trip-vlogs.json + trip-vlog-details.json (public/data/tripdots/) are both

@@ -278,5 +278,20 @@
     "title": "Santa Barbara, California · Dec 2022",
     "displayStartTs": 1669940236,
     "displayDurationDays": 2
+  },
+  "trip-1786212412": {
+    "title": "Berkeley & Marin, California · Aug 2026",
+    "displayStartTs": 1786212412,
+    "displayDurationDays": 1
+  },
+  "trip-1786757704": {
+    "title": "Tenaya Lake Paddleboarding · Aug 2026",
+    "displayStartTs": 1786757704,
+    "displayDurationDays": 2
+  },
+  "trip-1788495961": {
+    "title": "Denali, Kenai Fjords & Prince William Sound, Alaska · Sep 2026",
+    "displayStartTs": 1788495961,
+    "displayDurationDays": 11
   }
 }
