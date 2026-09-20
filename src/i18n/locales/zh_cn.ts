@@ -95,6 +95,8 @@ export const ZH_CN_MESSAGES = {
       legendPlacesLabel: '地点数',
       allTimeLabel: '全部时间',
       distanceKm: (km: number) => `${km.toLocaleString()} 公里`,
+      groundDistanceLabel: '陆路',
+      flightDistanceLabel: '飞行',
       noTripsInFilter: '当前筛选条件下没有匹配的行程。',
       homeLabel: (label: string) => `家 · ${label}`,
       tripDurationDays: (days: number) => `${days} 天`,

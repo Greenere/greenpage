@@ -7,7 +7,11 @@ type TripIndexEntry = {
   startTs: number;
   endTs: number;
   placeNames: string[];
+  // distanceKm is groundDistanceKm + flightDistanceKm, kept for callers that
+  // just want a single total (e.g. LegendStatsPanel's sum across all trips).
   distanceKm: number;
+  groundDistanceKm: number;
+  flightDistanceKm: number;
   bbox: [number, number, number, number];
   stayPoints: [number, number][];
   source: 'gps' | 'photo';

@@ -60,7 +60,9 @@ async function fetchOsrmRoute(a, b) {
 //    resolve to a route at all).
 // Results are cached on disk (keyed by rounded endpoints, shared across
 // trips) so re-runs only hit the network for genuinely new hops. Returns a
-// Map from hop.key to `{coordinates}` for hops judged plausible — callers
+// Map from hop.key to `{coordinates, distanceKm}` for hops judged plausible
+// (distanceKm is the real road length, not the straight-line hop distance —
+// used for the ground/flight distance split in write-outputs.mjs) — callers
 // should fall back to a straight line for any hop missing from the map.
 export async function recoverDriveSegments(hops) {
   const cache = await loadCache();
@@ -91,7 +93,7 @@ export async function recoverDriveSegments(hops) {
     const distancePlausible = route.distanceKm <= distanceKm * ROUTE_MAX_DISTANCE_RATIO;
     const durationPlausible = !hasTiming || route.durationHours <= timeHours * ROUTE_DURATION_SLACK_RATIO;
     if (distancePlausible && durationPlausible) {
-      recovered.set(hopKey, { coordinates: route.coordinates });
+      recovered.set(hopKey, { coordinates: route.coordinates, distanceKm: route.distanceKm });
     }
   }
 

@@ -95,6 +95,8 @@ export const EN_MESSAGES = {
       legendPlacesLabel: 'Places',
       allTimeLabel: 'All time',
       distanceKm: (km: number) => `${km.toLocaleString()} km`,
+      groundDistanceLabel: 'Driven',
+      flightDistanceLabel: 'Flown',
       noTripsInFilter: 'No trips match the current filter.',
       homeLabel: (label: string) => `Home · ${label}`,
       tripDurationDays: (days: number) => `${days} day${days === 1 ? '' : 's'}`,

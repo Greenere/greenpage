@@ -200,6 +200,38 @@ function planPhotoTripSegments(trip) {
   return segments;
 }
 
+// A trip's reported distance splits into what was actually driven/walked
+// (trace segments, plus gap segments — recovered-route length where OSRM
+// found one, else the straight-line fallback also used to draw them) vs.
+// what was flown (flight segments, great-circle length) — reusing the exact
+// same segment plan and recovered routes already computed for rendering, so
+// the number always matches what's drawn on the map. Previously trips-index
+// .json's single distanceKm came from a cruder point-to-point sum over the
+// trip's raw GPS pings (trips.mjs's totalDistanceKm) that silently included
+// flight legs and never benefited from route recovery — this replaces it.
+function computeSegmentDistanceKm(segments, recoveredRoutes) {
+  let groundKm = 0;
+  let flightKm = 0;
+  for (const segment of segments) {
+    if (segment.type === 'trace') {
+      for (let i = 1; i < segment.points.length; i++) {
+        groundKm += haversineDistanceKm(
+          segment.points[i - 1].lon,
+          segment.points[i - 1].lat,
+          segment.points[i].lon,
+          segment.points[i].lat,
+        );
+      }
+    } else if (segment.type === 'flight') {
+      flightKm += haversineDistanceKm(segment.a.lon, segment.a.lat, segment.b.lon, segment.b.lat);
+    } else {
+      const recovered = recoveredRoutes.get(segment.key);
+      groundKm += recovered ? recovered.distanceKm : haversineDistanceKm(segment.a.lon, segment.a.lat, segment.b.lon, segment.b.lat);
+    }
+  }
+  return { groundKm, flightKm };
+}
+
 // Turns segment descriptors into GeoJSON line features. A "gap" segment
 // renders as the recovered driving route if one was found and judged
 // plausible, otherwise falls back to a great-circle arc (the shortest real
@@ -423,17 +455,59 @@ export async function writeOutputs({
     return [...new Set(ids)];
   }
 
-  const tripsIndex = trips.map((trip) => ({
-    id: trip.id,
-    startTs: trip.startTs,
-    endTs: trip.endTs,
-    placeNames: buildPlaceNames(trip, getLabel),
-    distanceKm: Math.round(trip.totalDistanceKm),
-    bbox: trip.bbox,
-    stayPoints: trip.stays.map((stay) => [Number(stay.lon.toFixed(4)), Number(stay.lat.toFixed(4))]),
-    source: trip.source ?? 'gps',
-    homeCenterIds: tripHomeCenterIds(trip),
+  // Plan every trip's gap hops first, then resolve driving-route recovery in
+  // one batch (shared cache across trips, one throttled pass over the net) —
+  // needed up front here (rather than just below, where these segments are
+  // turned into rendered map lines) so the ground/flight distance split
+  // below can reuse the exact same plan and recovered routes.
+  const tripPlans = trips.map((trip) => ({
+    trip,
+    segments: trip.source === 'photo' ? planPhotoTripSegments(trip) : planTripSegments(trip, homeById.get(trip.homeCenterId)),
   }));
+  const allGapHops = tripPlans.flatMap(({ trip, segments }) => {
+    const gaps = segments.filter((segment) => segment.type === 'gap');
+    if (trip.source !== 'photo') return gaps;
+    const window = trip.nonDrivableWindow;
+    return gaps.filter((hop) => {
+      // See PHOTO_TRIP_MAX_DRIVE_KM — without reliable timing, distance alone
+      // has to stand in for "is this even plausible to drive".
+      if (haversineDistanceKm(hop.a.lon, hop.a.lat, hop.b.lon, hop.b.lat) > PHOTO_TRIP_MAX_DRIVE_KM) return false;
+      // trip.nonDrivableWindow (see photo-trip-corrections.mjs) marks a span
+      // where consecutive stays are close enough to look drivable but
+      // weren't — e.g. a boat tour, where OSRM would otherwise snap the
+      // offshore endpoints onto the nearest coastal road.
+      if (window && hop.a.startTs >= window.startTs && hop.a.startTs <= window.endTs && hop.b.startTs >= window.startTs && hop.b.startTs <= window.endTs) {
+        return false;
+      }
+      return true;
+    });
+  });
+  const recoveredRoutes = await recoverDriveSegments(allGapHops);
+
+  const tripDistances = new Map(
+    tripPlans.map(({ trip, segments }) => [trip.id, computeSegmentDistanceKm(segments, recoveredRoutes)]),
+  );
+
+  const tripsIndex = trips.map((trip) => {
+    const { groundKm, flightKm } = tripDistances.get(trip.id);
+    return {
+      id: trip.id,
+      startTs: trip.startTs,
+      endTs: trip.endTs,
+      placeNames: buildPlaceNames(trip, getLabel),
+      // Rounded independently and summed (rather than rounding the combined
+      // total separately) so distanceKm always exactly equals
+      // groundDistanceKm + flightDistanceKm for any caller that only reads
+      // the combined total (e.g. LegendStatsPanel's sum across trips).
+      groundDistanceKm: Math.round(groundKm),
+      flightDistanceKm: Math.round(flightKm),
+      distanceKm: Math.round(groundKm) + Math.round(flightKm),
+      bbox: trip.bbox,
+      stayPoints: trip.stays.map((stay) => [Number(stay.lon.toFixed(4)), Number(stay.lat.toFixed(4))]),
+      source: trip.source ?? 'gps',
+      homeCenterIds: tripHomeCenterIds(trip),
+    };
+  });
 
   await writeFile(path.join(outputDir, 'trips-index.json'), JSON.stringify(tripsIndex), 'utf8');
 
@@ -461,32 +535,6 @@ export async function writeOutputs({
     };
   }
   await writeFile(metaPath, `${JSON.stringify(tripsMeta, null, 2)}\n`, 'utf8');
-
-  // Plan every trip's gap hops first, then resolve driving-route recovery in
-  // one batch (shared cache across trips, one throttled pass over the net).
-  const tripPlans = trips.map((trip) => ({
-    trip,
-    segments: trip.source === 'photo' ? planPhotoTripSegments(trip) : planTripSegments(trip, homeById.get(trip.homeCenterId)),
-  }));
-  const allGapHops = tripPlans.flatMap(({ trip, segments }) => {
-    const gaps = segments.filter((segment) => segment.type === 'gap');
-    if (trip.source !== 'photo') return gaps;
-    const window = trip.nonDrivableWindow;
-    return gaps.filter((hop) => {
-      // See PHOTO_TRIP_MAX_DRIVE_KM — without reliable timing, distance alone
-      // has to stand in for "is this even plausible to drive".
-      if (haversineDistanceKm(hop.a.lon, hop.a.lat, hop.b.lon, hop.b.lat) > PHOTO_TRIP_MAX_DRIVE_KM) return false;
-      // trip.nonDrivableWindow (see photo-trip-corrections.mjs) marks a span
-      // where consecutive stays are close enough to look drivable but
-      // weren't — e.g. a boat tour, where OSRM would otherwise snap the
-      // offshore endpoints onto the nearest coastal road.
-      if (window && hop.a.startTs >= window.startTs && hop.a.startTs <= window.endTs && hop.b.startTs >= window.startTs && hop.b.startTs <= window.endTs) {
-        return false;
-      }
-      return true;
-    });
-  });
-  const recoveredRoutes = await recoverDriveSegments(allGapHops);
 
   // Compute each trip's GeoJSON once, write it to its own lazy-loaded file,
   // and reuse the same features (tagged with tripId) to build a merged

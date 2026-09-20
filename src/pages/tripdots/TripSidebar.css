@@ -82,6 +82,17 @@
   opacity: 0.7;
 }
 
+.tripdots-sidebar__item-distance {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.tripdots-sidebar__item-distance-part {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
 .tripdots-sidebar__empty {
   padding: 1rem 0.9rem;
   border-radius: 0.9rem;
