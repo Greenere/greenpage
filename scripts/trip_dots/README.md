@@ -1,3 +1,17 @@
+# Syncing new location history
+
+When a new raw GPS export (same `dataTime,locType,longitude,...` column schema as the main dataset — see `parse-csv.mjs`) is ready to fold in:
+
+```
+npm run trip_extract -- --file ~/path/to/new-export.csv
+```
+
+This merges the file into the canonical source (`~/files/tripdots/trip_dots_main.csv`, `paths.mjs`) in place — deduped by the `dataTime` column, new file wins on a timestamp collision — then runs the full detection pipeline (`pipeline.mjs`, shared with `generate.mjs`) without writing anything to `public/data/tripdots/`. Any resulting trip id not already in the committed `trips-index.json` is written to `scripts/trip_dots/new-trip-candidates.json` (gitignored — working review state, not build output) for review, alongside a console summary table.
+
+Each candidate's `title` field defaults to the same geocoded placeholder `write-outputs.mjs` would otherwise generate — hand-edit it in place to whatever the trip should actually be called. Then run `npm run generate:trip-dots` (or just `npm run dev`/`npm run build`, which run it via `predev`/`prebuild`) as usual: it bakes every candidate's (possibly hand-edited) title into `trips-meta.json` as that trip's permanent title — preserved across future regenerations same as any other hand edit — and automatically clears the now-baked entries out of the candidates file.
+
+Running `trip_extract` again before reviewing is safe — it re-merges (a no-op if the same file was already merged) and re-diffs against the *committed* `trips-index.json`, so already-baked trips never reappear as candidates, and an in-progress hand-edited title for a still-pending candidate is preserved rather than reset back to the geocoded default.
+
 # Trip-dots basemap
 
 `public/data/tripdots/basemap.pmtiles` is a self-hosted vector basemap (land/water/borders/labels only — no street detail) served directly by GitHub Pages via HTTP range requests, so the `/tripdots` page has no external tile-service dependency at runtime.

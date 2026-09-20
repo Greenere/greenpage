@@ -5,7 +5,7 @@ import bboxOf from '@turf/bbox';
 import greatCircle from '@turf/great-circle';
 import { lineString, point, featureCollection } from '@turf/helpers';
 import { haversineDistanceKm, estimateLocalHour, isNightHour } from './geo-utils.mjs';
-import { getCentralStay } from './trip-naming.mjs';
+import { defaultTripTitle, buildPlaceNames } from './trip-naming.mjs';
 import { recoverDriveSegments } from './route-recovery.mjs';
 import {
   TRIP_SIMPLIFY_TOLERANCE_DEG,
@@ -20,10 +20,6 @@ import {
   PHOTO_TRIP_MAX_DRIVE_KM,
   MIN_STAY_POINT_COUNT_FOR_DOT,
 } from './constants.mjs';
-
-function monthYearLabel(ts) {
-  return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
-}
 
 // A stay "included an overnight" if it's long enough to plausibly involve
 // real sleep and its midpoint falls in the estimated-local-time night window.
@@ -357,6 +353,7 @@ export async function writeOutputs({
   getLabel,
   funFacts,
   sourceRowCount,
+  titleOverrides,
 }) {
   const tripsDir = path.join(outputDir, 'trips');
   await mkdir(tripsDir, { recursive: true });
@@ -426,24 +423,17 @@ export async function writeOutputs({
     return [...new Set(ids)];
   }
 
-  const tripsIndex = trips.map((trip) => {
-    const placeNames = [];
-    for (const stay of trip.stays) {
-      const label = getLabel(stay.lon, stay.lat);
-      if (placeNames[placeNames.length - 1] !== label) placeNames.push(label);
-    }
-    return {
-      id: trip.id,
-      startTs: trip.startTs,
-      endTs: trip.endTs,
-      placeNames,
-      distanceKm: Math.round(trip.totalDistanceKm),
-      bbox: trip.bbox,
-      stayPoints: trip.stays.map((stay) => [Number(stay.lon.toFixed(4)), Number(stay.lat.toFixed(4))]),
-      source: trip.source ?? 'gps',
-      homeCenterIds: tripHomeCenterIds(trip),
-    };
-  });
+  const tripsIndex = trips.map((trip) => ({
+    id: trip.id,
+    startTs: trip.startTs,
+    endTs: trip.endTs,
+    placeNames: buildPlaceNames(trip, getLabel),
+    distanceKm: Math.round(trip.totalDistanceKm),
+    bbox: trip.bbox,
+    stayPoints: trip.stays.map((stay) => [Number(stay.lon.toFixed(4)), Number(stay.lat.toFixed(4))]),
+    source: trip.source ?? 'gps',
+    homeCenterIds: tripHomeCenterIds(trip),
+  }));
 
   await writeFile(path.join(outputDir, 'trips-index.json'), JSON.stringify(tripsIndex), 'utf8');
 
@@ -452,7 +442,9 @@ export async function writeOutputs({
   // precise computed values — e.g. if the algorithm's boundary doesn't quite
   // match memory). Existing entries are preserved across regenerations so
   // hand edits survive re-running the pipeline; only genuinely new trip ids
-  // get a freshly-computed default.
+  // get a freshly-computed default — or, if trip_extract.mjs's review file
+  // has a hand-edited title pending for this id, that instead (see
+  // titleOverrides in generate.mjs).
   const metaPath = path.join(outputDir, 'trips-meta.json');
   let tripsMeta = {};
   try {
@@ -462,9 +454,8 @@ export async function writeOutputs({
   }
   for (const trip of trips) {
     if (tripsMeta[trip.id]) continue;
-    const central = getCentralStay(trip);
     tripsMeta[trip.id] = {
-      title: `${getLabel(central.lon, central.lat)} · ${monthYearLabel(trip.startTs)}`,
+      title: titleOverrides?.get(trip.id) ?? defaultTripTitle(trip, getLabel),
       displayStartTs: trip.startTs,
       displayDurationDays: Math.max(1, Math.round((trip.endTs - trip.startTs) / 86400)),
     };

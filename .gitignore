@@ -17,6 +17,10 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+
+# Pending trip_extract.mjs review state (see scripts/trip_dots/README.md) —
+# working state for hand-editing candidate titles, not build output.
+scripts/trip_dots/new-trip-candidates.json
 *.suo
 *.ntvs*
 *.njsproj

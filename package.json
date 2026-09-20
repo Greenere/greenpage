@@ -6,6 +6,7 @@
   "scripts": {
     "generate:node-index": "node scripts/generate_node_index.mjs",
     "generate:trip-dots": "node scripts/generate_trip_dots.mjs",
+    "trip_extract": "node scripts/trip_dots/extract_new_trips.mjs",
     "predev": "npm run generate:node-index && npm run generate:trip-dots",
     "prebuild": "npm run generate:node-index && npm run generate:trip-dots",
     "dev": "vite",
